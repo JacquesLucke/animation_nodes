@@ -41,9 +41,6 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.object
 
-    def updateProperty(self):
-        self.getValue()
-
     def handleEyedropperButton(self, event):
         if event.ctrl:
             bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",

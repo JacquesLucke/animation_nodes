@@ -51,9 +51,6 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.object, self.useWorldSpace
 
-    def updateProperty(self):
-        self.object
-
     def handleEyedropperButton(self, event):
         if event.ctrl:
             bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",

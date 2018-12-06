@@ -27,9 +27,6 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
         try: return self.object.data.shape_keys.key_blocks[1]
         except: return None
 
-    def updateProperty(self):
-        self.object
-
     def assignActiveObject(self):
         object = bpy.context.active_object
         if object:
