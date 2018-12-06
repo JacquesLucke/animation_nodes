@@ -27,9 +27,8 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             self.invokeFunction(row, node, "createObject", icon = "PLUS")
 
         if self.showHideToggle:
-            object = self.getValue()
-            if object is not None:
-                icon = "RESTRICT_VIEW_ON" if object.hide_viewport else "RESTRICT_VIEW_OFF"
+            if self.object is not None:
+                icon = "RESTRICT_VIEW_ON" if self.object.hide_viewport else "RESTRICT_VIEW_OFF"
                 self.invokeFunction(row, node, "toggleObjectVisibilty", icon = icon,
                     description = "Toggle viewport and render visibility.")
 
