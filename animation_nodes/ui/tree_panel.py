@@ -33,7 +33,7 @@ class TreePanel(bpy.types.Panel):
         row.prop(getExecutionCodeSettings(), "measureExecution", text = "Details", emboss = False)
 
         layout.separator()
-        layout.prop_search(tree, "sceneName", bpy.data, "scenes", icon = "SCENE_DATA", text = "Scene")
+        layout.prop(tree, "globalScene", icon = "SCENE_DATA", text = "Scene")
         layout.prop(tree, "editNodeLabels")
 
 

@@ -44,7 +44,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
     autoExecution: PointerProperty(type = AutoExecutionProperties)
     lastExecutionInfo: PointerProperty(type = LastTreeExecutionInfo)
 
-    sceneName: StringProperty(name = "Scene",
+    globalScene: PointerProperty(type = bpy.types.Scene, name = "Scene",
         description = "The global scene used by this node tree (never none)")
 
     editNodeLabels: BoolProperty(name = "Edit Node Labels", default = False)
@@ -120,10 +120,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     @property
     def scene(self):
-        scene = bpy.data.scenes.get(self.sceneName)
-        if scene is None:
-            scene = bpy.data.scenes[0]
-        return scene
+        return bpy.data.scenes[0] if self.globalScene is None else self.globalScene
 
     @property
     def timeSinceLastAutoExecution(self):
@@ -140,6 +137,4 @@ class AnimationNodeTree(bpy.types.NodeTree):
 @eventHandler("SCENE_UPDATE_POST")
 def updateSelectedScenes(scene):
     for tree in getAnimationNodeTrees():
-        scene = tree.scene
-        if scene.name != tree.sceneName:
-            tree.sceneName = scene.name
+            tree.globalScene = tree.scene
