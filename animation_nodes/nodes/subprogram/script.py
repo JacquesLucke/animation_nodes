@@ -209,8 +209,8 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         return getSubprogramUnitByIdentifier(self.identifier)
 
 
-@eventHandler("SCENE_UPDATE_POST")
-def sceneUpdate(scene):
+@eventHandler("ALWAYS")
+def sceneUpdate():
     for node in getNodesByType("an_ScriptNode"):
         if node.interactiveMode:
             node.interactiveUpdate()

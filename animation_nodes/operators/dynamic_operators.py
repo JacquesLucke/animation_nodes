@@ -16,8 +16,8 @@ def getInvokeFunctionOperator(description):
     return fallbackOperator.bl_idname
 
 
-@eventHandler("SCENE_UPDATE_POST")
-def createMissingOperators(scene):
+@eventHandler("ALWAYS")
+def createMissingOperators():
     while len(missingDescriptions) > 0:
         description = missingDescriptions.pop()
         operator = createOperatorWithDescription(description)

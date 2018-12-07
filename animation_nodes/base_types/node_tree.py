@@ -134,7 +134,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
     def subprogramNetworks(self):
         return getSubprogramNetworksByNodeTree(self)
 
-@eventHandler("SCENE_UPDATE_POST")
-def updateSelectedScenes(scene):
+@eventHandler("ALWAYS")
+def updateSelectedScenes():
     for tree in getAnimationNodeTrees():
             tree.globalScene = tree.scene

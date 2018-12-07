@@ -30,8 +30,8 @@ class EventState:
 event = EventState()
 
 
-@eventHandler("SCENE_UPDATE_POST")
-def sceneUpdated(scene):
+@eventHandler("ALWAYS")
+def sceneUpdated():
     event.sceneChanged = True
     evaluateRaisedEvents()
 

@@ -687,8 +687,8 @@ infoByNode = defaultdict(NonPersistentNodeData)
 # Identifiers
 #####################################################
 
-@eventHandler("SCENE_UPDATE_POST")
-def createMissingIdentifiers(scene = None):
+@eventHandler("ALWAYS")
+def createMissingIdentifiers():
     def unidentifiedNodes():
         for tree in getAnimationNodeTrees():
             for node in tree.nodes:
