@@ -46,4 +46,4 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
         item = self.nodeTree.autoExecution.customTriggers.new("MONITOR_PROPERTY")
         item.idType = "OBJECT"
         item.dataPath = self.attribute
-        item.idObjectName = self.inputs["Object"].objectName
+        item.object = self.inputs["Object"].object
