@@ -21,4 +21,4 @@ class TransformVectorNode(bpy.types.Node, AnimationNode):
         if self.useVectorList:
             return "vectors.transform(matrix)"
         else:
-            return "transformedVector = matrix * vector"
+            return "transformedVector = matrix @ vector"
