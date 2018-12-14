@@ -35,7 +35,7 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
         # Vertex Colors are internally stored with 8 bytes
         # I compress the color already here for an easier comparison
-        newColor = tuple(min(max(int(x * 255) / 255, 0), 1) for x in color[:3])
+        newColor = tuple(min(max(int(x * 255) / 255, 0), 1) for x in color)
 
         colorLayer = getVertexColorLayer(mesh, self.vertexColorName)
         if len(colorLayer.data) == 0: return object
@@ -56,7 +56,7 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
 def getVertexColorLayer(mesh, name):
     try: return mesh.vertex_colors[name]
-    except: return mesh.vertex_colors.new(name)
+    except: return mesh.vertex_colors.new(name = name)
 
 def colorsAreEqual(a, b):
     return abs((a[0] * 100 + a[1] * 10 + a[2])
