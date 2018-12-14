@@ -48,7 +48,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
         source = self.getSourceObject()
         if source is not None:
-            row.prop(source, "hide", text = "")
+            row.prop(source, "hide_viewport", text = "")
 
         layout.prop_search(self, "materialName", bpy.data, "materials", text = "Material", icon = "MATERIAL_DATA")
         layout.prop(self, "originType", text = "Origin")
@@ -85,7 +85,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         source = self.getSourceObject()
         if source is None: return
         if source.data is None: return
-        source.hide = False
+        source.hide_viewport = False
 
         objects = splitTextObject(source)
         originalTexts = [object.data.body for object in objects]
@@ -114,7 +114,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if material:
             setMaterialOnObjects(objects, material)
 
-        source.hide = True
+        source.hide_viewport = True
         source.hide_render = True
 
     def removeExistingObjects(self):
@@ -187,7 +187,7 @@ def copyTextCharacterFormat(source, target):
 
 def setCharacterPosition(charObject, source, sourceSplinePosition, offsetPosition):
     characterOffset = sourceSplinePosition - offsetPosition
-    charObject.matrix_world = source.matrix_world * Matrix.Translation(characterOffset)
+    charObject.matrix_world = source.matrix_world @ Matrix.Translation(characterOffset)
 
 def getSplinePositions(textObject):
     makeObjectActive(textObject)
@@ -198,21 +198,22 @@ def getSplinePositions(textObject):
 
 def makeObjectActive(object):
     bpy.ops.object.select_all(action = "DESELECT")
-    bpy.context.scene.objects.active = object
-    object.select = True
+    bpy.context.view_layer.objects.active = object
+    object.select_set(True)
+    # object.hide_select = True
 
 def onlySelectList(objects):
     bpy.ops.object.select_all(action = "DESELECT")
     if len(objects) == 0:
-        bpy.context.scene.objects.active = None
+        bpy.context.view_layer.objects.active = None
     else:
-        bpy.context.scene.objects.active = objects[0]
+        bpy.context.view_layer.objects.active = objects[0]
     for object in objects:
-        object.select = True
+        object.hide_select = True
 
 def newCurveFromActiveObject():
     bpy.ops.object.convert(target = "CURVE", keep_original = True)
-    return bpy.context.scene.objects.active
+    return bpy.context.view_layer.objects.active
 
 def convertSelectedObjects(type = "MESH"):
     bpy.ops.object.convert(target = type)
@@ -222,7 +223,7 @@ def setOriginType(type = "ORIGIN_GEOMETRY"):
 
 def removeObject(object):
     if object.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")
-    bpy.context.scene.objects.unlink(object)
+    bpy.context.collection.objects.unlink(object)
     objectType = object.type
     data = object.data
     bpy.data.objects.remove(object)
