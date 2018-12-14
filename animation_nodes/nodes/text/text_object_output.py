@@ -114,7 +114,7 @@ class TextObjectOutputNode(bpy.types.Node, AnimationNode):
             self.setErrorMessage("Invalid align type. \n" + str(alignTypes))
 
     def setAlignmentY(self, textObject, align):
-        alignTypes = ("TOP_BASELINE", "TOP", "CENTER", "BOTTOM")
+        alignTypes = ("TOP_BASELINE", "TOP", "CENTER", "BOTTOM", "BOTTOM_BASELINE")
         if align in alignTypes:
             textObject.align_y = align
         else:
