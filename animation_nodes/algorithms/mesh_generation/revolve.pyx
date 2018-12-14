@@ -16,10 +16,10 @@ def vertices(Spline axis not None, Spline profile not None,
     assert nSurfaceSamples >= 3
 
     cdef Vector3DList axisSamples, profileSamples, tangents
-    profileSamples = profile.getSamples(nSplineSamples)
+    profileSamples = profile.getDistributedPoints(nSplineSamples)
     if type == "PARAMETER":
-        axisSamples = axis.getSamples(nSplineSamples)
-        tangents = profile.getTangentSamples(nSplineSamples)
+        axisSamples = axis.getDistributedPoints(nSplineSamples)
+        tangents = profile.getDistributedTangents(nSplineSamples)
     elif type == "PROJECT":
         axisSamples = Vector3DList()
         tangents = Vector3DList()
