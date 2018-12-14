@@ -37,7 +37,7 @@ def vectorsFromValues(DoubleList values):
         output.data[i].z = <float>values.data[i]
     return output
 
-def calculateVectorDistances(int amount,
+def calculateVectorDistancesVirtual(int amount,
                              VirtualVector3DList vectors1,
                              VirtualVector3DList vectors2):
     cdef DoubleList distances = DoubleList(length = amount)
@@ -45,6 +45,15 @@ def calculateVectorDistances(int amount,
 
     for i in range(amount):
         distances.data[i] = distanceVec3(vectors1.get(i), vectors2.get(i))
+
+    return distances
+
+def calculateVectorDistances(Vector3DList vectors1, Vector3DList vectors2):
+    cdef DoubleList distances = DoubleList(length = len(vectors1))
+    cdef Py_ssize_t i
+
+    for i in range(len(vectors1)):
+        distances.data[i] = distanceVec3(vectors1.data + i, vectors2.data + i)
 
     return distances
 

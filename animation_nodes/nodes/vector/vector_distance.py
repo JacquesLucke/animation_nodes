@@ -1,5 +1,5 @@
 import bpy
-from . c_utils import calculateVectorDistances
+from . c_utils import calculateVectorDistancesVirtual
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList
 
@@ -29,4 +29,4 @@ class VectorDistanceNode(bpy.types.Node, AnimationNode):
         vectors1 = VirtualVector3DList.create(a, (0, 0, 0))
         vectors2 = VirtualVector3DList.create(b, (0, 0, 0))
         amount = VirtualVector3DList.getMaxRealLength(vectors1, vectors2)
-        return calculateVectorDistances(amount, vectors1, vectors2)
+        return calculateVectorDistancesVirtual(amount, vectors1, vectors2)
