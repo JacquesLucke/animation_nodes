@@ -23,8 +23,8 @@ class TransformObjectNode(bpy.types.Node, AnimationNode):
         if object is None: return None
         if self.useCenter:
             offset = Matrix.Translation(object.location)
-            transformation = offset * matrix * offset.inverted()
+            transformation = offset @ matrix @ offset.inverted()
         else:
             transformation = matrix
-        object.matrix_world = transformation * object.matrix_world
+        object.matrix_world = transformation @ object.matrix_world
         return object
