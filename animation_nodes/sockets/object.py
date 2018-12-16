@@ -64,8 +64,8 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def toggleObjectVisibilty(self):
         if self.object is None: return
-        object.hide_viewport = not object.hide_viewport
-        object.hide_render = object.hide_viewport
+        self.object.hide_viewport = not self.object.hide_viewport
+        self.object.hide_render = self.object.hide_viewport
 
     @classmethod
     def getDefaultValue(cls):
