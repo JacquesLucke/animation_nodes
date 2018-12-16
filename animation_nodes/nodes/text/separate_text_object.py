@@ -29,7 +29,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     sourceObjectName: StringProperty(name = "Source Object")
     currentID: IntProperty(default = 0)
     objectCount: IntProperty(default = 0)
-    parentLetters: BoolProperty(name = "Parent to Main Container", default = True)
+    addToMainContainer: BoolProperty(name = "Add To Main Container", default = True)
     materialName: StringProperty(name = "Material", default = "")
 
     outputType: EnumProperty(name = "Output Type", default = "MESH",
@@ -60,7 +60,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             icon = "FILE_REFRESH")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "parentLetters")
+        layout.prop(self, "addToMainContainer")
 
         self.invokeFunction(layout, "hideRelationshipLines",
             text = "Hide Relationship Lines",
@@ -97,8 +97,8 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if self.originType != "DEFAULT":
             setOriginType(self.originType)
 
-        if self.parentLetters:
-            parentObjectsToMainController(objects)
+        if self.addToMainContainer:
+            addObjectsToMainContainer(objects)
 
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
             object[idPropertyName] = self.currentID
@@ -200,7 +200,7 @@ def makeObjectActive(object):
     bpy.ops.object.select_all(action = "DESELECT")
     bpy.context.view_layer.objects.active = object
     object.select_set(True)
-    # object.hide_select = True
+    object.hide_select = True
 
 def onlySelectList(objects):
     bpy.ops.object.select_all(action = "DESELECT")
@@ -232,10 +232,10 @@ def removeObject(object):
     elif objectType == "MESH":
         bpy.data.meshes.remove(data)
 
-def parentObjectsToMainController(objects):
-    mainController = getMainObjectContainer(bpy.context.scene)
+def addObjectsToMainContainer(objects):
+    mainContainer = getMainObjectContainer(bpy.context.scene)
     for object in objects:
-        object.parent = mainController
+        mainContainer.objects.link(object)
 
 def setMaterialOnObjects(objects, material):
     for object in objects:

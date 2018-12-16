@@ -66,7 +66,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         description = "Remove the active action on the instance; This is useful when you want to animate the object yourself",
         update = resetInstancesEvent)
 
-    parentInstances: BoolProperty(name = "Parent to Main Container",
+    addToMainContainer: BoolProperty(name = "Add To Main Container",
         default = True, update = resetInstancesEvent)
 
     emptyDisplayType: EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
@@ -92,7 +92,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                 layout.prop(self, "emptyDisplayType", text = "")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "parentInstances")
+        layout.prop(self, "addToMainContainer")
         layout.prop(self, "removeAnimationData")
 
         self.invokeFunction(layout, "resetObjectDataOnAllInstances",
@@ -260,8 +260,11 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def appendNewObject(self, name, sourceObject, scenes):
         object = self.newInstance(name, sourceObject, scenes)
-        for scene in scenes:
-            if scene is not None: scene.collection.objects.link(object)
+        if self.addToMainContainer:
+            for scene in scenes:
+                if scene is not None:
+                    getMainObjectContainer(scene).objects.link(object)
+                    break
         linkedItem = self.linkedObjects.add()
         linkedItem.objectName = object.name
         linkedItem.objectIndex = bpy.data.objects.find(object.name)
@@ -275,11 +278,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         else:
             newObject = self.createObject(name, instanceData)
 
-        if self.parentInstances:
-            for scene in scenes:
-                if scene is not None:
-                    newObject.parent = getMainObjectContainer(scene)
-                    break
         if self.removeAnimationData and newObject.animation_data is not None:
             newObject.animation_data.action = None
         newObject.hide_select = False
@@ -323,7 +321,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             bpy.ops.object.mode_set(mode = "OBJECT")
         for scene in bpy.data.scenes:
             if object.name in scene.objects:
-                scene.collection.objects.unlink(object)
+                getMainObjectContainer(scene).objects.unlink(object)
 
     def resetObjectDataOnAllInstances(self):
         self.resetInstances = True
