@@ -225,8 +225,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             self.removeObject(object)
 
     def removeObject(self, object):
-        self.unlinkInstance(object)
-        if object.users == 0:
+        if object.users < 2:
             data = object.data
             type = object.type
             self.removeShapeKeys(object)
@@ -264,6 +263,11 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             for scene in scenes:
                 if scene is not None:
                     getMainObjectContainer(scene).objects.link(object)
+                    break
+        else:
+            for scene in scenes:
+                if scene is not None:
+                    scene.collection.objects.link(object)
                     break
         linkedItem = self.linkedObjects.add()
         linkedItem.objectName = object.name
@@ -315,13 +319,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         else:
             data.an_data.removeOnZeroUsers = True
             return data
-
-    def unlinkInstance(self, object):
-        if bpy.context.mode != "OBJECT" and bpy.context.active_object == object:
-            bpy.ops.object.mode_set(mode = "OBJECT")
-        for scene in bpy.data.scenes:
-            if object.name in scene.objects:
-                getMainObjectContainer(scene).objects.unlink(object)
 
     def resetObjectDataOnAllInstances(self):
         self.resetInstances = True
