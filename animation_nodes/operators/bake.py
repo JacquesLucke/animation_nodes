@@ -12,7 +12,7 @@ class BakeAnimation(bpy.types.Operator):
 
     def invoke(self, context, event):
         context.window_manager.modal_handler_add(self)
-        self.timer = context.window_manager.event_timer_add(0.001, context.window)
+        self.timer = context.window_manager.event_timer_add(0.001, window = context.window)
 
         getPreferences().executionCode.type = "BAKE"
 
