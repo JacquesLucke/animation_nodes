@@ -121,7 +121,7 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
         if scene is None:
             self.raiseErrorMessage(noSceneMessage)
 
-        mesh = object.an.getMesh(scene, applyModifiers = True)
+        mesh = object.an.getMesh(bpy.context.depsgraph, applyModifiers = True)
         index = vertexGroup.index
         weights = DoubleList(length = len(mesh.vertices))
         weights.fill(0)

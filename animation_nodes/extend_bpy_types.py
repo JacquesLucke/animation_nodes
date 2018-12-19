@@ -92,17 +92,14 @@ class MeshProperties(bpy.types.PropertyGroup):
 class ObjectProperties(bpy.types.PropertyGroup):
     bl_idname = "an_ObjectProperties"
 
-    def getMesh(self, scene, applyModifiers = False):
-        if scene is None: return None
+    def getMesh(self, depsgraph, applyModifiers = False):
+        if depsgraph is None: return None
         object = self.id_data
-
-        from . events import isRendering
-        settings = "RENDER" if isRendering() else "PREVIEW"
 
         if not applyModifiers and object.type == "MESH":
             return object.data
         else:
-            try: return object.to_mesh(scene, applyModifiers, settings)
+            try: return object.to_mesh(depsgraph, applyModifiers)
             except: return None
 
 class IDProperties(bpy.types.PropertyGroup):
