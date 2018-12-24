@@ -188,7 +188,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
             col.label("2. Restart Blender and remove the addon (without enabling it first).")
 
 def getPreferences():
-    return bpy.context.user_preferences.addons[addonName].preferences
+    return bpy.context.preferences.addons[addonName].preferences
 
 def getDeveloperSettings():
     return getPreferences().developer
