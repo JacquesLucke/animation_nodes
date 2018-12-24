@@ -21,7 +21,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         executionCodeChanged()
 
     executionCode: StringProperty(default = "")
-    textBlockName: StringProperty(default = "")
+    textBlock: PointerProperty(type = bpy.types.Text)
 
     debugMode: BoolProperty(name = "Debug Mode", default = True,
         description = "Give error message inside the node", update = scriptExecutionCodeChanged)
@@ -54,7 +54,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         else:
             self.invokeSelector(row, "AREA", "viewTextBlockInArea",
                 icon = "ZOOM_SELECTED")
-        row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
+        row.prop(self, "textBlock", text = "")
         subrow = row.row(align = True)
         subrow.active = self.textBlock is not None
         self.invokeFunction(subrow, "writeToTextBlock", icon = "COPYDOWN",
@@ -150,7 +150,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def duplicate(self, sourceNode):
         self.randomizeNetworkColor()
-        self.textBlockName = ""
+        self.textBlock = None
 
     def getSocketData(self):
         data = SubprogramData()
@@ -165,7 +165,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def createNewTextBlock(self):
         textBlock = bpy.data.texts.new(name = self.subprogramName)
         textBlock.use_tabs_as_spaces = True
-        self.textBlockName = textBlock.name
+        self.textBlock = textBlock
         self.writeToTextBlock()
 
     def viewTextBlockInArea(self, area):
@@ -202,7 +202,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     @property
     def textBlock(self):
-        return bpy.data.texts.get(self.textBlockName)
+        return self.textBlock
 
     @property
     def executionUnit(self):
