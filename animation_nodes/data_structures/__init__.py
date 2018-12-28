@@ -24,8 +24,8 @@ def importDataStructures():
     from . falloffs.falloff_base import Falloff, BaseFalloff, CompoundFalloff
 
     from . sounds.sound import Sound
-    from . sounds.average_sound import AverageSound
-    from . sounds.spectrum_sound import SpectrumSound
+    from . sounds.sound_data import SoundData
+    from . sounds.sound_sequence import SoundSequence
 
     from . action import (
         Action, ActionEvaluator, ActionChannel,
