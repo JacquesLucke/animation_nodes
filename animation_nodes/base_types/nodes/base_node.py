@@ -622,7 +622,7 @@ class SocketPropertyState:
         self = cls()
         self.hide = socket.hide
         self.isUsed = socket.isUsed
-        self.data: socket.getProperty()
+        self.data = socket.getProperty()
         self.allIdentifiers = node.getAllIdentifiersOfSocket(socket)
         return self
 
@@ -635,13 +635,13 @@ class FullNodeState:
 
     def update(self, node):
         for socket in node.inputs:
-            self.inputProperties[(socket.identifier, socket.dataType)]: socket.getProperty()
+            self.inputProperties[(socket.identifier, socket.dataType)] = socket.getProperty()
             linkedSocketIDs = getDirectlyLinkedSocketsIDs(socket)
             for identifier in node.getAllIdentifiersOfSocket(socket):
                 self.inputStates[identifier] = (socket.hide, socket.isUsed, linkedSocketIDs)
 
         for socket in node.outputs:
-            self.outputProperties[(socket.identifier, socket.dataType)]: socket.getProperty()
+            self.outputProperties[(socket.identifier, socket.dataType)] = socket.getProperty()
             linkedSocketIDs = getDirectlyLinkedSocketsIDs(socket)
             for identifier in node.getAllIdentifiersOfSocket(socket):
                 self.outputStates[identifier] = (socket.hide, socket.isUsed, linkedSocketIDs)
