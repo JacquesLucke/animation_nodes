@@ -87,7 +87,11 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if source.data is None: return
         source.hide_viewport = False
 
-        objects = splitTextObject(source)
+        collection = bpy.context.collection
+        if self.addToMainContainer:
+            collection = getMainObjectContainer(bpy.context.scene)
+
+        objects = splitTextObject(source, collection)
         originalTexts = [object.data.body for object in objects]
 
         onlySelectList(objects)
@@ -96,10 +100,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
         if self.originType != "DEFAULT":
             setOriginType(self.originType)
-
-        if self.addToMainContainer:
-            addObjectsToMainContainer(objects)
-            unlinkObjectsFromSceneCollection(objects)
 
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
             object.hide_select = True
@@ -147,7 +147,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         self.createNewNodeID()
 
 @executeInAreaType("VIEW_3D")
-def splitTextObject(sourceObject):
+def splitTextObject(sourceObject, collection):
     enterObjectMode()
 
     objects = []
@@ -161,7 +161,7 @@ def splitTextObject(sourceObject):
             continue
 
         newName = sourceObject.name + " part " + str(index).zfill(3)
-        charObject = newCharacterObject(newName, sourceObject.data, index)
+        charObject = newCharacterObject(newName, sourceObject.data, index, collection)
 
         charSplinePositions = getSplinePositions(charObject)
         setCharacterPosition(charObject, sourceObject, sourceSplinePositions[splineCounter], charSplinePositions[0])
@@ -171,13 +171,13 @@ def splitTextObject(sourceObject):
 
     return objects
 
-def newCharacterObject(name, sourceData, index):
+def newCharacterObject(name, sourceData, index, collection):
     newTextData = sourceData.copy()
     newTextData.body = sourceData.body[index]
     copyTextCharacterFormat(sourceData.body_format[index], newTextData.body_format[0])
 
     characterObject = bpy.data.objects.new(name, newTextData)
-    bpy.context.collection.objects.link(characterObject)
+    collection.objects.link(characterObject)
     return characterObject
 
 def copyTextCharacterFormat(source, target):
@@ -232,15 +232,6 @@ def removeObject(object):
     elif objectType == "MESH":
         bpy.data.meshes.remove(data)
 
-def addObjectsToMainContainer(objects):
-    mainContainer = getMainObjectContainer(bpy.context.scene)
-    for object in objects:
-        mainContainer.objects.link(object)
-
 def setMaterialOnObjects(objects, material):
     for object in objects:
         object.active_material = material
-
-def unlinkObjectsFromSceneCollection(objects):
-    for object in objects:
-        bpy.context.collection.objects.unlink(object)
