@@ -27,7 +27,6 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
 
     smoothingSamples: IntProperty(name = "Smoothing Samples", default = 5)
     window: EnumProperty(name = "Window", default = "HANNING", items = windowItems)
-    minimumChunkExponent: IntProperty(name = "Minimum Chunk Exponent", default = 10)
 
     samplingMethod: EnumProperty(name = "Sampling Method", default = "EXP", items = samplingItems,
         update = AnimationNode.refresh)
@@ -62,7 +61,6 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "smoothingSamples")
         layout.prop(self, "window", text = "")
-        layout.prop(self, "minimumChunkExponent")
 
     def getExecutionFunctionName(self):
         if self.samplingMethod == "EXP": return "executeExponential"
@@ -98,15 +96,16 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
 
     def computeFFT(self, buffer, frame, fps, sampleRate, attack, release):
         FFT = None
-        chunkSize = max(2**ceil(log(sampleRate / fps, 2)), 2**self.minimumChunkExponent)
+        chunkSize = max(sampleRate // fps, 512)
+        chunk = numpy.zeros(2**ceil(log(chunkSize, 2)))
+        window = windowFunctions[self.window](chunkSize)
         for i in range(min(self.smoothingSamples, int(frame)), -1, -1):
-            chunkStart = int((frame - i) * (sampleRate // fps))
-            window = windowFunctions[self.window]
-            chunk = buffer[chunkStart:chunkStart + chunkSize] * window(chunkSize)
-            newFFT = numpy.abs(numpy.fft.rfft(chunk))
+            chunkStart = int((frame - i) * chunkSize)
+            chunk[:chunkSize] = buffer[chunkStart:chunkStart + chunkSize] * window
+            newFFT = numpy.abs(numpy.fft.rfft(chunk)) / chunkSize * 2
             if FFT is None:
                 FFT = newFFT
             else:
-                factor = numpy.array((attack, release))[(newFFT - FFT < 0).astype(int)]
+                factor = numpy.array((attack, release))[(newFFT < FFT).astype(int)]
                 FFT = FFT * factor + newFFT * (1 - factor)
-        return chunkSize // 2, FFT # Nyquist Frequency - 1, FFT
+        return len(FFT) - 1, FFT
