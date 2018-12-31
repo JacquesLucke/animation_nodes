@@ -99,6 +99,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
         if self.addToMainContainer:
             addObjectsToMainContainer(objects)
+            unlinkObjectsFromSceneCollection(objects)
 
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
             object.hide_select = True
@@ -234,9 +235,12 @@ def removeObject(object):
 def addObjectsToMainContainer(objects):
     mainContainer = getMainObjectContainer(bpy.context.scene)
     for object in objects:
-        bpy.context.collection.objects.unlink(object)
         mainContainer.objects.link(object)
 
 def setMaterialOnObjects(objects, material):
     for object in objects:
         object.active_material = material
+
+def unlinkObjectsFromSceneCollection(objects):
+    for object in objects:
+        bpy.context.collection.objects.unlink(object)
