@@ -10,23 +10,13 @@ samplingItems = [
     ("CUSTOM", "Custom", "", "", 1),
     ("SINGLE", "Single", "", "", 2)
 ]
-windowItems = [
-    ("HANNING", "Hanning", "", "", 0),
-    ("HAMMING", "Hamming", "", "", 1),
-    ("BLACKMAN", "Blackman", "", "", 2),
-    ("BARTLETT", "Bartlett", "", "", 3)
-]
-windowFunctions = {
-    "HANNING": numpy.hanning, "HAMMING": numpy.hamming,
-    "BLACKMAN": numpy.blackman, "BARTLETT": numpy.bartlett
-}
 
 class SoundSpectrumNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundSpectrumNode"
     bl_label = "Sound Spectrum"
 
     smoothingSamples: IntProperty(name = "Smoothing Samples", default = 5)
-    window: EnumProperty(name = "Window", default = "HANNING", items = windowItems)
+    beta: FloatProperty(name = "Kaiser Beta", default = 6)
 
     samplingMethod: EnumProperty(name = "Sampling Method", default = "EXP", items = samplingItems,
         update = AnimationNode.refresh)
@@ -60,7 +50,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "smoothingSamples")
-        layout.prop(self, "window", text = "")
+        layout.prop(self, "beta")
 
     def getExecutionFunctionName(self):
         if self.samplingMethod == "EXP": return "executeExponential"
@@ -98,7 +88,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         FFT = None
         chunkSize = max(sampleRate // fps, 512)
         chunk = numpy.zeros(2**ceil(log(chunkSize, 2)))
-        window = windowFunctions[self.window](chunkSize)
+        window = numpy.kaiser(chunkSize, self.beta)
         for i in range(min(self.smoothingSamples, int(frame)), -1, -1):
             chunkStart = int((frame - i) * chunkSize)
             chunk[:chunkSize] = buffer[chunkStart:chunkStart + chunkSize] * window
