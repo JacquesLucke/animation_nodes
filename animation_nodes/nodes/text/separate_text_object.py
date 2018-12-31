@@ -101,6 +101,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             addObjectsToMainContainer(objects)
 
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
+            object.hide_select = True
             object[idPropertyName] = self.currentID
             object[indexPropertyName] = i
             object.id_keys.set("Text", "Initial Text", originalCharacter)
@@ -200,7 +201,6 @@ def makeObjectActive(object):
     bpy.ops.object.select_all(action = "DESELECT")
     bpy.context.view_layer.objects.active = object
     object.select_set(True)
-    object.hide_select = True
 
 def onlySelectList(objects):
     bpy.ops.object.select_all(action = "DESELECT")
@@ -209,7 +209,7 @@ def onlySelectList(objects):
     else:
         bpy.context.view_layer.objects.active = objects[0]
     for object in objects:
-        object.hide_select = True
+        object.select_set(True)
 
 def newCurveFromActiveObject():
     bpy.ops.object.convert(target = "CURVE", keep_original = True)
@@ -223,7 +223,6 @@ def setOriginType(type = "ORIGIN_GEOMETRY"):
 
 def removeObject(object):
     if object.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")
-    bpy.context.collection.objects.unlink(object)
     objectType = object.type
     data = object.data
     bpy.data.objects.remove(object)
@@ -235,6 +234,7 @@ def removeObject(object):
 def addObjectsToMainContainer(objects):
     mainContainer = getMainObjectContainer(bpy.context.scene)
     for object in objects:
+        bpy.context.collection.objects.unlink(object)
         mainContainer.objects.link(object)
 
 def setMaterialOnObjects(objects, material):
