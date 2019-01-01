@@ -29,7 +29,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     sourceObjectName: StringProperty(name = "Source Object")
     currentID: IntProperty(default = 0)
     objectCount: IntProperty(default = 0)
-    addToMainContainer: BoolProperty(name = "Add To Main Container", default = True)
     materialName: StringProperty(name = "Material", default = "")
 
     outputType: EnumProperty(name = "Output Type", default = "MESH",
@@ -59,13 +58,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             description = "Recreate the individual characters from the source object",
             icon = "FILE_REFRESH")
 
-    def drawAdvanced(self, layout):
-        layout.prop(self, "addToMainContainer")
-
-        self.invokeFunction(layout, "hideRelationshipLines",
-            text = "Hide Relationship Lines",
-            icon = "RESTRICT_VIEW_OFF")
-
     def assignActiveObject(self):
         self.sourceObjectName = getattr(bpy.context.active_object, "name", "")
 
@@ -87,11 +79,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if source.data is None: return
         source.hide_viewport = False
 
-        collection = bpy.context.collection
-        if self.addToMainContainer:
-            collection = getMainObjectContainer(bpy.context.scene)
-
-        objects = splitTextObject(source, collection)
+        objects = splitTextObject(source)
         originalTexts = [object.data.body for object in objects]
 
         onlySelectList(objects)
@@ -139,15 +127,11 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if getattr(source, "type", "") == "FONT": return source
         return None
 
-    def hideRelationshipLines(self):
-        for space in iterActiveSpacesByType("VIEW_3D"):
-            space.show_relationship_lines = False
-
     def duplicate(self, sourceNode):
         self.createNewNodeID()
 
 @executeInAreaType("VIEW_3D")
-def splitTextObject(sourceObject, collection):
+def splitTextObject(sourceObject):
     enterObjectMode()
 
     objects = []
@@ -161,7 +145,7 @@ def splitTextObject(sourceObject, collection):
             continue
 
         newName = sourceObject.name + " part " + str(index).zfill(3)
-        charObject = newCharacterObject(newName, sourceObject.data, index, collection)
+        charObject = newCharacterObject(newName, sourceObject.data, index)
 
         charSplinePositions = getSplinePositions(charObject)
         setCharacterPosition(charObject, sourceObject, sourceSplinePositions[splineCounter], charSplinePositions[0])
@@ -171,13 +155,13 @@ def splitTextObject(sourceObject, collection):
 
     return objects
 
-def newCharacterObject(name, sourceData, index, collection):
+def newCharacterObject(name, sourceData, index):
     newTextData = sourceData.copy()
     newTextData.body = sourceData.body[index]
     copyTextCharacterFormat(sourceData.body_format[index], newTextData.body_format[0])
 
     characterObject = bpy.data.objects.new(name, newTextData)
-    collection.objects.link(characterObject)
+    getMainObjectContainer(bpy.context.scene).objects.link(characterObject)
     return characterObject
 
 def copyTextCharacterFormat(source, target):
