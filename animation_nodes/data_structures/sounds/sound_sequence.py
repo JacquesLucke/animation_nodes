@@ -10,7 +10,7 @@ class SoundSequence:
         self.fps = fps
 
     @classmethod
-    def FromSequence(cls, sequence):
+    def fromSequence(cls, sequence):
         for scene in bpy.data.scenes:
             if scene.sequence_editor is not None:
                 for strip in scene.sequence_editor.sequences_all:
@@ -19,5 +19,5 @@ class SoundSequence:
                         break
         factory = sequence.sound.factory
         cls(SoundData(factory.rechannel(1).data().ravel(), factory.specs[0]),
-            sequence.frame_start, sequence.frame_end,
+            sequence.frame_final_start, sequence.frame_final_end,
             sequence.volume, sequenceScene.render.fps)
