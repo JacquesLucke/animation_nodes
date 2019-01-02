@@ -1,4 +1,5 @@
 import numpy
+from math import ceil, log
 from functools import lru_cache
 
 class Sound:
@@ -22,7 +23,6 @@ class Sound:
             chunk = samplesData[i:j] * sequence.volume
 
             relativeStart  = max((sequenceStart - start) / (end - start), 0)
-            relativeEnd  = (sequenceEnd - start) / (end - start)
             i = int(relativeStart * samplesSize)
             j = i + len(chunk)
             if sampleRate == maxSampleRate:
@@ -34,7 +34,7 @@ class Sound:
     def computeSpectrum(self, start, end, beta = 6):
         samples = self.getSamplesInRange(start, end)
         chunk = numpy.zeros(2**ceil(log(len(samples), 2)))
-        chunk[:chunkSize] = samples * self.getCachedKaiser(len(samples), beta)
+        chunk[:len(samples)] = samples * self.getCachedKaiser(len(samples), beta)
         return numpy.abs(numpy.fft.rfft(chunk)) / len(samples) * 2
 
     def computeTimeSmoothedSpectrum(self, start, end, attack, release, smoothingSamples = 5, beta = 6):
@@ -50,4 +50,4 @@ class Sound:
 
     @lru_cache(maxsize = 16)
     def getCachedKaiser(self, length, beta):
-        return numpy.kaiser(chunkSize, beta)
+        return numpy.kaiser(length, beta)
