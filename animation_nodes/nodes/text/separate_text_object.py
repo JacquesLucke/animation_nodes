@@ -29,7 +29,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     sourceObjectName: StringProperty(name = "Source Object")
     currentID: IntProperty(default = 0)
     objectCount: IntProperty(default = 0)
-    addToMainContainer: BoolProperty(name = "Add To Main Container", default = True)
     materialName: StringProperty(name = "Material", default = "")
 
     outputType: EnumProperty(name = "Output Type", default = "MESH",
@@ -58,13 +57,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             text = "Update",
             description = "Recreate the individual characters from the source object",
             icon = "FILE_REFRESH")
-
-    def drawAdvanced(self, layout):
-        layout.prop(self, "addToMainContainer")
-
-        self.invokeFunction(layout, "hideRelationshipLines",
-            text = "Hide Relationship Lines",
-            icon = "RESTRICT_VIEW_OFF")
 
     def assignActiveObject(self):
         self.sourceObjectName = getattr(bpy.context.active_object, "name", "")
@@ -97,10 +89,8 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if self.originType != "DEFAULT":
             setOriginType(self.originType)
 
-        if self.addToMainContainer:
-            addObjectsToMainContainer(objects)
-
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
+            object.hide_select = True
             object[idPropertyName] = self.currentID
             object[indexPropertyName] = i
             object.id_keys.set("Text", "Initial Text", originalCharacter)
@@ -137,10 +127,6 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if getattr(source, "type", "") == "FONT": return source
         return None
 
-    def hideRelationshipLines(self):
-        for space in iterActiveSpacesByType("VIEW_3D"):
-            space.show_relationship_lines = False
-
     def duplicate(self, sourceNode):
         self.createNewNodeID()
 
@@ -175,7 +161,7 @@ def newCharacterObject(name, sourceData, index):
     copyTextCharacterFormat(sourceData.body_format[index], newTextData.body_format[0])
 
     characterObject = bpy.data.objects.new(name, newTextData)
-    bpy.context.collection.objects.link(characterObject)
+    getMainObjectContainer(bpy.context.scene).objects.link(characterObject)
     return characterObject
 
 def copyTextCharacterFormat(source, target):
@@ -200,7 +186,6 @@ def makeObjectActive(object):
     bpy.ops.object.select_all(action = "DESELECT")
     bpy.context.view_layer.objects.active = object
     object.select_set(True)
-    object.hide_select = True
 
 def onlySelectList(objects):
     bpy.ops.object.select_all(action = "DESELECT")
@@ -209,7 +194,7 @@ def onlySelectList(objects):
     else:
         bpy.context.view_layer.objects.active = objects[0]
     for object in objects:
-        object.hide_select = True
+        object.select_set(True)
 
 def newCurveFromActiveObject():
     bpy.ops.object.convert(target = "CURVE", keep_original = True)
@@ -223,7 +208,6 @@ def setOriginType(type = "ORIGIN_GEOMETRY"):
 
 def removeObject(object):
     if object.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")
-    bpy.context.collection.objects.unlink(object)
     objectType = object.type
     data = object.data
     bpy.data.objects.remove(object)
@@ -231,11 +215,6 @@ def removeObject(object):
         bpy.data.curves.remove(data)
     elif objectType == "MESH":
         bpy.data.meshes.remove(data)
-
-def addObjectsToMainContainer(objects):
-    mainContainer = getMainObjectContainer(bpy.context.scene)
-    for object in objects:
-        mainContainer.objects.link(object)
 
 def setMaterialOnObjects(objects, material):
     for object in objects:
