@@ -18,6 +18,6 @@ class SoundSequence:
                         sequenceScene = scene
                         break
         factory = sequence.sound.factory
-        cls(SoundData(factory.rechannel(1).data().ravel(), factory.specs[0]),
+        return cls(SoundData(factory.rechannel(1).data().ravel(), factory.specs[0]),
             sequence.frame_final_start, sequence.frame_final_end,
             sequence.volume, sequenceScene.render.fps)
