@@ -2,10 +2,10 @@ import bpy
 from . sound_data import SoundData
 
 class SoundSequence:
-    def __init__(self, data, startFrame, endFrame, volume, fps):
+    def __init__(self, data, start, end, volume, fps):
         self.data = data
-        self.startFrame = startFrame
-        self.endFrame = endFrame
+        self.start = start
+        self.end = end
         self.volume = volume
         self.fps = fps
 

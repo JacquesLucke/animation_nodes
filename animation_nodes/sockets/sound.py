@@ -31,8 +31,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop(self, "soundSequence", text = text)
-        if self.soundSequence == "NONE":
-            self.invokeSelector(row, "PATH", node, "loadSound", icon = "PLUS")
+        self.invokeSelector(row, "PATH", node, "loadSound", icon = "PLUS")
 
     def getValue(self):
         if self.soundSequence == "NONE": return None

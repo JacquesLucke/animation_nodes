@@ -8,7 +8,7 @@ class Sound:
 
     def getSamplesInRange(self, start, end):
         if end <= start: raise ValueError("Invaild range!")
-        maxSampleRate = max(sequence.soundData.sampleRate for sequence in self.soundSequences)
+        maxSampleRate = max(sequence.data.sampleRate for sequence in self.soundSequences)
         samplesSize = int(maxSampleRate * (end - start))
         samples = numpy.zeros(samplesSize)
 
@@ -17,16 +17,13 @@ class Sound:
             sequenceEnd = sequence.end / sequence.fps
             if sequenceStart > end or sequenceEnd < start: continue
 
-            samplesData, sampleRate = sequence.soundData.samples, sequence.soundData.sampleRate
-            i = int(max(start - sequenceStart, 0) * sampleRate)
-            j = int((end - sequenceStart) * sampleRate)
-            chunk = samplesData[i:j] * sequence.volume
+            i = int(max(start - sequenceStart, 0) * sequence.data.sampleRate)
+            j = int((end - sequenceStart) * sequence.data.sampleRate)
+            chunk = sequence.data.samples[i:j] * sequence.volume
 
-            relativeStart  = max((sequenceStart - start) / (end - start), 0)
-            i = int(relativeStart * samplesSize)
-            j = i + len(chunk)
-            if sampleRate == maxSampleRate:
-                samples[i:j] += chunk
+            i = int(max(sequenceStart - start, 0) / (end - start) * samplesSize)
+            if sequence.data.sampleRate == maxSampleRate:
+                samples[i:i + len(chunk)] += chunk
             else:
                 pass # Variable sample rate, needs interpolation.
         return samples
@@ -48,6 +45,7 @@ class Sound:
                 FFT = FFT * factor + newFFT * (1 - factor)
         return FFT
 
-    @lru_cache(maxsize = 16)
-    def getCachedKaiser(self, length, beta):
-        return numpy.kaiser(length, beta)
+
+@lru_cache(maxsize = 16)
+def getCachedKaiser(length, beta):
+    return numpy.kaiser(length, beta)
