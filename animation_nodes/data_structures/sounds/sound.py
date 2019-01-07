@@ -18,7 +18,7 @@ class Sound:
             if sequenceStart > end or sequenceEnd < start: continue
 
             i = int(max(start - sequenceStart, 0) * sequence.data.sampleRate)
-            j = int((end - sequenceStart) * sequence.data.sampleRate)
+            j = int((end - sequenceStart) * sequence.data.sampleRate) - 1
             chunk = sequence.data.samples[i:j] * sequence.volume
 
             i = int(max(sequenceStart - start, 0) / (end - start) * samplesSize)
@@ -31,13 +31,13 @@ class Sound:
     def computeSpectrum(self, start, end, beta = 6):
         samples = self.getSamplesInRange(start, end)
         chunk = numpy.zeros(2**ceil(log(len(samples), 2)))
-        chunk[:len(samples)] = samples * self.getCachedKaiser(len(samples), beta)
+        chunk[:len(samples)] = samples * getCachedKaiser(len(samples), beta)
         return numpy.abs(numpy.fft.rfft(chunk)) / len(samples) * 2
 
     def computeTimeSmoothedSpectrum(self, start, end, attack, release, smoothingSamples = 5, beta = 6):
         FFT = None
         duration = end - start
-        for i in range(min(smoothingSamples, int(start / duration)), -1, -1):
+        for i in range(min(smoothingSamples, int(start // duration)), -1, -1):
             newFFT = self.computeSpectrum(start - i * duration, end - i * duration, beta = beta)
             if FFT is None: FFT = newFFT
             else:
