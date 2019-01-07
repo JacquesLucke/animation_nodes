@@ -8,13 +8,25 @@ from ... data_structures import DoubleList
 samplingItems = [
     ("EXP", "Exponential", "", "", 0),
     ("CUSTOM", "Custom", "", "", 1),
-    ("SINGLE", "Single", "", "", 2)
+    ("SINGLE", "Single", "", "", 2),
+    ("FULL", "Full", "", "", 3)
 ]
+reductionItems = [
+    ("MEAN", "Mean", "", "", 0),
+    ("MAX", "Max", "", "", 1)
+]
+reductionFunctions = {
+    "MEAN" : numpy.mean,
+    "MAX" : numpy.max
+}
 
 class SoundSpectrumNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundSpectrumNode"
     bl_label = "Sound Spectrum"
+    errorHandlingType = "EXCEPTION"
 
+    reductionFunction: EnumProperty(name = "Reduction Function", default = "MAX",
+        items = reductionItems)
     smoothingSamples: IntProperty(name = "Smoothing Samples", default = 5)
     beta: FloatProperty(name = "Kaiser Beta", default = 6)
 
@@ -22,7 +34,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         update = AnimationNode.refresh)
 
     def create(self):
-        self.newInput("Generic", "Buffer", "buffer")
+        self.newInput("Sound", "Sound", "sound")
         self.newInput("Float", "Frame", "frame")
         self.newInput("Float", "Attack", "attack", value = 0.005, minValue = 0, maxValue = 1)
         self.newInput("Float", "Release", "release", value = 0.6, minValue = 0, maxValue = 1)
@@ -40,7 +52,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
 
         self.newInput("Scene", "Scene", "scene", hide = True)
 
-        if self.samplingMethod in ("EXP", "CUSTOM"):
+        if self.samplingMethod in ("EXP", "CUSTOM", "FULL"):
             self.newOutput("Float List", "Spectrum", "spectrum")
         else:
             self.newOutput("Float", "Spectrum", "spectrum")
@@ -49,6 +61,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "samplingMethod", text = "")
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "reductionFunction", text = "")
         layout.prop(self, "smoothingSamples")
         layout.prop(self, "beta")
 
@@ -56,46 +69,58 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         if self.samplingMethod == "EXP": return "executeExponential"
         elif self.samplingMethod == "CUSTOM": return "executeCustom"
         elif self.samplingMethod == "SINGLE": return "executeSingle"
+        elif self.samplingMethod == "FULL": return "executeFull"
 
-    def executeExponential(self, buffer, frame, attack, release, count, low, high, k, scene):
-        if low >= high: return DoubleList.fromValue(0, length = count)
-        nyquist, FFT = self.computeFFT(buffer, frame, scene.render.fps, 44100, attack, release)
-        bars = DoubleList(count)
+    def executeExponential(self, sound, frame, attack, release, count, low, high, k, scene):
+        if low >= high: self.raiseErrorMessage("Invalid interval!")
+
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            (frame + 1) / scene.render.fps, attack, release, self.smoothingSamples, self.beta)
+        maxFrequency = len(spectrum) - 1
+
         scale = expm1(k) / (high - low)
         pins = [low + expm1(k * i / count) / scale for i in range(count + 1)]
+
+        bars = DoubleList(count)
+        reductionFunction = reductionFunctions[self.reductionFunction]
         for i in range(count):
-            x, y = int(pins[i] * nyquist), int(pins[i + 1] * nyquist)
+            x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
             if x == y: y = x + 1
-            bars[i] = numpy.mean(FFT[x:y])
+            bars[i] = reductionFunction(spectrum[x:y])
         return bars
 
-    def executeSingle(self, buffer, frame, attack, release, low, high, scene):
-        if low >= high: return 0
-        nyquist, FFT = self.computeFFT(buffer, frame, scene.render.fps, 44100, attack, release)
-        return numpy.mean(FFT[int(low * nyquist):int(high * nyquist)])
+    def executeSingle(self, sound, frame, attack, release, low, high, scene):
+        if low >= high: self.raiseErrorMessage("Invalid interval!")
 
-    def executeCustom(self, buffer, frame, attack, release, pins, scene):
-        if len(pins) < 3: return DoubleList.fromValue(0, length = len(pins) - 1)
-        nyquist, FFT = self.computeFFT(buffer, frame, scene.render.fps, 44100, attack, release)
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            (frame + 1) / scene.render.fps, attack, release, self.smoothingSamples, self.beta)
+        maxFrequency = len(spectrum) - 1
+
+        reductionFunction = reductionFunctions[self.reductionFunction]
+        return reductionFunction(spectrum[int(low * maxFrequency):int(high * maxFrequency)])
+
+    def executeCustom(self, sound, frame, attack, release, pins, scene):
+        if not isValidCustomList(pins): self.raiseErrorMessage("Invalid pins list!")
+
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            (frame + 1) / scene.render.fps, attack, release, self.smoothingSamples, self.beta)
+        maxFrequency = len(spectrum) - 1
+
         bars = DoubleList(len(pins) - 1)
+        reductionFunction = reductionFunctions[self.reductionFunction]
         for i in range(len(pins) - 1):
-            x, y = int(pins[i] * nyquist), int(pins[i + 1] * nyquist)
-            if x == y: y = x + 1
-            bars[i] = numpy.mean(FFT[x:y])
+            x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
+            bars[i] = reductionFunction(spectrum[x:y])
         return bars
 
-    def computeFFT(self, buffer, frame, fps, sampleRate, attack, release):
-        FFT = None
-        chunkSize = max(sampleRate // fps, 512)
-        chunk = numpy.zeros(2**ceil(log(chunkSize, 2)))
-        window = numpy.kaiser(chunkSize, self.beta)
-        for i in range(min(self.smoothingSamples, int(frame)), -1, -1):
-            chunkStart = int((frame - i) * chunkSize)
-            chunk[:chunkSize] = buffer[chunkStart:chunkStart + chunkSize] * window
-            newFFT = numpy.abs(numpy.fft.rfft(chunk)) / chunkSize * 2
-            if FFT is None:
-                FFT = newFFT
-            else:
-                factor = numpy.array((attack, release))[(newFFT < FFT).astype(int)]
-                FFT = FFT * factor + newFFT * (1 - factor)
-        return len(FFT) - 1, FFT
+    def executeFull(self, sound, frame, attack, release, scene):
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            (frame + 1) / scene.render.fps, attack, release, self.smoothingSamples, self.beta)
+        return DoubleList.fromNumpyArray(spectrum)
+
+def isValidCustomList(pins):
+    if len(pins) < 3: return False
+    for i in range(len(pins) - 1):
+        if pins[i] < 0 or pins[i] > 1: return False
+        if pins[i] >= pins[i + 1]: return False
+    return pins[-1] >= 0 and pins[-1] <= 1

@@ -30,7 +30,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
-        row.prop(self, "soundSequence", text = text)
+        row.prop(self, "soundSequence", text = "")
         self.invokeSelector(row, "PATH", node, "loadSound", icon = "PLUS")
 
     def getValue(self):
