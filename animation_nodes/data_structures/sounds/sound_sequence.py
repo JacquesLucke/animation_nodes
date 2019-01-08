@@ -1,5 +1,6 @@
 import bpy
 import aud
+from bpy.path import abspath
 from functools import lru_cache
 from . sound_data import SoundData
 
@@ -20,7 +21,7 @@ class SoundSequence:
                         sequenceScene = scene
                         break
         factory = sequence.sound.factory
-        return cls(getCachedSoundData(sequence.sound.filepath),
+        return cls(getCachedSoundData(abspath(sequence.sound.filepath)),
             sequence.frame_final_start, sequence.frame_final_end,
             sequence.volume, sequenceScene.render.fps)
 
