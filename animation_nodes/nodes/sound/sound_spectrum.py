@@ -38,11 +38,12 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Frame", "frame")
         self.newInput("Float", "Attack", "attack", value = 0.005, minValue = 0, maxValue = 1)
         self.newInput("Float", "Release", "release", value = 0.6, minValue = 0, maxValue = 1)
+        self.newInput("Float", "Amplitude", "amplitude", value = 1)
 
         if self.samplingMethod == "EXP":
             self.newInput("Integer", "Count", "count", value = 20, minValue = 1)
-            self.newInput("Float", "Low", "low", value = 0, minValue = 0, maxValue = 1)
-            self.newInput("Float", "High", "high", value = 1, minValue = 0, maxValue = 1)
+            self.newInput("Float", "Low", "low", value = 0, minValue = 0, maxValue = 1, hide = True)
+            self.newInput("Float", "High", "high", value = 1, minValue = 0, maxValue = 1, hide = True)
             self.newInput("Float", "K", "k", value = 5, minValue = 0.00001)
         elif self.samplingMethod == "CUSTOM":
             self.newInput("Float List", "Pins", "pins")
@@ -71,7 +72,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         elif self.samplingMethod == "SINGLE": return "executeSingle"
         elif self.samplingMethod == "FULL": return "executeFull"
 
-    def executeExponential(self, sound, frame, attack, release, count, low, high, k, scene):
+    def executeExponential(self, sound, frame, attack, release, amplitude, count, low, high, k, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
         if count < 1: self.raiseErrorMessage("Invalid count!")
@@ -89,7 +90,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         for i in range(count):
             x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
             if x == y: y = x + 1
-            bars[i] = reductionFunction(spectrum[x:y])
+            bars[i] = reductionFunction(spectrum[x:y]) * 300 * amplitude
         return bars
 
     def executeSingle(self, sound, frame, attack, release, low, high, scene):
@@ -102,7 +103,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         maxFrequency = len(spectrum) - 1
 
         reductionFunction = reductionFunctions[self.reductionFunction]
-        return reductionFunction(spectrum[int(low * maxFrequency):int(high * maxFrequency)])
+        return reductionFunction(spectrum[int(low * maxFrequency):int(high * maxFrequency)]) * 300 * amplitude
 
     def executeCustom(self, sound, frame, attack, release, pins, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
@@ -117,7 +118,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         reductionFunction = reductionFunctions[self.reductionFunction]
         for i in range(len(pins) - 1):
             x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
-            bars[i] = reductionFunction(spectrum[x:y])
+            bars[i] = reductionFunction(spectrum[x:y]) * 300 * amplitude
         return bars
 
     def executeFull(self, sound, frame, attack, release, scene):
@@ -125,7 +126,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         fps = scene.render.fps
         spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
             attack, release, self.smoothingSamples, self.beta)
-        return DoubleList.fromNumpyArray(spectrum)
+        return DoubleList.fromNumpyArray(spectrum) * (300 * amplitude)
 
 def isValidCustomList(pins):
     if len(pins) < 3: return False
