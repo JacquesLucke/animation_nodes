@@ -40,7 +40,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Release", "release", value = 0.6, minValue = 0, maxValue = 1)
 
         if self.samplingMethod == "EXP":
-            self.newInput("Integer", "Count", "count", value = 20, minValue = 2)
+            self.newInput("Integer", "Count", "count", value = 20, minValue = 1)
             self.newInput("Float", "Low", "low", value = 0, minValue = 0, maxValue = 1)
             self.newInput("Float", "High", "high", value = 1, minValue = 0, maxValue = 1)
             self.newInput("Float", "K", "k", value = 5, minValue = 0.00001)
@@ -73,7 +73,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
 
     def executeExponential(self, sound, frame, attack, release, count, low, high, k, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
-        if low >= high: self.raiseErrorMessage("Invalid interval!")
+        if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
+        if count < 1: self.raiseErrorMessage("Invalid count!")
 
         fps = scene.render.fps
         spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
@@ -93,7 +94,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, sound, frame, attack, release, low, high, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
-        if low >= high: self.raiseErrorMessage("Invalid interval!")
+        if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
 
         fps = scene.render.fps
         spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
@@ -132,3 +133,9 @@ def isValidCustomList(pins):
         if pins[i] < 0 or pins[i] > 1: return False
         if pins[i] >= pins[i + 1]: return False
     return pins[-1] >= 0 and pins[-1] <= 1
+
+def isValidRange(low, high):
+    if low >= high: return False
+    if low < 0 or low > 1: return False
+    if high < 0 or high > 1: return False
+    return True
