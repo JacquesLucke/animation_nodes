@@ -15,7 +15,7 @@ def getSoundSequenceItems(self, context):
                 if strip.type == "SOUND":
                     items.append((strip.name, strip.name, "", i))
                     i += 1
-    return items if len(items) != 0 else [("NONE", "No sound sequences.", "", 0)]
+    return items if items else [("NONE", "No sound sequences.", "", 0)]
 
 class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SoundSocket"
@@ -34,7 +34,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.invokeSelector(row, "PATH", node, "loadSound", icon = "PLUS")
 
     def getValue(self):
-        if self.soundSequence == "NONE": return None
+        if self.soundSequence == "NONE": return Sound([])
         for scene in bpy.data.scenes:
             if scene.sequence_editor is not None:
                 sequence = scene.sequence_editor.sequences_all.get(self.soundSequence)
@@ -59,7 +59,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getDefaultValue(cls):
-        return None
+        return Sound([])
 
     @classmethod
     def correctValue(cls, value):

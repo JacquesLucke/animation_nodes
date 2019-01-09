@@ -16,6 +16,7 @@ reductionFunctions = {
 class SoundIntensityNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundIntensityNode"
     bl_label = "Sound Intensity"
+    errorHandlingType = "EXCEPTION"
 
     smoothingSamples: IntProperty(name = "Smoothing Samples", default = 5, min = 0)
     reductionFunction: EnumProperty(name = "Reduction Function", default = "MAX",
@@ -43,11 +44,15 @@ class SoundIntensityNode(bpy.types.Node, AnimationNode):
         else: return "executeSingle"
 
     def executeSingle(self, sound, frame, attack, release, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
+
         fps = scene.render.fps
         return sound.computeTimeSmoothedIntensity(frame / fps, (frame + 1) / fps,
             attack, release, self.smoothingSamples, reductionFunctions[self.reductionFunction])
 
     def executeMultiple(self, sound, frames, attack, release, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
+
         fps = scene.render.fps
         intensities = DoubleList(len(frames))
         for i, frame in enumerate(frames):

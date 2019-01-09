@@ -1,6 +1,6 @@
 import numpy
-from math import ceil, log
 from functools import lru_cache
+from math import ceil, log, isclose
 
 class Sound:
     def __init__(self, soundSequences):
@@ -15,7 +15,8 @@ class Sound:
         for sequence in self.soundSequences:
             sequenceStart = sequence.start / sequence.fps
             sequenceEnd = sequence.end / sequence.fps
-            if sequenceStart > end or sequenceEnd < start: continue
+            if (sequenceStart > end or isclose(sequenceStart, end)
+                or sequenceEnd < start or isclose(sequenceEnd, start)): continue
 
             i = int(max(start - sequenceStart, 0) * sequence.data.sampleRate)
             j = int((end - sequenceStart) * sequence.data.sampleRate) - 1

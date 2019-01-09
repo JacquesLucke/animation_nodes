@@ -72,6 +72,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         elif self.samplingMethod == "FULL": return "executeFull"
 
     def executeExponential(self, sound, frame, attack, release, count, low, high, k, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if low >= high: self.raiseErrorMessage("Invalid interval!")
 
         fps = scene.render.fps
@@ -91,6 +92,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         return bars
 
     def executeSingle(self, sound, frame, attack, release, low, high, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if low >= high: self.raiseErrorMessage("Invalid interval!")
 
         fps = scene.render.fps
@@ -102,6 +104,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         return reductionFunction(spectrum[int(low * maxFrequency):int(high * maxFrequency)])
 
     def executeCustom(self, sound, frame, attack, release, pins, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if not isValidCustomList(pins): self.raiseErrorMessage("Invalid pins list!")
 
         fps = scene.render.fps
@@ -117,6 +120,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         return bars
 
     def executeFull(self, sound, frame, attack, release, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         fps = scene.render.fps
         spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
             attack, release, self.smoothingSamples, self.beta)
