@@ -90,7 +90,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         for i in range(count):
             x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
             if x == y: y = x + 1
-            bars[i] = reductionFunction(spectrum[x:y]) * 300 * amplitude
+            bars[i] = reductionFunction(spectrum[x:y]) * amplitudeFactor * amplitude
         return bars
 
     def executeSingle(self, sound, frame, attack, release, amplitude, low, high, scene):
@@ -103,7 +103,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         maxFrequency = len(spectrum) - 1
 
         reductionFunction = reductionFunctions[self.reductionFunction]
-        return reductionFunction(spectrum[int(low * maxFrequency):int(high * maxFrequency)]) * 300 * amplitude
+        return reductionFunction(spectrum[int(low * maxFrequency):int(high * maxFrequency)]) * amplitudeFactor * amplitude
 
     def executeCustom(self, sound, frame, attack, release, amplitude, pins, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
@@ -118,7 +118,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         reductionFunction = reductionFunctions[self.reductionFunction]
         for i in range(len(pins) - 1):
             x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
-            bars[i] = reductionFunction(spectrum[x:y]) * 300 * amplitude
+            bars[i] = reductionFunction(spectrum[x:y]) * amplitudeFactor * amplitude
         return bars
 
     def executeFull(self, sound, frame, attack, release, amplitude, scene):
@@ -126,7 +126,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         fps = scene.render.fps
         spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
             attack, release, self.smoothingSamples, self.beta)
-        return DoubleList.fromNumpyArray(spectrum) * (300 * amplitude)
+        return DoubleList.fromNumpyArray(spectrum) * (amplitudeFactor * amplitude)
 
 def isValidCustomList(pins):
     if len(pins) < 3: return False
@@ -140,3 +140,6 @@ def isValidRange(low, high):
     if low < 0 or low > 1: return False
     if high < 0 or high > 1: return False
     return True
+
+# An aribitrary value to compansate for the small FFT amplitude.
+amplitudeFactor = 300
