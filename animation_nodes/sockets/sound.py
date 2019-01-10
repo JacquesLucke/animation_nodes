@@ -3,18 +3,17 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. base_types import AnimationNodeSocket
+from .. algorithms.hashing import strToEnumItemID
 from .. data_structures import Sound, SoundSequence
 from .. utils.sequence_editor import getOrCreateSequencer, getEmptyChannel
 
 def getSoundSequenceItems(self, context):
     items = []
-    i = 0
     for scene in bpy.data.scenes:
         if scene.sequence_editor is not None:
             for strip in scene.sequence_editor.sequences_all:
                 if strip.type == "SOUND":
-                    items.append((strip.name, strip.name, "", i))
-                    i += 1
+                    items.append((strip.name, strip.name, "", strToEnumItemID(strip.name)))
     return items if items else [("NONE", "No sound sequences.", "", 0)]
 
 class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -34,12 +33,12 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         self.invokeSelector(row, "PATH", node, "loadSound", icon = "PLUS")
 
     def getValue(self):
-        if self.soundSequence == "NONE": return Sound([])
+        if self.soundSequence == "NONE" or self.soundSequence == "": return Sound([])
         for scene in bpy.data.scenes:
             if scene.sequence_editor is not None:
                 sequence = scene.sequence_editor.sequences_all.get(self.soundSequence)
-                if sequence is not None: break
-        return Sound([SoundSequence.fromSequence(sequence)])
+                if sequence is not None:
+                    return Sound([SoundSequence.fromSequence(sequence)])
 
     def setProperty(self, data):
         self.soundSequence = data
