@@ -46,20 +46,6 @@ class Sound:
                 FFT = FFT * factor + newFFT * (1 - factor)
         return FFT
 
-    def computeIntensity(self, start, end, reductionFunction):
-        return reductionFunction(numpy.abs(self.getSamplesInRange(start, end)))
-
-    def computeTimeSmoothedIntensity(self, start, end, attack, release, smoothingSamples, reductionFunction):
-        intensity = None
-        duration = end - start
-        for i in range(min(smoothingSamples, int(start // duration)), -1, -1):
-            newIntensity = self.computeIntensity(start - i * duration, end - i * duration, reductionFunction)
-            if intensity is None: intensity = newIntensity
-            else:
-                factor = release if newIntensity < intensity else attack
-                intensity = intensity * factor + newIntensity * (1 - factor)
-        return intensity
-
 @lru_cache(maxsize = 16)
 def getCachedKaiser(length, beta):
     return numpy.kaiser(length, beta)

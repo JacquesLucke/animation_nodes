@@ -24,6 +24,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundSpectrumNode"
     bl_label = "Sound Spectrum"
     errorHandlingType = "EXCEPTION"
+    searchTags = [("Sound Intensity", {"samplingMethod" : repr("SINGLE")})]
 
     reductionFunction: EnumProperty(name = "Reduction Function", default = "MAX",
         description = "The function used to sample frequency bins", items = reductionFunctionItems)
