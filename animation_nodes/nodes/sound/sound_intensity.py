@@ -4,9 +4,9 @@ from bpy.props import *
 from ... data_structures import DoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
-reductionItems = [
-    ("MEAN", "Mean", "", "", 0),
-    ("MAX", "Max", "", "", 1)
+reductionFunctionItems = [
+    ("MEAN", "Mean", "Sample the frequency bins by computing the mean of frequency bins", "", 0),
+    ("MAX", "Max", "Sample the frequency bins by computing the maximum of frequency bins", "", 1)
 ]
 reductionFunctions = {
     "MEAN" : numpy.mean,
@@ -18,21 +18,23 @@ class SoundIntensityNode(bpy.types.Node, AnimationNode):
     bl_label = "Sound Intensity"
     errorHandlingType = "EXCEPTION"
 
-    smoothingSamples: IntProperty(name = "Smoothing Samples", default = 5, min = 0)
     reductionFunction: EnumProperty(name = "Reduction Function", default = "MAX",
-        items = reductionItems)
+        description = "The function used to sample frequency bins", items = reductionFunctionItems)
+    smoothingSamples: IntProperty(name = "Smoothing Samples", default = 5, min = 0,
+        description = ("The number of frames computed to smooth the output."
+        " High value corresponds to more accurate results but with higher execution time"))
 
-    useFloatList: VectorizedSocket.newProperty()
+    useFrameList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Sound", "Sound", "sound")
-        self.newInput(VectorizedSocket("Float", "useFloatList",
+        self.newInput(VectorizedSocket("Float", "useFrameList",
             ("Frame", "frame"), ("Frames", "frame")))
         self.newInput("Float", "Attack", "attack", value = 0.005, minValue = 0, maxValue = 1)
         self.newInput("Float", "Release", "release", value = 0.6, minValue = 0, maxValue = 1)
         self.newInput("Scene", "Scene", "scene", hide = True)
 
-        self.newOutput(VectorizedSocket("Float", "useFloatList",
+        self.newOutput(VectorizedSocket("Float", "useFrameList",
             ("Intensity", "intensity"), ("Intensities", "intensities")))
 
     def drawAdvanced(self, layout):
@@ -40,7 +42,7 @@ class SoundIntensityNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "smoothingSamples")
 
     def getExecutionFunctionName(self):
-        if self.useFloatList: return "executeMultiple"
+        if self.useFrameList: return "executeMultiple"
         else: return "executeSingle"
 
     def executeSingle(self, sound, frame, attack, release, scene):
