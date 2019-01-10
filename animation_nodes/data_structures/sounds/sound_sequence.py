@@ -14,12 +14,7 @@ class SoundSequence:
 
     @classmethod
     def fromSequence(cls, sequence):
-        for scene in bpy.data.scenes:
-            if scene.sequence_editor is not None:
-                for strip in scene.sequence_editor.sequences_all:
-                    if strip == sequence:
-                        sequenceScene = scene
-                        break
+        sequenceScene = findSceneWithSequence(sequence)
         factory = sequence.sound.factory
         return cls(getCachedSoundData(abspath(sequence.sound.filepath)),
             sequence.frame_final_start, sequence.frame_final_end,
@@ -29,3 +24,10 @@ class SoundSequence:
 def getCachedSoundData(path):
     sound = aud.Sound.file(path)
     return SoundData(sound.rechannel(1).data().ravel(), sound.specs[0])
+
+def findSceneWithSequence(sequence):
+    for scene in bpy.data.scenes:
+         if scene.sequence_editor is not None:
+            for strip in scene.sequence_editor.sequences_all:
+                if strip == sequence:
+                    return scene
