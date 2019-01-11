@@ -43,7 +43,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Frame", "frame")
         self.newInput("Float", "Attack", "attack", value = 0.005, minValue = 0, maxValue = 1)
         self.newInput("Float", "Release", "release", value = 0.6, minValue = 0, maxValue = 1)
-        self.newInput("Float", "Amplitude", "amplitude", value = 1)
+        self.newInput("Float", "Amplitude", "amplitude", value = 10)
 
         if self.samplingMethod == "EXP":
             self.newInput("Integer", "Count", "count", value = 20, minValue = 1)
@@ -95,7 +95,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         for i in range(count):
             x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
             if x == y: y = x + 1
-            bars[i] = reductionFunction(spectrum[x:y]) * amplitudeFactor * amplitude
+            bars[i] = reductionFunction(spectrum[x:y]) * amplitude
         return bars
 
     def executeSingle(self, sound, frame, attack, release, amplitude, low, high, scene):
@@ -108,7 +108,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         maxFrequency = len(spectrum) - 1
 
         reductionFunction = reductionFunctions[self.reductionFunction]
-        return reductionFunction(spectrum[int(low * maxFrequency):int(high * maxFrequency)]) * amplitudeFactor * amplitude
+        return reductionFunction(spectrum[int(low * maxFrequency):int(high * maxFrequency)]) * amplitude
 
     def executeCustom(self, sound, frame, attack, release, amplitude, pins, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
@@ -123,7 +123,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         reductionFunction = reductionFunctions[self.reductionFunction]
         for i in range(len(pins) - 1):
             x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
-            bars[i] = reductionFunction(spectrum[x:y]) * amplitudeFactor * amplitude
+            bars[i] = reductionFunction(spectrum[x:y]) * amplitude
         return bars
 
     def executeFull(self, sound, frame, attack, release, amplitude, scene):
@@ -131,7 +131,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         fps = scene.render.fps
         spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
             attack, release, self.smoothingSamples, self.kaiserBeta)
-        return DoubleList.fromNumpyArray(spectrum) * (amplitudeFactor * amplitude)
+        return DoubleList.fromNumpyArray(spectrum) * amplitude
 
 def isValidCustomList(pins):
     if len(pins) < 3: return False
@@ -145,6 +145,3 @@ def isValidRange(low, high):
     if low < 0 or low > 1: return False
     if high < 0 or high > 1: return False
     return True
-
-# An aribitrary value to compansate for the small FFT amplitude.
-amplitudeFactor = 300
