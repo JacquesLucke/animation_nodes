@@ -15,10 +15,10 @@ class SoundSequence:
     @classmethod
     def fromSequence(cls, sequence):
         sequenceScene = findSceneWithSequence(sequence)
-        factory = sequence.sound.factory
+        fps = sequenceScene.render.fps
         return cls(getCachedSoundData(abspath(sequence.sound.filepath)),
-            sequence.frame_final_start, sequence.frame_final_end,
-            sequence.volume, sequenceScene.render.fps)
+            sequence.frame_final_start / fps, sequence.frame_final_end / fps,
+            sequence.volume, fps)
 
 @lru_cache(maxsize=32)
 def getCachedSoundData(path):

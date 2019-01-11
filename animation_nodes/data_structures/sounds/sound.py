@@ -13,16 +13,14 @@ class Sound:
         samples = numpy.zeros(samplesSize)
 
         for sequence in self.soundSequences:
-            sequenceStart = sequence.start / sequence.fps
-            sequenceEnd = sequence.end / sequence.fps
-            if (sequenceStart > end or isclose(sequenceStart, end)
-                or sequenceEnd < start or isclose(sequenceEnd, start)): continue
+            if (sequence.start > end or isclose(sequence.start, end)
+                or sequence.end < start or isclose(sequence.end, start)): continue
 
-            i = int(max(start - sequenceStart, 0) * sequence.data.sampleRate)
-            j = int((end - sequenceStart) * sequence.data.sampleRate) - 1
+            i = int(max(start - sequence.start, 0) * sequence.data.sampleRate)
+            j = int((end - sequence.start) * sequence.data.sampleRate) - 1
             chunk = sequence.data.samples[i:j] * sequence.volume
 
-            i = int(max(sequenceStart - start, 0) / (end - start) * samplesSize)
+            i = int(max(sequence.start - start, 0) / (end - start) * samplesSize)
             if sequence.data.sampleRate == maxSampleRate:
                 samples[i:i + len(chunk)] += chunk
             else:
