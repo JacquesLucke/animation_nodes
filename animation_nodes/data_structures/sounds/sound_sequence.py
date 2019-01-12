@@ -23,7 +23,10 @@ class SoundSequence:
 @lru_cache(maxsize=32)
 def getCachedSoundData(path):
     sound = aud.Sound.file(path)
-    return SoundData(sound.rechannel(1).data().ravel(), sound.specs[0])
+    if sound.specs[0] == 44100:
+        return SoundData(sound.rechannel(1).data().ravel(), sound.specs[0])
+    else:
+        return SoundData(sound.rechannel(1).resample(44100).data().ravel(), sound.specs[0])
 
 def findSceneWithSequence(sequence):
     for scene in bpy.data.scenes:

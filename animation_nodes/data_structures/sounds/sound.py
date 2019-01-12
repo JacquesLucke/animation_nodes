@@ -9,22 +9,17 @@ class Sound:
     def getSamplesInRange(self, start, end):
         if end <= start: raise ValueError("Invaild range!")
         maxSampleRate = max(sequence.data.sampleRate for sequence in self.soundSequences)
-        samplesSize = int(maxSampleRate * (end - start))
-        samples = numpy.zeros(samplesSize)
+        start, end = int(start * maxSampleRate), int(end * maxSampleRate)
+        samples = numpy.zeros(end - start + 1)
 
         for sequence in self.soundSequences:
-            if (sequence.start > end or isclose(sequence.start, end)
-                or sequence.end < start or isclose(sequence.end, start)): continue
+            sequenceStart = int(sequence.start * maxSampleRate)
+            sequenceEnd = int(sequence.end * maxSampleRate)
+            if start > sequenceEnd or end < sequenceStart: continue
 
-            i = int(max(start - sequence.start, 0) * sequence.data.sampleRate)
-            j = int((end - sequence.start) * sequence.data.sampleRate) - 1
-            chunk = sequence.data.samples[i:j] * sequence.volume
-
-            i = int(max(sequence.start - start, 0) / (end - start) * samplesSize)
-            if sequence.data.sampleRate == maxSampleRate:
-                samples[i:i + len(chunk)] += chunk
-            else:
-                pass # Variable sample rate, needs interpolation.
+            i, j = max(start, sequenceStart), min(end, sequenceEnd)
+            chunk = sequence.data.samples[i - sequenceStart:j - sequenceStart]
+            samples[i - start:i - start + len(chunk)] += chunk
         return samples
 
     def computeSpectrum(self, start, end, beta = 6):
