@@ -14,7 +14,8 @@ def getSoundSequenceItems(self, context):
             for strip in scene.sequence_editor.sequences_all:
                 if strip.type == "SOUND":
                     items.append((strip.name, strip.name, "", strToEnumItemID(strip.name)))
-    return items if items else [("NONE", "No sound sequences.", "", 0)]
+    items.append(("NONE", "Empty Sound", "", 0))
+    return items
 
 class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SoundSocket"
