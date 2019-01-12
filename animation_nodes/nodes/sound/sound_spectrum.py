@@ -28,12 +28,15 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
 
     reductionFunction: EnumProperty(name = "Reduction Function", default = "MAX",
         description = "The function used to sample frequency bins", items = reductionFunctionItems)
-    smoothingSamples: IntProperty(name = "Smoothing Samples", default = 5, min = 0,
+    smoothingSamples: IntProperty(name = "Smoothing Samples", default = 10, min = 0,
         description = ("The number of frames computed to smooth the output."
         " High value corresponds to more accurate results but with higher execution time"))
     kaiserBeta: FloatProperty(name = "Kaiser Beta", default = 6, min = 0,
         description = ("Beta parameter of the Kaiser window function."
         " High value corresponds to higher main-lobe leaking and lower side-lobe leaking"))
+    minDuration: FloatProperty(name = "Minimum Duration", default = 0.03, min = 0,
+        description = ("The minimum duration of the sound used to compute the spectrum."
+        " High value corresponds to higher spectral resolution but introduce overlapping spectrum"))
 
     samplingMethod: EnumProperty(name = "Sampling Method", default = "EXP",
         items = samplingMethodItems, update = AnimationNode.refresh)
@@ -70,6 +73,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "reductionFunction", text = "")
         layout.prop(self, "smoothingSamples")
         layout.prop(self, "kaiserBeta")
+        layout.prop(self, "minDuration")
 
     def getExecutionFunctionName(self):
         if self.samplingMethod == "EXP": return "executeExponential"
@@ -82,8 +86,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
         if count < 1: self.raiseErrorMessage("Invalid count!")
 
-        fps = scene.render.fps
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
@@ -102,8 +106,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
 
-        fps = scene.render.fps
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
@@ -114,8 +118,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if not isValidCustomList(pins): self.raiseErrorMessage("Invalid pins list!")
 
-        fps = scene.render.fps
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
@@ -128,8 +132,9 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
 
     def executeFull(self, sound, frame, attack, release, amplitude, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
-        fps = scene.render.fps
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / fps, (frame + 1) / fps,
+
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
         return DoubleList.fromNumpyArray(spectrum) * amplitude
 
