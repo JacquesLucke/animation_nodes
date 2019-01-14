@@ -1,6 +1,7 @@
 import numpy
+from math import ceil, log
 from functools import lru_cache
-from math import ceil, log, isclose
+from . sound_sequence import sampleRate
 
 class Sound:
     def __init__(self, soundSequences):
@@ -8,13 +9,12 @@ class Sound:
 
     def getSamplesInRange(self, start, end):
         if end <= start: raise ValueError("Invaild range!")
-        maxSampleRate = max(sequence.data.sampleRate for sequence in self.soundSequences)
-        start, end = int(start * maxSampleRate), int(end * maxSampleRate)
+        start, end = int(start * sampleRate), int(end * sampleRate)
         samples = numpy.zeros(end - start + 1)
 
         for sequence in self.soundSequences:
-            sequenceStart = int(sequence.start * maxSampleRate)
-            sequenceEnd = int(sequence.end * maxSampleRate)
+            sequenceStart = int(sequence.start * sampleRate)
+            sequenceEnd = int(sequence.end * sampleRate)
             if start > sequenceEnd or end < sequenceStart: continue
 
             i, j = max(start, sequenceStart), min(end, sequenceEnd)
