@@ -136,17 +136,16 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
             frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
-        return DoubleList.fromNumpyArray(spectrum) * amplitude
-
-def isValidCustomList(pins):
-    if len(pins) < 3: return False
-    for i in range(len(pins) - 1):
-        if pins[i] < 0 or pins[i] > 1: return False
-        if pins[i] >= pins[i + 1]: return False
-    return pins[-1] >= 0 and pins[-1] <= 1
+        return DoubleList.fromNumpyArray(spectrum * amplitude)
 
 def isValidRange(low, high):
     if low >= high: return False
     if low < 0 or low > 1: return False
     if high < 0 or high > 1: return False
     return True
+
+def isValidCustomList(pins):
+    if len(pins) < 3: return False
+    for i in range(len(pins) - 1):
+        if not isValidRange(pins[i], pins[i + 1]): return False
+    return pins[-1] >= 0 and pins[-1] <= 1
