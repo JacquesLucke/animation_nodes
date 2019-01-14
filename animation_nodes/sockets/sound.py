@@ -1,46 +1,21 @@
+import os
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. tree_info import nodeOfTypeExists
 from .. base_types import AnimationNodeSocket
 from .. algorithms.hashing import strToEnumItemID
-from .. data_structures import AverageSound, SpectrumSound
-from .. utils.nodes import newNodeAtCursor, invokeTranslation
+from .. data_structures import Sound, SoundSequence
+from .. utils.sequence_editor import getOrCreateSequencer, getEmptyChannel
 
-typeFilterItems = [
-    ("ALL", "All", "", "NONE", 0),
-    ("AVERAGE", "Average", "", "NONE", 1),
-    ("SPECTRUM", "Spectrum", "", "NONE", 2)]
-
-def getBakeDataItems(self, context):
+def getSoundSequenceItems(self, context):
     items = []
-    sequences = getattr(self.nodeTree.scene.sequence_editor, "sequences", [])
-    for index, sequence in enumerate(sequences):
-        if sequence.type != "SOUND": continue
-
-        if self.typeFilter in {"ALL", "AVERAGE"}:
-            items.extend(iterAverageItems(index, sequence))
-
-        if self.typeFilter in {"ALL", "SPECTRUM"}:
-            items.extend(iterSpectrumItems(index, sequence))
-
-    items.append(("NONE", "None", "", "NONE", 0))
+    for scene in bpy.data.scenes:
+        if scene.sequence_editor is not None:
+            for strip in scene.sequence_editor.sequences_all:
+                if strip.type == "SOUND":
+                    items.append((strip.name, strip.name, "", strToEnumItemID(strip.name)))
+    items.append(("NONE", "Empty Sound", "", 0))
     return items
-
-def iterAverageItems(sequenceIndex, sequence):
-    for bakeIndex, data in enumerate(sequence.sound.bakedData.average):
-        yield ("AVERAGE_{}_{}".format(sequenceIndex, bakeIndex),
-               "#{} - {} - Average".format(bakeIndex, sequence.name),
-               "Low: {}  High: {}  Attack: {:.3f}  Release: {:.3f}".format(
-                   data.low, data.high, data.attack, data.release),
-               strToEnumItemID(data.identifier))
-
-def iterSpectrumItems(sequenceIndex, sequence):
-    for bakeIndex, data in enumerate(sequence.sound.bakedData.spectrum):
-        yield ("SPECTRUM_{}_{}".format(sequenceIndex, bakeIndex),
-               "#{} - {} - Spectrum".format(bakeIndex, sequence.name),
-               "Attack: {:.3f}  Release: {:.3f}".format(data.attack, data.release),
-               strToEnumItemID(data.identifier))
 
 class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SoundSocket"
@@ -50,48 +25,44 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    bakeData: EnumProperty(name = "Bake Data", items = getBakeDataItems,
+    soundSequence: EnumProperty(name = "Sound Sequence", items = getSoundSequenceItems,
         update = propertyChanged)
-
-    typeFilter: EnumProperty(items = typeFilterItems, default = "ALL")
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
-        row.prop(self, "bakeData", text = text)
-        if self.bakeData == "NONE" and not nodeOfTypeExists("an_BakeSoundNode"):
-            self.invokeFunction(row, node, "createSoundBakeNode", icon = "PLUS",
-                description = "Create sound bake node")
+        row.prop(self, "soundSequence", text = "")
+        self.invokeSelector(row, "PATH", node, "loadSound", icon = "PLUS")
 
     def getValue(self):
-        if self.bakeData == "NONE":
-            return None
-
-        soundType, sequenceIndex, bakeIndex = self.bakeData.split("_")
-        try: sequence = self.nodeTree.scene.sequence_editor.sequences[int(sequenceIndex)]
-        except IndexError:
-            return None
-
-        if soundType == "AVERAGE": return AverageSound.fromSequences([sequence], int(bakeIndex))
-        if soundType == "SPECTRUM": return SpectrumSound.fromSequences([sequence], int(bakeIndex))
-        return None
+        if self.soundSequence == "NONE" or self.soundSequence == "": return Sound([])
+        for scene in bpy.data.scenes:
+            if scene.sequence_editor is not None:
+                sequence = scene.sequence_editor.sequences_all.get(self.soundSequence)
+                if sequence is not None:
+                    return Sound([SoundSequence.fromSequence(sequence)])
 
     def setProperty(self, data):
-        try: self.bakeData = data
-        except: pass
+        self.soundSequence = data
 
     def getProperty(self):
-        return self.bakeData
+        return self.soundSequence
 
-    def createSoundBakeNode(self):
-        newNodeAtCursor("an_BakeSoundNode")
-        invokeTranslation()
+    def loadSound(self, path):
+        editor = getOrCreateSequencer(self.nodeTree.scene)
+        channel = getEmptyChannel(editor)
+        sequence = editor.sequences.new_sound(
+            name = os.path.basename(path),
+            filepath = path,
+            channel = channel,
+            frame_start = bpy.context.scene.frame_start)
+        self.soundSequence = sequence.name
 
     @classmethod
     def getDefaultValue(cls):
-        return None
+        return Sound([])
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, (AverageSound, SpectrumSound)) or value is None:
+        if isinstance(value, Sound) or value is None:
             return value, 0
         return cls.getDefaultValue(), 2

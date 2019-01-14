@@ -541,9 +541,8 @@ class SoundMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_BakeSoundNode", "Bake Sound")
-        insertNode(layout, "an_SoundFromSequencesNode", "Sound from Sequences")
-        insertNode(layout, "an_EvaluateSoundNode", "Evaluate")
+        insertNode(layout, "an_SoundFromSequenceNode", "Sound From Sequence")
+        insertNode(layout, "an_SoundSpectrumNode", "Sound Spectrum")
 
 class SequenceMenu(bpy.types.Menu):
     bl_idname = "an_sequence_menu"
