@@ -18,7 +18,7 @@ class Sound:
             if start > sequenceEnd or end < sequenceStart: continue
 
             i, j = max(start, sequenceStart), min(end, sequenceEnd)
-            chunk = sequence.data.samples[i - sequenceStart:j - sequenceStart]
+            chunk = sequence.data.samples[i - sequenceStart:j - sequenceStart] * sequence.volume
             samples[i - start:i - start + len(chunk)] += chunk
         return samples
 

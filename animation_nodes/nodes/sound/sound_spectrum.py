@@ -56,8 +56,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         elif self.samplingMethod == "CUSTOM":
             self.newInput("Float List", "Pins", "pins")
         elif self.samplingMethod == "SINGLE":
-            self.newInput("Float", "Low", "low", value = 0, minValue = 0, maxValue = 1)
-            self.newInput("Float", "High", "high", value = 0.1, minValue = 0, maxValue = 1)
+            self.newInput("Float", "Low", "lowFrequency", value = 0, minValue = 0, maxValue = 1)
+            self.newInput("Float", "High", "highFrequency", value = 0.1, minValue = 0, maxValue = 1)
 
         self.newInput("Scene", "Scene", "scene", hide = True)
 
@@ -94,13 +94,13 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         scale = expm1(k) / (high - low)
         pins = [low + expm1(k * i / count) / scale for i in range(count + 1)]
 
-        bars = DoubleList(count)
+        bins = DoubleList(count)
         reductionFunction = reductionFunctions[self.reductionFunction]
         for i in range(count):
             x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
             if x == y: y = x + 1
-            bars[i] = reductionFunction(spectrum[x:y]) * amplitude
-        return bars
+            bins[i] = reductionFunction(spectrum[x:y]) * amplitude
+        return bins
 
     def executeSingle(self, sound, frame, attack, release, amplitude, low, high, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
@@ -123,12 +123,12 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
             attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
-        bars = DoubleList(len(pins) - 1)
+        bins = DoubleList(len(pins) - 1)
         reductionFunction = reductionFunctions[self.reductionFunction]
         for i in range(len(pins) - 1):
             x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
-            bars[i] = reductionFunction(spectrum[x:y]) * amplitude
-        return bars
+            bins[i] = reductionFunction(spectrum[x:y]) * amplitude
+        return bins
 
     def executeFull(self, sound, frame, attack, release, amplitude, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
