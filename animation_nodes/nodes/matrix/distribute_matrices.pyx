@@ -154,9 +154,9 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             yDis = size2 / max(yDiv - 1, 1)
             zDis = size3 / max(zDiv - 1, 1)
 
-        xOffset = xDis * (xDiv - 1) / 2 * self.centerAlongX
-        yOffset = yDis * (yDiv - 1) / 2 * self.centerAlongY
-        zOffset = zDis * (zDiv - 1) / 2 * self.centerAlongZ
+        xOffset = xDis * (xDiv - 1) / 2 * int(self.centerAlongX)
+        yOffset = yDis * (yDiv - 1) / 2 * int(self.centerAlongY)
+        zOffset = zDis * (zDiv - 1) / 2 * int(self.centerAlongZ)
 
         for x in range(xDiv):
             for y in range(yDiv):
