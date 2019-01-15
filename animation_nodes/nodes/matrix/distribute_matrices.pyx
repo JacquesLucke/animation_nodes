@@ -4,6 +4,7 @@ from math import pi as _pi
 from libc.math cimport sin, cos
 from ... utils.limits cimport INT_MAX
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
@@ -45,6 +46,13 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     __annotations__["meshMode"] = EnumProperty(name = "Mesh Mode", default = "VERTICES",
         items = meshModeItems, update = AnimationNode.refresh)
 
+    __annotations__["centerAlongX"] = BoolProperty(name = "Center Along X", default = True,
+        description = "Center the grid along the x axis.", update = executionCodeChanged)
+    __annotations__["centerAlongY"] = BoolProperty(name = "Center Along Y", default = True,
+        description = "Center the grid along the y axis.", update = executionCodeChanged)
+    __annotations__["centerAlongZ"] = BoolProperty(name = "Center Along Z", default = False,
+        description = "Center the grid along the z axis.", update = executionCodeChanged)
+
     __annotations__["exactCircleSegment"] = BoolProperty(name = "Exact Circle Segment", default = False)
 
     def create(self):
@@ -82,6 +90,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "End Angle", "endAngel", value = 6 * PI)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
+        self.newOutput("Vector List", "Vectors", "vectors")
 
     def draw(self, layout):
         col = layout.column()
@@ -90,25 +99,39 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             col.prop(self, "distanceMode", text = "")
         if self.mode == "MESH":
             col.prop(self, "meshMode", text = "")
+        if self.mode == "GRID":
+            row = col.row(align = True)
+            row.prop(self, "centerAlongX", text = "X", toggle = True)
+            row.prop(self, "centerAlongY", text = "Y", toggle = True)
+            row.prop(self, "centerAlongZ", text = "Z", toggle = True)
 
     def drawAdvanced(self, layout):
         if self.mode == "CIRCLE":
             layout.prop(self, "exactCircleSegment")
 
-    def getExecutionFunctionName(self):
+    def getExecutionCode(self, required):
         if self.mode == "LINEAR":
-            return "execute_Linear"
+            if self.distanceMode == "STEP":
+                yield "matrices = self.execute_Linear(amount, distance)"
+            else:
+                yield "matrices = self.execute_Linear(amount, size)"
         elif self.mode == "GRID":
-            return "execute_Grid"
+            if self.distanceMode == "STEP":
+                yield "matrices = self.execute_Grid(xDivisions, yDivisions, zDivisions, xDistance, yDistance, zDistance)"
+            else:
+                yield "matrices = self.execute_Grid(xDivisions, yDivisions, zDivisions, width, length, height)"
         elif self.mode == "CIRCLE":
-            return "execute_Circle"
+            yield "matrices = self.execute_Circle(amount, radius, segment)"
         elif self.mode == "MESH":
             if self.meshMode == "VERTICES":
-                return "execute_Vertices"
+                yield "matrices = self.execute_Vertices(mesh)"
             elif self.meshMode == "POLYGONS":
-                return "execute_Polygons"
+                yield "matrices = self.execute_Polygons(mesh)"
         elif self.mode == "SPIRAL":
-            return "execute_Spiral"
+            yield "matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel)"
+
+        if "vectors" in required:
+            yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
 
     def execute_Linear(self, amount, size):
         return self.execute_Grid(amount, 1, 1, size, 0, 0)
@@ -131,16 +154,17 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             yDis = size2 / max(yDiv - 1, 1)
             zDis = size3 / max(zDiv - 1, 1)
 
-        xOffset = xDis * (xDiv - 1) / 2
-        yOffset = yDis * (yDiv - 1) / 2
+        xOffset = xDis * (xDiv - 1) / 2 * self.centerAlongX
+        yOffset = yDis * (yDiv - 1) / 2 * self.centerAlongY
+        zOffset = zDis * (zDiv - 1) / 2 * self.centerAlongZ
 
         for x in range(xDiv):
             for y in range(yDiv):
                 for z in range(zDiv):
-                    index = x * yDiv * zDiv + y * zDiv + z
+                    index = z * xDiv * yDiv + y * xDiv + x
                     vector.x = <float>(x * xDis - xOffset)
                     vector.y = <float>(y * yDis - yOffset)
-                    vector.z = <float>(z * zDis)
+                    vector.z = <float>(z * zDis - zOffset)
                     setTranslationMatrix(matrices.data + index, &vector)
 
         return matrices
