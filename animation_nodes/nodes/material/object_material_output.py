@@ -1,9 +1,9 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SetObjectMaterialsNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SetObjectMaterialsNode"
-    bl_label = "Set Object Materials"
+class ObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectMaterialOutputNode"
+    bl_label = "Object Material Output"
 
     useMaterialList: VectorizedSocket.newProperty()
 
