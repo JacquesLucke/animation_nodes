@@ -33,9 +33,9 @@ class MaterialOutputNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self, required):
         yield "if material is not None:"
         yield "    pass"
-        for i, (socketType, name, attr) in enumerate(attributes):
+        for i, (socketType, name, attr) in enumerate(attributes, 1):
             setFunction = "setAttribute_" + ('Color' if socketType == 'Color' else 'Numeric')
-            if self.inputs[i + 1].isUsed: yield f"    self.{setFunction}(material, '{attr}', {attr})"
+            if self.inputs[i].isUsed: yield f"    self.{setFunction}(material, '{attr}', {attr})"
 
     def setAttribute_Color(self, material, attribute, color):
         newColor = color[:3]
