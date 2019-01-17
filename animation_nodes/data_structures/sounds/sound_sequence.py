@@ -1,5 +1,6 @@
 import bpy
 import aud
+from os import path
 from bpy.path import abspath
 from functools import lru_cache
 from . sound_data import SoundData
@@ -17,6 +18,7 @@ class SoundSequence:
 
     @classmethod
     def fromSequence(cls, sequence):
+        if not path.exists(abspath(sequence.sound.filepath)): return None
         sequenceScene = findSceneWithSequence(sequence)
         fps = sequenceScene.render.fps
         return cls(getCachedSoundData(abspath(sequence.sound.filepath)),

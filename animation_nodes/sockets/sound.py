@@ -39,10 +39,12 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             if scene.sequence_editor is not None:
                 sequence = scene.sequence_editor.sequences_all.get(self.soundSequence)
                 if sequence is not None:
-                    return Sound([SoundSequence.fromSequence(sequence)])
+                    soundSequence = SoundSequence.fromSequence(sequence)
+                    return Sound([soundSequence]) if soundSequence is not None else Sound([])
 
     def setProperty(self, data):
-        self.soundSequence = data
+        try: self.soundSequence = data
+        except: pass
 
     def getProperty(self):
         return self.soundSequence
