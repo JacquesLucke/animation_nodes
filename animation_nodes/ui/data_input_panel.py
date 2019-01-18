@@ -11,12 +11,9 @@ class DataInputPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        nodes = getNodesByType("an_DataInputNode")
-        amount = 0
+        nodes = getNodesByType("an_ViewportInputNode")
         for node in nodes:
-            if not node.showInViewport: continue
-            socket = node.inputs[0]
-            socket.drawSocket(layout, text = node.label, node = node, drawType = "TEXT_PROPERTY_OR_NONE")
-            amount += 1
-        if amount == 0:
-            writeText(layout, "Enable 'Show in Viewport' in the advanced settings of a Data Input node", icon = "INFO")
+            box = layout.box()
+            box.label(text = node.name + ":")
+            for socket in node.outputs[:-1]:
+                socket.drawSocket(box, text = socket.text, node = node, drawType = "TEXT_PROPERTY_OR_NONE")
