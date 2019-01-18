@@ -1,7 +1,6 @@
+import os
 import bpy
 import aud
-from os import path
-from bpy.path import abspath
 from functools import lru_cache
 from . sound_data import SoundData
 
@@ -18,16 +17,28 @@ class SoundSequence:
 
     @classmethod
     def fromSequence(cls, sequence):
-        if not path.exists(abspath(sequence.sound.filepath)): return None
+        if sequence.type != "SOUND": raise ValueError("Not a sound sequence!")
+        if sequence.sound.packed_file is None:
+            path = bpy.path.abspath(sequence.sound.filepath)
+            if not os.path.exists(path): return None
+            soundData = getCachedSoundDataFromPath(path)
+        else:
+            soundData = getCachedSoundDataFromSound(sequence.sound)
+
         sequenceScene = findSceneWithSequence(sequence)
         fps = sequenceScene.render.fps
-        return cls(getCachedSoundData(abspath(sequence.sound.filepath)),
-            sequence.frame_final_start / fps, sequence.frame_final_end / fps,
+        return cls(soundData, sequence.frame_final_start / fps, sequence.frame_final_end / fps,
             sequence.volume, fps)
 
-@lru_cache(maxsize=32)
-def getCachedSoundData(path):
-    sound = aud.Sound.file(path)
+@lru_cache(maxsize=16)
+def getCachedSoundDataFromPath(path):
+    return getSoundData(aud.Sound.file(path))
+
+@lru_cache(maxsize=16)
+def getCachedSoundDataFromSound(sound):
+    return getSoundData(sound.factory)
+
+def getSoundData(sound):
     if sound.specs[0] == sampleRate:
         return SoundData(sound.rechannel(1).data().ravel(), sampleRate)
     else:
