@@ -7,7 +7,10 @@ class ViewportInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ViewportInputNode"
     bl_label = "Viewport Input"
 
+    hidden: BoolProperty(default = False)
+
     def setup(self):
+        self.label = "Viewport Input"
         self.newOutput("Node Control", "New Output", margin = 0.15)
 
     def drawControlSocket(self, layout, socket):
@@ -15,7 +18,8 @@ class ViewportInputNode(bpy.types.Node, AnimationNode):
             description = "Create a new output socket", icon = "ADD", emboss = False)
 
     def getExecutionCode(self, required):
-        return []
+        for i, output in enumerate(self.outputs[:-1]):
+            yield f"{output.identifier} = self.outputs[{i}].getValue()"
 
     def edit(self):
         for target in self.outputs[-1].dataTargets:
