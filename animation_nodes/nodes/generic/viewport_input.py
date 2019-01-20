@@ -15,7 +15,8 @@ class ViewportInputNode(bpy.types.Node, AnimationNode):
 
     def drawControlSocket(self, layout, socket):
         self.invokeSelector(layout, "DATA_TYPE", "newOutputSocket", text = "New Output",
-            description = "Create a new output socket", icon = "ADD", emboss = False)
+            description = "Create a new output socket", icon = "ADD", emboss = False,
+            dataTypes = "DRAWABLE")
 
     def getExecutionCode(self, required):
         for i, output in enumerate(self.outputs[:-1]):
