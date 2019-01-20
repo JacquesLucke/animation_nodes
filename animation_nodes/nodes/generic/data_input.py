@@ -16,9 +16,6 @@ class DataInputNode(bpy.types.Node, AnimationNode):
 
     assignedType: StringProperty(default = "Float", update = AnimationNode.refresh)
 
-    showInViewport: BoolProperty(default = False, name = "Show in Viewport",
-        description = "Draw the input of that node in the 'AN' category of the 3D view (Use the node label as name)")
-
     def create(self):
         socket = self.newInput(self.assignedType, "Input", "value",
             dataIsModified = True, hide = True)
@@ -45,10 +42,6 @@ class DataInputNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         self.invokeSelector(layout, "DATA_TYPE", "assignSocketType",
             text = "Change Type", icon = "TRIA_RIGHT")
-
-        col = layout.column()
-        col.active = self.inputs[0].hasProperty()
-        col.prop(self, "showInViewport")
 
     def getExecutionCode(self, required):
         # needs no execution, because no value is changed

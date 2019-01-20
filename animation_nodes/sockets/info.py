@@ -24,6 +24,7 @@ class SocketInfo:
 
         self.baseDataTypes = set()
         self.listDataTypes = set()
+        self.drawableDataTypes = set()
 
         self.copyFunctionByType = dict()
 
@@ -70,6 +71,9 @@ class SocketInfo:
 
         self.copyFunctionByType[idName] = copyFunction
         self.copyFunctionByType[dataType] = copyFunction
+
+        if socketClass.hasProperty():
+            self.drawableDataTypes.add(socketClass.dataType)
 
     def insertSocketConnection(self, baseDataType, listDataType):
         baseIdName = self.typeConversion[baseDataType]
@@ -185,6 +189,9 @@ def getListDataTypeItems():
 def getBaseDataTypeItems():
     return enumItemsFromList(getBaseDataTypes())
 
+def getDrawableDataTypeItems():
+    return enumItemsFromList(getDrawableDataTypes())
+
 def getDataTypeItems(skipInternalTypes = False):
     return enumItemsFromList(getDataTypes(skipInternalTypes))
 
@@ -193,6 +200,9 @@ def getListDataTypes():
 
 def getBaseDataTypes():
     return list(_socketInfo.baseDataTypes)
+
+def getDrawableDataTypes():
+    return list(_socketInfo.drawableDataTypes)
 
 def getDataTypes(skipInternalTypes = False):
     internalTypes = {"Node Control"}

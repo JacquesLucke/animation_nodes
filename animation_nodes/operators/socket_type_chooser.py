@@ -1,11 +1,12 @@
 import bpy
 from bpy.props import *
 from .. tree_info import getNodeByIdentifier
-from .. sockets.info import getDataTypeItems, getListDataTypeItems
+from .. sockets.info import getDataTypeItems, getListDataTypeItems, getDrawableDataTypeItems
 
 socketGroupItems = [
     ("ALL", "All", ""),
-    ("LIST", "List", "") ]
+    ("LIST", "List", ""),
+    ("DRAWABLE", "Drawable", ""),]
 
 class ChooseSocketType(bpy.types.Operator):
     bl_idname = "an.choose_socket_type"
@@ -17,6 +18,8 @@ class ChooseSocketType(bpy.types.Operator):
             return getDataTypeItems(skipInternalTypes = True)
         if self.socketGroup == "LIST":
             return getListDataTypeItems()
+        if self.socketGroup == "DRAWABLE":
+            return getDrawableDataTypeItems()
 
     selectedDataType: EnumProperty(items = getItems)
     socketGroup: EnumProperty(items = socketGroupItems)
