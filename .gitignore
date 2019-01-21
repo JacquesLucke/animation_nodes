@@ -13,6 +13,7 @@
 *.a
 *.o
 .vscode
+.idea
 build/
 conf.json
 animation_nodes/compilation_info.json
