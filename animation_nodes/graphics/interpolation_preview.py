@@ -1,10 +1,15 @@
+import bpy
 import gpu
 import numpy
 from bgl import *
 from . rectangle import Rectangle
 from gpu_extras.batch import batch_for_shader
 
-shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+# Can't use OpenGl functions when running in background mode.
+if not bpy.app.background:
+    shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+else:
+    shader = None
 
 class InterpolationPreview:
     def __init__(self, interpolation, position, width, resolution):
@@ -43,13 +48,15 @@ class InterpolationPreview:
     def draw(self, backgroundColor = (0.9, 0.9, 0.9, 0.6),
                    borderColor = (0.9, 0.76, 0.4, 1.0),
                    borderThickness = -1):
-        self.boundary.draw(
-            color = backgroundColor,
-            borderColor = borderColor,
-            borderThickness = borderThickness
-        )
-        self.drawInterpolationCurve()
-        self.drawRangeLines()
+        # Can't use OpenGl functions when running in background mode.
+        if not bpy.app.background:
+            self.boundary.draw(
+                color = backgroundColor,
+                borderColor = borderColor,
+                borderThickness = borderThickness
+            )
+            self.drawInterpolationCurve()
+            self.drawRangeLines()
 
     def drawInterpolationCurve(self):
         left, right = self.interpolationLeft, self.interpolationRight

@@ -1,9 +1,14 @@
+import bpy
 import gpu
 from bgl import *
 from mathutils import Vector
 from gpu_extras.batch import batch_for_shader
 
-shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+# Can't use OpenGl functions when running in background mode.
+if not bpy.app.background:
+    shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+else:
+    shader = None
 
 class Rectangle:
     def __init__(self, x1 = 0, y1 = 0, x2 = 0, y2 = 0):
@@ -65,38 +70,40 @@ class Rectangle:
         return self.left <= point[0] <= self.right and self.bottom <= point[1] <= self.top
 
     def draw(self, color = (0.8, 0.8, 0.8, 1.0), borderColor = (0.1, 0.1, 0.1, 1.0), borderThickness = 0):
-        locations = (
-            (self.x1, self.y1),
-            (self.x2, self.y1),
-            (self.x1, self.y2),
-            (self.x2, self.y2))
-        batch = batch_for_shader(shader, 'TRI_STRIP', {"pos": locations})
+        # Can't use OpenGl functions when running in background mode.
+        if not bpy.app.background:
+            locations = (
+                (self.x1, self.y1),
+                (self.x2, self.y1),
+                (self.x1, self.y2),
+                (self.x2, self.y2))
+            batch = batch_for_shader(shader, 'TRI_STRIP', {"pos": locations})
 
-        shader.bind()
-        shader.uniform_float("color", color)
+            shader.bind()
+            shader.uniform_float("color", color)
 
-        glEnable(GL_BLEND)
-        batch.draw(shader)
-        glDisable(GL_BLEND)
+            glEnable(GL_BLEND)
+            batch.draw(shader)
+            glDisable(GL_BLEND)
 
-        if borderThickness == 0: return
+            if borderThickness == 0: return
 
-        offset = borderThickness // 2
-        bWidth = offset * 2 if borderThickness > 0 else 0
-        borderLocations = (
-            (self.x1 - bWidth, self.y1 + offset), (self.x2 + bWidth, self.y1 + offset),
-            (self.x2 + offset, self.y1 + bWidth), (self.x2 + offset, self.y2 - bWidth),
-            (self.x2 + bWidth, self.y2 - offset), (self.x1 - bWidth, self.y2 - offset),
-            (self.x1 - offset, self.y2 - bWidth), (self.x1 - offset, self.y1 + bWidth))
-        batch = batch_for_shader(shader, 'LINES',{"pos": borderLocations})
+            offset = borderThickness // 2
+            bWidth = offset * 2 if borderThickness > 0 else 0
+            borderLocations = (
+                (self.x1 - bWidth, self.y1 + offset), (self.x2 + bWidth, self.y1 + offset),
+                (self.x2 + offset, self.y1 + bWidth), (self.x2 + offset, self.y2 - bWidth),
+                (self.x2 + bWidth, self.y2 - offset), (self.x1 - bWidth, self.y2 - offset),
+                (self.x1 - offset, self.y2 - bWidth), (self.x1 - offset, self.y1 + bWidth))
+            batch = batch_for_shader(shader, 'LINES',{"pos": borderLocations})
 
-        shader.bind()
-        shader.uniform_float("color", borderColor)
+            shader.bind()
+            shader.uniform_float("color", borderColor)
 
-        glEnable(GL_BLEND)
-        glLineWidth(abs(borderThickness))
-        batch.draw(shader)
-        glDisable(GL_BLEND)
+            glEnable(GL_BLEND)
+            glLineWidth(abs(borderThickness))
+            batch.draw(shader)
+            glDisable(GL_BLEND)
 
     def __repr__(self):
         return "({}, {}) - ({}, {})".format(self.x1, self.y1, self.x2, self.y2)

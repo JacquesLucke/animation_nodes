@@ -15,8 +15,14 @@ from gpu_extras.batch import batch_for_shader
 from ... graphics.import_shader import getShader
 from ... graphics.c_utils import getMatricesVBOandIBO
 
-vectorsShader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-matricesShader = getShader(os.path.join(os.path.dirname(__file__), "matrix_shader.glsl"))
+# Can't use OpenGl functions when running in background mode.
+if not bpy.app.background:
+    vectorsShader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+    matricesShader = getShader(os.path.join(os.path.dirname(__file__), "matrix_shader.glsl"))
+else:
+    vectorsShader = None
+    matricesShader = None
+
 
 dataByIdentifier = {}
 
@@ -82,29 +88,33 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
             dataByIdentifier[self.identifier] = DrawData(Matrix4x4List.fromValues([data]), self.drawMatrices)
 
     def drawVectors(self, vectors):
-        shader = vectorsShader
-        batch = batch_for_shader(shader, 'POINTS', {"pos": vectors.asNumpyArray().reshape(-1, 3)})
+        # Can't use OpenGl functions when running in background mode.
+        if not bpy.app.background:
+            shader = vectorsShader
+            batch = batch_for_shader(shader, 'POINTS', {"pos": vectors.asNumpyArray().reshape(-1, 3)})
 
-        shader.bind()
-        shader.uniform_float("color", (*self.drawColor, 1))
+            shader.bind()
+            shader.uniform_float("color", (*self.drawColor, 1))
 
-        glPointSize(self.width)
-        batch.draw(shader)
+            glPointSize(self.width)
+            batch.draw(shader)
 
     def drawMatrices(self, matrices):
-        shader = matricesShader
-        vbo, ibo = getMatricesVBOandIBO(matrices, self.matrixScale)
-        batch = batch_for_shader(shader, 'LINES',
-            {"pos": vbo.asNumpyArray().reshape(-1, 3)},
-            indices = ibo.asNumpyArray().reshape(-1, 2))
+        # Can't use OpenGl functions when running in background mode.
+        if not bpy.app.background:
+            shader = matricesShader
+            vbo, ibo = getMatricesVBOandIBO(matrices, self.matrixScale)
+            batch = batch_for_shader(shader, 'LINES',
+                {"pos": vbo.asNumpyArray().reshape(-1, 3)},
+                indices = ibo.asNumpyArray().reshape(-1, 2))
 
-        shader.bind()
-        viewMatrix = bpy.context.region_data.perspective_matrix
-        shader.uniform_float("u_ViewProjectionMatrix", viewMatrix)
-        shader.uniform_int("u_Count", len(matrices))
+            shader.bind()
+            viewMatrix = bpy.context.region_data.perspective_matrix
+            shader.uniform_float("u_ViewProjectionMatrix", viewMatrix)
+            shader.uniform_int("u_Count", len(matrices))
 
-        glLineWidth(self.width)
-        batch.draw(shader)
+            glLineWidth(self.width)
+            batch.draw(shader)
 
     def delete(self):
         self.freeDrawingData()
