@@ -23,7 +23,7 @@ class SelectArea(bpy.types.Operator):
         self.drawHandlers = []
         for area in iterAreas():
             space = area.spaces.active
-            regionTypes = set(region.type for region in area.regions)
+            regionTypes = set(region.type for region in area.regions if region.type != "")
             for regionType in regionTypes:
                 handler = space.draw_handler_add(self.drawCallback, tuple(), regionType, "POST_PIXEL")
                 self.drawHandlers.append((space, handler, regionType))
