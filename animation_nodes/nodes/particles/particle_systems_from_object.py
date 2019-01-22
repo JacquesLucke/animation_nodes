@@ -13,7 +13,6 @@ class ParticleSystemsInputNode(bpy.types.Node, AnimationNode):
 
     def execute(self, object):
         if not object: return None, []
-        evaluatedObject = bpy.context.depsgraph.objects.get(object.name, None)
-        particleSystems = evaluatedObject.particle_systems
+        particleSystems = object.particle_systems
         active = particleSystems.active
         return active, list(particleSystems)
