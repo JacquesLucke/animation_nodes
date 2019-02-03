@@ -49,7 +49,6 @@ class CompareNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         type = self.compareType
-        print(self.assignedType)
         if "List" in self.assignedType and self.elementwise:
             if self.assignedType == "Integer List":
                 if type == "A = B": return "result = AN.nodes.boolean.compare_c_utils.equal_LongList(a, b)"
