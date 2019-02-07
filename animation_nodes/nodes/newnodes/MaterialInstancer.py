@@ -24,6 +24,8 @@ class MaterialInstancerNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Prefix For Instance Materials", "i_mat")
         self.newInput("Integer", "Amount", "nmat")
 
+        self.newOutput("Material List", "Instanced Materials", "matlist")
+
     def draw(self, layout):
         layout.prop(self, "i_mat_bool")
         layout.prop(self, "rm_mat_bool")
@@ -66,3 +68,11 @@ class MaterialInstancerNode(bpy.types.Node, AnimationNode):
                 if imat not in bpy.data.materials:
                     mat = bpy.data.materials[b_mat].copy()
                     mat.name = imat
+        
+        matlist = []
+        for imat in bpy.data.materials:
+            name = imat.name
+            if name.startswith(i_mat):
+                matlist.append(imat)
+        return matlist        
+        

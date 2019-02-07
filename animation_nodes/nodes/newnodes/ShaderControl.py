@@ -9,9 +9,9 @@ noShdMessage = "Material does not has this Shader Node Name"
 noProMessage = "Shader does not has this Property Name"
 noValEListMessage = "Empty Value list"
 
-class ShaderNodeControler(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ShaderNodeControler"
-    bl_label = "Shader Node Controler"
+class ShaderNodeController(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ShaderNodeController"
+    bl_label = "Shader Node Controller"
     bl_width_default = 180
 
     errorMessage: StringProperty()
@@ -24,7 +24,7 @@ class ShaderNodeControler(bpy.types.Node, AnimationNode):
             layout.label(text = self.message1, icon="INFO")
 
     def create(self):
-        self.newInput("Generic List", "Materials", "mat")
+        self.newInput("Material List", "Materials", "mat")
         self.newInput("Text", "Shader Node Name", "shd")
         self.newInput("Text", "Shader Property Name", "shd_pro_nam")
         self.newInput("Generic List", "Values", "val")
@@ -70,8 +70,7 @@ class ShaderNodeControler(bpy.types.Node, AnimationNode):
             return
         
         #Shader property controler
-        
-        #Each material's shader has its own value
+        #Each material's shader node has its own value
         if len(val) >= 1 and len(val) == len(mat):
             i = 0
             for mati in mat:
