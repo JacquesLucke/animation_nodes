@@ -9,16 +9,14 @@ noInstMatMessage = "No Prefix Name"
 
 class MaterialInstancerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MaterialInstancerNode"
-    bl_label = "Material Instancer"
+    bl_label = "Material Instance"
 
-    errorMessage = StringProperty()
-    myLabel = StringProperty()
+    errorMessage: StringProperty()
+    useList: VectorizedSocket.newProperty()
 
-    useList = VectorizedSocket.newProperty()
-
-    i_mat_bool = BoolProperty(name="Instance Material",
+    i_mat_bool: BoolProperty(name="Instance Material",
                               default=False, update=propertyChanged)
-    rm_mat_bool = BoolProperty(
+    rm_mat_bool: BoolProperty(
         name="Remove Materials", default=False, update=propertyChanged)
 
     def create(self):
@@ -30,7 +28,7 @@ class MaterialInstancerNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "i_mat_bool")
         layout.prop(self, "rm_mat_bool")
         if self.errorMessage != "":
-            layout.label(self.errorMessage, icon="ERROR")
+            layout.label(text = self.errorMessage, icon="ERROR")
 
     def execute(self, b_mat, i_mat, nmat):
         self.errorMessage = ""
