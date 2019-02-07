@@ -14,15 +14,14 @@ class ShaderNodeControler(bpy.types.Node, AnimationNode):
     bl_label = "Shader Node Controler"
     bl_width_default = 180
 
-    errorMessage = StringProperty()
-    message1 = StringProperty()
-    myLabel = StringProperty()
+    errorMessage: StringProperty()
+    message1: StringProperty()
 
     def draw(self, layout):
         if self.errorMessage != "":
-            layout.label(self.errorMessage, icon="ERROR")
+            layout.label(text = self.errorMessage, icon="ERROR")
         if (self.message1 != ""):
-            layout.label(self.message1, icon="INFO")
+            layout.label(text = self.message1, icon="INFO")
 
     def create(self):
         self.newInput("Generic List", "Materials", "mat")
@@ -71,13 +70,16 @@ class ShaderNodeControler(bpy.types.Node, AnimationNode):
             return
         
         #Shader property controler
-        if len(val) > 1 and len(val) == len(mat):
+        
+        #Each material's shader has its own value
+        if len(val) >= 1 and len(val) == len(mat):
             i = 0
             for mati in mat:
                 if mati is not None:
                     vali = val[i]
                     bpy.data.materials[mati.name].node_tree.nodes[shd].inputs[shd_pro_nam].default_value = vali
                     i = i + 1
+        #One value for all meterial's shader node            
         elif len(val) >= 1 and len(val) != len(mat):
             for mati in mat:
                 if mati is not None:
