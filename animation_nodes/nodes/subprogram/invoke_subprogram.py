@@ -44,6 +44,8 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         if subprogram is not None:
             if subprogram.network.type != "Invalid":
                 subprogram.getSocketData().apply(self)
+        self.newInput("Boolean", "Condition", "condition", hide = True)
+
         self.checkCachingPossibilities()
         self.clearCache()
 
@@ -62,21 +64,22 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self, required):
         if self.subprogramNode is None: return ""
 
-        parameterString = ", ".join(["input_" + str(i) for i in range(len(self.inputs))])
-        invokeString = "_subprogram{}({})".format(self.subprogramIdentifier, parameterString)
-        outputString = ", ".join(["output_" + str(i) for i in range(len(self.outputs))])
+        parameterString = ", ".join([f"input_{i}" for i in range(len(self.inputs) - 1)])
+        invokeString = f"_subprogram{self.subprogramIdentifier}({parameterString})"
+        outputString = ", ".join([f"output_{i}" for i in range(len(self.outputs))])
+        defaultsString = ", ".join([f"self.outputs[{i}].getDefaultValue()" for i in range(len(self.outputs))])
 
+        yield f"if input_{len(self.inputs) - 1}:"
         if self.cacheType == "DISABLED" or not self.canCache:
-            if outputString == "": return invokeString
-            else: return "{} = {}".format(outputString, invokeString)
+            if outputString == "": yield "    " + invokeString
+            else: yield f"    {outputString} = {invokeString}"
         else:
-            lines = []
-            lines.append("useCache, groupOutputData = self.getCachedData({})".format(parameterString))
-            lines.append("if not useCache:")
-            lines.append("    groupOutputData = _subprogram{}({})".format(self.subprogramIdentifier, parameterString))
-            lines.append("    self.setCacheData(groupOutputData, {})".format(parameterString))
-            if outputString != "": lines.append("{} = groupOutputData".format(outputString))
-            return lines
+            yield f"    useCache, groupOutputData = self.getCachedData({parameterString})"
+            yield f"    if not useCache:"
+            yield f"        groupOutputData = _subprogram{self.subprogramIdentifier}({parameterString})"
+            yield f"        self.setCacheData(groupOutputData, {parameterString})"
+            if outputString != "": yield f"    {outputString} = groupOutputData"
+        if outputString != "": yield f"else: {outputString} = {defaultsString}"
 
     def getCachedData(self, *args):
         if self.cacheType == "ONE_TIME":
