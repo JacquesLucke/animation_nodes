@@ -42,7 +42,7 @@ def getSoundData(sound):
     if sound.specs[0] == sampleRate:
         return SoundData(sound.rechannel(1).data().ravel(), sampleRate)
     else:
-        return SoundData(sound.rechannel(1).resample(sampleRate).data().ravel(), sampleRate)
+        return SoundData(sound.rechannel(1).resample(sampleRate, True).data().ravel(), sampleRate)
 
 def findSceneWithSequence(sequence):
     for scene in bpy.data.scenes:
