@@ -1,19 +1,36 @@
 import bpy
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, VectorizedSocket
 
 class BevelEdgeWeights(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetBevelEdgeWeights"
     bl_label = "Set Bevel Edge Weights"
 
+    useFloatList: VectorizedSocket.newProperty()
+
     def create(self):
-        self.newInput("Object", "Object", "source")
-        self.newInput("Float List", "Weights", "weightFloatIn")
+        self.newInput("Object", "Object", "object")
+        self.newInput(VectorizedSocket("Float", "useFloatList",
+            ("Weight", "weight"), ("Weights", "weights")))
 
-    def execute(self, source, weightFloatIn):
-            if source is None or source.type != "MESH" or source.mode != "OBJECT":
-                return
+    def getExecutionFunctionName(self):
+        if self.useFloatList:
+            return "executeList"
+        else:
+            return "executeSingle"
 
-            for i in range(len(weightFloatIn)):
-                source.data.edges[i].bevel_weight = weightFloatIn[i] 
+    def executeSingle(self, object, weight):
+        if object is None or object.type != "MESH" or object.mode != "OBJECT": return
+        if object.data.use_customdata_edge_bevel is False:
+            object.data.use_customdata_edge_bevel = True
+        for i in range(len(object.data.edges)):
+            object.data.edges[i].bevel_weight = weight 
+        object.data.update()
 
-            source.data.update()
+    def executeList(self, object, weights):
+        if object is None or object.type != "MESH" or object.mode != "OBJECT": return
+        if object.data.use_customdata_edge_bevel is False:
+            object.data.use_customdata_edge_bevel = True
+        for i in range(len(weights)):
+            if i >= len(object.data.edges): return 
+            object.data.edges[i].bevel_weight = weights[i] 
+        object.data.update()

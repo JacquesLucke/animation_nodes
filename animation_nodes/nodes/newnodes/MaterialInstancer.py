@@ -9,7 +9,7 @@ noInstMatMessage = "No Prefix Name"
 
 class MaterialInstancerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MaterialInstancerNode"
-    bl_label = "Material Instance"
+    bl_label = "Material Instancer"
 
     errorMessage: StringProperty()
     useList: VectorizedSocket.newProperty()
