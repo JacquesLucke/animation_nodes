@@ -1,7 +1,7 @@
 cimport cython
 from . random cimport randomDouble_UnitRange
 from .. utils.limits cimport INT_MAX
-from .. data_structures cimport Vector3DList, FloatList
+from .. data_structures cimport Vector3DList, FloatList, EulerList, Euler3
 
 # http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
 
@@ -32,6 +32,19 @@ def wiggleFloatList(amount, double evolution, amplitude, int octaves, double per
     cdef Py_ssize_t i
     for i in range(amount):
         values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude
+    return result
+
+def wiggleEulerList(amount, double evolution, amplitude, int octaves, double persistance):
+    cdef EulerList result = EulerList(length = amount)
+    cdef Euler3 *values = <Euler3*>result.data
+    cdef float _amplitude[3]
+    cdef Py_ssize_t i
+    _amplitude[0], _amplitude[1], _amplitude[2] = amplitude[0], amplitude[1], amplitude[2]
+    for i in range(amount):
+        values[i].x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[0]
+        values[i].y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * _amplitude[1]
+        values[i].z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * _amplitude[2]
+        values[i].order = 0
     return result
 
 cpdef double perlinNoise1D(double x, double persistance, int octaves):
