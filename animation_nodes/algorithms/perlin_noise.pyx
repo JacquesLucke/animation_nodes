@@ -1,7 +1,7 @@
 cimport cython
 from . random cimport randomDouble_UnitRange
 from .. utils.limits cimport INT_MAX
-from .. data_structures cimport Vector3DList
+from .. data_structures cimport Vector3DList, FloatList
 
 # http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
 
@@ -27,12 +27,12 @@ def wiggleVectorList(amount, double evolution, amplitude, int octaves, double pe
     return result
 
 def wiggleFloatList(amount, double evolution, amplitude, int octaves, double persistance):
-    cdef list values = []
+    cdef FloatList result = FloatList(length = amount)
+    cdef float *values = <float*>result.data
     cdef Py_ssize_t i
     for i in range(amount):
-        res = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude
-        values.append(res)
-    return values
+        values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude
+    return result
 
 cpdef double perlinNoise1D(double x, double persistance, int octaves):
     cdef:
