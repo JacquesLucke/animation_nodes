@@ -26,6 +26,14 @@ def wiggleVectorList(amount, double evolution, amplitude, int octaves, double pe
         values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[i % 3]
     return result
 
+def wiggleFloatList(amount, double evolution, amplitude, int octaves, double persistance):
+    cdef list values = []
+    cdef Py_ssize_t i
+    for i in range(amount):
+        res = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude
+        values.append(res)
+    return values
+
 cpdef double perlinNoise1D(double x, double persistance, int octaves):
     cdef:
         double total = 0
