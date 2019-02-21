@@ -10,33 +10,34 @@ noInstMatMessage = "No Prefix Name"
 class MaterialInstancerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MaterialInstancerNode"
     bl_label = "Material Instancer"
-
+    options = {"NOT_IN_SUBPROGRAM"}
+    
     errorMessage: StringProperty()
     useList: VectorizedSocket.newProperty()
 
-    i_mat_bool: BoolProperty(name="Instance Material",
+    prefixMaterial_bool: BoolProperty(name="Instance Material",
                               default=False, update=propertyChanged)
     rm_mat_bool: BoolProperty(
         name="Remove Materials", default=False, update=propertyChanged)
 
     def create(self):
-        self.newInput("Text", "Base Material Name", "b_mat")
-        self.newInput("Text", "Prefix For Instance Materials", "i_mat")
-        self.newInput("Integer", "Amount", "nmat")
+        self.newInput("Text", "Base Material", "baseMaterial")
+        self.newInput("Text", "Prefix For Instance Materials", "prefixMaterial")
+        self.newInput("Integer", "Amount", "amount")
 
         self.newOutput("Material List", "Instanced Materials", "matlist")
 
     def draw(self, layout):
-        layout.prop(self, "i_mat_bool")
+        layout.prop(self, "prefixMaterial_bool")
         layout.prop(self, "rm_mat_bool")
         if self.errorMessage != "":
             layout.label(text = self.errorMessage, icon="ERROR")
 
-    def execute(self, b_mat, i_mat, nmat):
+    def execute(self, baseMaterial, prefixMaterial, amount):
         self.errorMessage = ""
 
         #Error messages
-        if b_mat is "":
+        if baseMaterial is "":
             self.errorMessage = noBaseMatMessage
             return
 
@@ -44,35 +45,33 @@ class MaterialInstancerNode(bpy.types.Node, AnimationNode):
         if self.rm_mat_bool:
             if len(bpy.data.materials) >= 1:
                 for material in bpy.data.materials:
-                    if material.name != b_mat:
-                        #material.user_clear()
+                    if material.name != baseMaterial and material.name.startswith(prefixMaterial):
                         bpy.data.materials.remove(material)
             else:
                 return
 
         #Error message
-        if i_mat is "":
+        if prefixMaterial is "":
             self.errorMessage = noInstMatMessage
             return
 
         #Material instancer
-        if self.i_mat_bool:
-            for i in range(nmat):
+        if self.prefixMaterial_bool:
+            for i in range(amount):
                 if i <= 9:
-                    imat = i_mat + '.00' + str(i)
+                    material = prefixMaterial + '.00' + str(i)
                 elif i > 9 and i <= 99:
-                    imat = i_mat + '.0' + str(i)
+                    material = prefixMaterial + '.0' + str(i)
                 elif i > 99:
-                    imat = i_mat + '.' + str(i)
+                    material = prefixMaterial + '.' + str(i)
 
-                if imat not in bpy.data.materials:
-                    mat = bpy.data.materials[b_mat].copy()
-                    mat.name = imat
+                if material not in bpy.data.materials:
+                    mat = bpy.data.materials[baseMaterial].copy()
+                    mat.name = material
         
         matlist = []
-        for imat in bpy.data.materials:
-            name = imat.name
-            if name.startswith(i_mat):
-                matlist.append(imat)
+        for material in bpy.data.materials:
+            if material.name.startswith(prefixMaterial):
+                matlist.append(material)
         return matlist        
         

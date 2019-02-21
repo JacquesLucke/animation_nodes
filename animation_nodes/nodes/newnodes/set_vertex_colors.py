@@ -42,8 +42,7 @@ class SetVertexColorsNode(bpy.types.Node, AnimationNode):
         if object.mode == "EDIT":
             self.raiseErrorMessage("Object is in edit mode")
             return object
-        mesh = object.data    
-        colorLayer = getVertexColorLayer(mesh, self.vertexColorName)
+        colorLayer = getVertexColorLayer(object, self.vertexColorName)
         if len(colorLayer.data) == 0: return object
         newColorAsArray = numpy.array(colorList(self, color), dtype = "f")
         colors = numpy.tile(newColorAsArray, len(colorLayer.data))
@@ -57,8 +56,7 @@ class SetVertexColorsNode(bpy.types.Node, AnimationNode):
         if object.mode == "EDIT":
             self.raiseErrorMessage("Object is in edit mode")
             return object
-        mesh = object.data
-        colorLayer = getVertexColorLayer(mesh, self.vertexColorName)
+        colorLayer = getVertexColorLayer(object, self.vertexColorName)
         if len(colorLayer.data) == 0: return object
         self.messageInfo = "Vertices: " + str(len(colorLayer.data))
         colorLayer.data.foreach_set("color", colorsList(self, colors))
@@ -74,6 +72,6 @@ def colorList(self, color):
         flist.append(val)     
     return flist
         
-def getVertexColorLayer(mesh, name):
-    try: return mesh.vertex_colors[name]
-    except: return mesh.vertex_colors.new(name = name)
+def getVertexColorLayer(object, name):
+    try: return object.data.vertex_colors[name]
+    except: return object.data.vertex_colors.new(name = name)
