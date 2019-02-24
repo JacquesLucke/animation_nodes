@@ -1,0 +1,6 @@
+def COMPARENAME_LISTNAME(LISTNAME a, LISTNAME b):
+    cdef BooleanList result = BooleanList(length = a.length)
+    cdef long i
+    for i in range(a.length):
+        result.data[i] = a.data[i] OPERATOR b.data[i]
+    return result
