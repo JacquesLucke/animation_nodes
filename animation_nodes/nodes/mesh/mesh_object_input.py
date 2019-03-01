@@ -28,7 +28,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         self.newOutput("Polygon Indices List", "Polygon Indices", "polygonIndices")
 
         self.newOutput("Float List", "Local Polygon Areas", "localPolygonAreas")
-        self.newOutput("Integer List", "Material Indices", "material Indices")
+        self.newOutput("Integer List", "Material Indices", "materialIndices")
 
         self.newOutput("Text", "Mesh Name", "meshName")
 
