@@ -8,9 +8,10 @@ class BevelEdgeWeights(bpy.types.Node, AnimationNode):
     useFloatList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Object", "Object", "object")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Float", "useFloatList",
             ("Weight", "weight"), ("Weights", "weights")))
+        self.newOutput("Object", "Object", "object")
 
     def getExecutionFunctionName(self):
         if self.useFloatList:
@@ -25,6 +26,7 @@ class BevelEdgeWeights(bpy.types.Node, AnimationNode):
         for i in range(len(object.data.edges)):
             object.data.edges[i].bevel_weight = weight 
         object.data.update()
+        return object
 
     def executeList(self, object, weights):
         if object is None or object.type != "MESH" or object.mode != "OBJECT": return
@@ -34,3 +36,4 @@ class BevelEdgeWeights(bpy.types.Node, AnimationNode):
             if i >= len(object.data.edges): return 
             object.data.edges[i].bevel_weight = weights[i] 
         object.data.update()
+        return object        

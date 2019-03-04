@@ -18,10 +18,11 @@ class VertexWeights(bpy.types.Node, AnimationNode):
         items = textModeTypeItems, update = AnimationNode.refresh)
     
     def create(self):
-        self.newInput("Object", "Object", "object")
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Integer", "Vertex Group Index", "vertexWeightIndex")
         self.newInput(VectorizedSocket("Float", "useFloatList",
             ("Weight", "weight"), ("Weights", "weights")))
+        self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
         layout.prop(self, "textModeType", text = "")
@@ -47,6 +48,7 @@ class VertexWeights(bpy.types.Node, AnimationNode):
         for i in range(len(object.data.vertices)):
             object.vertex_groups[vertexWeightIndex].add([i], weight, modes)
         object.data.update()    
+        return object
 
     def executeList(self, object, vertexWeightIndex, weights):
         if object is None or object.type != "MESH" or object.mode == "EDIT": return
@@ -64,6 +66,7 @@ class VertexWeights(bpy.types.Node, AnimationNode):
             if i >= len(object.data.vertices): return  
             object.vertex_groups[vertexWeightIndex].add([i], weights[i], modes)
         object.data.update()
+        return object            
      
     def getVertexWeightGroup(self, object, identifier):
         try:return bpy.data.objects[object.name].vertex_groups[identifier]

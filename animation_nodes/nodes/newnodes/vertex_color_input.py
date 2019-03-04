@@ -40,13 +40,17 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
 
         if self.mode == "INDEX":
             self.newInput(VectorizedSocket("Integer", "useIndexList",
-                ("Weight Index", "index"), ("Weight Indices", "indices")))
+                ("Index", "index"), ("Indices", "indices")))
             self.newOutput(VectorizedSocket("Color", "useIndexList",
                 ("Vertex Color", "color"), ("Vertex Colors", "colors")))
             self.newOutput("Float List", "Vertex Flat Colors", "vertfatcolors")        
         elif self.mode == "ALL":
             self.newOutput("Color List", "Vertex Colors", "colors")        
             self.newOutput("Float List", "Vertex Flat Colors", "vertfatcolors")        
+
+        visibleOutputs = ("Vertex Color", "Vertex Colors")
+        for socket in self.outputs:
+            socket.hide = socket.name not in visibleOutputs
 
     def draw(self, layout):
         layout.prop(self, "mode", text = "")

@@ -17,7 +17,7 @@ class SetVertexColorsNode(bpy.types.Node, AnimationNode):
     messageInfo: StringProperty()
 
     def create(self):
-        self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
+        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Color", "useColorList",
             ("Color", "color"), ("Colors", "colors")))
         self.newOutput("Object", "Object", "outObject")
