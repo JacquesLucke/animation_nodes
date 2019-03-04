@@ -4,7 +4,6 @@ from bgl import *
 from gpu_extras.batch import batch_for_shader
 
 dpi = 72
-shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
 
 def setTextDrawingDpi(new_dpi):
     global dpi
@@ -17,6 +16,7 @@ def drawVerticalLine(x, y, length, color = None, thickness = None):
     drawLine(x, y, x, y + length, color, thickness)
 
 def drawLine(x1, y1, x2, y2, color = None, thickness = None):
+    shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
     batch = batch_for_shader(shader, 'LINES', {"pos": ((x1, y1),(x2, y2))})
 
     shader.bind()
@@ -47,6 +47,7 @@ def drawText(text, x, y, font = 0, align = "LEFT", verticalAlignment = "BASELINE
     blf.draw(font, text)
 
 def drawPolygon(vertices, color):
+    shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
     batch = batch_for_shader(shader, 'TRI_STRIP', {"pos": vertices[:2] + vertices[2:][::-1]})
 
     shader.bind()
