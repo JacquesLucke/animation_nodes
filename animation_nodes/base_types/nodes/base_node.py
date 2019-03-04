@@ -166,7 +166,7 @@ class AnimationNode:
 
     def copy(self, sourceNode):
         self.identifier = createIdentifier()
-        infoByNode[self.identifier] = infoByNode[sourceNode.identifier]
+        infoByNode[self.identifier] = infoByNode[sourceNode.identifier].clone()
         self.duplicate(sourceNode)
 
     def free(self):
@@ -679,6 +679,16 @@ class NonPersistentNodeData:
         self.codeEffects = []
         self.errorMessage = None
         self.showErrorMessage = True
+
+    def clone(self):
+        newData = NonPersistentNodeData()
+        for (k, v) in self.inputs.items():
+            newData.inputs[k] = v
+
+        for (k, v) in self.outputs.items():
+            newData.outputs[k] = v
+
+        return newData
 
 infoByNode = defaultdict(NonPersistentNodeData)
 
