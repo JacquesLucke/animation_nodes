@@ -18,7 +18,7 @@ class SortNode(bpy.types.Node, AnimationNode):
             yield "    sortedNumbers = DoubleList()"
         if "indices" in required:
             yield "if len(numbers):"
-            yield "    indices = LongList.fromNumpyArray(numpy.argsort(numbers.asMemoryView()))"
+            yield "    indices = LongList.fromNumpyArray(numpy.argsort(numbers.asMemoryView()).astype(int))"
             yield "else:"
             yield "    indices = LongList()"
 
