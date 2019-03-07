@@ -2,4 +2,4 @@
 
 ### Fixed
 
-- Fixed sort node. 0832e2ea5dbea216d77b0e5ac3430dd5746c635e
+- Fixed sort node. [0832e2e](https://github.com/JacquesLucke/animation_nodes/commit/0832e2e)
