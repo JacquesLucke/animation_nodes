@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 from ... sockets.info import toListDataType
 
 from . c_utils import (
@@ -28,6 +29,8 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
     floatStepType: EnumProperty(name = "Float Step Type", default = "START_STEP",
         items = floatStepTypeItems, update = AnimationNode.refresh)
 
+    endPoint: BoolProperty(name = "End Point", default = True, update = executionCodeChanged)
+
     def create(self):
         self.newInput("Integer", "Amount", "amount", value = 5, minValue = 0)
 
@@ -46,6 +49,8 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         if self.dataType == "Float":
             layout.prop(self, "floatStepType", text = "")
+            if self.floatStepType == "START_STOP":
+                layout.prop(self, "endPoint")
 
     def drawLabel(self):
         return self.inputs[1].dataType + " Range"
@@ -57,7 +62,10 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
             if self.floatStepType == "START_STEP":
                 return "execute_FloatRange_StartStep"
             elif self.floatStepType == "START_STOP":
-                return "execute_FloatRange_StartStop"
+                if self.endPoint:
+                    return "execute_FloatRange_StartStop_EndPoint"
+                else:
+                    return "execute_FloatRange_StartStop"
 
     def execute_IntegerRange(self, amount, start, step):
         return range_LongList_StartStep(amount, start, step)
@@ -65,5 +73,9 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
     def execute_FloatRange_StartStep(self, amount, start, step):
         return range_DoubleList_StartStep(amount, start, step)
 
-    def execute_FloatRange_StartStop(self, amount, start, stop):
+    def execute_FloatRange_StartStop_EndPoint(self, amount, start, stop):
         return range_DoubleList_StartStop(amount, start, stop)
+
+    def execute_FloatRange_StartStop(self, amount, start, stop):
+        return range_DoubleList_StartStep(amount, start,
+            ((stop - start) / amount) if amount != 0 else 0)
