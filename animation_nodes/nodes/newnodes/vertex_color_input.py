@@ -5,13 +5,13 @@ from ... data_structures import DoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
 modeItems = [
-    ("ALL", "All", "Get weight of every vertex", "NONE", 0),
-    ("INDEX", "Index", "Get weight of a specific vertex", "NONE", 1)
+    ("ALL", "All", "Get color of every vertex", "NONE", 0),
+    ("INDEX", "Index", "Get color of a specific vertex", "NONE", 1)
 ]
 
-groupIdentifierTypeItems = [
-    ("INDEX", "Index", "Get vertex group based on the index", "NONE", 0),
-    ("NAME", "Name", "Get vertex group based on the name", "NONE", 1)
+colorLayerIdentifierTypeItems = [
+    ("INDEX", "Index", "Get color layer based on the index", "NONE", 0),
+    ("NAME", "Name", "Get color layer based on the name", "NONE", 1)
 ]
 
 layerNotFoundMessage = "color layer not found"
@@ -25,17 +25,17 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
     mode: EnumProperty(name = "Mode", default = "ALL",
         items = modeItems, update = AnimationNode.refresh)
 
-    groupIdentifierType: EnumProperty(name = "Group Identifier Type", default = "INDEX",
-        items = groupIdentifierTypeItems, update = AnimationNode.refresh)
+    colorLayerIdentifierType: EnumProperty(name = "Color Layer Identifier Type", default = "INDEX",
+        items = colorLayerIdentifierTypeItems, update = AnimationNode.refresh)
 
     useIndexList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
 
-        if self.groupIdentifierType == "INDEX":
+        if self.colorLayerIdentifierType == "INDEX":
             self.newInput("Integer", "Color Index", "groupIndex")
-        elif self.groupIdentifierType == "NAME":
+        elif self.colorLayerIdentifierType == "NAME":
             self.newInput("Text", "Name", "groupName")
 
         if self.mode == "INDEX":
@@ -43,10 +43,10 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
                 ("Index", "index"), ("Indices", "indices")))
             self.newOutput(VectorizedSocket("Color", "useIndexList",
                 ("Vertex Color", "color"), ("Vertex Colors", "colors")))
-            self.newOutput("Float List", "Vertex Flat Colors", "vertfatcolors")        
+            self.newOutput("Float List", "Vertex Flat Colors", "vertexFlatColors")        
         elif self.mode == "ALL":
             self.newOutput("Color List", "Vertex Colors", "colors")        
-            self.newOutput("Float List", "Vertex Flat Colors", "vertfatcolors")        
+            self.newOutput("Float List", "Vertex Flat Colors", "vertexFlatColors")        
 
         visibleOutputs = ("Vertex Color", "Vertex Colors")
         for socket in self.outputs:
@@ -56,7 +56,7 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "mode", text = "")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "groupIdentifierType", text = "Type")
+        layout.prop(self, "colorLayerIdentifierType", text = "Type")
 
     def getExecutionFunctionName(self):
         if self.mode == "INDEX":
@@ -76,9 +76,9 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage(layerNotFoundMessage)
             
         colorLayer = self.getVertexColorLayer(object, identifier)
-        getColor, vertfatcolors = self.getColorList(colorLayer) 
-        try: return getColor[index], vertfatcolors
-        except: return None, vertfatcolors
+        getColor, vertexFlatColors = self.getColorList(colorLayer) 
+        try: return getColor[index], vertexFlatColors
+        except: return None, vertexFlatColors
 
     def execute_Indices(self, object, identifier, indices):
         if object is None:
@@ -90,12 +90,12 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
             return DoubleList()
 
         colorLayer = self.getVertexColorLayer(object, identifier)
-        getColor, vertfatcolors = self.getColorList(colorLayer)
+        getColor, vertexFlatColors = self.getColorList(colorLayer)
         colors = []
         for i, index in enumerate(indices):
             try: colors.append(getColor[index])
             except: colors.append([0., 0., 0., 0.])
-        return colors, vertfatcolors
+        return colors, vertexFlatColors
 
     def execute_All(self, object, identifier):
         if object is None:
