@@ -7,4 +7,5 @@
 
 ### Fixed
 
-- Fixed sort node. [0832e2e](https://github.com/JacquesLucke/animation_nodes/commit/0832e2e)
+- Fixed *Sort* node. [0832e2e](https://github.com/JacquesLucke/animation_nodes/commit/0832e2e)
+- Fixed bad path resolution in *Set Keyframe* node. [f563bd0](https://github.com/JacquesLucke/animation_nodes/commit/f563bd0)
