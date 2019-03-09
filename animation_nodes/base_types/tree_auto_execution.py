@@ -2,83 +2,108 @@ import bpy
 from bpy.props import *
 from .. utils.blender_ui import getDpiFactor
 
-triggerTypeItems = [
-    ("MONITOR_PROPERTY", "Monitor Property", "", "", 0)]
-
 idTypeItems = [
     ("OBJECT", "Object", "", "OBJECT_DATA", 0),
-    ("SCENE", "Scene", "", "SCENE_DATA", 1)]
+    ("COLLECTION", "Collection", "", "GROUP", 1),
+    ("SCENE", "Scene", "", "SCENE_DATA", 2)]
 
 class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     bl_idname = "an_AutoExecutionTrigger_MonitorProperty"
 
+    def resetIDs(self, context):
+        self.object = self.collection = self.scene = None
+
     idType: EnumProperty(name = "ID Type", default = "OBJECT",
-        items = idTypeItems)
+        items = idTypeItems, update = resetIDs)
 
     object: PointerProperty(type = bpy.types.Object, name = "Object")
+    collection: PointerProperty(type = bpy.types.Collection, name = "Collection")
     scene: PointerProperty(type = bpy.types.Scene, name = "Scene")
-    dataPath: StringProperty(name = "Data Path", default = "")
+    dataPaths: StringProperty(name = "Data Paths", default = "",
+        description = "Comma separated paths of properties to monitor")
 
     lastState: StringProperty(default = "")
+    expanded: BoolProperty(default = True)
     enabled: BoolProperty(default = True)
     hasError: BoolProperty(default = False)
 
     def update(self):
         lastState = self.lastState
-        newState = self.getPropertyState()
+        newState = self.getPropertiesState()
         if newState == lastState:
             return False
         else:
             self.lastState = newState
             return self.enabled and lastState != ""
 
-    def getPropertyState(self):
-        prop = self.getProperty()
-        if prop is None: return ""
-        if hasattr(prop, "__iter__"):
-            return " ".join(str(part) for part in prop)
-        return str(prop)
+    def getPropertiesState(self):
+        props = self.getProperties()
+        if len(props) == 0: return ""
 
-    def getProperty(self):
+        propsString = ""
+        for prop in props:
+            if hasattr(prop, "__iter__"):
+                propsString += "".join(str(part) for part in prop)
+            else: propsString += str(prop)
+
+        return propsString
+
+    def getProperties(self):
         self.hasError = False
-        object = self.getObject()
-        if object is None or self.dataPath is "":
-            return None
+        idBlocks = self.getIDBlocks()
+        if len(idBlocks) == 0 or self.dataPaths.strip() is "": return []
 
-        try: return object.path_resolve(self.dataPath)
+        try:
+            properties = []
+            paths = self.getDataPaths()
+            for idBlock in idBlocks:
+                properties.extend(idBlock.path_resolve(p) for p in paths)
+            return properties
         except:
             self.hasError = True
-            return None
+            return []
 
-    def getObject(self):
+    def getDataPaths(self):
+        return [p.strip() for p in self.dataPaths.split(",")]
+
+    def getIDBlocks(self):
         if self.idType == "OBJECT":
-            return self.object
+            if self.object is None: return []
+            return [self.object]
+        elif self.idType == "COLLECTION":
+            if self.collection is None: return []
+            return self.collection.all_objects
         elif self.idType == "SCENE":
-            return self.scene
+            if self.scene is None: return []
+            return [self.scene]
 
     def draw(self, layout, index):
-        row = layout.row(align = True)
-        if self.hasError:
-            row.label(text = "", icon = "ERROR")
+        box = layout.box()
 
-        icon = "LAYER_ACTIVE" if self.enabled else "LAYER_USED"
-        row.prop(self, "enabled", icon = icon, text = "")
+        header = box.row()
+        icon = 'TRIA_DOWN' if self.expanded else 'TRIA_RIGHT'
+        header.prop(self, "expanded", icon = icon, text = "", emboss = False)
+        if self.hasError: header.label(text = "", icon = "ERROR")
+        header.prop(self, "enabled", text = "Enable " + self.dataPaths, toggle = True)
+        header.operator("an.remove_auto_execution_trigger", icon = "X",
+            text = "", emboss = False).index = index
 
-        row.active = self.enabled
+        if self.expanded:
+            col = box.column(align = True)
+            col.active = self.enabled
+            col.prop(self, "idType", text = "")
+            row = col.row(align = True)
+            row.operator("an.assign_active_object_to_auto_execution_trigger",
+                icon = "EYEDROPPER", text = "").index = index
 
-        props = row.operator("an.assign_active_object_to_auto_execution_trigger", icon = "EYEDROPPER", text = "")
-        props.index = index
+            if self.idType == "OBJECT":
+                row.prop(self, "object", text = "")
+            elif self.idType == "COLLECTION":
+                row.prop(self, "collection", text = "")
+            elif self.idType == "SCENE":
+                row.prop(self, "scene", text = "")
 
-        if self.idType == "OBJECT":
-            row.prop(self, "object", text = "")
-        elif self.idType == "SCENE":
-            row.prop(self, "scene", text = "")
-
-        row.prop(self, "dataPath", text = "")
-
-        props = row.operator("an.remove_auto_execution_trigger", icon = "X", text = "")
-        props.triggerType = "MONITOR_PROPERTY"
-        props.index = index
+            col.prop(self, "dataPaths", text = "")
 
 
 class CustomAutoExecutionTriggers(bpy.types.PropertyGroup):
@@ -129,33 +154,14 @@ class AddAutoExecutionTrigger(bpy.types.Operator):
     bl_label = "Add Auto Execution Trigger"
     bl_options = {"UNDO"}
 
-    triggerType: EnumProperty(name = "Trigger Type", default = "MONITOR_PROPERTY",
-        items = triggerTypeItems)
-
-    idType: EnumProperty(name = "ID Type", default = "OBJECT",
-        items = idTypeItems)
-
     @classmethod
     def poll(cls, context):
         return context.getActiveAnimationNodeTree() is not None
 
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 250 * getDpiFactor())
-
-    def draw(self, context):
-        layout = self.layout
-        layout.prop(self, "triggerType")
-        if self.triggerType == "MONITOR_PROPERTY":
-            layout.prop(self, "idType")
-
-    def check(self, context):
-        return True
-
     def execute(self, context):
         tree = context.space_data.node_tree
-        trigger = tree.autoExecution.customTriggers.new(self.triggerType)
-        if self.triggerType == "MONITOR_PROPERTY":
-            trigger.idType = self.idType
+        trigger = tree.autoExecution.customTriggers.new("MONITOR_PROPERTY")
+        trigger.idType = "OBJECT"
         context.area.tag_redraw()
         return {"FINISHED"}
 
@@ -165,7 +171,6 @@ class RemoveAutoExecutionTrigger(bpy.types.Operator):
     bl_label = "Remove Auto Execution Trigger"
     bl_options = {"UNDO"}
 
-    triggerType: EnumProperty(items = triggerTypeItems)
     index: IntProperty()
 
     @classmethod
@@ -175,9 +180,7 @@ class RemoveAutoExecutionTrigger(bpy.types.Operator):
     def execute(self, context):
         tree = context.space_data.node_tree
         customTriggers = tree.autoExecution.customTriggers
-
-        if self.triggerType == "MONITOR_PROPERTY":
-            customTriggers.monitorPropertyTriggers.remove(self.index)
+        customTriggers.monitorPropertyTriggers.remove(self.index)
         return {"FINISHED"}
 
 
@@ -197,6 +200,8 @@ class AssignActiveObjectToAutoExecutionTrigger(bpy.types.Operator):
         trigger = tree.autoExecution.customTriggers.monitorPropertyTriggers[self.index]
         if trigger.idType == "OBJECT":
             trigger.object = context.active_object
+        if trigger.idType == "COLLECTION":
+            trigger.collection = context.collection
         if trigger.idType == "SCENE":
             trigger.scene = context.scene
         return {"FINISHED"}
