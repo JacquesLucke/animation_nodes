@@ -4,7 +4,8 @@ from .. utils.blender_ui import getDpiFactor
 
 idTypeItems = [
     ("OBJECT", "Object", "", "OBJECT_DATA", 0),
-    ("SCENE", "Scene", "", "SCENE_DATA", 1)]
+    ("COLLECTION", "Collection", "", "GROUP", 1),
+    ("SCENE", "Scene", "", "SCENE_DATA", 2)]
 
 class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     bl_idname = "an_AutoExecutionTrigger_MonitorProperty"
@@ -13,6 +14,7 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
         items = idTypeItems)
 
     object: PointerProperty(type = bpy.types.Object, name = "Object")
+    collection: PointerProperty(type = bpy.types.Collection, name = "Collection")
     scene: PointerProperty(type = bpy.types.Scene, name = "Scene")
     dataPaths: StringProperty(name = "Data Paths", default = "",
         description = "Comma separated paths of properties to monitor")
@@ -49,7 +51,15 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
         if object is None or self.dataPaths.strip() is "":
             return []
 
-        try: return [object.path_resolve(p.strip()) for p in self.dataPaths.split(",")]
+        try:
+            paths = self.dataPaths.split(",")
+            if self.idType == "COLLECTION":
+                properties = []
+                for obj in object.all_objects:
+                    properties.extend(obj.path_resolve(p.strip()) for p in paths)
+                return properties
+            else:
+                return [object.path_resolve(p.strip()) for p in paths]
         except:
             self.hasError = True
             return []
@@ -57,6 +67,8 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     def getObject(self):
         if self.idType == "OBJECT":
             return self.object
+        elif self.idType == "COLLECTION":
+            return self.collection
         elif self.idType == "SCENE":
             return self.scene
 
@@ -86,6 +98,8 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
             if self.idType == "OBJECT":
                 row.prop(self, "object", text = "")
+            elif self.idType == "COLLECTION":
+                row.prop(self, "collection", text = "")
             elif self.idType == "SCENE":
                 row.prop(self, "scene", text = "")
 
@@ -186,6 +200,8 @@ class AssignActiveObjectToAutoExecutionTrigger(bpy.types.Operator):
         trigger = tree.autoExecution.customTriggers.monitorPropertyTriggers[self.index]
         if trigger.idType == "OBJECT":
             trigger.object = context.active_object
+        if trigger.idType == "COLLECTION":
+            trigger.collection = context.collection
         if trigger.idType == "SCENE":
             trigger.scene = context.scene
         return {"FINISHED"}
