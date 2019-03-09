@@ -50,19 +50,19 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
     def getProperties(self):
         self.hasError = False
-        objects = self.getObjects()
-        if len(objects) == 0 or self.dataPaths.strip() is "": return []
+        IDBlocks = self.getIDBlocks()
+        if len(IDBlocks) == 0 or self.dataPaths.strip() is "": return []
 
         try:
             properties = []
-            for obj in objects:
-                properties.extend(obj.path_resolve(p.strip()) for p in self.dataPaths.split(","))
+            for IDBlock in IDBlocks:
+                properties.extend(IDBlock.path_resolve(p.strip()) for p in self.dataPaths.split(","))
             return properties
         except:
             self.hasError = True
             return []
 
-    def getObjects(self):
+    def getIDBlocks(self):
         if self.idType == "OBJECT":
             if self.object is None: return []
             return [self.object]
