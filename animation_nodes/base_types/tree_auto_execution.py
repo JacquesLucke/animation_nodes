@@ -2,9 +2,6 @@ import bpy
 from bpy.props import *
 from .. utils.blender_ui import getDpiFactor
 
-triggerTypeItems = [
-    ("MONITOR_PROPERTY", "Monitor Property", "", "", 0)]
-
 idTypeItems = [
     ("OBJECT", "Object", "", "OBJECT_DATA", 0),
     ("SCENE", "Scene", "", "SCENE_DATA", 1)]
@@ -17,7 +14,8 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
     object: PointerProperty(type = bpy.types.Object, name = "Object")
     scene: PointerProperty(type = bpy.types.Scene, name = "Scene")
-    dataPath: StringProperty(name = "Data Path", default = "")
+    dataPaths: StringProperty(name = "Data Paths", default = "",
+        description = "Comma separated paths of properties to monitor")
 
     lastState: StringProperty(default = "")
     expanded: BoolProperty(default = True)
@@ -26,30 +24,35 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
     def update(self):
         lastState = self.lastState
-        newState = self.getPropertyState()
+        newState = self.getPropertiesState()
         if newState == lastState:
             return False
         else:
             self.lastState = newState
             return self.enabled and lastState != ""
 
-    def getPropertyState(self):
-        prop = self.getProperty()
-        if prop is None: return ""
-        if hasattr(prop, "__iter__"):
-            return " ".join(str(part) for part in prop)
-        return str(prop)
+    def getPropertiesState(self):
+        props = self.getProperties()
+        if len(props) == 0: return ""
 
-    def getProperty(self):
+        propsString = ""
+        for prop in props:
+            if hasattr(prop, "__iter__"):
+                propsString += "".join(str(part) for part in prop)
+            else: propsString += str(prop)
+
+        return propsString
+
+    def getProperties(self):
         self.hasError = False
         object = self.getObject()
-        if object is None or self.dataPath is "":
-            return None
+        if object is None or self.dataPaths.strip() is "":
+            return []
 
-        try: return object.path_resolve(self.dataPath)
+        try: return [object.path_resolve(p.strip()) for p in self.dataPaths.split(",")]
         except:
             self.hasError = True
-            return None
+            return []
 
     def getObject(self):
         if self.idType == "OBJECT":
@@ -67,7 +70,7 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
         enableText = "Enable "
         object = self.getObject()
-        if object is not None: enableText += object.name + "." + self.dataPath
+        if object is not None: enableText += object.name + "." + self.dataPaths
         header.prop(self, "enabled", text = enableText, toggle = True)
 
         header.operator("an.remove_auto_execution_trigger", icon = "X",
@@ -86,7 +89,7 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
             elif self.idType == "SCENE":
                 row.prop(self, "scene", text = "")
 
-            col.prop(self, "dataPath", text = "")
+            col.prop(self, "dataPaths", text = "")
 
 
 class CustomAutoExecutionTriggers(bpy.types.PropertyGroup):
