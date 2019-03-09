@@ -20,6 +20,7 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     dataPath: StringProperty(name = "Data Path", default = "")
 
     lastState: StringProperty(default = "")
+    expanded: BoolProperty(default = True)
     enabled: BoolProperty(default = True)
     hasError: BoolProperty(default = False)
 
@@ -57,28 +58,35 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
             return self.scene
 
     def draw(self, layout, index):
-        row = layout.row(align = True)
-        if self.hasError:
-            row.label(text = "", icon = "ERROR")
+        box = layout.box()
 
-        icon = "LAYER_ACTIVE" if self.enabled else "LAYER_USED"
-        row.prop(self, "enabled", icon = icon, text = "")
+        header = box.row()
+        icon = 'TRIA_DOWN' if self.expanded else 'TRIA_RIGHT'
+        header.prop(self, "expanded", icon = icon, text = "", emboss = False)
+        if self.hasError: header.label(text = "", icon = "ERROR")
 
-        row.active = self.enabled
+        enableText = "Enable "
+        object = self.getObject()
+        if object is not None: enableText += object.name + "." + self.dataPath
+        header.prop(self, "enabled", text = enableText, toggle = True)
 
-        props = row.operator("an.assign_active_object_to_auto_execution_trigger", icon = "EYEDROPPER", text = "")
-        props.index = index
+        header.operator("an.remove_auto_execution_trigger", icon = "X",
+            text = "", emboss = False).index = index
 
-        if self.idType == "OBJECT":
-            row.prop(self, "object", text = "")
-        elif self.idType == "SCENE":
-            row.prop(self, "scene", text = "")
+        if self.expanded:
+            col = box.column(align = True)
+            col.active = self.enabled
+            col.prop(self, "idType", text = "")
+            row = col.row(align = True)
+            row.operator("an.assign_active_object_to_auto_execution_trigger",
+                icon = "EYEDROPPER", text = "").index = index
 
-        row.prop(self, "dataPath", text = "")
+            if self.idType == "OBJECT":
+                row.prop(self, "object", text = "")
+            elif self.idType == "SCENE":
+                row.prop(self, "scene", text = "")
 
-        props = row.operator("an.remove_auto_execution_trigger", icon = "X", text = "")
-        props.triggerType = "MONITOR_PROPERTY"
-        props.index = index
+            col.prop(self, "dataPath", text = "")
 
 
 class CustomAutoExecutionTriggers(bpy.types.PropertyGroup):
@@ -129,33 +137,14 @@ class AddAutoExecutionTrigger(bpy.types.Operator):
     bl_label = "Add Auto Execution Trigger"
     bl_options = {"UNDO"}
 
-    triggerType: EnumProperty(name = "Trigger Type", default = "MONITOR_PROPERTY",
-        items = triggerTypeItems)
-
-    idType: EnumProperty(name = "ID Type", default = "OBJECT",
-        items = idTypeItems)
-
     @classmethod
     def poll(cls, context):
         return context.getActiveAnimationNodeTree() is not None
 
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 250 * getDpiFactor())
-
-    def draw(self, context):
-        layout = self.layout
-        layout.prop(self, "triggerType")
-        if self.triggerType == "MONITOR_PROPERTY":
-            layout.prop(self, "idType")
-
-    def check(self, context):
-        return True
-
     def execute(self, context):
         tree = context.space_data.node_tree
-        trigger = tree.autoExecution.customTriggers.new(self.triggerType)
-        if self.triggerType == "MONITOR_PROPERTY":
-            trigger.idType = self.idType
+        trigger = tree.autoExecution.customTriggers.new("MONITOR_PROPERTY")
+        trigger.idType = "OBJECT"
         context.area.tag_redraw()
         return {"FINISHED"}
 
@@ -165,7 +154,6 @@ class RemoveAutoExecutionTrigger(bpy.types.Operator):
     bl_label = "Remove Auto Execution Trigger"
     bl_options = {"UNDO"}
 
-    triggerType: EnumProperty(items = triggerTypeItems)
     index: IntProperty()
 
     @classmethod
@@ -175,9 +163,7 @@ class RemoveAutoExecutionTrigger(bpy.types.Operator):
     def execute(self, context):
         tree = context.space_data.node_tree
         customTriggers = tree.autoExecution.customTriggers
-
-        if self.triggerType == "MONITOR_PROPERTY":
-            customTriggers.monitorPropertyTriggers.remove(self.index)
+        customTriggers.monitorPropertyTriggers.remove(self.index)
         return {"FINISHED"}
 
 
