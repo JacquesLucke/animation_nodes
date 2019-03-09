@@ -47,30 +47,28 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
     def getProperties(self):
         self.hasError = False
-        object = self.getObject()
-        if object is None or self.dataPaths.strip() is "":
-            return []
+        objects = self.getObjects()
+        if len(objects) == 0 or self.dataPaths.strip() is "": return []
 
         try:
-            paths = self.dataPaths.split(",")
-            if self.idType == "COLLECTION":
-                properties = []
-                for obj in object.all_objects:
-                    properties.extend(obj.path_resolve(p.strip()) for p in paths)
-                return properties
-            else:
-                return [object.path_resolve(p.strip()) for p in paths]
+            properties = []
+            for obj in objects:
+                properties.extend(obj.path_resolve(p.strip()) for p in self.dataPaths.split(","))
+            return properties
         except:
             self.hasError = True
             return []
 
-    def getObject(self):
+    def getObjects(self):
         if self.idType == "OBJECT":
-            return self.object
+            if self.object is None: return []
+            return [self.object]
         elif self.idType == "COLLECTION":
-            return self.collection
+            if self.collection is None: return []
+            return self.collection.all_objects
         elif self.idType == "SCENE":
-            return self.scene
+            if self.scene is None: return []
+            return [self.scene]
 
     def draw(self, layout, index):
         box = layout.box()
@@ -79,12 +77,7 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
         icon = 'TRIA_DOWN' if self.expanded else 'TRIA_RIGHT'
         header.prop(self, "expanded", icon = icon, text = "", emboss = False)
         if self.hasError: header.label(text = "", icon = "ERROR")
-
-        enableText = "Enable "
-        object = self.getObject()
-        if object is not None: enableText += object.name + "." + self.dataPaths
-        header.prop(self, "enabled", text = enableText, toggle = True)
-
+        header.prop(self, "enabled", text = "Enable " + self.dataPaths, toggle = True)
         header.operator("an.remove_auto_execution_trigger", icon = "X",
             text = "", emboss = False).index = index
 
