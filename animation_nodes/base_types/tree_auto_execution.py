@@ -10,8 +10,11 @@ idTypeItems = [
 class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
     bl_idname = "an_AutoExecutionTrigger_MonitorProperty"
 
+    def resetIDs(self, context):
+        self.object = self.collection = self.scene = None
+
     idType: EnumProperty(name = "ID Type", default = "OBJECT",
-        items = idTypeItems)
+        items = idTypeItems, update = resetIDs)
 
     object: PointerProperty(type = bpy.types.Object, name = "Object")
     collection: PointerProperty(type = bpy.types.Collection, name = "Collection")
