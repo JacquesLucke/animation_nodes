@@ -55,8 +55,9 @@ class AutoExecutionTrigger_MonitorProperty(bpy.types.PropertyGroup):
 
         try:
             properties = []
+            paths = self.getDataPaths()
             for idBlock in idBlocks:
-                properties.extend(idBlock.path_resolve(p) for p in self.getDataPaths())
+                properties.extend(idBlock.path_resolve(p) for p in paths)
             return properties
         except:
             self.hasError = True
