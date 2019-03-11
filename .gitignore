@@ -12,6 +12,7 @@
 *.zip
 *.a
 *.o
+*.lnk
 .vscode
 build/
 conf.json
