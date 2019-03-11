@@ -3,8 +3,10 @@ from bpy.props import *
 from ... data_structures import Mesh
 from ... base_types import AnimationNode
 from . c_utils import getMatricesAlongSpline
+from .. matrix.c_utils import extractMatrixTranslations
 from .. mesh.c_utils import getReplicatedVertices
 from . spline_evaluation_base import SplineEvaluationBase
+from ... algorithms.mesh_generation.line import edges
 from ... algorithms.mesh_generation.circle import getPointsOnCircle
 from ... algorithms.mesh_generation.grid import quadEdges, quadPolygons
 
@@ -13,25 +15,33 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Mesh from Spline"
     bl_width_default = 160
 
+    usePathShape: BoolProperty(name = "Just Evaluate the Spline", default = False,
+        update = AnimationNode.refresh)
+
     useCustomShape: BoolProperty(name = "Use Custom Shape", default = False,
         update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("Float", "Size", "size", value = 0.3, minValue = 0)
+        if not self.usePathShape or not self.useCustomShape:
+            self.newInput("Float", "Size", "size", value = 0.3, minValue = 0)
         self.newInput("Integer", "Spline Resolution", "splineResolution", value = 5, minValue = 0)
 
-        if self.useCustomShape:
-            self.newInput("Vector List", "Shape Border", "shapeBorder", dataIsModified = True)
-            self.newInput("Boolean", "Closed Shape", "closedShape", value = True)
-        else:
-            self.newInput("Integer", "Bevel Resolution", "bevelResolution", value = 4, minValue = 2)
+        if not self.usePathShape or not self.useCustomShape:
+            if self.useCustomShape:
+                self.newInput("Vector List", "Shape Border", "shapeBorder", dataIsModified = True)
+                self.newInput("Boolean", "Closed Shape", "closedShape", value = True)
+            else:
+                self.newInput("Integer", "Bevel Resolution", "bevelResolution", value = 4, minValue = 1)
 
-        self.newInput("Boolean", "Cap Ends", "capEnds", value = False)
+            self.newInput("Boolean", "Cap Ends", "capEnds", value = False)
+
         self.newOutput("Mesh", "Mesh", "mesh")
 
     def draw(self, layout):
         layout.prop(self, "useCustomShape")
+        if self.useCustomShape:
+            layout.prop(self, "usePathShape")
 
     def drawAdvanced(self, layout):
         col = layout.column()
@@ -41,12 +51,21 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         subcol.prop(self, "resolution")
 
     def getExecutionFunctionName(self):
-        if self.useCustomShape:
-            return "execute_CustomShape"
+        if self.usePathShape and self.useCustomShape:
+            return "execute_PathShape"
         else:
-            return "execute_CircleShape"
+            if self.useCustomShape:
+                return "execute_CustomShape"
+            else:
+                return "execute_CircleShape"
+
+    def execute_PathShape(self, spline, splineResolution):
+        return self.createPathMesh(spline, splineResolution)
 
     def execute_CircleShape(self, spline, size, splineResolution, bevelResolution, capEnds):
+        if bevelResolution == 1:
+            return self.createPathMesh(spline, splineResolution)
+        
         size = max(size, 0)
         bevelResolution = max(bevelResolution, 2)
         circlePoints = getPointsOnCircle(bevelResolution, size)
@@ -56,6 +75,24 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         size = max(size, 0)
         shapeBorder.scale(size)
         return self.createSplineMesh(spline, capEnds, splineResolution, shapeBorder, closedShape)
+
+    def createPathMesh(self, spline, splineResolution):
+        if not spline.isEvaluable():
+            return Mesh()
+
+        splineResolution = max(splineResolution, 0)
+
+        if spline.cyclic:
+            amount = len(spline.points) + splineResolution * len(spline.points)
+        else:
+            amount = len(spline.points) + splineResolution * (len(spline.points) - 1)
+
+        spline.ensureUniformConverter(self.resolution)
+        matrices = getMatricesAlongSpline(spline, amount, self.parameterType)
+        allVertices = extractMatrixTranslations(matrices)
+        allEdges = edges(amount)
+
+        return Mesh(allVertices, allEdges, skipValidation = True)
 
     def createSplineMesh(self, spline, capEnds, splineResolution, shape, closedShape):
         if not spline.isEvaluable() or len(shape) < 2:
