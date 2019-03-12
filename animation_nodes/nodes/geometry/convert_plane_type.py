@@ -41,4 +41,4 @@ class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
             yield "matrix = Matrix.Translation(planePoint) @ planeNormal.to_track_quat('Z', 'Y').to_matrix().to_4x4()"
         if self.conversionType == "MATRIX_TO_POINT_NORMAL":
             if "planePoint" in required: yield "planePoint = matrix.to_translation()"
-            if "planeNormal" in required: yield "planeNormal = matrix.to_3x3() * Vector((0, 0, 1))"
+            if "planeNormal" in required: yield "planeNormal = matrix.to_3x3() @ Vector((0, 0, 1))"
