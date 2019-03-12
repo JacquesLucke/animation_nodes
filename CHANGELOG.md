@@ -10,6 +10,7 @@
 
 - Fixed the *Sort* node for windows users.
 - Fixed bad path resolution in the *Set Keyframe* node.
+- Fixed *Convert Plane Type* node.
 
 ### Changed
 
