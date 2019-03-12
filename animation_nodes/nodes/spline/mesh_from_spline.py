@@ -15,27 +15,21 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_label = "Mesh from Spline"
     bl_width_default = 160
 
-    usePathShape: BoolProperty(name = "Just Evaluate the Spline", default = False,
-        update = AnimationNode.refresh)
-
     useCustomShape: BoolProperty(name = "Use Custom Shape", default = False,
         update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
-        if not self.usePathShape or not self.useCustomShape:
-            self.newInput("Float", "Size", "size", value = 0.3, minValue = 0)
+        self.newInput("Float", "Size", "size", value = 0.3, minValue = 0)
         self.newInput("Integer", "Spline Resolution", "splineResolution", value = 5, minValue = 0)
 
-        if not self.usePathShape or not self.useCustomShape:
-            if self.useCustomShape:
-                self.newInput("Vector List", "Shape Border", "shapeBorder", dataIsModified = True)
-                self.newInput("Boolean", "Closed Shape", "closedShape", value = True)
-            else:
-                self.newInput("Integer", "Bevel Resolution", "bevelResolution", value = 4, minValue = 1)
+        if self.useCustomShape:
+            self.newInput("Vector List", "Shape Border", "shapeBorder", dataIsModified = True)
+            self.newInput("Boolean", "Closed Shape", "closedShape", value = True)
+        else:
+            self.newInput("Integer", "Bevel Resolution", "bevelResolution", value = 4, minValue = 1)
 
-            self.newInput("Boolean", "Cap Ends", "capEnds", value = False)
-
+        self.newInput("Boolean", "Cap Ends", "capEnds", value = False)
         self.newOutput("Mesh", "Mesh", "mesh")
 
     def draw(self, layout):
@@ -51,16 +45,10 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         subcol.prop(self, "resolution")
 
     def getExecutionFunctionName(self):
-        if self.usePathShape and self.useCustomShape:
-            return "execute_PathShape"
+        if self.useCustomShape:
+            return "execute_CustomShape"
         else:
-            if self.useCustomShape:
-                return "execute_CustomShape"
-            else:
-                return "execute_CircleShape"
-
-    def execute_PathShape(self, spline, splineResolution):
-        return self.createPathMesh(spline, splineResolution)
+            return "execute_CircleShape"
 
     def execute_CircleShape(self, spline, size, splineResolution, bevelResolution, capEnds):
         if bevelResolution == 1:
