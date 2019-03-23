@@ -12,6 +12,7 @@
 - Fixed bad path resolution in the *Set Keyframe* node.
 - Fixed *Convert Plane Type* node.
 - Fixed *ReturnDefaultsOnExceptionCodeEffect* and *Get Struct* node.
+- Fixed the *fromFloatList* method of the *3DVectorList* structure.
 
 ### Changed
 
