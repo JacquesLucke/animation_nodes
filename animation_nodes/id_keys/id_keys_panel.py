@@ -6,7 +6,7 @@ from .. utils.operators import makeOperator
 hiddenIDKeys = set()
 
 class IDKeyPanel(bpy.types.Panel):
-    bl_idname = "an_id_keys_panel"
+    bl_idname = "AN_PT_id_keys_panel"
     bl_label = "ID Keys"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"

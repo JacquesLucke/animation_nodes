@@ -4,7 +4,7 @@ from .. utils.layout import writeText
 from .. tree_info import getNodesByType, getNodeByIdentifier
 
 class ViewportInputPanel(bpy.types.Panel):
-    bl_idname = "an_viewport_input_panel"
+    bl_idname = "AN_PT_viewport_input_panel"
     bl_label = "Viewport Input"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"

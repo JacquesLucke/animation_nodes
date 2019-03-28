@@ -1,7 +1,7 @@
 import bpy
 
 class NodeSettingsPanel(bpy.types.Panel):
-    bl_idname = "an_node_settings_panel"
+    bl_idname = "AN_PT_node_settings_panel"
     bl_label = "Advanced Node Settings"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"

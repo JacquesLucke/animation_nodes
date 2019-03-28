@@ -49,7 +49,7 @@ def drawSocketLists(layout, node):
 
 
 class SocketUiList_Normal(bpy.types.UIList):
-    bl_idname = "an_SocketUiList_Normal"
+    bl_idname = "AN_UL_SocketUiList_Normal"
 
     def draw_item(self, context, layout, node, socket, icon, activeData, activePropname):
         if not isinstance(socket, AnimationNodeSocket):
