@@ -4,6 +4,7 @@
 
 - Added *Include End Point* option to the *Float Range* node.
 - Added collection option to *Execution Triggers*.
+- Added missing nodes to the node menu
 
 ### Fixed
 
@@ -12,6 +13,7 @@
 - Fixed *Convert Plane Type* node.
 - Fixed *ReturnDefaultsOnExceptionCodeEffect* and *Get Struct* node.
 - Fixed the *fromFloatList* method of the *3DVectorList* structure.
+- Fixed Material Output node with color output enabled
 
 ### Changed
 
@@ -19,3 +21,5 @@
 - Allow multiple comma separated data paths per *Execution Trigger*.
 - Replaced colored icons in the *Node Menu* to be more uniform.
 - Started following Blender's class naming conventions.
+- Renamed Material Output node to Workbench Material Output
+- Changed location of Animation Nodes to Animation Nodes 

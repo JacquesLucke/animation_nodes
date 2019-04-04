@@ -31,6 +31,7 @@ def drawMenu(self, context):
     layout.menu("AN_MT_mesh_menu", text = "Mesh", icon = "MESH_DATA")
     layout.menu("AN_MT_spline_menu", text = "Spline", icon = "CURVE_DATA")
     layout.menu("AN_MT_particle_system_menu", text = "Particle System", icon = "PARTICLE_DATA")
+    layout.menu("AN_MT_action_menu", text = "Action", icon = "ANIM_DATA")
     layout.separator()
     layout.menu("AN_MT_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
     layout.menu("AN_MT_interpolation_menu", text = "Interpolation", icon = "IPO_BEZIER")
@@ -42,6 +43,7 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("AN_MT_geometry_menu", text = "Geometry", icon = "ORIENTATION_NORMAL")
     layout.menu("AN_MT_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
+    layout.menu("AN_MT_unsorted_menu", text = "Unsorted", icon = "SEQ_SEQUENCER")
     layout.separator()
     layout.menu("AN_MT_viewer_menu", text = "Viewer", icon = "INFO")
     layout.menu("AN_MT_subprograms_menu", text = "Subprograms", icon = "FILE_SCRIPT")
@@ -201,6 +203,10 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_CharacterPropertiesOutputNode", "Character Property")
         insertNode(layout, "an_SeparateTextObjectNode", "Object Separate")
         insertNode(layout, "an_TextObjectOutputNode", "Object Output")
+        layout.separator()
+        insertNode(layout, "an_LSystemNode", "LSystem")
+        insertNode(layout, "an_ConvertToTextNode", "Convert To Text")
+        insertNode(layout, "an_ChangeTextCaseNode", "Change Text Case")
 
 class BooleanMenu(bpy.types.Menu):
     bl_idname = "AN_MT_boolean_menu"
@@ -357,13 +363,17 @@ class MeshMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_MeshObjectInputNode", "Mesh Input")
+        insertNode(layout, "an_MeshInfoNode", "Mesh Info")
         insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
         insertNode(layout, "an_CombineMeshNode", "Combine Mesh")
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
+        insertNode(layout, "an_MeshFromSplineNode", "MeshFromSpline")
         layout.separator()
         insertNode(layout, "an_OffsetPolygonsNode", "Offset Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
         insertNode(layout, "an_ExtractPolygonTransformsNode", "Extract Polygon Transforms")
+        insertNode(layout, "an_OffsetVerticesNode", "Offset Vertices")
+        insertNode(layout, "an_TransformMeshNode", "Transform Mesh")
         layout.menu("AN_MT_mesh_generators_menu", text = "Generators")
         layout.menu("AN_MT_mesh_operators_menu", text = "Operators")
         layout.separator()
@@ -445,6 +455,23 @@ class SplineMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_LoftSplinesNode", "Loft")
         insertNode(layout, "an_RevolveSplineNode", "Revolve")
+        insertNode(layout, "an_TiltSplineNode", "Tilt Spline")
+
+class ActionMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_action_menu"
+    bl_label = "Action Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_ActionFromObjectNode", "Action From Object")
+        layout.separator()
+        insertNode(layout, "an_ChainActionsNode", "Chain Actions")
+        insertNode(layout, "an_DelayActionNode", "Delay Action")
+        insertNode(layout, "an_OverlayActionNode", "Overlay Action")
+        insertNode(layout, "an_WiggleActionNode", "Wiggle Action")
+        insertNode(layout, "an_FollowSplineActionNode", "Follow Spline Action")
+        layout.separator()
+        insertNode(layout, "an_ObjectActionOutputNode", "Object Action Output")
 
 class AnimationMenu(bpy.types.Menu):
     bl_idname = "AN_MT_animation_menu"
@@ -473,6 +500,7 @@ class InterpolationMenu(bpy.types.Menu):
         insertNode(layout, "an_InterpolationFromCurveNode", "From Curve")
         insertNode(layout, "an_InterpolationFromFCurveNode", "From FCurve")
         insertNode(layout, "an_MixInterpolationNode", "Mix")
+        insertNode(layout, "an_MirrorInterpolationNode", "Mirror Interpolation")
         layout.separator()
         insertNode(layout, "an_EvaluateInterpolationNode", "Evaluate")
         insertNode(layout, "an_MapRangeNode", "Map Range", {"useInterpolation" : repr(True)})
@@ -487,6 +515,7 @@ class FalloffMenu(bpy.types.Menu):
         insertNode(layout, "an_DelayFalloffNode", "Delay")
         insertNode(layout, "an_WiggleFalloffNode", "Wiggle")
         insertNode(layout, "an_RandomFalloffNode", "Random")
+        insertNode(layout, "an_NoiseFalloffNode", "Noise Falloff")
         insertNode(layout, "an_IndexMaskFalloffNode", "Index Mask")
         insertNode(layout, "an_ObjectControllerFalloffNode", "Object Controller")
         insertNode(layout, "an_SoundFalloffNode", "Sound")
@@ -513,7 +542,7 @@ class MaterialMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
-        insertNode(layout, "an_MaterialOutputNode", "Material Output")
+        insertNode(layout, "an_MaterialOutputNode", "Workbench Material Output")
 
 class ParticleSystemMenu(bpy.types.Menu):
     bl_idname = "AN_MT_particle_system_menu"
@@ -604,6 +633,7 @@ class ViewerMenu(bpy.types.Menu):
         insertNode(layout, "an_Viewer3DNode", "3D Viewer")
         insertNode(layout, "an_LoopViewerNode", "Loop Viewer")
         insertNode(layout, "an_InterpolationViewerNode", "Interpolation Viewer")
+        insertNode(layout, "an_ActionViewerNode", "Action Viewer")
 
 class SubprogramsMenu(bpy.types.Menu):
     bl_idname = "AN_MT_subprograms_menu"
@@ -637,6 +667,18 @@ class LayoutMenu(bpy.types.Menu):
         props = layout.operator("node.add_node", text = "Reroute")
         props.use_transform = True
         props.type = "NodeReroute"
+
+class UnsortedMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_unsorted_menu"
+    bl_label = "Unsorted Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_BlendDataByNameNode", "get Data By Name")
+        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Data List By Name")
+        insertNode(layout, "an_MixDataListNode", "Mix Data")
+        layout.separator()
+        insertNode(layout, "an_DataInterfaceNode", "Data Interface")
 
 def insertNode(layout, type, text, settings = {}, icon = "NONE"):
     operator = layout.operator("node.add_node", text = text, icon = icon)
