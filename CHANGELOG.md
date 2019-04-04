@@ -4,6 +4,7 @@
 
 - Added *Include End Point* option to the *Float Range* node.
 - Added collection option to *Execution Triggers*.
+- Added *Sound Falloff* node.
 - Added missing nodes to the node menu
 
 ### Fixed
