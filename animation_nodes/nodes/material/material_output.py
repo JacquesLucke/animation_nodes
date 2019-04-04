@@ -16,7 +16,7 @@ attributes = (
 
 class MaterialOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MaterialOutputNode"
-    bl_label = "Material Output"
+    bl_label = "Workbench Material Output"
 
     def create(self):
         self.newInput("Material", "Material", "material", defaultDrawType = "PROPERTY_ONLY")
@@ -38,7 +38,7 @@ class MaterialOutputNode(bpy.types.Node, AnimationNode):
             if self.inputs[i].isUsed: yield f"    self.{setFunction}(material, '{attr}', {attr})"
 
     def setAttribute_Color(self, material, attribute, color):
-        newColor = color[:3]
+        newColor = color[:4]
         oldColor = list(getattr(material, attribute))
         if not all(isclose(a, b) for a, b in zip(oldColor, newColor)):
             setattr(material, attribute, newColor)
