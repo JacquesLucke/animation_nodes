@@ -13,7 +13,7 @@ class MirrorInterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Mirror Interpolation"
 
     chain: BoolProperty(name = "Chain", default = True,
-        description = "Connect original and mirrored interpolation.",
+        description = "Connect original and mirrored interpolation",
         update = propertyChanged)
 
     def create(self):
