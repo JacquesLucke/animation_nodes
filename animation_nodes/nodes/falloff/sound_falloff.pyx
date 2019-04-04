@@ -5,6 +5,7 @@ from ... base_types import AnimationNode
 from ... algorithms.interpolations import Linear
 from ... data_structures cimport DoubleList, FloatList, BaseFalloff
 from . interpolate_list_falloff import createIndexBasedFalloff, createFalloffBasedFalloff
+from .. sound.sound_spectrum import reductionFunctionItems, reductionFunctions, isValidRange
 
 typeItems = [
     ("AVERAGE", "Average", "", "FORCE_TURBULENCE", 0),
@@ -21,15 +22,6 @@ indexFrequencyExtensionItems = [
     ("MIRROR", "Mirror", "", "NONE", 1),
     ("EXTEND", "Extend Last", "NONE", 2)
 ]
-
-reductionFunctionItems = [
-    ("MEAN", "Mean", "Sample the frequency bins by computing the mean of frequency bins", "", 0),
-    ("MAX", "Max", "Sample the frequency bins by computing the maximum of frequency bins", "", 1)
-]
-reductionFunctions = {
-    "MEAN" : numpy.mean,
-    "MAX" : numpy.max
-}
 
 class SoundFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundFalloffNode"
@@ -112,6 +104,9 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
 
     def execute_Average_IndexOffset(self, sound, frame, attack, release, amplitude,
         low, high, scale, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
+        if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
+
         return Average_Index_SoundFalloff(sound, frame, scale, attack, release, amplitude,
             low, high, scene.render.fps, self.smoothingSamples, self.kaiserBeta,
             reductionFunctions[self.reductionFunction])
@@ -159,9 +154,9 @@ cdef class Average_Index_SoundFalloff(BaseFalloff):
         object sound, reductionFunction
         float frame, scale, attack, release, amplitude, low, high, kaiserBeta
 
-    def __cinit__(self, object sound, float frame, float scale, float attack, float release,
-        float amplitude, float low, float high, int fps, int smoothingSamples, float kaiserBeta,
-        object reductionFunction):
+    def __cinit__(self, object sound, float frame, float scale,
+        float attack, float release, float amplitude, float low, float high,
+        int fps, int smoothingSamples, float kaiserBeta, object reductionFunction):
         self.sound = sound
         self.frame = frame
         self.scale = scale
@@ -186,9 +181,3 @@ cdef class Average_Index_SoundFalloff(BaseFalloff):
 
         return self.reductionFunction(
             spectrum[int(self.low * maxFrequency):int(self.high * maxFrequency)]) * self.amplitude
-
-def isValidRange(low, high):
-    if low >= high: return False
-    if low < 0 or low > 1: return False
-    if high < 0 or high > 1: return False
-    return True
