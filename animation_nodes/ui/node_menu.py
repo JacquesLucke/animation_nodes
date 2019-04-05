@@ -6,6 +6,7 @@ from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
 
 mainBaseDataTypes = ("Object", "Integer", "Float", "Vector", "Text")
+searcheableDataTypes = ("Object","Scene","Text Block", "Collection")
 
 def drawMenu(self, context):
     if context.space_data.tree_type != "an_AnimationNodeTree": return
@@ -184,11 +185,13 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Text")})
         insertNode(layout, "an_RandomTextNode", "Random")
         insertNode(layout, "an_CharactersNode", "Characters")
+        insertNode(layout, "an_ConvertToTextNode", "Convert To Text")
         insertNode(layout, "an_TimecodeGeneratorNode", "Timecode Generator")
         layout.separator()
         insertNode(layout, "an_SplitTextNode", "Split")
         insertNode(layout, "an_JoinTextsNode", "Join")
         insertNode(layout, "an_TrimTextNode", "Trim")
+        insertNode(layout, "an_ChangeTextCaseNode", "Change Text Case")
         layout.separator()
         insertNode(layout, "an_ReverseTextNode", "Reverse")
         insertNode(layout, "an_ReplaceTextNode", "Replace")
@@ -205,8 +208,6 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_TextObjectOutputNode", "Object Output")
         layout.separator()
         insertNode(layout, "an_LSystemNode", "LSystem")
-        insertNode(layout, "an_ConvertToTextNode", "Convert To Text")
-        insertNode(layout, "an_ChangeTextCaseNode", "Change Text Case")
 
 class BooleanMenu(bpy.types.Menu):
     bl_idname = "AN_MT_boolean_menu"
@@ -241,6 +242,7 @@ class ListMenu(bpy.types.Menu):
         layout = self.layout
         layout.menu("AN_MT_create_list_menu", text = "Create")
         layout.menu("AN_MT_combine_list_menu", text = "Combine")
+        layout.menu("AN_MT_mix_list_menu", text = "Mix")
         insertNode(layout, "an_AppendListNode", "Append")
         layout.separator()
         insertNode(layout, "an_GetListElementNode", "Get Element")
@@ -309,6 +311,27 @@ class CombineListMenuExtended(bpy.types.Menu):
             if dataType not in mainBaseDataTypes:
                 insertNode(layout, "an_CombineListsNode", dataType, {"assignedType" : repr(dataType)})
 
+class MixListMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_mix_list_menu"
+    bl_label = "Mix List Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        for dataType in mainBaseDataTypes:
+            insertNode(layout, "an_MixDataListNode", dataType, {"assignedType" : repr(dataType)})
+        layout.separator()
+        layout.menu("AN_MT_mix_list_menu_extended", text = "More")
+
+class MixListMenuExtended(bpy.types.Menu):
+    bl_idname = "AN_MT_mix_list_menu_extended"
+    bl_label = "Mix List Menu Extended"
+
+    def draw(self, context):
+        layout = self.layout
+        for dataType in sorted(getBaseDataTypes()):
+            if dataType not in mainBaseDataTypes:
+                insertNode(layout, "an_MixDataListNode", dataType, {"assignedType" : repr(dataType)})
+
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "AN_MT_object_menu"
     bl_label = "Object Menu"
@@ -367,7 +390,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
         insertNode(layout, "an_CombineMeshNode", "Combine Mesh")
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
-        insertNode(layout, "an_MeshFromSplineNode", "MeshFromSpline")
+        insertNode(layout, "an_MeshFromSplineNode", "Mesh From Spline")
         layout.separator()
         insertNode(layout, "an_OffsetPolygonsNode", "Offset Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
@@ -674,11 +697,29 @@ class UnsortedMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_BlendDataByNameNode", "get Data By Name")
-        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Data List By Name")
-        insertNode(layout, "an_MixDataListNode", "Mix Data")
+        layout.menu("AN_MT_data_by_name_menu", text = "Get Data By Name")
+        layout.menu("AN_MT_filter_data_list_by_name_menu", text = "Filter Data List By Name")
         layout.separator()
         insertNode(layout, "an_DataInterfaceNode", "Data Interface")
+
+class DataByNameMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_data_by_name_menu"
+    bl_label = "Get Data By Name"
+    
+    def draw(self, context):
+        layout = self.layout
+        for dataType in searcheableDataTypes:
+            insertNode(layout, "an_BlendDataByNameNode", dataType, {"dataType" : repr(dataType)})
+
+class FilterDataListByNameMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_filter_data_list_by_name_menu"
+    bl_label = "Filter Data List By Name"
+
+    def draw(self, context):
+        layout = self.layout
+        for dataType in searcheableDataTypes:
+            insertNode(layout, "an_FilterBlendDataListByNameNode", dataType, {"dataType" : repr(dataType)})
+            
 
 def insertNode(layout, type, text, settings = {}, icon = "NONE"):
     operator = layout.operator("node.add_node", text = text, icon = icon)
