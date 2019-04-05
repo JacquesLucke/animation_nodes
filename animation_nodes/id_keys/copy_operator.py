@@ -32,7 +32,7 @@ class CopyIDKeyMenuOpener(bpy.types.Operator):
 
 @makeOperator("an.copy_id_key_to_selected_objects", "Copy ID Key",
               arguments = ["String", "String"],
-              description = "Copy this ID Key from active to all selected objects.")
+              description = "Copy this ID Key from active to all selected objects")
 def copyIDKeyToSelectedObjects(dataType, propertyName):
     activeObject = bpy.context.active_object
     if activeObject is None: return
@@ -43,7 +43,7 @@ def copyIDKeyToSelectedObjects(dataType, propertyName):
 
 @makeOperator("an.copy_id_key_to_attribute", "Copy ID Key to Attribute",
               arguments = ["String", "String", "String"],
-              description = "Copy this ID Key to an attribute.")
+              description = "Copy this ID Key to an attribute")
 def copyIntegerIDKeyToAttribute(dataType, propertyName, attribute):
     for object in bpy.context.selected_objects:
         setattrRecursive(object, attribute, object.id_keys.get(dataType, propertyName))

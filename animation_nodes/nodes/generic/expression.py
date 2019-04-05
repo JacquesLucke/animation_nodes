@@ -31,7 +31,7 @@ class ExpressionNode(bpy.types.Node, AnimationNode):
     containsSyntaxError: BoolProperty()
 
     debugMode: BoolProperty(name = "Debug Mode", default = True,
-        description = "Show detailed error messages in the node but is slower.",
+        description = "Show detailed error messages in the node but is slower",
         update = executionCodeChanged)
 
     correctType: BoolProperty(name = "Correct Type", default = True,

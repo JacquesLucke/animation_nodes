@@ -15,11 +15,11 @@ class CircleMeshNode(bpy.types.Node, AnimationNode):
         executionCodeChanged()
 
     mergeStartEnd: BoolProperty(name = "Merge Start End", default = True,
-        description = "Merge the start and end of the circle.",
+        description = "Merge the start and end of the circle",
         update = checkedPropertiesChanged)
 
     mergeCenter: BoolProperty(name = "Merge Center", default = True,
-        description = "Merge the center of the circle using a triangle fan.",
+        description = "Merge the center of the circle using a triangle fan",
         update = checkedPropertiesChanged)
 
     useRadialLoopsList: VectorizedSocket.newProperty()

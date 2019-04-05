@@ -71,7 +71,7 @@ class ExtractPolygonTransformsNode(bpy.types.Node, AnimationNode):
 
     polygonsAreFlat: BoolProperty(name = "Polygons are Flat", default = False,
         description = ("Performance can be improved when you are certain that all polygons are flat. "
-                       "Enabling this can lead to artifacts when the polygons are not actually flat."),
+                       "Enabling this can lead to artifacts when the polygons are not actually flat"),
         update = propertyChanged)
 
     def create(self):

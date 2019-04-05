@@ -14,6 +14,7 @@
 - Fixed *Convert Plane Type* node.
 - Fixed *ReturnDefaultsOnExceptionCodeEffect* and *Get Struct* node.
 - Fixed the *fromFloatList* method of the *3DVectorList* structure.
+- Fixed double period in the description of some properties.
 - Fixed Material Output node with color output enabled
 
 ### Changed
