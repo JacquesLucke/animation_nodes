@@ -22,4 +22,4 @@
 - Allow multiple comma separated data paths per *Execution Trigger*.
 - Replaced colored icons in the *Node Menu* to be more uniform.
 - Started following Blender's class naming conventions.
-- Made some nodes unsearchable like *Loop Generator* and *Group Output* nodes.
+- Made dependent nodes unsearchable like *Loop Generator* and *Group Output* nodes.
