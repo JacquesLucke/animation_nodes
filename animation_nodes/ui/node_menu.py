@@ -684,9 +684,7 @@ class LayoutMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        props = layout.operator("node.add_node", text = "Frame")
-        props.use_transform = True
-        props.type = "NodeFrame"
+        layout.operator("an.frame_selected", text = "Frame")
         props = layout.operator("node.add_node", text = "Reroute")
         props.use_transform = True
         props.type = "NodeReroute"
