@@ -1,6 +1,7 @@
 import bpy
 import itertools
 from bpy.props import *
+from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import iterAnimationNodeClasses, newNodeAtCursor, invokeTranslation
 
 itemsByIdentifier = {}
@@ -54,6 +55,7 @@ class InsertItem:
 
 def iterSingleNodeItems():
     for node in iterAnimationNodeClasses():
+        if not node.isSearchable: continue
         if not node.onlySearchTags:
             yield SingleNodeInsertionItem(node.bl_idname, node.bl_label)
         for customSearch in node.getSearchTags():
@@ -61,6 +63,9 @@ def iterSingleNodeItems():
                 yield SingleNodeInsertionItem(node.bl_idname, customSearch[0], customSearch[1])
             else:
                 yield SingleNodeInsertionItem(node.bl_idname, customSearch)
+    for network in getSubprogramNetworks():
+        yield SingleNodeInsertionItem("an_InvokeSubprogramNode", network.name,
+            {"subprogramIdentifier" : repr(network.identifier)})
 
 class SingleNodeInsertionItem:
     def __init__(self, idName, tag, settings = {}):

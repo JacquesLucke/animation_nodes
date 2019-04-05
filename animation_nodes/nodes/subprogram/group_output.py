@@ -11,6 +11,7 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutputNode"
     bl_label = "Group Output"
     bl_width_default = 180
+    isSearchable = False
 
     def inputNodeIdentifierChanged(self, context):
         subprogramInterfaceChanged()

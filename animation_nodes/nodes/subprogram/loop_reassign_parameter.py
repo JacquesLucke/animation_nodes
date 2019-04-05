@@ -8,6 +8,7 @@ class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
     bl_label = "Reassign Loop Parameter"
     bl_width_default = 180
     onlySearchTags = True
+    isSearchable = False
 
     def identifierChanged(self, context):
         socket = self.linkedParameterSocket

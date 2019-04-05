@@ -7,6 +7,7 @@ from ... events import treeChanged, propertyChanged
 class LoopBreakNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopBreakNode"
     bl_label = "Loop Break"
+    isSearchable = False
 
     loopInputIdentifier: StringProperty(update = treeChanged)
 
