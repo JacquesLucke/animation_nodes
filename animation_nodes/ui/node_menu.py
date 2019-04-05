@@ -44,7 +44,7 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("AN_MT_geometry_menu", text = "Geometry", icon = "ORIENTATION_NORMAL")
     layout.menu("AN_MT_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
-    layout.menu("AN_MT_unsorted_menu", text = "Unsorted", icon = "SEQ_SEQUENCER")
+    layout.menu("AN_MT_unsorted_menu", text = "Data", icon = "SEQ_SEQUENCER")
     layout.separator()
     layout.menu("AN_MT_viewer_menu", text = "Viewer", icon = "INFO")
     layout.menu("AN_MT_subprograms_menu", text = "Subprograms", icon = "FILE_SCRIPT")
