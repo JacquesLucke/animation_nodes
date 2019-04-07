@@ -4,7 +4,7 @@ from .. operators.output_execution_code import setupTextEditorCallback, executio
 
 
 class DeveloperPanel(bpy.types.Panel):
-    bl_idname = "an_developer_panel"
+    bl_idname = "AN_PT_developer_panel"
     bl_label = "Developer"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"

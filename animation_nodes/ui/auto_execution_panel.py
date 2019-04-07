@@ -4,7 +4,7 @@ from .. utils.layout import writeText
 from .. utils.blender_ui import isViewportRendering
 
 class AutoExecutionPanel(bpy.types.Panel):
-    bl_idname = "an_auto_execution_panel"
+    bl_idname = "AN_PT_auto_execution_panel"
     bl_label = "Auto Execution"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"

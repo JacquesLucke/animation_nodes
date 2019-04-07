@@ -3,7 +3,7 @@ import bpy
 class RemoveNodeTree(bpy.types.Operator):
     bl_idname = "an.remove_node_tree"
     bl_label = "Remove Animation Node Tree"
-    bl_description = "Remove the active animation node tree."
+    bl_description = "Remove the active animation node tree"
 
     @classmethod
     def poll(cls, context):

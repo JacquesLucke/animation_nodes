@@ -63,7 +63,7 @@ def removesIDKey(function):
 
 @makeOperator("an.remove_id_key", "Remove ID Key", arguments = ["String", "String"],
               redraw = True, confirm = True,
-              description = "Remove this ID Key from the whole file.")
+              description = "Remove this ID Key from the whole file")
 def removeIDKey(dataType, propertyName):
     idKey = IDKey(dataType, propertyName)
     for removeFunction in removeIDKeyFunctions:

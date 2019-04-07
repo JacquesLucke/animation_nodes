@@ -21,11 +21,11 @@ class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
 
     algorithmType: EnumProperty(name = "Algorithm Type", default = "EDGE",
-        description = "Choose the algorithm used for generating the splines.",
+        description = "Choose the algorithm used for generating the splines",
         update = propertyChanged, items = algorithmTypeItems)
 
     radiusType: EnumProperty(name = "Radius Type", default = "EDGE",
-        description = "Only important if there is a list of radii.",
+        description = "Only important if there is a list of radii",
         update = propertyChanged, items = radiusTypeItems)
 
     useRadiusList: VectorizedSocket.newProperty()

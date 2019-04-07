@@ -16,7 +16,7 @@ class ChainActionsNode(bpy.types.Node, AnimationNode):
 
     __annotations__ = {}
     __annotations__["relative"] = BoolProperty(name = "Relative", default = True,
-        description = "Use last frame of first action as starting point of the second.",
+        description = "Use last frame of first action as starting point of the second",
         update = propertyChanged)
 
     def create(self):

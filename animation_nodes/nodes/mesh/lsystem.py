@@ -16,7 +16,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
     useSymbolLimit: BoolProperty(name = "Use Symbol Limit", default = True)
 
     symbolLimit: IntProperty(name = "Symbol Limit", default = 100000,
-        description = "To prevent freezing Blender when trying to calculate too many generations.",
+        description = "To prevent freezing Blender when trying to calculate too many generations",
         min = 0)
 
     preset: EnumProperty(name = "Preset", items = getPresetItems)
