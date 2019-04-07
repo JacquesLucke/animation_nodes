@@ -5,6 +5,7 @@
 - Added *Include End Point* option to the *Float Range* node.
 - Added collection option to *Execution Triggers*.
 - Added *Sound Falloff* node.
+- Added missing nodes to the node menu
 
 ### Fixed
 
@@ -21,3 +22,4 @@
 - Allow multiple comma separated data paths per *Execution Trigger*.
 - Replaced colored icons in the *Node Menu* to be more uniform.
 - Started following Blender's class naming conventions.
+- Changed location of Animation Nodes to Animation Nodes 
