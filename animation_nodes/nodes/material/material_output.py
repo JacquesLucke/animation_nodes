@@ -16,7 +16,7 @@ attributes = (
 
 class MaterialOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MaterialOutputNode"
-    bl_label = "Workbench Material Output"
+    bl_label = "Material Output"
 
     def create(self):
         self.newInput("Material", "Material", "material", defaultDrawType = "PROPERTY_ONLY")

@@ -22,4 +22,3 @@
 - Allow multiple comma separated data paths per *Execution Trigger*.
 - Replaced colored icons in the *Node Menu* to be more uniform.
 - Started following Blender's class naming conventions.
-- Renamed *Material Output* to *Workbench Material Output*

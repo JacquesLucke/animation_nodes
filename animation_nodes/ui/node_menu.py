@@ -513,7 +513,7 @@ class MaterialMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
-        insertNode(layout, "an_MaterialOutputNode", "Workbench Material Output")
+        insertNode(layout, "an_MaterialOutputNode", "Material Output")
 
 class ParticleSystemMenu(bpy.types.Menu):
     bl_idname = "AN_MT_particle_system_menu"
