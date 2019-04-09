@@ -15,6 +15,7 @@
 - Fixed *ReturnDefaultsOnExceptionCodeEffect* and *Get Struct* node.
 - Fixed the *fromFloatList* method of the *3DVectorList* structure.
 - Fixed double period in the description of some properties.
+- Fixed Material Output Node's Color output
 
 ### Changed
 
