@@ -15,6 +15,7 @@
 - Fixed *ReturnDefaultsOnExceptionCodeEffect* and *Get Struct* node.
 - Fixed the *fromFloatList* method of the *3DVectorList* structure.
 - Fixed double period in the description of some properties.
+- Fixed Material Output Node's Color output
 
 ### Changed
 
@@ -23,3 +24,4 @@
 - Replaced colored icons in the *Node Menu* to be more uniform.
 - Started following Blender's class naming conventions.
 - Made dependent nodes unsearchable like *Loop Generator* and *Group Output* nodes.
+- Started following Blender's class naming conventions.
