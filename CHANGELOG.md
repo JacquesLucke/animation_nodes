@@ -5,6 +5,7 @@
 - Added *Include End Point* option to the *Float Range* node.
 - Added collection option to *Execution Triggers*.
 - Added *Sound Falloff* node.
+- Added *Subprograms* to the search menu.
 
 ### Fixed
 
@@ -21,4 +22,6 @@
 - Redesigned *Execution Triggers* UI.
 - Allow multiple comma separated data paths per *Execution Trigger*.
 - Replaced colored icons in the *Node Menu* to be more uniform.
+- Started following Blender's class naming conventions.
+- Made dependent nodes unsearchable like *Loop Generator* and *Group Output* nodes.
 - Started following Blender's class naming conventions.
