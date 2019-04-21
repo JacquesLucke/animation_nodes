@@ -9,13 +9,14 @@
 
 ### Fixed
 
-- Fixed the *Sort* node for windows users.
+- Fixed the *Sort* node for Windows users.
 - Fixed bad path resolution in the *Set Keyframe* node.
 - Fixed *Convert Plane Type* node.
 - Fixed *ReturnDefaultsOnExceptionCodeEffect* and *Get Struct* node.
 - Fixed the *fromFloatList* method of the *3DVectorList* structure.
 - Fixed double period in the description of some properties.
-- Fixed Material Output Node's Color output
+- Fixed *Material Output* node's color output.
+- Fixed *Create Execution Trigger* operators.
 
 ### Changed
 

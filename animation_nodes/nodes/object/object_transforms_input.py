@@ -49,13 +49,14 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
         isLinked = self.getLinkedOutputsDict()
         customTriggers = self.nodeTree.autoExecution.customTriggers
 
-        object = self.inputs["Object"].object
-
-        if isLinked["location"]:
-            customTriggers.new("MONITOR_PROPERTY", idType = "OBJECT", dataPath = "location", object = object)
-        if isLinked["rotation"]:
-            customTriggers.new("MONITOR_PROPERTY", idType = "OBJECT", dataPath = "rotation_euler", object = object)
-        if isLinked["scale"]:
-            customTriggers.new("MONITOR_PROPERTY", idType = "OBJECT", dataPath = "scale", object = object)
-        if isLinked["quaternion"]:
-            customTriggers.new("MONITOR_PROPERTY", idType = "OBJECT", dataPath = "rotation_quaternion", object = object)
+        attrs = []
+        if isLinked["scale"]: attrs.append("scale")
+        if isLinked["location"]: attrs.append("location")
+        if isLinked["rotation"]: attrs.append("rotation_euler")
+        if isLinked["quaternion"]: attrs.append("rotation_quaternion")
+        
+        if attrs:
+            item = self.nodeTree.autoExecution.customTriggers.new("MONITOR_PROPERTY")
+            item.idType = "OBJECT"
+            item.dataPaths = ",".join(attrs)
+            item.object = self.inputs["Object"].object
