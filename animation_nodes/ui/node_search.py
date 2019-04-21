@@ -55,7 +55,6 @@ class InsertItem:
 
 def iterSingleNodeItems():
     for node in iterAnimationNodeClasses():
-        if not node.isSearchable: continue
         if not node.onlySearchTags:
             yield SingleNodeInsertionItem(node.bl_idname, node.bl_label)
         for customSearch in node.getSearchTags():
