@@ -10,7 +10,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
     dynamicLabelType = "ALWAYS"
-    isSearchable = False
+    onlySearchTags = True
 
     def settingChanged(self, context):
         self.refresh()

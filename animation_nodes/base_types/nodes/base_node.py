@@ -52,7 +52,6 @@ class AnimationNode:
     activeOutputIndex: IntProperty()
 
     searchTags = []
-    isSearchable = True
     onlySearchTags = False
 
     # can contain: 'NO_EXECUTION', 'NOT_IN_SUBPROGRAM',
