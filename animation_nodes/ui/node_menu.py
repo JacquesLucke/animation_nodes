@@ -7,7 +7,6 @@ from .. utils.nodes import getAnimationNodeTrees
 
 mainBaseDataTypes = ("Object", "Integer", "Float", "Vector", "Text")
 numericalDataTypes = ("Matrix", "Vector", "Float", "Color", "Euler", "Quaternion")
-searcheableDataTypes = ("Object","Scene","Text Block", "Collection")
 
 def drawMenu(self, context):
     if context.space_data.tree_type != "an_AnimationNodeTree": return
@@ -45,7 +44,6 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("AN_MT_geometry_menu", text = "Geometry", icon = "ORIENTATION_NORMAL")
     layout.menu("AN_MT_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
-    layout.menu("AN_MT_data_menu", text = "Data", icon = "SEQ_SEQUENCER")
     layout.separator()
     layout.menu("AN_MT_viewer_menu", text = "Viewer", icon = "INFO")
     layout.menu("AN_MT_subprograms_menu", text = "Subprograms", icon = "FILE_SCRIPT")
@@ -680,35 +678,6 @@ class LayoutMenu(bpy.types.Menu):
         props.use_transform = True
         props.type = "NodeReroute"
 
-class DataMenu(bpy.types.Menu):
-    bl_idname = "AN_MT_data_menu"
-    bl_label = "Unsorted Menu"
-
-    def draw(self, context):
-        layout = self.layout
-        layout.menu("AN_MT_data_by_name_menu", text = "Get Data By Name")
-        layout.menu("AN_MT_filter_data_list_by_name_menu", text = "Filter Data List By Name")
-        layout.separator()
-        insertNode(layout, "an_DataInterfaceNode", "Data Interface")
-
-class DataByNameMenu(bpy.types.Menu):
-    bl_idname = "AN_MT_data_by_name_menu"
-    bl_label = "Get Data By Name"
-    
-    def draw(self, context):
-        layout = self.layout
-        for dataType in searcheableDataTypes:
-            insertNode(layout, "an_BlendDataByNameNode", dataType, {"dataType" : repr(dataType)})
-
-class FilterDataListByNameMenu(bpy.types.Menu):
-    bl_idname = "AN_MT_filter_data_list_by_name_menu"
-    bl_label = "Filter Data List By Name"
-
-    def draw(self, context):
-        layout = self.layout
-        for dataType in searcheableDataTypes:
-            insertNode(layout, "an_FilterBlendDataListByNameNode", dataType, {"dataType" : repr(dataType)})
-            
 
 def insertNode(layout, type, text, settings = {}, icon = "NONE"):
     operator = layout.operator("node.add_node", text = text, icon = icon)
