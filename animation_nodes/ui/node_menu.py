@@ -6,6 +6,7 @@ from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees
 
 mainBaseDataTypes = ("Object", "Integer", "Float", "Vector", "Text")
+numericalDataTypes = ("Matrix", "Vector", "Float", "Color", "Euler", "Quaternion")
 searcheableDataTypes = ("Object","Scene","Text Block", "Collection")
 
 def drawMenu(self, context):
@@ -317,20 +318,8 @@ class MixListMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for dataType in mainBaseDataTypes:
-            insertNode(layout, "an_MixDataListNode", dataType, {"assignedType" : repr(dataType)})
-        layout.separator()
-        layout.menu("AN_MT_mix_list_menu_extended", text = "More")
-
-class MixListMenuExtended(bpy.types.Menu):
-    bl_idname = "AN_MT_mix_list_menu_extended"
-    bl_label = "Mix List Menu Extended"
-
-    def draw(self, context):
-        layout = self.layout
-        for dataType in sorted(getBaseDataTypes()):
-            if dataType not in mainBaseDataTypes:
-                insertNode(layout, "an_MixDataListNode", dataType, {"assignedType" : repr(dataType)})
+        for dataType in numericalDataTypes:
+            insertNode(layout, "an_MixDataListNode", dataType, {"dataType" : repr(dataType)})
 
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "AN_MT_object_menu"
