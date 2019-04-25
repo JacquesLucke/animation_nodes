@@ -25,7 +25,7 @@ bl_info = {
     "author":      "Jacques Lucke",
     "version":     (2, 1, 4),
     "blender":     (2, 80, 0),
-    "location":    "Animation Nodes",
+    "location":    "Animation Nodes Editor",
     "category":    "Node",
     "warning":     "This version is still in development."
 }
