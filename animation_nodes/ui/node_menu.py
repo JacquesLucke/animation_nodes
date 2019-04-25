@@ -241,7 +241,6 @@ class ListMenu(bpy.types.Menu):
         layout = self.layout
         layout.menu("AN_MT_create_list_menu", text = "Create")
         layout.menu("AN_MT_combine_list_menu", text = "Combine")
-        layout.menu("AN_MT_mix_list_menu", text = "Mix")
         insertNode(layout, "an_AppendListNode", "Append")
         layout.separator()
         insertNode(layout, "an_GetListElementNode", "Get Element")
@@ -309,15 +308,6 @@ class CombineListMenuExtended(bpy.types.Menu):
         for dataType in sorted(getBaseDataTypes()):
             if dataType not in mainBaseDataTypes:
                 insertNode(layout, "an_CombineListsNode", dataType, {"assignedType" : repr(dataType)})
-
-class MixListMenu(bpy.types.Menu):
-    bl_idname = "AN_MT_mix_list_menu"
-    bl_label = "Mix List Menu"
-
-    def draw(self, context):
-        layout = self.layout
-        for dataType in numericalDataTypes:
-            insertNode(layout, "an_MixDataListNode", dataType, {"dataType" : repr(dataType)})
 
 class ObjectMenu(bpy.types.Menu):
     bl_idname = "AN_MT_object_menu"
@@ -493,12 +483,11 @@ class AnimationMenu(bpy.types.Menu):
         insertNode(layout, "an_DelayTimeNode", "Delay")
         insertNode(layout, "an_RepeatTimeNode", "Repeat")
         layout.separator()
-        insertNode(layout, "an_AnimateDataNode", "Animate Number", {"dataType" : repr("Float")})
-        insertNode(layout, "an_AnimateDataNode", "Animate Vector", {"dataType" : repr("Vector")})
-        insertNode(layout, "an_AnimateDataNode", "Animate Euler", {"dataType" : repr("Euler")})
-        insertNode(layout, "an_AnimateDataNode", "Animate Quaternion", {"dataType" : repr("Quaternion")})
-        insertNode(layout, "an_AnimateDataNode", "Animate Matrix", {"dataType" : repr("Matrix")})
-        insertNode(layout, "an_AnimateDataNode", "Animate Color", {"dataType" : repr("Color")})
+        for dataType in numericalDataTypes:
+            insertNode(layout, "an_AnimateDataNode", "Animate " + dataType, {"dataType" : repr(dataType)})
+        layout.separator()
+        for dataType in numericalDataTypes:
+            insertNode(layout, "an_MixDataListNode", "Mix " + dataType + " List", {"dataType" : repr(dataType)})
 
 class InterpolationMenu(bpy.types.Menu):
     bl_idname = "AN_MT_interpolation_menu"
