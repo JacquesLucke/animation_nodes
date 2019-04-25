@@ -331,6 +331,7 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
+        insertNode(layout, "an_CollectionOperationsNode", "Collection Operations")
         insertNode(layout, "an_ArmatureInfoNode", "Armature Info")
         layout.menu("AN_MT_object_utils_menu", text = "Utils")
         layout.separator()
