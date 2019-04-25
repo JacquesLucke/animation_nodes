@@ -1,6 +1,7 @@
 import bpy
 import time
-from bpy.props import *
+from .. import bl_info
+from bpy.props import * 
 from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
 from . tree_auto_execution import AutoExecutionProperties
@@ -16,8 +17,8 @@ class LastTreeExecutionInfo(bpy.types.PropertyGroup):
 
     isDefault: BoolProperty(default = True)
     executionTime: FloatProperty(name = "Execution Time")
-    blenderVersion: IntVectorProperty(name = "Blender Version", default = (2, 77, 0))
-    animationNodesVersion: IntVectorProperty(name = "Animation Nodes Version", default = (1, 0, 1))
+    blenderVersion: IntVectorProperty(name = "Blender Version", default = bl_info["blender"])
+    animationNodesVersion: IntVectorProperty(name = "Animation Nodes Version", default = bl_info["version"])
 
     def updateVersions(self):
         self.blenderVersion = getBlenderVersion()
