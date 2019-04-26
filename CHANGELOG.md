@@ -6,6 +6,7 @@
 - Added collection option to *Execution Triggers*.
 - Added *Sound Falloff* node.
 - Added *Subprograms* to the search menu.
+- Added *Collection Operations* node.
 
 ### Fixed
 
