@@ -21,3 +21,4 @@ class CollectionOperationsNode(bpy.types.Node, AnimationNode):
             if linked: collection.objects.link(object)
 
         return collection
+    
