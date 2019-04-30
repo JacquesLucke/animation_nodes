@@ -18,7 +18,7 @@ class CollectionOperationsNode(bpy.types.Node, AnimationNode):
         self.newOutput("Collection", "Collection", "collection")
 
     def getExecutionCode(self, required):
-        return "self.executeSingleObject(collection, object, linked)"
+        return "collection = self.executeSingleObject(collection, object, linked)"
 
     def executeSingleObject(self, collection, object, linked):
         if collection is None: return collection
@@ -30,4 +30,3 @@ class CollectionOperationsNode(bpy.types.Node, AnimationNode):
             if linked: collection.objects.link(object)
 
         return collection
-    
