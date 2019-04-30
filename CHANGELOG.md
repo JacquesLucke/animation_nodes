@@ -7,6 +7,7 @@
 - Added *Sound Falloff* node.
 - Added *Subprograms* to the search menu.
 - Added missing nodes to the node menu
+- Added *Collection Operations* node.
 
 ### Fixed
 
