@@ -2,7 +2,7 @@ import bpy
 from .. utils.blender_ui import PieMenuHelper
 
 class SelectionPie(bpy.types.Menu, PieMenuHelper):
-    bl_idname = "an.selection_pie"
+    bl_idname = "AN_MT_selection_pie"
     bl_label = "Selection Pie"
 
     @classmethod

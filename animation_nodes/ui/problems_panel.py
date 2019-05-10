@@ -7,7 +7,7 @@ from .. graphics.rectangle import Rectangle
 from .. utils.blender_ui import getDpiFactor
 
 class ProblemsPanel(bpy.types.Panel):
-    bl_idname = "an_problems_panel"
+    bl_idname = "AN_PT_problems_panel"
     bl_label = "Problems"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"

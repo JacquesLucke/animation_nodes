@@ -15,9 +15,6 @@ from gpu_extras.batch import batch_for_shader
 from ... graphics.import_shader import getShader
 from ... graphics.c_utils import getMatricesVBOandIBO
 
-vectorsShader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-matricesShader = getShader(os.path.join(os.path.dirname(__file__), "matrix_shader.glsl"))
-
 dataByIdentifier = {}
 
 class DrawData:
@@ -82,7 +79,7 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
             dataByIdentifier[self.identifier] = DrawData(Matrix4x4List.fromValues([data]), self.drawMatrices)
 
     def drawVectors(self, vectors):
-        shader = vectorsShader
+        shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
         batch = batch_for_shader(shader, 'POINTS', {"pos": vectors.asNumpyArray().reshape(-1, 3)})
 
         shader.bind()
@@ -92,7 +89,7 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
         batch.draw(shader)
 
     def drawMatrices(self, matrices):
-        shader = matricesShader
+        shader = getShader(os.path.join(os.path.dirname(__file__), "matrix_shader.glsl"))
         vbo, ibo = getMatricesVBOandIBO(matrices, self.matrixScale)
         batch = batch_for_shader(shader, 'LINES',
             {"pos": vbo.asNumpyArray().reshape(-1, 3)},

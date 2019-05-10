@@ -200,9 +200,9 @@ def checkBuildEnvironment(checkCython, checkPython):
             sys.exit()
     if checkPython:
         v = sys.version_info
-        if v.major != 3 or v.minor != 5:
+        if v.major != 3 or v.minor != 7:
             print(textwrap.dedent('''\
-            Blender 2.78/2.79 officially uses Python 3.5.x.
+            Blender 2.8 officially uses Python 3.7.x.
             You are using: {}
 
             Use the --noversioncheck option to disable this check.\

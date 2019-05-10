@@ -12,9 +12,15 @@ class SortNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         if "sortedNumbers" in required:
-            yield "sortedNumbers = DoubleList.fromNumpyArray(numpy.sort(numbers.asMemoryView()))"
+            yield "if len(numbers):"
+            yield "    sortedNumbers = DoubleList.fromNumpyArray(numpy.sort(numbers.asMemoryView()))"
+            yield "else:"
+            yield "    sortedNumbers = DoubleList()"
         if "indices" in required:
-            yield "indices = LongList.fromNumpyArray(numpy.argsort(numbers.asMemoryView()))"
+            yield "if len(numbers):"
+            yield "    indices = LongList.fromNumpyArray(numpy.argsort(numbers.asMemoryView()).astype(int))"
+            yield "else:"
+            yield "    indices = LongList()"
 
     def getUsedModules(self):
         return ["numpy"]
