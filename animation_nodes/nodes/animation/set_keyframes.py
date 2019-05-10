@@ -1,7 +1,8 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode
 from ... events import propertyChanged
+from ... base_types import AnimationNode
+from ... utils.path import getResolvedNestedPath
 
 pathTypes = ("Custom", "Location", "Rotation", "Scale", "LocRotScale")
 pathTypeItems = [(pathType, pathType, "") for pathType in pathTypes]
@@ -15,6 +16,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetKeyframesNode"
     bl_label = "Set Keyframes"
     bl_width_default = 200
+    errorHandlingType = "MESSAGE"
 
     paths: CollectionProperty(type = KeyframePath)
 
@@ -46,22 +48,17 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
         if setKeyframe:
             for item in self.paths:
                 try:
-                    obj, path = self.getResolvedNestedPath(object, item.path)
+                    obj, path = getResolvedNestedPath(object, item.path)
                     obj.keyframe_insert(data_path = path, frame = frame, index = item.index)
-                except: pass
+                except:
+                    self.setErrorMessage("Could not set keyframe.")
         elif removeUnwanted:
             for item in self.paths:
                 try:
-                    obj, path = self.getResolvedNestedPath(object, item.path)
+                    obj, path = getResolvedNestedPath(object, item.path)
                     obj.keyframe_delete(data_path = path, frame = frame, index = item.index)
-                except: pass
-
-    def getResolvedNestedPath(self, object, path):
-        index = path.find(".")
-        if index == -1: return object, path
-        else:
-            data = eval("object." + path[:index])
-            return data, path[index+1:]
+                except:
+                    self.setErrorMessage("Could not remove keyframe.")
 
     def newPath(self, path, index = -1):
         item = self.paths.add()

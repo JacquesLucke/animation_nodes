@@ -40,7 +40,8 @@ class ActionChannelProperty(bpy.types.PropertyGroup):
             return PathIndexActionChannel(self.channelPath, self.channelIndex)
 
 class ActionChannelsNodeBase:
-    channels: CollectionProperty(type = ActionChannelProperty)
+    __annotations__ = {}
+    __annotations__["channels"] = CollectionProperty(type = ActionChannelProperty)
 
     def drawChannels(self, layout):
         col = layout.column()

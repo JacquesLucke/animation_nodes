@@ -5,7 +5,7 @@ from .. utils.timing import prettyTime
 from .. preferences import getExecutionCodeSettings
 
 class TreePanel(bpy.types.Panel):
-    bl_idname = "an_tree_panel"
+    bl_idname = "AN_PT_tree_panel"
     bl_label = "Animation Node Tree"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"

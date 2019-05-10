@@ -4,7 +4,7 @@ from .. utils.timing import prettyTime
 from .. utils.nodes import getAnimationNodeTrees
 
 class OverviewPanel(bpy.types.Panel):
-    bl_idname = "an_overview_panel"
+    bl_idname = "AN_PT_overview_panel"
     bl_label = "Overview"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"

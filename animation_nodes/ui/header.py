@@ -1,7 +1,7 @@
 import bpy
 
 class TemplatesMenuInHeader(bpy.types.Header):
-    bl_idname = "an_templates_menu_in_header"
+    bl_idname = "AN_HT_templates_menu_in_header"
     bl_space_type = "NODE_EDITOR"
 
     def draw(self, context):
@@ -9,6 +9,6 @@ class TemplatesMenuInHeader(bpy.types.Header):
 
         layout = self.layout
         layout.separator()
-        layout.menu("an_subprograms_menu", text = "Subprograms")
+        layout.menu("AN_MT_subprograms_menu", text = "Subprograms")
 
         layout.operator("an.remove_node_tree", text = "Remove", emboss = False)

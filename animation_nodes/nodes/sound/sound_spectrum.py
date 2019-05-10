@@ -34,7 +34,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
     kaiserBeta: FloatProperty(name = "Kaiser Beta", default = 6, min = 0,
         description = ("Beta parameter of the Kaiser window function."
         " High value corresponds to higher main-lobe leaking and lower side-lobe leaking"))
-    minDuration: FloatProperty(name = "Minimum Duration", default = 0.03, min = 0,
+    minDuration: FloatProperty(name = "Minimum Duration", default = 0, min = 0,
         description = ("The minimum duration of the sound used to compute the spectrum."
         " High value corresponds to higher spectral resolution but introduce overlapping spectrum"))
 

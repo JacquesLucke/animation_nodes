@@ -53,7 +53,7 @@ locationModeItems = [
 class IDKeysFromSortedObjects(bpy.types.Operator):
     bl_idname = "an.id_keys_from_sorted_objects"
     bl_label = "ID Keys from Sorted Objects"
-    bl_description = "Assign ID Keys based on the selected sorting method."
+    bl_description = "Assign ID Keys based on the selected sorting method"
 
     idKeyName: StringProperty()
     sortMode: EnumProperty(name = "Sorting Method", default = "SELECTION_ORDER",
