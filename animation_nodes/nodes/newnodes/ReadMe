@@ -1,0 +1,5 @@
+These nodes for Blender 2.8x
+
+Note:- Right now, the Particle Output Node only works during rendering with baked particles. The direct bake option of 
+particles does not work. So, you have to first cache the particles then convert the cache into the bake. I have provided
+an addon (Bake_Cached_Particles) which allows doing the same. You DO NOT need to bake these particles for the viewport.
