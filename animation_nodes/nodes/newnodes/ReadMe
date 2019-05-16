@@ -10,3 +10,4 @@ Manually Installation Guide:
    2) Copy the "gpencil" folder into the "data_structures" folder of animation nodes
    3) Copy the "layer.py, stroke.py, and object.py" into the "sockets" folder of animation nodes
    4) Copy the "node_menu.py" into the "ui" folder of animation nodes
+   5) Replace the "c_utils.cpython-37m-x86_64-linux-gnu" from "vector" folder for Windows or Mac.
