@@ -21,7 +21,7 @@ class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "End Cap", "endCapMode")
         self.newOutput("Integer", "Material Index", "materialIndex") 
 
-        visibleOutputs = ("Points", "Vectors")
+        visibleOutputs = ("Total Points", "Points")
         for socket in self.outputs:
             socket.hide = socket.name not in visibleOutputs
 
