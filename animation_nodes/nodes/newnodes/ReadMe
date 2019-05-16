@@ -3,3 +3,10 @@ These nodes for Blender 2.8x
 Note:- Right now, the Particle Output Node only works during rendering with baked particles. The direct bake option of 
 particles does not work. So, you have to first cache the particles then convert the cache into the bake. I have provided
 an addon (Bake_Cached_Particles) which allows doing the same. You DO NOT need to bake these particles for the viewport.
+
+
+Manually Installation Guide:
+   1) Copy the "newnodes" folder into the "nodes" folder of animation noddes
+   2) Copy the "gpencil" folder into the "data_structures" folder of animation nodes
+   3) Copy the "layer.py, stroke.py, and object.py" into the "sockets" folder of animation nodes
+   4) Copy the "node_menu.py" into the "ui" folder of animation nodes
