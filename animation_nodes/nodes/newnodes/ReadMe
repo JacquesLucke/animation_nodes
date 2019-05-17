@@ -11,4 +11,4 @@ Manually Installation Guide:
    3) Copy the "layer.py, stroke.py, and object.py" into the "sockets" folder of animation nodes
    4) Copy the "node_menu.py" into the "ui" folder of animation nodes
    5) Copy the "newnodes" folder into the "nodes" folder of animation noddes
-   6) Copy the "c_utils.cpython-37m-x86_64-linux-gnu.so" into "newnodes" folder from "vector" folder for Linux but a similar file for Windows, or Mac.
+   6) Copy the "c_utils.cpython-37m-x86_64-linux-gnu.so" into "newnodes" folder from "vector" folder for Linux, Windows, or Mac.
