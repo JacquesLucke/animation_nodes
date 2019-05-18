@@ -19,6 +19,8 @@
 - Fixed double period in the description of some properties.
 - Fixed *Material Output* node's color output.
 - Fixed *Create Execution Trigger* operators.
+- Fixed *Dependency Graph* calls.
+- Fixed *Scene Update* calls.
 
 ### Changed
 
@@ -27,5 +29,4 @@
 - Replaced colored icons in the *Node Menu* to be more uniform.
 - Started following Blender's class naming conventions.
 - Made dependent nodes unsearchable like *Loop Generator* and *Group Output* nodes.
-- Started following Blender's class naming conventions.
 - Changed location of Animation Nodes to Animation Nodes Editor.
