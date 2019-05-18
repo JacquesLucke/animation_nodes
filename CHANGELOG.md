@@ -27,5 +27,4 @@
 - Replaced colored icons in the *Node Menu* to be more uniform.
 - Started following Blender's class naming conventions.
 - Made dependent nodes unsearchable like *Loop Generator* and *Group Output* nodes.
-- Started following Blender's class naming conventions.
 - Changed location of Animation Nodes to Animation Nodes Editor.
