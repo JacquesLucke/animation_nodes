@@ -1,7 +1,7 @@
 import bpy
 
 def getActiveDepsgraph():
-    return bpy.context.depsgraph
+    return bpy.context.evaluated_depsgraph_get()
 
 def getEvaluatedObject(object):
-    return getActiveDepsgraph().objects.get(object.name)
+    return object.evaluated_get(getActiveDepsgraph())
