@@ -3,7 +3,6 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... data_structures import DoubleList
 from ... utils.depsgraph import getActiveDepsgraph
-from ... utils.data_blocks import removeNotUsedDataBlock
 from ... base_types import AnimationNode, VectorizedSocket
 
 modeItems = [
@@ -132,8 +131,7 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
                     weights[i] = vertexGroupElement.weight
                     break
 
-        if mesh.users == 0:
-            removeNotUsedDataBlock(mesh, "MESH")
+        if mesh.users == 0: object.to_mesh_clear()
 
         return weights
 

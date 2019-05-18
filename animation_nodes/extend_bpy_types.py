@@ -99,7 +99,9 @@ class ObjectProperties(bpy.types.PropertyGroup):
         if not applyModifiers and object.type == "MESH":
             return object.data
         else:
-            try: return object.to_mesh(depsgraph, applyModifiers)
+            try:
+                if applyModifiers: return object.evaluated_get(depsgraph).to_mesh()
+                else: return object.to_mesh()
             except: return None
 
 class IDProperties(bpy.types.PropertyGroup):

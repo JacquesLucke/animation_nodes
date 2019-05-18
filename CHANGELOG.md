@@ -19,8 +19,6 @@
 - Fixed double period in the description of some properties.
 - Fixed *Material Output* node's color output.
 - Fixed *Create Execution Trigger* operators.
-- Fixed *Dependency Graph* calls.
-- Fixed *Scene Update* calls.
 
 ### Changed
 
