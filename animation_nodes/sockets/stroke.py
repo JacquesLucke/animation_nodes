@@ -6,7 +6,7 @@ class StrokeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_StrokeSocket"
     bl_label = "Stroke Socket"
     dataType = "Stroke"
-    drawColor = (0.85, 0.55, 0.2, 1)
+    drawColor = (0.85, 0.35, 0.0, 1)
     storable = True
     comparable = False
 
@@ -26,7 +26,7 @@ class StrokeListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_label = "Stroke List Socket"
     dataType = "Stroke List"
     baseType = StrokeSocket
-    drawColor = (0.7, 0.55, 0.2, 0.5)
+    drawColor = (0.85, 0.35, 0.0, 0.5)
     storable = True
     comparable = False
 
