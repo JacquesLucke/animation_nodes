@@ -101,7 +101,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "unlinkInstancesFromNode",
             confirm = True,
             text = "Unlink Instances from Node",
-            description = "This will make sure that the objects won't be removed if you remove the Instancer Node.")
+            description = "This will make sure that the objects won't be removed if you remove the Instancer Node")
 
         layout.separator()
         self.invokeFunction(layout, "toggleRelationshipLines",
