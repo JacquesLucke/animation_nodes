@@ -1,8 +1,6 @@
 from itertools import chain
 import bpy
 from bpy.props import *
-from . c_utils import combineVectorList
-from ... data_structures import DoubleList, VirtualDoubleList
 from ... base_types import AnimationNode
 
 strokeTypeItems = [
@@ -58,7 +56,7 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
     def executeStrokeList(self, object, strokes):
         if self.isValidObject(object) is False: return object
         gpencil = object.data
-        gpencilFrame = self.getFrame(gpencil)
+        gpencilFrame = self.setFrameStrokes(gpencil, strokes)
         if gpencilFrame is None:
             self.setErrorMessage("Grease Pencil Object should have at least a stroke frame!")
             return object
@@ -84,6 +82,15 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
     def getStroke(self, index, gpFrame):
         try: return gpFrame.strokes[index]
         except: return gpFrame.strokes.new()
+
+    def setFrameStrokes(self, gpencil, strokes):
+        gpencilFrame = self.getFrame(gpencil)
+        lenStrokes = len(strokes)
+        lenGStrokes = len(gpencilFrame.strokes)
+        while lenStrokes < lenGStrokes:
+            gpencilFrame.strokes.remove(gpencilFrame.strokes[lenGStrokes - 1])
+            lenGStrokes = len(gpencilFrame.strokes)
+        return gpencilFrame
 
     def setStrokePoints(self, gpencilStroke, stroke):
         lenSPoints = len(stroke.vectors)
@@ -120,11 +127,6 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
             self.setErrorMessage("Object is not in object mode or is no gpencil object")
             return False
         return True
-
-    def createVectorList(self, x, y, z):
-        x, y, z = VirtualDoubleList.createMultiple((x, 0), (y, 0), (z, 0))
-        amount = VirtualDoubleList.getMaxRealLength(x, y, z)
-        return combineVectorList(amount, x, y, z)
 
     def flatList(self, vectors):
         return list(chain.from_iterable(vectors))
