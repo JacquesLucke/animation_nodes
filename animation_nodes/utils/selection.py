@@ -36,4 +36,4 @@ def updateSelectionSorting():
         sortedSelectionNames = selectedNames
 
 def getSelectedObjectNames():
-    return [obj.name for obj in bpy.context.scene.objects if obj.select_get()]
+    return [obj.name for obj in bpy.context.view_layer.objects if obj.select_get()]
