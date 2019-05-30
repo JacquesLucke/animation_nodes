@@ -1,5 +1,4 @@
 import bpy
-from ... data_structures import Stroke
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPencilStrokeLineWidthNode(bpy.types.Node, AnimationNode):
@@ -12,11 +11,11 @@ class GPencilStrokeLineWidthNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Float", "useFloatList",
             ("Line Width", "lineWidth"), ("Line Widths", "lineWidths")), value = 100)
         self.newOutput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
+            ("Stroke", "outStroke"), ("Strokes", "outStrokes")), dataIsModified = True)
 
     def getExecutionFunctionName(self):
         if self.useStrokeList and self.useFloatList:
@@ -28,31 +27,19 @@ class GPencilStrokeLineWidthNode(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, stroke, lineWidth):
         if stroke is None: return None
-        outStroke = self.copyStroke(stroke)
-        outStroke.line_width = lineWidth
-        return outStroke
+        stroke.line_width = lineWidth
+        return stroke
 
     def executeList(self, strokes, lineWidth):
         if len(strokes) == 0: return strokes
-        outStrokes = []
         for stroke in strokes:
             if stroke is not None:
-                outStroke = self.copyStroke(stroke)
-                outStroke.line_width = lineWidth
-                outStrokes.append(outStroke)    
-        return outStrokes
+                stroke.line_width = lineWidth
+        return strokes
 
     def executeListList(self, strokes, lineWidths):
         if len(strokes) == 0 or len(lineWidths) == 0 or len(strokes) != len(lineWidths): return strokes
-        outStrokes = []
         for i, stroke in enumerate(strokes):
             if stroke is not None:
-                outStroke = self.copyStroke(stroke)
-                outStroke.line_width = lineWidths[i]
-                outStrokes.append(outStroke)
-        return outStrokes
-
-    def copyStroke(self, stroke):
-        return Stroke(stroke.vectors, stroke.strength, stroke.pressure, stroke.uv_rotation,
-        stroke.line_width, stroke.draw_cyclic, stroke.start_cap_mode, stroke.end_cap_mode,
-        stroke.material_index, stroke.display_mode, stroke.frame_number)
+                stroke.line_width = lineWidths[i]
+        return strokes

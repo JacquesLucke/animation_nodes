@@ -1,7 +1,7 @@
 from itertools import chain
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, VectorizedSocket
 
 strokeTypeItems = [
     ("STROKE", "Stroke", "One Stroke", "NONE", 0),
@@ -14,34 +14,39 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "MESSAGE"
     bl_width_default = 165
 
-    strokeType: EnumProperty(name = "Stroke / Stroke list", default = "STROKE",
-        items = strokeTypeItems, update = AnimationNode.refresh)
-
-    def draw(self, layout):
-        layout.prop(self, "strokeType", text = "")
+    useStrokeList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        if self.strokeType == "STROKE":
-            self.newInput("Stroke", "Stroke", "stroke")
-        elif self.strokeType == "STROKES":
-            self.newInput("Stroke List", "Strokes", "strokes")
+        socket = self.newInput("Object", "Object", "object")
+        socket.defaultDrawType = "PROPERTY_ONLY"
+        socket.objectCreationType = "GPENCIL"
+        self.newInput(VectorizedSocket("Stroke", "useStrokeList",
+            ("Stroke", "stroke"), ("Strokes", "strokes")))
+        self.newInput("Integer", "GP-Layer Index", "gpLayerIndex", value = 0)
         self.newOutput("Object", "Object", "object")
         
     def getExecutionFunctionName(self):
-        if self.strokeType == "STROKE":
-            return "executeStroke"
-        elif self.strokeType == "STROKES":
+        if self.useStrokeList:
             return "executeStrokeList"
+        else:
+            return "executeStroke"
 
-    def executeStroke(self, object, stroke):
-        if self.isValidObject(object) is False: return object
+    def executeStroke(self, object, stroke, gpLayerIndex):
+        if self.isValidObject(object) is False or stroke is None: return object
+        
         gpencil = object.data
-        gpencilFrame = self.getFrame(gpencil)
+        if gpencil is None: return object
+
+        gpencilLayer = self.getLayer(gpencil, gpLayerIndex)
+        if gpencilLayer is None: return object
+        
+        gpencilFrame = self.getFrame(gpencilLayer, 0, 1)
         if gpencilFrame is None:
-            self.setErrorMessage("Grease Pencil Object should have at least a stroke frame!")
+            self.setErrorMessage("Current GPencil Frame has same the frame-number. Each GPencil Frame must have unique frame-number!")
             return object
+        gpencilFrame = self.setFrameStrokes(gpencilFrame, [stroke])
         gpencilStroke = self.setStrokeProperties(self.getStroke(0, gpencilFrame), stroke)
+        
         gpencilPoints = self.setStrokePoints(gpencilStroke, stroke)
         if gpencilPoints is not None:
             gpencilPoints.foreach_set('co', self.flatList(stroke.vectors))
@@ -53,13 +58,20 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
         gpencil.layers.active.frames.update()
         return object
 
-    def executeStrokeList(self, object, strokes):
+    def executeStrokeList(self, object, strokes, gpLayerIndex):
         if self.isValidObject(object) is False: return object
         gpencil = object.data
-        gpencilFrame = self.setFrameStrokes(gpencil, strokes)
+        if gpencil is None: return object
+
+        gpencilLayer = self.getLayer(gpencil, gpLayerIndex)
+        if gpencilLayer is None: return object
+        
+        gpencilFrame = self.getFrame(gpencilLayer, 0, 1)
         if gpencilFrame is None:
-            self.setErrorMessage("Grease Pencil Object should have at least a stroke frame!")
+            self.setErrorMessage("Current GPencil Frame has same the frame-number. Each GPencil Frame must have unique frame-number!")
             return object
+        gpencilFrame = self.setFrameStrokes(gpencilFrame, strokes)
+
         for i, stroke in enumerate(strokes):
             gpencilStroke = self.setStrokeProperties(self.getStroke(i, gpencilFrame), stroke)
             gpencilPoints = self.setStrokePoints(gpencilStroke, stroke)
@@ -72,19 +84,25 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
         gpencil.layers.active.frames.update()
         return object
 
-    def getFrame(self, gpencil):
-        return self.copyFrame(gpencil)
+    def getLayer(self, gpencil, gpLayerIndex):
+        if gpLayerIndex < 0: return None
+        try:
+            index = len(gpencil.layers) - gpLayerIndex - 1
+            if index < 0: return gpencil.layers.new("ANGPencil_Layer", set_active = True)
+            return gpencil.layers[index]
+        except: return gpencil.layers.new("ANGPencil_Layer", set_active = True)
 
-    def copyFrame(self, gpencil):
-        try: return gpencil.layers.active.frames[0]
-        except: return None
+    def getFrame(self, gprencilLayer, gpFrameIndex, frameNumber):
+        try: return gprencilLayer.frames[gpFrameIndex]
+        except:
+            try: return gprencilLayer.frames.new(frameNumber)
+            except: return None
 
     def getStroke(self, index, gpFrame):
         try: return gpFrame.strokes[index]
         except: return gpFrame.strokes.new()
 
-    def setFrameStrokes(self, gpencil, strokes):
-        gpencilFrame = self.getFrame(gpencil)
+    def setFrameStrokes(self, gpencilFrame, strokes):
         lenStrokes = len(strokes)
         lenGStrokes = len(gpencilFrame.strokes)
         while lenStrokes < lenGStrokes:

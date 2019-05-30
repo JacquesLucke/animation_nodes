@@ -19,10 +19,10 @@ class MaterialInstancerNode(bpy.types.Node, AnimationNode):
                         description = "It removes material which has prefix name. Only use when it is required, otherwise keep it off",
                         default=False, update=propertyChanged)
     prefixName: StringProperty(default="New", description = "Prefix Name for Instanced Materials", update=propertyChanged)
-    baseMaterial: StringProperty(description = "Base Material", update=propertyChanged)
     errorMessage: StringProperty()
 
     def create(self):
+        self.newInput("Material", "", "baseMaterial")
         self.newInput("Integer", "Amount", "amount")
         self.newOutput("Material List", "Instanced Materials", "instMaterials")
 
@@ -30,31 +30,28 @@ class MaterialInstancerNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "instMaterialBool")
         layout.prop(self, "removeMaterialBool")
         layout.prop(self, "prefixName", text = "")
-        layout.prop_search(self, "baseMaterial", bpy.data, "materials", text = "", icon = "MATERIAL_DATA")
-        material = bpy.data.materials.get(self.baseMaterial)
-        if material is None: return
         if self.errorMessage != "":
             layout.label(text = self.errorMessage, icon="ERROR")
 
-    def execute(self, amount):
+    def execute(self, baseMaterial, amount):
         self.errorMessage = ""
-
-        if self.baseMaterial == "":
-            self.errorMessage = noBaseMatMessage
-            return []
-
+        
         if self.prefixName == "":
             self.errorMessage = noPrefixMatMessage
             return []
 
         if self.removeMaterialBool: self.removeMaterials()
+        
+        if baseMaterial is None:
+            self.errorMessage = noBaseMatMessage
+            return self.getInstMaterials()
 
-        if self.instMaterialBool: self.copyMaterial(amount)
+        if self.instMaterialBool: self.copyMaterial(baseMaterial, amount)
 
         return self.getInstMaterials()
 
 
-    def copyMaterial(self, amount):
+    def copyMaterial(self, baseMaterial, amount):
         for i in range(amount):
             if i <= 9:
                 material = self.prefixName + '.00' + str(i)
@@ -64,13 +61,13 @@ class MaterialInstancerNode(bpy.types.Node, AnimationNode):
                 material = self.prefixName + '.' + str(i)
 
             if material not in bpy.data.materials:
-                mat = bpy.data.materials[self.baseMaterial].copy()
+                mat = bpy.data.materials[baseMaterial.name].copy()
                 mat.name = material
 
     def removeMaterials(self):
         if len(bpy.data.materials) > 0:
             for material in bpy.data.materials:
-                if material.name != self.baseMaterial and material.name.startswith(self.prefixName):
+                if material.name.startswith(self.prefixName):
                     bpy.data.materials.remove(material)
 
     def getInstMaterials(self):

@@ -11,11 +11,11 @@ class GPencilStrokeStartCapNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Boolean", "useStartBooleanList",
             ("Start Cap (ROUND/FLAT)", "startCap"), ("Start Caps (ROUND/FLAT)", "startCaps")))
         self.newOutput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
 
     def getExecutionFunctionName(self):
         if self.useStrokeList and self.useStartBooleanList:

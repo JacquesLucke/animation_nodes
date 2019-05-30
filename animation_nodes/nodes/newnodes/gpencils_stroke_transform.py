@@ -1,6 +1,5 @@
 from itertools import chain
 import bpy
-from ... data_structures import Stroke
 from . c_utils import combineVectorList
 from ... data_structures import DoubleList, VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
@@ -15,11 +14,11 @@ class GPencilStrokeTransformNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Matrix", "useMatrixList",
             ("Matrix", "matrix"), ("Matices", "matrices")))
         self.newOutput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
+            ("Stroke", "outStroke"), ("Strokes", "outStrokes")), dataIsModified = True)
 
     def getExecutionFunctionName(self):
         if self.useStrokeList and self.useMatrixList:
@@ -31,37 +30,25 @@ class GPencilStrokeTransformNode(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, stroke, matrix):
         if stroke is None: return None
-        outStroke = self.copyStroke(stroke)
         if matrix is not None:
-            self.strokeTransfom(outStroke, matrix)
-        return outStroke
+            self.strokeTransfom(stroke, matrix)
+        return stroke
 
     def executeList(self, strokes, matrix):
-        outStrokes = []
         if len(strokes) == 0: return strokes
         for stroke in strokes:
             if stroke is not None:
-                outStroke = self.copyStroke(stroke)
                 if matrix is not None:
-                    self.strokeTransfom(outStroke, matrix)
-                outStrokes.append(outStroke)    
-        return outStrokes
+                    self.strokeTransfom(stroke, matrix)
+        return strokes
 
     def executeListList(self, strokes, matrices):
         if len(strokes) == 0 or len(matrices) == 0 or len(strokes) != len(matrices): return strokes
-        outStrokes = []
         for i, stroke in enumerate(strokes):
             if stroke is not None:
-                outStroke = self.copyStroke(stroke)
                 if matrices[i] is not None:
-                    self.strokeTransfom(outStroke, matrices[i])
-                outStrokes.append(outStroke)
-        return outStrokes
-
-    def copyStroke(self, stroke):
-        return Stroke(stroke.vectors, stroke.strength, stroke.pressure, stroke.uv_rotation,
-        stroke.line_width, stroke.draw_cyclic, stroke.start_cap_mode, stroke.end_cap_mode,
-        stroke.material_index, stroke.display_mode, stroke.frame_number)
+                    self.strokeTransfom(stroke, matrices[i])
+        return strokes
 
     def strokeTransfom(self, outStroke, matrix):
         vectors = outStroke.vectors

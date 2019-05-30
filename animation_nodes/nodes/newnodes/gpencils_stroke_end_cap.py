@@ -11,11 +11,11 @@ class GPencilStrokeEndCapNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Boolean", "useEndBooleanList",
             ("End Cap (ROUND/FLAT)", "endCap"), ("End Caps (ROUND/FLAT)", "endCaps")))
         self.newOutput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
 
     def getExecutionFunctionName(self):
         if self.useStrokeList and self.useEndBooleanList:

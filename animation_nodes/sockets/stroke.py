@@ -15,6 +15,10 @@ class StrokeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return Stroke()
 
     @classmethod
+    def getCopyExpression(cls):
+        return "value.copy()"
+
+    @classmethod
     def correctValue(cls, value):
         if isinstance(value, Stroke):
             return value, 0
@@ -29,6 +33,10 @@ class StrokeListSocket(bpy.types.NodeSocket, PythonListSocket):
     drawColor = (0.85, 0.35, 0.0, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "[element.copy() for element in value]"
 
     @classmethod
     def correctValue(cls, value):

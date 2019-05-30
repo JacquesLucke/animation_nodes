@@ -56,3 +56,8 @@ class Stroke:
                 Material Index: {}
                 Display Mode: {}\
             """.format(len(self.vectors), self.material_index, self.display_mode))
+
+    def copy(self):
+        return Stroke(self.vectors, self.strength, self.pressure, self.uv_rotation,
+        self.line_width, self.draw_cyclic, self.start_cap_mode, self.end_cap_mode,
+        self.material_index, self.display_mode, self.frame_number)

@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... data_structures import Stroke
 from ... base_types import AnimationNode, VectorizedSocket
 
 displayModeTypeItems = [
@@ -22,9 +21,9 @@ class GPencilStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newOutput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
+            ("Stroke", "outStroke"), ("Strokes", "outStrokes")), dataIsModified = True)
 
     def draw(self, layout):
         layout.prop(self, "displayModeType", text = "")
@@ -37,18 +36,14 @@ class GPencilStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, stroke):
         if stroke is None: return None
-        outStroke = self.copyStroke(stroke)
-        return self.strokeDisplayMode(outStroke)
+        return self.strokeDisplayMode(stroke)
 
     def executeList(self, strokes):
         if len(strokes) == 0: return strokes
-        outStrokes = []
         for stroke in strokes:
             if stroke is not None:
-                outStroke = self.copyStroke(stroke)
-                self.strokeDisplayMode(outStroke)
-                outStrokes.append(outStroke)
-        return outStrokes
+                self.strokeDisplayMode(stroke)
+        return strokes
 
     def strokeDisplayMode(self, outStroke):
         if self.displayModeType == "SCREEN":
@@ -60,8 +55,3 @@ class GPencilStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
         elif self.displayModeType == "2DIMAGE":
             outStroke.display_mode = '2DIMAGE' 
         return outStroke
-
-    def copyStroke(self, stroke):
-        return Stroke(stroke.vectors, stroke.strength, stroke.pressure, stroke.uv_rotation,
-        stroke.line_width, stroke.draw_cyclic, stroke.start_cap_mode, stroke.end_cap_mode,
-        stroke.material_index, stroke.display_mode, stroke.frame_number)

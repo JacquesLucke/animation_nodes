@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import Stroke
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPencilStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
@@ -14,11 +13,11 @@ class GPencilStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Integer", "useIntegerList",
             ("Material Index", "materialIndex"), ("Material Indices", "materialIndices")))
         self.newOutput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
+            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
     
     def getExecutionFunctionName(self):
         if self.useStrokeList and self.useIntegerList:
@@ -30,31 +29,19 @@ class GPencilStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, stroke, materialIndex):
         if stroke is None: return None
-        outStroke = self.copyStroke(stroke)
-        outStroke.material_index = materialIndex
-        return outStroke
+        stroke.material_index = materialIndex
+        return stroke
 
     def executeList(self, strokes, materialIndex):
         if len(strokes) == 0: return strokes
-        outStrokes = []
         for stroke in strokes:
             if stroke is not None:
-                outStroke = self.copyStroke(stroke)
-                outStroke.material_index = materialIndex
-                outStrokes.append(outStroke)
-        return outStrokes
+                stroke.material_index = materialIndex
+        return strokes
 
     def executeListList(self, strokes, materialIndices):
         if len(strokes) == 0 or len(materialIndices) == 0 or len(strokes) != len(materialIndices): return strokes
-        outStrokes = []
         for i, stroke in enumerate(strokes):
             if stroke is not None:
-                outStroke = self.copyStroke(stroke)
-                outStroke.material_index = materialIndices[i]
-                outStrokes.append(outStroke)
-        return outStrokes
-
-    def copyStroke(self, stroke):
-        return Stroke(stroke.vectors, stroke.strength, stroke.pressure, stroke.uv_rotation,
-        stroke.line_width, stroke.draw_cyclic, stroke.start_cap_mode, stroke.end_cap_mode,
-        stroke.material_index, stroke.display_mode, stroke.frame_number)
+                stroke.material_index = materialIndices[i]
+        return strokes

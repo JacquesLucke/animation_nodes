@@ -19,8 +19,6 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
     bl_label = "GPencil Object Input"
     bl_width_default = 165
 
-    useGenericList: VectorizedSocket.newProperty()
-    
     layerType: EnumProperty(name = "Layer Type", default = "INDEX",
         items = layerTypeItems, update = AnimationNode.refresh)
 
