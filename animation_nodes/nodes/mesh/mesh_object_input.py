@@ -43,7 +43,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         if len(required) == 0:
             return
 
-        yield "sourceMesh = object.an.getMesh(AN.utils.depsgraph.getActiveDepsgraph(), useModifiers) if object else None"
+        yield "sourceMesh = object.an.getMesh(useModifiers) if object else None"
         yield "if sourceMesh is not None:"
         yield from ("    " + line for line in self.iterGetMeshDataCodeLines(required))
         yield "    if sourceMesh.users == 0: object.to_mesh_clear()"

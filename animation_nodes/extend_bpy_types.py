@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from . utils.depsgraph import getActiveDepsgraph
 from . operators.callbacks import executeCallback
 from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
                                FloatList, UShortList, UIntegerList, Vector2DList)
@@ -92,15 +93,14 @@ class MeshProperties(bpy.types.PropertyGroup):
 class ObjectProperties(bpy.types.PropertyGroup):
     bl_idname = "an_ObjectProperties"
 
-    def getMesh(self, depsgraph, applyModifiers = False):
-        if depsgraph is None: return None
+    def getMesh(self, applyModifiers = False):
         object = self.id_data
 
         if not applyModifiers and object.type == "MESH":
             return object.data
         else:
             try:
-                if applyModifiers: return object.evaluated_get(depsgraph).to_mesh()
+                if applyModifiers: return object.evaluated_get(getActiveDepsgraph()).to_mesh()
                 else: return object.to_mesh()
             except: return None
 
