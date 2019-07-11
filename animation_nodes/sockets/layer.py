@@ -15,6 +15,10 @@ class LayerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         return Layer()
 
     @classmethod
+    def getCopyExpression(cls):
+        return "value.copy()"
+
+    @classmethod
     def correctValue(cls, value):
         if isinstance(value, Layer):
             return value, 0
@@ -29,6 +33,10 @@ class LayerListSocket(bpy.types.NodeSocket, PythonListSocket):
     drawColor = (0.7, 0.1, 0.35, 0.5)
     storable = True
     comparable = False
+
+    @classmethod
+    def getCopyExpression(cls):
+        return "[element.copy() for element in value]"
 
     @classmethod
     def correctValue(cls, value):

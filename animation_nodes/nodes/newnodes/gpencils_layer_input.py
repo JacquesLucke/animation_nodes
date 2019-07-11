@@ -27,7 +27,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
         items = layerTypeItems, update = AnimationNode.refresh)
 
     def create(self):
-        self.newInput("Layer", "GPencil Layer", "gpencilLayer")
+        self.newInput("Layer", "GPencil Layer", "gpencilLayer", dataIsModified = True)
 
         if self.gframeType == "INDEX":
             self.newInput("Integer", "GFrame Index", "gframeIndex")

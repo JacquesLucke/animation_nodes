@@ -34,9 +34,9 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
                 self.newInput("Integer", "Layer Index", "layerIndex")
             elif self.layerIdentifierType == "NAME":
                 self.newInput("Text", "Name", "layerName")        
-            self.newOutput("Layer", "GPencil Layer", "gpencilLayer")
+            self.newOutput("Layer", "GPencil Layer", "gpencilLayer", dataIsModified = True)
         elif self.layerType == "ALL":
-            self.newOutput("Layer List", "GPencil Layers", "gpencilLayers")
+            self.newOutput("Layer List", "GPencil Layers", "gpencilLayers", dataIsModified = True)
 
     def draw(self, layout):
         layout.prop(self, "layerType", text = "")
@@ -72,24 +72,14 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
     def getLayer(self, object, identifier):
         try:
             if type(identifier) == int:
-                layers = self.copyObjectData(object).layers
+                layers = object.data.layers
                 lenLayer = len(layers)
                 index = lenLayer - 1 - identifier
                 if index < 0: return None
                 return layers[index]
-            else: return self.copyObjectData(object).layers[identifier]
+            else: return object.data.layers[identifier]
         except: return None
         
     def getLayers(self, object):
-        try: return self.copyObjectData(object).layers
+        try: return object.data.layers
         except: return None
-
-    def copyObjectData(self, object):
-        objectName = object.name
-        copyObjectName = "an_gcopy_" + objectName
-        if copyObjectName in bpy.data.grease_pencils:
-            oldCopyObject =  bpy.data.grease_pencils[copyObjectName]
-            bpy.data.grease_pencils.remove(oldCopyObject)
-        copyData = object.data.copy()
-        copyData.name = copyObjectName
-        return copyData

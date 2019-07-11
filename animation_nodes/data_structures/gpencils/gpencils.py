@@ -20,6 +20,9 @@ class Layer:
                             {}\
                         """.format("None"))
 
+    def copy(self):
+        return Layer(self.layer, self.matrix_world)
+
 class Stroke:
     def __init__(self, vectors = None, strength = None, pressure = None,
         uv_rotation = None, line_width = None, draw_cyclic = None, start_cap_mode = None,
