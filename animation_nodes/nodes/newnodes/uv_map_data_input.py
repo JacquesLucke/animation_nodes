@@ -9,9 +9,9 @@ mapIdentifierTypeItems = [
     ("NAME", "Name", "Get uv map based on the name", "NONE", 1)
 ]
 
-class UVMapDataNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_UVMapDataNode"
-    bl_label = "UV Map Data"
+class UVMapDataInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_UVMapDataInputNode"
+    bl_label = "UV Map Data Input"
 
     mapIdentifierType: EnumProperty(name = "UV Map Identifier Type", default = "INDEX",
         items = mapIdentifierTypeItems, update = AnimationNode.refresh)
