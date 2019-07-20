@@ -43,10 +43,11 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def handleEyedropperButton(self, event):
         if event.ctrl:
-            bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
-                oldName = self.object.name,
-                path = "bpy.data.objects",
-                icon = "OBJECT_DATA")
+            if self.object:
+                bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
+                    oldName = self.object.name,
+                    path = "bpy.data.objects",
+                    icon = "OBJECT_DATA")
         else:
             object = bpy.context.active_object
             if object: self.object = object
