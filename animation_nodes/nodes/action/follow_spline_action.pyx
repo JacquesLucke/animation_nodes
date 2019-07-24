@@ -16,13 +16,14 @@ class FollowSplineActionNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY", dataIsModified = True)
         self.newInput("Float", "Duration", "duration", value = 100)
+        self.newInput("Boolean", "Rotate", "rotate", value = True)
         self.newOutput("Action", "Action", "action")
 
-    def execute(self, spline, duration):
+    def execute(self, spline, duration, rotate):
         if not spline.isEvaluable():
             return None
 
-        return FollowSplineAction(spline, duration)
+        return FollowSplineAction(spline, duration, rotate)
 
 
 locationChannels = PathIndexActionChannel.forArray("location", 3)
@@ -32,15 +33,18 @@ scaleChannels = PathIndexActionChannel.forArray("scale", 3)
 cdef class FollowSplineAction(SimpleBoundedAction):
     cdef Spline spline
     cdef float duration
+    cdef bint rotate
 
-    def __cinit__(self, Spline spline, float duration):
+    def __cinit__(self, Spline spline, float duration, bint rotate):
         self.spline = spline
         self.duration = max(duration, 0.001)
+        self.rotate = rotate
 
     cdef list getEvaluateFunctions(self):
         cdef list functions = []
         functions.append(self.newFunction(<void*>self.evaluateLocation, locationChannels))
-        functions.append(self.newFunction(<void*>self.evaluateRotation, rotationChannels))
+        if self.rotate:
+            functions.append(self.newFunction(<void*>self.evaluateRotation, rotationChannels))
         functions.append(self.newFunction(<void*>self.evaluateScale, scaleChannels))
         return functions
 
