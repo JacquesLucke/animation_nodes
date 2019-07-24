@@ -472,6 +472,8 @@ class ActionMenu(bpy.types.Menu):
         insertNode(layout, "an_WiggleActionNode", "Wiggle Action")
         insertNode(layout, "an_FollowSplineActionNode", "Follow Spline Action")
         layout.separator()
+        insertNode(layout, "an_ChainActionListNode", "Chain Action List")
+        layout.separator()
         insertNode(layout, "an_ObjectActionOutputNode", "Object Action Output")
 
 class AnimationMenu(bpy.types.Menu):
