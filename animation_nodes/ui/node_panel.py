@@ -37,7 +37,7 @@ def drawSocketLists(layout, node):
         subrow.label(text = "Inputs")
         subrow.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
         subrow.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
-        col.template_list("an_SocketUiList_Normal", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
+        col.template_list("AN_UL_SocketUiList_Normal", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
 
     if len(node.outputs) > 0:
         col = row.column()
@@ -45,11 +45,11 @@ def drawSocketLists(layout, node):
         subrow.label(text = "Outputs")
         subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
         subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
-        col.template_list("an_SocketUiList_Normal", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
+        col.template_list("AN_UL_SocketUiList_Normal", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
 
 
 class SocketUiList_Normal(bpy.types.UIList):
-    bl_idname = "an_SocketUiList_Normal"
+    bl_idname = "AN_UL_SocketUiList_Normal"
 
     def draw_item(self, context, layout, node, socket, icon, activeData, activePropname):
         if not isinstance(socket, AnimationNodeSocket):

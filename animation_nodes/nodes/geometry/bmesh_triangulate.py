@@ -9,11 +9,11 @@ class BMeshTriangulateNode(bpy.types.Node, AnimationNode):
     bl_width_default = 160
 
     quad: IntProperty(name = "Quad Method", max = 3, min = 0,
-        description = "Select a quad triangulation method.",
+        description = "Select a quad triangulation method",
         update = propertyChanged)
 
     ngon: IntProperty(name = "Ngon Method", max = 1, min = 0,
-        description = "Select a ngon triangulation method.",
+        description = "Select a ngon triangulation method",
         update = propertyChanged)
 
     def create(self):

@@ -27,7 +27,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             if self.object is not None:
                 icon = "RESTRICT_VIEW_ON" if self.object.hide_viewport else "RESTRICT_VIEW_OFF"
                 self.invokeFunction(row, node, "toggleObjectVisibilty", icon = icon,
-                    description = "Toggle viewport and render visibility.")
+                    description = "Toggle viewport and render visibility")
 
         self.invokeFunction(row, node, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
             description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
@@ -43,10 +43,11 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     def handleEyedropperButton(self, event):
         if event.ctrl:
-            bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
-                oldName = self.object.name,
-                path = "bpy.data.objects",
-                icon = "OBJECT_DATA")
+            if self.object:
+                bpy.ops.an.rename_datablock_popup("INVOKE_DEFAULT",
+                    oldName = self.object.name,
+                    path = "bpy.data.objects",
+                    icon = "OBJECT_DATA")
         else:
             object = bpy.context.active_object
             if object: self.object = object

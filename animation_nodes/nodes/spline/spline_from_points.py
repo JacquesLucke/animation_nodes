@@ -17,7 +17,7 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         items = splineTypeItems, update = AnimationNode.refresh)
 
     improveBezierHandles: BoolProperty(name = "Improve Bezier Handles",
-        description = "Tries to avoid that the handles are equal to the corresponding points.",
+        description = "Tries to avoid that the handles are equal to the corresponding points",
         default = True, update = propertyChanged)
 
     useRadiusList: VectorizedSocket.newProperty()

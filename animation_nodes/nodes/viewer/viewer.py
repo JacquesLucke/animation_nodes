@@ -13,17 +13,17 @@ class ViewerNode(bpy.types.Node, AnimationNode):
     bl_width_default = 180
 
     maxRows: IntProperty(name = "Max Rows", default = 150, min = 0,
-        description = "Max amount of lines visible in the floating text box.")
+        description = "Max amount of lines visible in the floating text box")
     fontSize: IntProperty(name = "Font Size", default = 12, min = 1, max = 1000)
 
     maxListStartElements: IntProperty(name = "Max List Start Elements", default = 15, min = 0)
     maxListEndElements: IntProperty(name = "Max List End Elements", default = 0, min = 0)
 
     outputConsole: BoolProperty(name = "Console Output", default = False,
-        description = "Output data in the terminal/console. May slow down execution a lot.")
+        description = "Output data in the terminal/console. May slow down execution a lot")
 
     outputTextBlock: BoolProperty(name = "Text Block Output", default = False,
-        description = "Output data in a text block. May slow down execution a lot.")
+        description = "Output data in a text block. May slow down execution a lot")
 
     textBlockName: StringProperty(name = "Text Block Name")
 

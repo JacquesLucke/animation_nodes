@@ -6,7 +6,7 @@ from .. utils.operators import makeOperator
 hiddenIDKeys = set()
 
 class IDKeyPanel(bpy.types.Panel):
-    bl_idname = "an_id_keys_panel"
+    bl_idname = "AN_PT_id_keys_panel"
     bl_label = "ID Keys"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -76,14 +76,14 @@ class IDKeyPanel(bpy.types.Panel):
 
 @makeOperator("an.create_id_key_on_selected_objects",
               "Create ID Key", arguments = ["String", "String"],
-              description = "Create this ID Key on selected objects.")
+              description = "Create this ID Key on selected objects")
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.create(dataType, propertyName)
 
 @makeOperator("an.remove_id_key_on_selected_objects",
               "Remove ID Key", arguments = ["String", "String"], confirm = True,
-              description = "Remove this ID Key on selected objects.")
+              description = "Remove this ID Key on selected objects")
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.remove(dataType, propertyName)

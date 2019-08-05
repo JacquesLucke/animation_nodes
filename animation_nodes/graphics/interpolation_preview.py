@@ -4,8 +4,6 @@ from bgl import *
 from . rectangle import Rectangle
 from gpu_extras.batch import batch_for_shader
 
-shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
-
 class InterpolationPreview:
     def __init__(self, interpolation, position, width, resolution):
         self.interpolation = interpolation
@@ -57,6 +55,7 @@ class InterpolationPreview:
         x = numpy.linspace(left, right, self.resolution)
         y = top + (self.samples.asNumpyArray() - 1) * (top - bottom)
         points = numpy.stack((x, y), axis = -1).astype(numpy.float32)
+        shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
         batch = batch_for_shader(shader, 'LINE_STRIP', {"pos": points})
 
         shader.bind()
@@ -76,6 +75,7 @@ class InterpolationPreview:
             (self.boundary.right, self.interpolationTop),
             (self.boundary.left, self.interpolationBottom),
             (self.boundary.right, self.interpolationBottom))
+        shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
         batch = batch_for_shader(shader, 'LINES', {"pos": points})
 
         shader.bind()

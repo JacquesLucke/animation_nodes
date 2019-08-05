@@ -19,7 +19,7 @@ class TextDataType(SingleIDKeyDataType):
         props.attribute = "data.body"
 
 @makeOperator("an.id_keys_from_text_body", "From Text Body", arguments = ["String"],
-              description = "Assign text ID Keys based on text body.")
+              description = "Assign text ID Keys based on text body")
 def idKeyFromTextBody(name):
     for object in bpy.context.selected_objects:
         if object.type == "FONT":

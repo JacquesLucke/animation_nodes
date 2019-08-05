@@ -146,10 +146,11 @@ class ReturnDefaultsOnExceptionCodeEffect(CodeEffect):
         yield from self.iterIndented(code)
         yield "    pass"
         yield "except {}:".format(self.exceptionString)
+        outputVariables = node.getOutputSocketVariables()
         for i, s in enumerate(node.outputs):
             if s.identifier in required:
                 if hasattr(s, "getDefaultValueCode"):
-                    yield "    {} = {}".format(s.identifier, s.getDefaultValueCode())
+                    yield f"    {outputVariables[s.identifier]} = {s.getDefaultValueCode()}"
                 else:
-                    yield "    {} = self.outputs[{}].getDefaultValue()".format(s.identifier, i)
+                    yield f"    {outputVariables[s.identifier]} = self.outputs[{i}].getDefaultValue()"
         yield "    pass"

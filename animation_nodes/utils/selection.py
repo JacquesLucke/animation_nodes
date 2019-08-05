@@ -36,7 +36,5 @@ def updateSelectionSorting():
         sortedSelectionNames = selectedNames
 
 def getSelectedObjectNames():
-    selectedNames = []
-    for object in getattr(bpy.context, "selected_objects", []):
-        selectedNames.append(object.name)
-    return selectedNames
+    viewLayer = bpy.data.window_managers[0].windows[0].view_layer
+    return [obj.name for obj in viewLayer.objects if obj.select_get(view_layer = viewLayer)]

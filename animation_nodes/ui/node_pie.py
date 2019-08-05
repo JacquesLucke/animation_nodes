@@ -4,7 +4,7 @@ from .. utils.blender_ui import PieMenuHelper
 from .. nodes.subprogram.subprogram_base import SubprogramBaseNode
 
 class ContextPie(bpy.types.Menu, PieMenuHelper):
-    bl_idname = "an.context_pie"
+    bl_idname = "AN_MT_context_pie"
     bl_label = "Context Pie"
 
     @classmethod

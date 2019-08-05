@@ -28,7 +28,7 @@ class BakeAnimation(bpy.types.Operator):
 
         if event.type == "TIMER":
             self.scene.frame_set(currentFrame + 1)
-            self.scene.update()
+            context.view_layer.update()
 
         if self.scene.frame_current == self.endFrame:
             return self.finish()

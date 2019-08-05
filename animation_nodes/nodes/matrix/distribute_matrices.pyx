@@ -47,11 +47,11 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         items = meshModeItems, update = AnimationNode.refresh)
 
     __annotations__["centerAlongX"] = BoolProperty(name = "Center Along X", default = True,
-        description = "Center the grid along the x axis.", update = executionCodeChanged)
+        description = "Center the grid along the x axis", update = executionCodeChanged)
     __annotations__["centerAlongY"] = BoolProperty(name = "Center Along Y", default = True,
-        description = "Center the grid along the y axis.", update = executionCodeChanged)
+        description = "Center the grid along the y axis", update = executionCodeChanged)
     __annotations__["centerAlongZ"] = BoolProperty(name = "Center Along Z", default = False,
-        description = "Center the grid along the z axis.", update = executionCodeChanged)
+        description = "Center the grid along the z axis", update = executionCodeChanged)
 
     __annotations__["exactCircleSegment"] = BoolProperty(name = "Exact Circle Segment", default = False)
 

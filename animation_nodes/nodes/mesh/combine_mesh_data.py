@@ -10,7 +10,7 @@ class CombineMeshNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
 
     skipValidation: BoolProperty(name = "Skip Validation", default = False,
-        description = "Skipping validation might cause Blender to crash when the data is not valid.",
+        description = "Skipping validation might cause Blender to crash when the data is not valid",
         update = propertyChanged)
 
     def create(self):
