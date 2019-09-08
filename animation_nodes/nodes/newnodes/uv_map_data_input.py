@@ -1,4 +1,5 @@
 import bpy
+import numpy as np
 from bpy.props import *
 from ... events import propertyChanged
 from ... data_structures import DoubleList
@@ -37,11 +38,10 @@ class UVMapDataInputNode(bpy.types.Node, AnimationNode):
         uvMap = self.getUVMap(object, identifier)
         if uvMap is None:
             return DoubleList.fromValues(x), DoubleList.fromValues(y)
-        coList= [0., 0.]*len(uvMap.data)
+        coList = np.zeros((len(uvMap.data)), dtype=float)
         uvMap.data.foreach_get('uv', coList)
-        end = len(coList) 
-        x = coList[:end:2]
-        y = coList[1:end:2]
+        x = coList[::2]
+        y = coList[1::2]
         return DoubleList.fromValues(x), DoubleList.fromValues(y)
 
     def getUVMap(self, object, identifier):

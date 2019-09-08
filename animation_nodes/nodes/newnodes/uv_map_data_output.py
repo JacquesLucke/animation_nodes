@@ -38,12 +38,13 @@ class UVMapDataOutputNode(bpy.types.Node, AnimationNode):
         uvMap = self.getUVMap(object, identifier)
         if uvMap is None:
             return object
-        if len(x) == 0 or len(y) == 0:
+        lenX = len(x)
+        lenY = len(y)    
+        if lenX == 0 or lenY == 0:
             return object
-        end = len(x) + len(y) 
-        coList = np.zeros((end), dtype=float)
-        coList[:end:2] = np.array(x)
-        coList[1:end:2] = np.array(y)
+        coList = np.zeros((lenX + lenY), dtype=float)
+        coList[::2] = np.array(x)
+        coList[1::2] = np.array(y)
         uvMap.data.foreach_set('uv', coList)
         object.update_tag()
         return object
