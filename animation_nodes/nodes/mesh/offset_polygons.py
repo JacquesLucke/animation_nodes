@@ -32,7 +32,7 @@ class OffsetPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase
         items = pivotSourceItems, update = AnimationNode.refresh)
 
     def create(self):
-        self.newInput("Mesh", "Mesh", "inMesh")
+        self.newInput("Mesh", "Mesh", "inMesh", dataIsModified = True)
         self.createMatrixTransformationInputs(useMatrixList = True)
 
         if self.pivotSource == "CUSTOM_POINTS":

@@ -20,6 +20,7 @@
 - Fixed *Material Output* node's color output.
 - Fixed *Create Execution Trigger* operators.
 - Fixed *getSelectedObjectNames* function.
+- Fixed the *Offset Vertices* and *Offset Polygons* nodes. Copy the input mesh if needed.
 
 ### Changed
 
