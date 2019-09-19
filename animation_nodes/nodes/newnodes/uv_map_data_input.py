@@ -38,7 +38,7 @@ class UVMapDataInputNode(bpy.types.Node, AnimationNode):
         uvMap = self.getUVMap(object, identifier)
         if uvMap is None:
             return DoubleList.fromValues(x), DoubleList.fromValues(y)
-        coList = np.zeros((len(uvMap.data)), dtype=float)
+        coList = np.zeros((2 * len(uvMap.data)), dtype=float)
         uvMap.data.foreach_get('uv', coList)
         x = coList[::2]
         y = coList[1::2]
