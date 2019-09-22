@@ -40,6 +40,7 @@ def drawMenu(self, context):
     layout.menu("AN_MT_action_menu", text = "Action", icon = "ANIM_DATA")
     layout.menu("AN_MT_fcurve_menu", text = "FCurves", icon = "FCURVE")
     layout.menu("AN_MT_material_menu", text = "Material", icon = "NODE_MATERIAL")
+    layout.menu("AN_MT_texture_menu", text = "Texture", icon = "TEXTURE_DATA")
     layout.menu("AN_MT_sound_menu", text = "Sound", icon = "SPEAKER")
     layout.menu("AN_MT_sequence_menu", text = "Sequence", icon = "SEQUENCE")
     layout.separator()
@@ -368,8 +369,17 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_MeshInfoNode", "Mesh Info")
         insertNode(layout, "an_ObjectBoundingBoxNode", "Get Bounding Box")
         insertNode(layout, "an_CombineMeshNode", "Combine Mesh")
-        insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
         insertNode(layout, "an_MeshFromSplineNode", "Mesh From Spline")
+        layout.separator()
+        insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
+        insertNode(layout, "an_SetVertexWeights", "Set Vertex Weights")
+        insertNode(layout, "an_VertexColorInputNode", "Vertex Color Input")
+        insertNode(layout, "an_SetVertexColorsNode", "Set Vertex Colors")
+        insertNode(layout, "an_SetBevelVertexWeights", "Set Bevel Vertex Weights")
+        insertNode(layout, "an_SetBevelEdgeWeights", "Set Bevel Edge Weights")
+        insertNode(layout, "an_SetEdgeCreases", "Set Edge Creases")
+        insertNode(layout, "an_UVMapDataInputNode", "UV Map Data Input")
+        insertNode(layout, "an_UVMapDataOutputNode", "UV Map Data Output")
         layout.separator()
         insertNode(layout, "an_OffsetPolygonsNode", "Offset Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
@@ -568,6 +578,16 @@ class MaterialMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
+        insertNode(layout, "an_ShaderNodeController", "Shader Node Controller")
+        insertNode(layout, "an_MaterialInstancerNode", "Material Instancer")
+
+class TexturelMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_texture_menu"
+    bl_label = "Texture Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_TextureInputNode", "Texture Input")
 
 class ParticleSystemMenu(bpy.types.Menu):
     bl_idname = "AN_MT_particle_system_menu"
@@ -578,6 +598,7 @@ class ParticleSystemMenu(bpy.types.Menu):
         insertNode(layout, "an_ParticleSystemsFromObjectNode", "From Object")
         insertNode(layout, "an_ParticleSystemParticlesDataNode", "Particles Data")
         insertNode(layout, "an_ParticleSystemHairDataNode", "Hair Data")
+        insertNode(layout, "an_ParticlesOutputNode", "Particles Data Output")
 
 class FCurveMenu(bpy.types.Menu):
     bl_idname = "AN_MT_fcurve_menu"
