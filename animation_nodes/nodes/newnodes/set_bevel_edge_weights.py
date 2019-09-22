@@ -1,9 +1,11 @@
 import bpy
+import numpy as np
 from ... base_types import AnimationNode, VectorizedSocket
 
 class BevelEdgeWeights(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetBevelEdgeWeights"
     bl_label = "Set Bevel Edge Weights"
+    errorHandlingType = "EXCEPTION"
 
     useFloatList: VectorizedSocket.newProperty()
 
@@ -23,8 +25,9 @@ class BevelEdgeWeights(bpy.types.Node, AnimationNode):
         if object is None or object.type != "MESH" or object.mode != "OBJECT": return
         if object.data.use_customdata_edge_bevel is False:
             object.data.use_customdata_edge_bevel = True
-        for i in range(len(object.data.edges)):
-            object.data.edges[i].bevel_weight = weight 
+        weights = np.zeros((len(object.data.edges)), dtype=float)     
+        weights[:] = weight
+        object.data.edges.foreach_set('bevel_weight', weights)
         object.data.update()
         return object
 
@@ -32,8 +35,10 @@ class BevelEdgeWeights(bpy.types.Node, AnimationNode):
         if object is None or object.type != "MESH" or object.mode != "OBJECT": return
         if object.data.use_customdata_edge_bevel is False:
             object.data.use_customdata_edge_bevel = True
-        for i in range(len(weights)):
-            if i >= len(object.data.edges): return 
-            object.data.edges[i].bevel_weight = weights[i] 
+        try:
+            object.data.edges.foreach_set('bevel_weight', weights)
+        except:
+            self.raiseErrorMessage("Input Weights has wrong length")
+            return object
         object.data.update()
-        return object        
+        return object
