@@ -2,8 +2,8 @@ import bpy
 from ... base_types import AnimationNode
 
 class CopyLocationWithOffsetNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_CopyLocationWithOffsetNode"
-    bl_label = "Copy Location with Offset"
+    bl_idname = "an_MidiNode"
+    bl_label = "MIDI"
 
     def create(self):
         self.newInput("Object", "Source", "source")
