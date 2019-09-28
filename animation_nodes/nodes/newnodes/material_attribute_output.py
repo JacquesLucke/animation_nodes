@@ -13,9 +13,6 @@ class MaterialAttributeOutputNode(bpy.types.Node, AnimationNode):
     attribute: StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
-    extraSetting: BoolProperty(name = "Extra Setting", default=False,
-        update = executionCodeChanged)
-
     useMaterialList: VectorizedSocket.newProperty()
     useValueList: BoolProperty(update = AnimationNode.refresh)
 
@@ -38,9 +35,6 @@ class MaterialAttributeOutputNode(bpy.types.Node, AnimationNode):
         col.prop(self, "attribute", text = "")
         if self.useMaterialList:
             col.prop(self, "useValueList", text = "Multiple Values")
-
-    def drawAdvanced(self, layout):
-        layout.prop(self, "extraSetting", text = "Extra Setting")    
 
     def getExecutionCode(self, required):
         code = self.evaluationExpression
@@ -76,11 +70,9 @@ class MaterialAttributeOutputNode(bpy.types.Node, AnimationNode):
     def evaluationExpression(self):
         if self.attribute.startswith("grease_pencil"):
             return "bpy.data.materials[material.name]." + self.attribute + " = value"
-        elif self.extraSetting:
-            return "bpy.data.materials[material.name]." + self.attribute + " = value"
         else:
             if self.attribute.startswith("["): return "bpy.data.materials[material.name]" + self.attribute + " = value"
-            else: return "bpy.data.materials[material.name].node_tree." + self.attribute + " = value"
+            else: return "bpy.data.materials[material.name]." + self.attribute + " = value"
 
     def getBakeCode(self):
         if not isCodeValid(self.attribute): return

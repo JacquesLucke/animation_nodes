@@ -11,10 +11,7 @@ class MaterialAttributeInputNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "MESSAGE"
 
     attribute: StringProperty(name = "Attribute", default = "",
-        update = executionCodeChanged)
-
-    extraSetting: BoolProperty(name = "Extra Setting", default=False,
-        update = executionCodeChanged)    
+        update = executionCodeChanged)   
 
     def create(self):
         self.newInput("Material", "Material", "material", defaultDrawType = "PROPERTY_ONLY")
@@ -22,9 +19,6 @@ class MaterialAttributeInputNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "attribute", text = "")
-    
-    def drawAdvanced(self, layout):
-        layout.prop(self, "extraSetting", text = "Extra Setting")
 
     def getExecutionCode(self, required):
         code = self.evaluationExpression
@@ -44,8 +38,6 @@ class MaterialAttributeInputNode(bpy.types.Node, AnimationNode):
     def evaluationExpression(self):
         if self.attribute.startswith("grease_pencil"):
             return "value = bpy.data.materials[material.name]." + self.attribute
-        elif self.extraSetting:
-            return "value = bpy.data.materials[material.name]." + self.attribute
         else:
             if self.attribute.startswith("["): return "value = bpy.data.materials[material.name]" + self.attribute
-            else: return "value = bpy.data.materials[material.name].node_tree." + self.attribute
+            else: return "value = bpy.data.materials[material.name]." + self.attribute
