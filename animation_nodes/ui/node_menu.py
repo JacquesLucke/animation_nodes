@@ -578,7 +578,9 @@ class MaterialMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
-        insertNode(layout, "an_ShaderNodeController", "Shader Node Controller")
+        insertNode(layout, "an_MaterialAttributeInputNode", "Material Attribute Input")
+        insertNode(layout, "an_MaterialAttributeOutputNode", "Material Attribute Output")
+        layout.separator()
         insertNode(layout, "an_MaterialInstancerNode", "Material Instancer")
 
 class TexturelMenu(bpy.types.Menu):
