@@ -573,6 +573,8 @@ class SoundMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_SoundFromSequenceNode", "Sound From Sequence")
         insertNode(layout, "an_SoundSpectrumNode", "Sound Spectrum")
+        insertNode(layout, "an_MIDIFileNode", "MIDI File")
+        insertNode(layout, "an_MidiTrackNode", "MIDI Track")
 
 class SequenceMenu(bpy.types.Menu):
     bl_idname = "AN_MT_sequence_menu"
