@@ -62,9 +62,11 @@ cdef class FollowSplineAction(SimpleBoundedAction):
         target[2] = rotation.z
 
     cdef void evaluateScale(self, float frame, Py_ssize_t index, float *target):
-        target[0] = 1
-        target[1] = 1
-        target[2] = 1
+        cdef float t = min(max(frame / self.duration, 0), 1)
+        cdef float radius = self.spline.evaluateRadius_LowLevel(t)
+        target[0] = radius
+        target[1] = radius
+        target[2] = radius
 
     cdef float getStart(self, Py_ssize_t index):
         return 0
