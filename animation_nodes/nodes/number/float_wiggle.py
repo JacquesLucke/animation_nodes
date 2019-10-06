@@ -39,7 +39,7 @@ class FloatWiggleNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self, required):
         if self.createList:
             yield "_seed = seed * 23452 + self.nodeSeed * 643523"
-            yield "numbers = algorithms.perlin_noise.wiggleFloatList(max(0, count), _seed + evolution * speed / 20, amplitude, octaves, persistance)"
+            yield "numbers = algorithms.perlin_noise.wiggleDoubleList(max(0, count), _seed + evolution * speed / 20, amplitude, octaves, persistance)"
         else:
             yield "number = algorithms.perlin_noise.perlinNoiseForNodes(seed, self.nodeSeed, evolution, speed, amplitude, octaves, persistance)"
 

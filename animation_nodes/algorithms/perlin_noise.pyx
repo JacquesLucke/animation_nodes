@@ -2,7 +2,7 @@ cimport cython
 from libc.math cimport sqrt
 from . random cimport randomDouble_UnitRange
 from .. utils.limits cimport INT_MAX
-from .. data_structures cimport Vector3DList, FloatList, EulerList, Euler3, QuaternionList, Quaternion
+from .. data_structures cimport Vector3DList, DoubleList, EulerList, Euler3, QuaternionList, Quaternion
 
 # http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
 
@@ -27,9 +27,9 @@ def wiggleVectorList(amount, double evolution, amplitude, int octaves, double pe
         values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[i % 3]
     return result
 
-def wiggleFloatList(amount, double evolution, amplitude, int octaves, double persistance):
-    cdef FloatList result = FloatList(length = amount)
-    cdef float *values = <float*>result.data
+def wiggleDoubleList(amount, double evolution, amplitude, int octaves, double persistance):
+    cdef DoubleList result = DoubleList(length = amount)
+    cdef double *values = <double*>result.data
     cdef Py_ssize_t i
     for i in range(amount):
         values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude
@@ -38,40 +38,36 @@ def wiggleFloatList(amount, double evolution, amplitude, int octaves, double per
 def wiggleEulerList(amount, double evolution, amplitude, int octaves, double persistance):
     cdef EulerList result = EulerList(length = amount)
     cdef Euler3 *values = <Euler3*>result.data
-    cdef float _amplitude[3]
     cdef Py_ssize_t i
-    _amplitude[0], _amplitude[1], _amplitude[2] = amplitude[0], amplitude[1], amplitude[2]
     for i in range(amount):
-        values[i].x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[0]
-        values[i].y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * _amplitude[1]
-        values[i].z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * _amplitude[2]
+        values[i].x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude[0]
+        values[i].y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * amplitude[1]
+        values[i].z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * amplitude[2]
         values[i].order = 0
     return result
 
 def wiggleQuaternionList(amount, double evolution, amplitude, int octaves, double persistance):
     cdef QuaternionList result = QuaternionList(length = amount)
     cdef Quaternion *values = <Quaternion*>result.data
-    cdef float _amplitude[4]
-    cdef float _length
-    cdef float x, y, z, w
+    cdef double length
+    cdef double w, x, y, z
     cdef Py_ssize_t i
-    _amplitude[0], _amplitude[1], _amplitude[2], _amplitude[3] = amplitude[0], amplitude[1], amplitude[2], amplitude[3]
     for i in range(amount):
-        x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[0]
-        y = perlinNoise1D(evolution + i + 0.25 * 354623, persistance, octaves) * _amplitude[1]
-        z = perlinNoise1D(evolution + i + 0.5 * 354623, persistance, octaves) * _amplitude[2]
-        w = perlinNoise1D(evolution + i + 0.75 * 354623, persistance, octaves) * _amplitude[3]
+        w = 1.0
+        x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude[1]
+        y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * amplitude[2]
+        z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * amplitude[3]
 
-        _length = sqrt(x * x + y * y + z * z + w * w)
-        x /= _length
-        y /= _length
-        z /= _length
-        w /= _length
+        length = sqrt(x * x + y * y + z * z + w * w)
+        w /= length
+        x /= length
+        y /= length
+        z /= length
 
-        values[i].x = x
-        values[i].y = y
-        values[i].z = z
-        values[i].w = w
+        values[i].w = <float>w
+        values[i].x = <float>x
+        values[i].y = <float>y
+        values[i].z = <float>z
 
     return result
 

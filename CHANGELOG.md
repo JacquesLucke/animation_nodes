@@ -8,6 +8,7 @@
 - Added *Subprograms* to the search menu.
 - Added missing nodes to the node menu
 - Added *Collection Operations* node.
+- Added List/Vectorized output to *Number Wiggle*, *Euler Wiggle* and *Quaternion Wiggle*.
 
 ### Fixed
 
