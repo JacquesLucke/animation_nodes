@@ -31,3 +31,4 @@
 - Started following Blender's class naming conventions.
 - Made dependent nodes unsearchable like *Loop Generator* and *Group Output* nodes.
 - Changed location of Animation Nodes to Animation Nodes Editor.
+- Allow spline radius to affect the object's scale in the Follow Spline Action.
