@@ -3,11 +3,12 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... algorithms.lists import mask_CList
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import BooleanList, Vector3DList, DoubleList, FloatList
+from ... data_structures import BooleanList, Vector3DList, DoubleList, FloatList, QuaternionList
 
 particleAttributes = [
     ("Locations", "locations", "location", "Vector List", Vector3DList),
     ("Velocities", "velocities", "velocity", "Vector List", Vector3DList),
+    ("Rotations", "rotations", "rotation", "Quaternion List", QuaternionList),
     ("Sizes", "sizes", "size", "Float List", FloatList),
     ("Birth Times", "birthTimes", "birth_time", "Float List", FloatList),
     ("Die Times", "dieTimes", "die_time", "Float List", FloatList)
@@ -69,9 +70,13 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, AnimationNode):
             yield "    values = self.getParticleProperties(system, '{}', {}, _mask)".format(attribute, CListType.__name__)
             yield "    {}.extend(values)".format(identifier)
 
-        # convert FloatList to DoubleList
         for identifier, attribute, CListType in executionData:
             if identifier in required:
+                # Correct particle rotations.
+                if attribute == "rotation":
+                    yield "{0} = AN.nodes.particles.c_utils.correctParticleRotations({0})".format(identifier)
+                
+                # Convert FloatList to DoubleList.
                 if CListType is FloatList:
                     yield "{0} = DoubleList.fromValues({0})".format(identifier)
 
