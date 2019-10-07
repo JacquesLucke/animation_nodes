@@ -27,7 +27,7 @@ def wiggleVectorList(amount, double evolution, amplitude, int octaves, double pe
         values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[i % 3]
     return result
 
-def wiggleDoubleList(amount, double evolution, amplitude, int octaves, double persistance):
+def wiggleDoubleList(amount, double evolution, double amplitude, int octaves, double persistance):
     cdef DoubleList result = DoubleList(length = amount)
     cdef double *values = <double*>result.data
     cdef Py_ssize_t i
@@ -39,10 +39,12 @@ def wiggleEulerList(amount, double evolution, amplitude, int octaves, double per
     cdef EulerList result = EulerList(length = amount)
     cdef Euler3 *values = <Euler3*>result.data
     cdef Py_ssize_t i
+    cdef float xAmplitude, yAmplitude, zAmplitude
+    (xAmplitude, yAmplitude, zAmplitude) = amplitude
     for i in range(amount):
-        values[i].x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude[0]
-        values[i].y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * amplitude[1]
-        values[i].z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * amplitude[2]
+        values[i].x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * xAmplitude
+        values[i].y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * yAmplitude
+        values[i].z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * zAmplitude
         values[i].order = 0
     return result
 
@@ -51,12 +53,14 @@ def wiggleQuaternionList(amount, double evolution, amplitude, int octaves, doubl
     cdef Quaternion *values = <Quaternion*>result.data
     cdef double length
     cdef double w, x, y, z
+    cdef double wAmplitude, xAmplitude, yAmplitude, zAmplitude
+    (wAmplitude, xAmplitude, yAmplitude, zAmplitude) = amplitude
     cdef Py_ssize_t i
     for i in range(amount):
         w = 1.0
-        x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude[1]
-        y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * amplitude[2]
-        z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * amplitude[3]
+        x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * xAmplitude
+        y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * yAmplitude
+        z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * zAmplitude
 
         length = sqrt(x * x + y * y + z * z + w * w)
         w /= length
