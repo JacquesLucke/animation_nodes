@@ -25,15 +25,15 @@ class WiggleFalloffNode(bpy.types.Node, AnimationNode):
 
 cdef class WiggleFalloff(BaseFalloff):
     cdef:
-        float evolution
-        float offset, amplitude
-        float persistance
+        double evolution
+        double offset, amplitude
+        double persistance
         int octaves
 
     def __cinit__(self, float seed, float evolution,
                         float offset, float amplitude,
                         int octaves, float persistance):
-        self.evolution = seed * 3413123 + evolution
+        self.evolution = seed * 341312 + evolution
         self.amplitude = amplitude
         self.persistance = persistance
         self.offset = offset
@@ -42,6 +42,6 @@ cdef class WiggleFalloff(BaseFalloff):
         self.dataType = "None"
 
     cdef float evaluate(self, void *object, Py_ssize_t index):
-        cdef float x = self.evolution + index * 1127
-        cdef float noise = perlinNoise1D(x, self.persistance, self.octaves)
-        return self.amplitude * noise + self.offset
+        cdef double x = self.evolution + index * 1127
+        cdef double noise = perlinNoise1D(x, self.persistance, self.octaves)
+        return <float>(self.amplitude * noise + self.offset)
