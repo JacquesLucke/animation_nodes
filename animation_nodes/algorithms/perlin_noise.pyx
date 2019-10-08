@@ -1,7 +1,8 @@
 cimport cython
+from libc.math cimport sqrt
 from . random cimport randomDouble_UnitRange
 from .. utils.limits cimport INT_MAX
-from .. data_structures cimport Vector3DList
+from .. data_structures cimport Vector3DList, DoubleList, EulerList, Euler3, QuaternionList, Quaternion
 
 # http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
 
@@ -24,6 +25,54 @@ def wiggleVectorList(amount, double evolution, amplitude, int octaves, double pe
     _amplitude[0], _amplitude[1], _amplitude[2] = amplitude[0], amplitude[1], amplitude[2]
     for i in range(amount * 3):
         values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[i % 3]
+    return result
+
+def wiggleDoubleList(amount, double evolution, double amplitude, int octaves, double persistance):
+    cdef DoubleList result = DoubleList(length = amount)
+    cdef double *values = <double*>result.data
+    cdef Py_ssize_t i
+    for i in range(amount):
+        values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude
+    return result
+
+def wiggleEulerList(amount, double evolution, amplitude, int octaves, double persistance):
+    cdef EulerList result = EulerList(length = amount)
+    cdef Euler3 *values = <Euler3*>result.data
+    cdef Py_ssize_t i
+    cdef float xAmplitude, yAmplitude, zAmplitude
+    (xAmplitude, yAmplitude, zAmplitude) = amplitude
+    for i in range(amount):
+        values[i].x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * xAmplitude
+        values[i].y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * yAmplitude
+        values[i].z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * zAmplitude
+        values[i].order = 0
+    return result
+
+def wiggleQuaternionList(amount, double evolution, amplitude, int octaves, double persistance):
+    cdef QuaternionList result = QuaternionList(length = amount)
+    cdef Quaternion *values = <Quaternion*>result.data
+    cdef double length
+    cdef double w, x, y, z
+    cdef double wAmplitude, xAmplitude, yAmplitude, zAmplitude
+    (wAmplitude, xAmplitude, yAmplitude, zAmplitude) = amplitude
+    cdef Py_ssize_t i
+    for i in range(amount):
+        w = 1.0
+        x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * xAmplitude
+        y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * yAmplitude
+        z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * zAmplitude
+
+        length = sqrt(x * x + y * y + z * z + w * w)
+        w /= length
+        x /= length
+        y /= length
+        z /= length
+
+        values[i].w = <float>w
+        values[i].x = <float>x
+        values[i].y = <float>y
+        values[i].z = <float>z
+
     return result
 
 cpdef double perlinNoise1D(double x, double persistance, int octaves):
