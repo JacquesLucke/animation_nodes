@@ -4,7 +4,7 @@ import collections
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from . MTB import create_MIDI
+from ... utils.MIDI_Utils import MIDI_ReadFile
 
 # path : last modification, content
 cache = {}
@@ -15,11 +15,15 @@ class MIDIFile(bpy.types.Node, AnimationNode):
     bl_width_default = 180
     errorHandlingType = "EXCEPTION"
 
+    useChannel = BoolProperty(name = "Use channel", default = True,
+    description = "Use channel or track information", update = propertyChanged)
+
     def create(self):
         self.newInput("Text", "Path", "path", showFileChooser = True)
         self.newOutput("Generic", "MIDI Data", "midiData")
 
     def draw(self, layout):
+        layout.prop(self, "useChannel")
         if self.inputs[0].isUnlinked:
             name = os.path.basename(self.inputs[0].value)
             if name != "":
@@ -35,7 +39,7 @@ class MIDIFile(bpy.types.Node, AnimationNode):
         if not os.path.exists(path):
             self.raiseErrorMessage("Path does not exist")
 
-        key = path
+        key = path, self.useChannel
         lastModification = os.stat(path).st_mtime
 
         loadFile = False
@@ -48,7 +52,7 @@ class MIDIFile(bpy.types.Node, AnimationNode):
 
         if loadFile:
             try:
-                midiData = create_MIDI(path)
+                midiData = MIDI_ReadFile(path, self.useChannel)
                 print("D1 - len = " + str(len(midiData)))
                 cache[key] = (lastModification, midiData)
             except LookupError:

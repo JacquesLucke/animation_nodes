@@ -1,25 +1,4 @@
-import bpy
-
-# How to install a new python module in the blender (here mido) :
-# http://www.codeplastic.com/2019/03/12/how-to-install-python-modules-in-blender/
-# Mido is a library for working with MIDI messages and ports.
-# It’s designed to be as straight forward and Pythonic as possible:
-# https://mido.readthedocs.io/en/latest/installing.html
 from mido import MidiFile
-
-# ********************************************************************
-# Midi_To_Blend
-# version = 1.011
-# Blender version = 2.8
-# Author = Patrick Mauger
-# Web Site = docouatzat.com
-# Mail = docouatzat@gmail.com
-#
-# Licence used = Creative Commons CC BY
-# Check licence here : https://creativecommons.org
-#
-# Generate 3D objects animated from midifile
-# ********************************************************************
 
 class Tempo_Class:
 
@@ -70,8 +49,8 @@ class Tempo_Class:
 
         return None
 
-    # Return the second calculated with absolute time in seconds from ticks cumul provided
-    def second(self, ticks_cumul, ppq):
+    # Return the real time in second
+    def get_realtime(self, ticks_cumul, ppq):
 
         if ticks_cumul == 0:
             return 0
@@ -91,7 +70,6 @@ class Tempo_Class:
 
         return seconds
 
-
 class Channel_Class:
 
     # Channel initializations
@@ -107,14 +85,12 @@ class Channel_Class:
         self.idx = idx_channel                  # Channel index number
         self.name = name                        # mean the name or description
         self.list_note = list_note              # list of note used in this channel
-
-        # Internal use
         self.events = []                        # Memorize all events
 
-        return
+        return None
 
     # Add an new midi event related to the channel
-    def add_note_evt(self, evt, second, note, velocity):
+    def add_note_msg(self, evt, second, note, velocity):
         """
         React to note event
         IN
@@ -126,44 +102,18 @@ class Channel_Class:
             None
         """
         event = []
-        event.append(second)
-        event.append(evt)
         event.append(note)
+        event.append(evt)
+        event.append(second)
         event.append(velocity)
         self.events.append(event)
 
         return None
 
-    # get all note value for any second
-    def get_notes_value(self, second):
-        """
-        Sort all notes for track/channel value at frame
-        IN
-            frame       frame number
-        OUT
-            list of track/value
-        """
-        listvalues = []
-        for note in self.list_note:
-            listvalues.append(note)
-            value += event.velocity
+def MIDI_ReadFile(filemid, useChannel):
 
-        return listvalues
-
-
-def create_MIDI(filemid):
-
-    # path and name of midi file - temporary => replaced when this become an add-on
-    # path = "C:\\tmp\\MTB\\data"
-    path = "D:\\OneDrive\\Blog\\MTB\\data"
-    filename = "T1_take5"
     # If use_channel = True then manage separate channel as usual, wherever the tracks where the channel event are
     # If use_channel = False then MIDI File don't use channel info and we use 1 track = 1 channel
-    use_channel = True
-    # filemid = path + "\\" + filename + ".mid"
-
-    # Open log file for append
-    # flog = open(filelog, "w+")
 
     # Open MIDIFile with the module MIDO
     mid = MidiFile(filemid)
@@ -172,26 +122,14 @@ def create_MIDI(filemid):
     # type = 1 - (synchronous): all messages are in separated tracks and use the same tempo and start at the same time
     # type = 2 - (asynchronous): each track is independent of the others for tempo and for start - not yet supported
     if (mid.type == 2):
-        raise RuntimeError("Only type 0 or 1, type 2 is not yet supported")
-
-    """ STEP 1 - Prepare """
+        raise RuntimeError("Only MIDI file type 0 or 1, type 2 is not yet supported")
 
     # Set pulsation per quarter note (ppq)
-    # Mean the number of pulsation per round note / 4 = black note
+    # Mean the number of pulsation per round note / 4
     ppq = mid.ticks_per_beat
 
-    # Init Max frame number founded for all channel, mean the end of animation
-    max_num_frame = 0
-
-    # take the framerate directly from blender
-    # framerate = bpy.context.scene.render.fps
-    framerate = 24
-
-    # For type 0 and 1 midifile
-    # instanciate single time_map
+    # For type 0 and 1 midifile instanciate single time_map
     time_map = Tempo_Class(mid.tracks[0], ppq)
-
-    """ STEP 2 - Creating the 3D channel vizualisation objects """
 
     # Dictionnary of Channel <= receive object Channel_Class
     ChannelList = {}
@@ -201,7 +139,7 @@ def create_MIDI(filemid):
     l_channel_notes = {}
     # Fill l_channel with all channels found in all tracks
     # and set some channel parameters
-    if use_channel:
+    if useChannel:
         for current_track, track in enumerate(mid.tracks):
             for msg in track:
                 if msg.type == ('note_on'):
@@ -223,12 +161,12 @@ def create_MIDI(filemid):
                         l_channel_notes[current_track].append(msg.note)
         l_channel = sorted(l_channel)
 
-    # Create one vizualisation object per channel
+    # Add one object per channel
     for cur_chan in l_channel:
         l_channel_notes[cur_chan] = sorted(l_channel_notes[cur_chan])
         ChannelList[cur_chan] = Channel_Class(cur_chan, channel_name[cur_chan], l_channel_notes[cur_chan])
 
-    """ STEP 3 - Main LOOP to memorize event in time """
+    # Main LOOP to "play" and memorize MIDI msg in their realtime
     for current_track, track in enumerate(mid.tracks):
 
     #   Initialize the time cumul in ticks and second for the track
@@ -237,11 +175,13 @@ def create_MIDI(filemid):
         # Parse midi message for the current track
         for msg in track:
 
+            # Ignore sysex and sysex not participate to delta time
             if msg.type == "sysex":
                 continue
 
             time_in_ticks_cumul += msg.time
 
+            # ignore meta msg
             if msg.is_meta:
                 continue
 
@@ -251,64 +191,17 @@ def create_MIDI(filemid):
             else:
                 msgtype = msg.type
 
-            # Check real channel following the value of lag use_channel
-            if use_channel:
+            # Check real channel following the value of lag useChannel
+            if useChannel:
                 current_channel = msg.channel
             else:
                 current_channel = current_track
 
             # If note_on or note_off event
             if msgtype in ('note_on', 'note_off'):
-                # Evaluate the current frame following Tempo MAP
-                current_second = time_map.second(time_in_ticks_cumul, ppq)
+                # Evaluate the current time following Tempo MAP
+                current_time = time_map.get_realtime(time_in_ticks_cumul, ppq)
                 velocity = msg.velocity * (msgtype == 'note_on')  # to avoid note_off with velocity != 0
-                ChannelList[current_channel].add_note_evt(msgtype, current_second, msg.note, velocity)
-            # if pitchwheel event
-            # elif msg.type == 'pitchwheel':
-            #     ChannelList[current_channel].add_pitchwheel_evt(current_frame, msg.pitch)
-            # elif msg.type == 'aftertouch':
-            #     ChannelList[current_channel].add_aftertouch_evt(current_frame, msg.value)
-            # elif msg.type == 'control_change':
-            #     ChannelList[current_channel].add_ctrlchange_evt(current_frame, msg.control, msg.value)
+                ChannelList[current_channel].add_note_msg(msgtype, current_time, msg.note, velocity)
 
     return ChannelList
-
-
-def execute_MIDI(channel, frame, fps):
-    """
-    IN
-        channel     channel data
-        second      second for evt
-    OUT
-        List of velocity, one for each note
-    """
-
-    listvalues = []
-    velnote = {}
-    events = channel.events
-    # print(events)
-    second = frame / fps
-    range = 10 / fps
-    range_min = second - range
-    range_max = second + range
-
-    # print(str(second)+","+str(range_min)+","+str(range_max))
-
-    for event in events:
-        # print(event)
-        if (event[0] >= range_min) and (event[0] <= range_max):
-            velnote[event[2]] = event[3]
-
-    for note in channel.list_note:
-        # print("note = "+str(note))
-        if note not in velnote:
-            listvalues.append(0)  # maybe having a cache from value predecessor if the good idea
-        else:
-            listvalues.append(velnote[note])
-
-    return listvalues
-
-        # 0 event.append(second)
-        # 1 event.append(evt)
-        # 2 event.append(note)
-        # 3 event.append(velocity)
