@@ -12,7 +12,7 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
     autoRefreshBool: BoolProperty(name="Auto Refresh", default=False, update=propertyChanged)    
     
     def create(self):
-        self.newInput("Text", "Texture Name", "textureName")
+        self.newInput("Texture", "Texture", "texture", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Vector", "useVectorList",
             ("Location", "location"), ("Locations", "locations")))
         self.newOutput(VectorizedSocket("Color", "useVectorList",
@@ -25,7 +25,7 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
             ("Blue", "blue"), ("Blues", "blues")))
         self.newOutput(VectorizedSocket("Float", "useVectorList",
             ("Alpha / Luminance", "alpha"), ("Alphas / Luminances", "alphas")))
-        self.newOutput("Generic", "For Extra Property", "forExtraProperty")
+        self.newOutput("Generic", "Extra Settings", "texture")
 
         visibleOutputs = ("Color", "Colors")
         for socket in self.outputs:
@@ -45,52 +45,41 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
         else:
             return "executeSingle"
 
-    def executeSingle(self, textureName, location):
-        if len(bpy.data.textures) < 1 or textureName == "":
+    def executeSingle(self, texture, location):
+        if len(bpy.data.textures) < 1 or texture is None:
             return None, None, None, None, None, None
-        if self.getTexture(textureName) is None:
-            return None, None, None, None, None, None
-        forExtraProperty = bpy.data.textures[textureName]    
-        if location is None:
-            return None, None, None, None, None, forExtraProperty
         try:    
-            bpy.data.textures[textureName].image_user.use_auto_refresh = self.autoRefreshBool
+            texture.image_user.use_auto_refresh = self.autoRefreshBool
         except:
-            bpy.data.textures[textureName]
-        color = bpy.data.textures[textureName].evaluate(location)
+            pass
+
+        color = texture.evaluate(location)[:]
         red = color[0]
         green = color[1]
         blue = color[2]
         alpha = color[3]     
-        return color, red, green, blue, alpha, forExtraProperty
+        return color, red, green, blue, alpha, texture
         
-    def executeList(self, textureName, locations):
+    def executeList(self, texture, locations):
         reds = []
         greens = []
         blues = []
         alphas = []
         colors = []
-        if len(bpy.data.textures) < 1 or textureName == "":
+        if len(bpy.data.textures) < 1 or texture is None:
             return colors, DoubleList.fromValues(reds), DoubleList.fromValues(greens), DoubleList.fromValues(blues), DoubleList.fromValues(alphas), None
-        if self.getTexture(textureName) is None:
-            return colors, DoubleList.fromValues(reds), DoubleList.fromValues(greens), DoubleList.fromValues(blues), DoubleList.fromValues(alphas), None
-        forExtraProperty = bpy.data.textures[textureName]        
         if locations is None or len(locations) < 1:
-            return colors, DoubleList.fromValues(reds), DoubleList.fromValues(greens), DoubleList.fromValues(blues), DoubleList.fromValues(alphas), forExtraProperty
+            return colors, DoubleList.fromValues(reds), DoubleList.fromValues(greens), DoubleList.fromValues(blues), DoubleList.fromValues(alphas), texture
         try:    
-            bpy.data.textures[textureName].image_user.use_auto_refresh = self.autoRefreshBool
+            texture.image_user.use_auto_refresh = self.autoRefreshBool
         except:
-            bpy.data.textures[textureName]
+            pass
 
-        for i in range(len(locations)):
-            color = bpy.data.textures[textureName].evaluate(locations[i])
+        for location in locations:
+            color = texture.evaluate(location)[:]
             reds.append(color[0])
             greens.append(color[1])
             blues.append(color[2])
             alphas.append(color[3])
             colors.append(color)     
-        return colors, DoubleList.fromValues(reds), DoubleList.fromValues(greens), DoubleList.fromValues(blues), DoubleList.fromValues(alphas), forExtraProperty          
-        
-    def getTexture(self, name):
-        try: return bpy.data.textures.get(name)
-        except: return None
+        return colors, DoubleList.fromValues(reds), DoubleList.fromValues(greens), DoubleList.fromValues(blues), DoubleList.fromValues(alphas), texture
