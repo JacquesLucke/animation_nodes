@@ -9,6 +9,7 @@
 - Added missing nodes to the node menu
 - Added *Collection Operations* node.
 - Added *Rotations* output to the *Particles Data* node.
+- Added List/Vectorized output to *Number Wiggle*, *Euler Wiggle* and *Quaternion Wiggle*.
 
 ### Fixed
 
