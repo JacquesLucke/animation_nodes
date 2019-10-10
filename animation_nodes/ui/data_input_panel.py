@@ -15,19 +15,20 @@ class ViewportInputPanel(bpy.types.Panel):
         nodes = getNodesByType("an_ViewportInputNode")
         if len(nodes) == 0:
             layout.label(text="No Viewport Input node", icon="INFO")
-        else:
-            for node in nodes:
-                box = layout.box()
+            return
+        
+        for node in nodes:
+            box = layout.box()
 
-                row = box.row()
-                row.label(text = node.label + ":")
-                row.operator("an.toogle_viewport_input_box", text="",
-                    icon='TRIA_RIGHT' if node.hidden else 'TRIA_DOWN',
-                    emboss = False).identifier = node.identifier
+            row = box.row()
+            row.label(text = node.label + ":")
+            row.operator("an.toogle_viewport_input_box", text="",
+                icon='TRIA_RIGHT' if node.hidden else 'TRIA_DOWN',
+                emboss = False).identifier = node.identifier
 
-                if not node.hidden:
-                    for socket in node.outputs[:-1]:
-                        socket.drawSocket(box, text = socket.text, node = node, drawType = "TEXT_PROPERTY_OR_NONE")
+            if not node.hidden:
+                for socket in node.outputs[:-1]:
+                    socket.drawSocket(box, text = socket.text, node = node, drawType = "TEXT_PROPERTY_OR_NONE")
 
 class ToogleViewportInputBox(bpy.types.Operator):
     bl_idname = "an.toogle_viewport_input_box"
