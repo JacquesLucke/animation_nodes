@@ -14,7 +14,7 @@ class ViewportInputPanel(bpy.types.Panel):
         layout = self.layout
         nodes = getNodesByType("an_ViewportInputNode")
         if len(nodes) == 0:
-            layout.label(text="No Viewport Input node", icon="INFO")
+            layout.label(text="No Viewport Input node.", icon="INFO")
             return
         
         for node in nodes:
