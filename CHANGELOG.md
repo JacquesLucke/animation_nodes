@@ -24,6 +24,7 @@
 - Fixed *getSelectedObjectNames* function.
 - Fixed the *Offset Vertices* and *Offset Polygons* nodes. Copy the input mesh if needed.
 - Fixed a stepping/precision problem in *Wiggle Falloff*.
+- Fixed Data Input panel in 3d Viewport to give user informations if there is no *Viewport Input* node.
 
 ### Changed
 
