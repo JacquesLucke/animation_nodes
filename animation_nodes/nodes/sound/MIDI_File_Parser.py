@@ -4,26 +4,22 @@ import collections
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... utils.MIDI_Utils import MIDI_ReadFile
+from ... utils.MIDI_Utils import MIDI_ParseFile
 
 # path : last modification, content
 cache = {}
 
 class MIDIFile(bpy.types.Node, AnimationNode):
-    bl_idname = "an_MIDIFileNode"
-    bl_label = "MIDI File"
+    bl_idname = "an_MidiFileParserNode"
+    bl_label = "MIDI File Parser"
     bl_width_default = 180
     errorHandlingType = "EXCEPTION"
 
-    useChannel = BoolProperty(name = "Use channel", default = True,
-    description = "Use channel or track information", update = propertyChanged)
-
     def create(self):
         self.newInput("Text", "Path", "path", showFileChooser = True)
-        self.newOutput("Generic", "MIDI Data", "midiData")
+        self.newOutput("Generic", "Tracks", "tracks")
 
     def draw(self, layout):
-        layout.prop(self, "useChannel")
         if self.inputs[0].isUnlinked:
             name = os.path.basename(self.inputs[0].value)
             if name != "":
@@ -39,7 +35,7 @@ class MIDIFile(bpy.types.Node, AnimationNode):
         if not os.path.exists(path):
             self.raiseErrorMessage("Path does not exist")
 
-        key = path, self.useChannel
+        key = path
         lastModification = os.stat(path).st_mtime
 
         loadFile = False
@@ -52,14 +48,13 @@ class MIDIFile(bpy.types.Node, AnimationNode):
 
         if loadFile:
             try:
-                midiData = MIDI_ReadFile(path, self.useChannel)
-                print("D1 - len = " + str(len(midiData)))
-                cache[key] = (lastModification, midiData)
+                tracks = MIDI_ParseFile(path)
+                # print("D1 - len = " + str(len(tracks)))
+                cache[key] = (lastModification, tracks)
             except LookupError:
                 self.raiseErrorMessage("Invalid Encoding")
         else:
-            midiData = None
+            tracks = None
 
-        # midiData => [1]
-        # return cache.get(key, (0, ""))[1]
+        # tracks => [1]
         return cache.get(key)[1]

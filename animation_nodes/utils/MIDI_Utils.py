@@ -70,50 +70,36 @@ class Tempo_Class:
 
         return seconds
 
-class Channel_Class:
+class MIDINote_Class:
 
     # Channel initializations
-    def __init__(self, idx_channel, name, list_note):
-        """
-        Initialization of the Class Channel_Class
-        IN
-            See below for comment
-        OUT
-            The new object instanciated
-        """
+    def __init__(self, channel, note, time_on, time_off, velocity):
         # Parameters
-        self.idx = idx_channel                  # Channel index number
-        self.name = name                        # mean the name or description
-        self.list_note = list_note              # list of note used in this channel
-        self.events = []                        # Memorize all events
+        self.channel = channel      # channel
+        self.note = note            # number
+        self.time_on = time_on      # note on time
+        self.time_off= time_off     # note off time
+        self.velocity = velocity    # note on velocity
+
+        return
+
+class MIDITrack_Class:
+
+    # Channel initializations
+    def __init__(self, TrackIndex, TrackName):
+        self.Index = TrackIndex         # Channel index number
+        self.Name = TrackName           # mean the name or description
+        self.Notes = []                 # ListMemorize all events
 
         return None
 
-    # Add an new midi event related to the channel
-    def add_note_msg(self, evt, second, note, velocity):
-        """
-        React to note event
-        IN
-            evt         'note_on' or 'note_off' - Not really used for now
-            frame       frame number
-            note        note number
-            velocity    velocity
-        OUT
-            None
-        """
-        event = []
-        event.append(note)
-        event.append(evt)
-        event.append(second)
-        event.append(velocity)
-        self.events.append(event)
+    # Add an new midi note
+    def add_note(self, channel, note, time_on, time_off, velocity):
+        self.Notes.append(MIDINote_Class(channel, note, time_on, time_off, velocity))
 
         return None
 
-def MIDI_ReadFile(filemid, useChannel):
-
-    # If use_channel = True then manage separate channel as usual, wherever the tracks where the channel event are
-    # If use_channel = False then MIDI File don't use channel info and we use 1 track = 1 channel
+def MIDI_ParseFile(filemid):
 
     # Open MIDIFile with the module MIDO
     mid = MidiFile(filemid)
@@ -131,59 +117,25 @@ def MIDI_ReadFile(filemid, useChannel):
     # For type 0 and 1 midifile instanciate single time_map
     time_map = Tempo_Class(mid.tracks[0], ppq)
 
-    # Dictionnary of Channel <= receive object Channel_Class
-    ChannelList = {}
-
-    l_channel = []
-    channel_name = {}
-    l_channel_notes = {}
-    # Fill l_channel with all channels found in all tracks
-    # and set some channel parameters
-    if useChannel:
-        for current_track, track in enumerate(mid.tracks):
-            for msg in track:
-                if msg.type == ('note_on'):
-                    if msg.channel not in l_channel:
-                        l_channel.append(msg.channel)
-                        channel_name[msg.channel] = track.name
-                        l_channel_notes[msg.channel] = []
-                    if msg.note not in l_channel_notes[msg.channel]:
-                        l_channel_notes[msg.channel].append(msg.note)
-        l_channel = sorted(l_channel)
-    else:
-        for current_track, track in enumerate(mid.tracks):
-            l_channel.append(current_track)
-            channel_name[current_track] = track.name
-            l_channel_notes[current_track] = []
-            for msg in track:
-                if msg.type == ('note_on'):
-                    if msg.note not in l_channel_notes[current_track]:
-                        l_channel_notes[current_track].append(msg.note)
-        l_channel = sorted(l_channel)
-
-    # Add one object per channel
-    for cur_chan in l_channel:
-        l_channel_notes[cur_chan] = sorted(l_channel_notes[cur_chan])
-        ChannelList[cur_chan] = Channel_Class(cur_chan, channel_name[cur_chan], l_channel_notes[cur_chan])
-
+    Tracks = []
     # Main LOOP to "play" and memorize MIDI msg in their realtime
-    for current_track, track in enumerate(mid.tracks):
+    for TrackIndex, curTracks in enumerate(mid.tracks):
+        Track = MIDITrack_Class(TrackIndex,curTracks.name)
 
-    #   Initialize the time cumul in ticks and second for the track
+        # Initialize the time cumul in ticks
         time_in_ticks_cumul = 0
 
+        lastNoteOn = {}
         # Parse midi message for the current track
-        for msg in track:
+        for msg in curTracks:
 
             # Ignore sysex and sysex not participate to delta time
-            if msg.type == "sysex":
-                continue
+            if msg.type == "sysex": continue
 
             time_in_ticks_cumul += msg.time
 
             # ignore meta msg
-            if msg.is_meta:
-                continue
+            if msg.is_meta: continue
 
             # Check if note_on with velocity 0 will become note_off
             if (msg.type == 'note_on') and (msg.velocity == 0):
@@ -191,17 +143,16 @@ def MIDI_ReadFile(filemid, useChannel):
             else:
                 msgtype = msg.type
 
-            # Check real channel following the value of lag useChannel
-            if useChannel:
-                current_channel = msg.channel
-            else:
-                current_channel = current_track
+            current_time = time_map.get_realtime(time_in_ticks_cumul, ppq)
+            # If note_on then memorize til note_off become
+            if msgtype == 'note_on':
+                lastNoteOn[msg.note] = [msg.channel, current_time, msg.velocity]
 
-            # If note_on or note_off event
-            if msgtype in ('note_on', 'note_off'):
-                # Evaluate the current time following Tempo MAP
-                current_time = time_map.get_realtime(time_in_ticks_cumul, ppq)
-                velocity = msg.velocity * (msgtype == 'note_on')  # to avoid note_off with velocity != 0
-                ChannelList[current_channel].add_note_msg(msgtype, current_time, msg.note, velocity)
+            # If note_off then create the note with note_on memorized
+            # This is a naive think who take for sure all notes are in order in time and never cross off/on
+            if msgtype == 'note_off':
+                Track.add_note(msg.channel, msg.note, lastNoteOn[msg.note][1], current_time, lastNoteOn[msg.note][2])
 
-    return ChannelList
+        Tracks.append(Track)
+
+    return Tracks
