@@ -45,7 +45,7 @@ steps:
 
 - task: GitHubRelease@1
   inputs:
-    gitHubConnection: 'OmarEmaraDev'
+    gitHubConnection: 'JacquesLucke'
     repositoryName: 'JacquesLucke/animation_nodes'
     action: 'edit'
     target: '$(Build.SourceVersion)'
