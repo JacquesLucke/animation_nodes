@@ -9,8 +9,6 @@ class MidiTrackNode(bpy.types.Node, AnimationNode):
     bl_label = "MIDI Track Info"
     bl_width_default = 180
 
-    assignedType: ListTypeSelectorSocket.newProperty(default = "Float")
-
     def create(self):
         self.newInput("Generic", "Track", "track")
         self.newOutput("Generic", "Notes", "notes")

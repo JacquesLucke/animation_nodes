@@ -17,7 +17,7 @@ class MIDIFile(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Text", "Path", "path", showFileChooser = True)
-        self.newOutput("Generic", "Tracks", "tracks")
+        self.newOutput("MIDITrackList", "Tracks", "tracks")
 
     def draw(self, layout):
         if self.inputs[0].isUnlinked:
