@@ -10,7 +10,7 @@ class MidiNoteNode(bpy.types.Node, AnimationNode):
     bl_width_default = 180
 
     def create(self):
-        self.newInput("Generic", "Note", "note")
+        self.newInput("MIDINote", "Note", "note")
         self.newOutput("Integer", "Channel", "channel")
         self.newOutput("Integer", "Number", "number")
         self.newOutput("Integer", "Time On", "timeon")

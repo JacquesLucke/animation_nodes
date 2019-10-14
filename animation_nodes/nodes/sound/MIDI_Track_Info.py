@@ -10,10 +10,10 @@ class MidiTrackNode(bpy.types.Node, AnimationNode):
     bl_width_default = 180
 
     def create(self):
-        self.newInput("Generic", "Track", "track")
-        self.newOutput("Generic", "Notes", "notes")
+        self.newInput("MIDITrack", "Track", "track")
+        self.newOutput("MIDINoteList", "Notes", "notes")
 
     def execute(self, track):
-        if track is None: return None
+        # if track is None: return None
 
         return track.Notes
