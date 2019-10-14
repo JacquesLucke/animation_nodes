@@ -68,6 +68,10 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
         description = "Objects with similar location should get the same index")
     locationMode: EnumProperty(name = "Location Mode", default = "ORIGIN",
         items = locationModeItems)
+        
+    @classmethod
+    def poll(cls, context):
+        return len(context.selected_objects) != 0
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self, width = 250 * getDpiFactor())
