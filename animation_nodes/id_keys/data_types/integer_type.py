@@ -22,6 +22,7 @@ class IntegerDataType(SingleIDKeyDataType):
     def drawExtras(cls, layout, object, name):
         props = layout.operator("an.id_keys_from_sorted_objects", text = "Sort Objects", icon = "SORTSIZE")
         props.idKeyName = name
+        layout.operator("an.index_offset", icon="LINENUMBERS_ON")
 
     @classmethod
     def drawCopyMenu(cls, layout, object, name):
