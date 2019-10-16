@@ -188,56 +188,56 @@ def getObjectsIDKeys(idKeyName):
     sorted_list = sorted(object_list, key = lambda obj: obj[idKeyName])
     return sorted_list
 
+OffsetTypeItems = [
+    ('ADD', "Add",
+     "Add number to every selected object which have Index key.\n"
+     "Before :\n"
+     "0, 1, 2, 3\n"
+     "After Offset 1 :\n"
+     "1, 2, 3, 4"),
+    ('RANDOMIZE', "Randomize",
+     "Randomize Index key for all selected objects which have Index Key.\n"
+     "Before :\n"
+     "0, 1, 2, 3\n"
+     "After :\n"
+     "1, 3, 0, 2"),
+    ('REVERT', "Revert",
+     "Revert Index for every selected object which have Index Key.\n"
+     "Before :\n"
+     "0, 1, 2, 3\n"
+     "After :\n"
+     "3, 2, 1, 0"),
+    ('FILL', "Fill Gaps",
+     "Fill Gaps in a serie of Index.\n"
+     "Before :\n"
+     "0, 1, 3, 4\n"
+     "After :\n"
+     "0, 1, 2, 3")
+]
+
+RandomMethodItems = [
+    ('EXISTING', "Existing",
+     "Randomize existing indexes through selected objects."),
+    ('CREATE', "Create",
+     "Create random index for each selected object.")
+]
+
 class IDKeysIntegerOffset(bpy.types.Operator):
     bl_idname = "an.id_keys_integer_offset"
     bl_label = "ID Keys Offset"
     bl_description = "Offset ID Keys of selected Objects."
 
     idKeyName: StringProperty()
-    offset_type: EnumProperty(
-        name = "Type",
-        default = 'ADD',
-        items = (
-            ('ADD', "Add",
-             "Add number to every selected object which have Index key.\n"
-             "Before :\n"
-             "0, 1, 2, 3\n"
-             "After Offset 1 :\n"
-             "1, 2, 3, 4"),
-            ('RANDOMIZE', "Randomize",
-             "Randomize Index key for all selected objects which have Index Key.\n"
-             "Before :\n"
-             "0, 1, 2, 3\n"
-             "After :\n"
-             "1, 3, 0, 2"),
-            ('REVERSE', "Reverse",
-             "Revert Index for every selected object which have Index Key.\n"
-             "Before :\n"
-             "0, 1, 2, 3\n"
-             "After :\n"
-             "3, 2, 1, 0"),
-            ('FILL', "Fill Gaps",
-             "Fill Gaps in a serie of Index.\n"
-             "Before :\n"
-             "0, 1, 3, 4\n"
-             "After :\n"
-             "0, 1, 2, 3"),
-        ))
+    offset_type: EnumProperty(name="Type", default='ADD',
+                            items=OffsetTypeItems)
     offset_value: IntProperty(name="Offset value", default=0)
-    random_method: EnumProperty(
-        name = "Method",
-        default = 'EXISTING',
-        items = (
-            ('EXISTING', "Existing",
-             "Randomize existing indexes through selected objects."),
-            ('CREATE', "Create",
-             "Create random index for each selected object."),
-        ))
-    random_seed: IntProperty(name = "Seed", default = 0)
-    random_min: IntProperty(name = "Min", default = 0)
-    random_max: IntProperty(name = "Max", default = 10)
-    start_at: BoolProperty(name = "Start at", default = False)
-    remove_gaps: BoolProperty(name = "Remove gaps", default = False)
+    random_method: EnumProperty(name="Method", default='EXISTING',
+                                items=RandomMethodItems)
+    random_seed: IntProperty(name="Seed", default=0)
+    random_min: IntProperty(name="Min", default=0)
+    random_max: IntProperty(name="Max", default=10)
+    start_at: BoolProperty(name="Start at", default=False)
+    remove_gaps: BoolProperty(name="Remove gaps", default=False)
 
     @classmethod
     def poll(cls, context):
