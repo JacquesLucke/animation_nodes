@@ -184,10 +184,7 @@ def getIDKeyIntegerName(name):
 def getObjectsIDKeys(idKeyName):
     object_list = []
     for obj in bpy.context.selected_objects:
-        try:
-            obj[idKeyName]
-            object_list.append(obj)
-        except KeyError: pass
+        if idKeyName in obj:object_list.append(obj)
     sorted_list = sorted(object_list, key = lambda obj: obj[idKeyName])
     return sorted_list
 
