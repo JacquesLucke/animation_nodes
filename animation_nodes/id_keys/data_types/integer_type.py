@@ -178,7 +178,7 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
             return object.matrix_world * ((p1 + p2) / 2)
         
 def getIDKeyIntegerName(name):
-    IDKeyName = "AN*Integer*%s" % name
+    IDKeyName = f"AN*Integer*{name}"
     return IDKeyName
 
 def getObjectsIDKeys(idKeyName):
