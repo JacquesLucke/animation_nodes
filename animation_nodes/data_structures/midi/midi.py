@@ -2,10 +2,10 @@
 class MIDINote_Class:
 
     # Channel initializations
-    def __init__(self, channel, note, time_on, time_off, velocity):
+    def __init__(self, channel, number, time_on, time_off, velocity):
         # Parameters
         self.channel = channel      # channel
-        self.note = note            # number
+        self.number = number        # number of note
         self.time_on = time_on      # note on time
         self.time_off = time_off    # note off time
         self.velocity = velocity    # note on velocity
@@ -24,7 +24,7 @@ class MIDITrack_Class:
         return
 
     # Add an new midi note
-    def add_note(self, channel, note, time_on, time_off, velocity):
-        self.Notes.append(MIDINote_Class(channel, note, time_on, time_off, velocity))
+    def add_note(self, channel, number, time_on, time_off, velocity):
+        self.Notes.append(MIDINote_Class(channel, number, time_on, time_off, velocity))
 
         return

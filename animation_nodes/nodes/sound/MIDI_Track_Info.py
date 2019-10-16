@@ -14,6 +14,6 @@ class MidiTrackNode(bpy.types.Node, AnimationNode):
         self.newOutput("MIDINoteList", "Notes", "notes")
 
     def execute(self, track):
-        # if track is None: return None
+        if track is None: return None
 
         return track.Notes

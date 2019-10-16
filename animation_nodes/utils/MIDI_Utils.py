@@ -118,7 +118,7 @@ def MIDI_ParseFile(filemid):
             current_time = time_map.get_realtime(time_in_ticks_cumul, ppq)
             # If note_on then memorize til note_off become
             if msgtype == 'note_on':
-                lastNoteOn[msg.note] = [msg.channel, current_time, msg.velocity]
+                lastNoteOn[msg.note] = [msg.channel, current_time, msg.velocity / 127]
 
             # If note_off then create the note with note_on memorized
             # This is a naive think who take for sure all notes are in order in time and never cross off/on
