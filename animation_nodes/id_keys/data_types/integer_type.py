@@ -20,17 +20,11 @@ class IntegerDataType(SingleIDKeyDataType):
 
     @classmethod
     def drawExtras(cls, layout, object, name):
-        col=layout.column(align=True)
-        row=col.row(align=True)
-        row.operator("an.id_keys_from_sorted_objects", text = "Sort", icon = "SORTSIZE").idKeyName=name
-        row.operator("an.id_keys_integer_offset", text = "Offset", icon="LINENUMBERS_ON").idKeyName=name
-        row=col.row(align=True)
-        op=row.operator("an.id_keys_integer_draw", text="Select", icon="HIDE_OFF")
-        op.idKeyName=name
-        op.show_only_selected=True
-        op2=row.operator("an.id_keys_integer_draw", text="All", icon="HIDE_OFF")
-        op2.idKeyName=name
-        op2.show_only_selected=False
+        row = layout.row(align = True)
+        props = row.operator("an.id_keys_from_sorted_objects", text = "Sort", icon = "SORTSIZE")
+        props.idKeyName = name
+        props = row.operator("an.id_keys_integer_offset", text = "Offset", icon="LINENUMBERS_ON")
+        props.idKeyName = name
 
     @classmethod
     def drawCopyMenu(cls, layout, object, name):
