@@ -2,6 +2,7 @@ import bpy
 import random
 from bpy.props import *
 from mathutils import Vector
+from textwrap import dedent
 from . base import SingleIDKeyDataType
 from ... data_structures import LongList
 from ... algorithms.lists import naturalSortKey
@@ -190,29 +191,37 @@ def getObjectsIDKeys(idKeyName):
 
 offsetTypeItems = [
     ('ADD', "Add",
-     "Add number to every selected object which have Index key.\n"
-     "Before :\n"
-     "0, 1, 2, 3\n"
-     "After Offset 1 :\n"
-     "1, 2, 3, 4"),
+     dedent("""\
+     Add number to every selected object which have Index key.
+     Before :
+     0, 1, 2, 3
+     After Offset 1 :
+     1, 2, 3, 4
+     """)),
     ('RANDOMIZE', "Randomize",
-     "Randomize Index key for all selected objects which have Index Key.\n"
-     "Before :\n"
-     "0, 1, 2, 3\n"
-     "After :\n"
-     "1, 3, 0, 2"),
+     dedent("""\
+     Randomize Index key for all selected objects which have Index Key.
+     Before :
+     0, 1, 2, 3
+     After :
+     1, 3, 0, 2
+     """)),
     ('REVERT', "Revert",
-     "Revert Index for every selected object which have Index Key.\n"
-     "Before :\n"
-     "0, 1, 2, 3\n"
-     "After :\n"
-     "3, 2, 1, 0"),
+     dedent("""\
+     Revert Index for every selected object which have Index Key.
+     Before :
+     0, 1, 2, 3
+     After :
+     3, 2, 1, 0
+     """)),
     ('FILL', "Fill Gaps",
-     "Fill Gaps in a serie of Index.\n"
-     "Before :\n"
-     "0, 1, 3, 4\n"
-     "After :\n"
-     "0, 1, 2, 3")
+     dedent("""\
+     Fill Gaps in a serie of Index.
+     Before :
+     0, 1, 3, 4
+     After :
+     0, 1, 2, 3
+     """))
 ]
 
 randomMethodItems = [
