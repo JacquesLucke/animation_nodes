@@ -188,7 +188,7 @@ def getObjectsIDKeys(idKeyName):
     sorted_list = sorted(object_list, key = lambda obj: obj[idKeyName])
     return sorted_list
 
-OffsetTypeItems = [
+offsetTypeItems = [
     ('ADD', "Add",
      "Add number to every selected object which have Index key.\n"
      "Before :\n"
@@ -215,7 +215,7 @@ OffsetTypeItems = [
      "0, 1, 2, 3")
 ]
 
-RandomMethodItems = [
+randomMethodItems = [
     ('EXISTING', "Existing",
      "Randomize existing indexes through selected objects."),
     ('CREATE', "Create",
@@ -228,16 +228,16 @@ class IDKeysIntegerOffset(bpy.types.Operator):
     bl_description = "Offset ID Keys of selected Objects."
 
     idKeyName: StringProperty()
-    offset_type: EnumProperty(name="Type", default='ADD',
-                            items=OffsetTypeItems)
-    offset_value: IntProperty(name="Offset value", default=0)
-    random_method: EnumProperty(name="Method", default='EXISTING',
-                                items=RandomMethodItems)
-    random_seed: IntProperty(name="Seed", default=0)
-    random_min: IntProperty(name="Min", default=0)
-    random_max: IntProperty(name="Max", default=10)
-    start_at: BoolProperty(name="Start at", default=False)
-    remove_gaps: BoolProperty(name="Remove gaps", default=False)
+    offsetType: EnumProperty(name="Type", default='ADD',
+                            items=offsetTypeItems)
+    offsetValue: IntProperty(name="Offset value", default=0)
+    randomMethod: EnumProperty(name="Method", default='EXISTING',
+                                items=randomMethodItems)
+    randomSeed: IntProperty(name="Seed", default=0)
+    randomMin: IntProperty(name="Min", default=0)
+    randomMax: IntProperty(name="Max", default=10)
+    startAt: BoolProperty(name="Start at", default=False)
+    removeGaps: BoolProperty(name="Remove gaps", default=False)
 
     @classmethod
     def poll(cls, context):
@@ -248,60 +248,59 @@ class IDKeysIntegerOffset(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "offset_type", expand = True)
-        if self.offset_type == "ADD":
-            layout.prop(self, "offset_value")
-        elif self.offset_type == "RANDOMIZE":
-            layout.prop(self, "random_method", text = "")
-            if self.random_method == "CREATE":
+        layout.prop(self, "offsetType", expand = True)
+        if self.offsetType == "ADD":
+            layout.prop(self, "offsetValue")
+        elif self.offsetType == "RANDOMIZE":
+            layout.prop(self, "randomMethod", text = "")
+            if self.randomMethod == "CREATE":
                 row = layout.row(align = True)
-                row.prop(self, "random_min")
-                row.prop(self, "random_max")
-            else: layout.prop(self, "random_seed")
-        elif self.offset_type == "REVERSE":
-            layout.prop(self, "remove_gaps")
-            if self.remove_gaps:
+                row.prop(self, "randomMin")
+                row.prop(self, "randomMax")
+            else: layout.prop(self, "randomSeed")
+        elif self.offsetType == "REVERSE":
+            layout.prop(self, "removeGaps")
+            if self.removeGaps:
                 row = layout.row()
-                row.prop(self, "start_at")
-                if self.start_at: row.prop(self, "offset_value", text = "")
-        elif self.offset_type == "FILL":
+                row.prop(self, "startAt")
+                if self.startAt: row.prop(self, "offsetValue", text = "")
+        elif self.offsetType == "FILL":
             row = layout.row()
-            row.prop(self, "start_at")
-            if self.start_at: row.prop(self, "offset_value", text = "")
+            row.prop(self, "startAt")
+            if self.startAt: row.prop(self, "offsetValue", text = "")
 
     def check(self, context):
         return True
 
     def execute(self, context):
-        idkey = getIDKeyIntegerName(self.idKeyName)
-        object_list = getObjectsIDKeys(idkey)
-        if self.offset_type == "ADD":
-            for obj in object_list: obj[idkey] = obj[idkey]+self.offset_value
-            #for obj in object_list: obj.id_keys.set("Integer", idkey, index + self.offset)
-        elif self.offset_type == "RANDOMIZE":
-            if self.random_method == "EXISTING":
-                random_numbers = [i for i in range(len(object_list))]
-                random.seed(self.random_seed)
-                random.shuffle(random_numbers)
+        idKey = getIDKeyIntegerName(self.idKeyName)
+        objectList = getObjectsIDKeys(idKey)
+        if self.offsetType == "ADD":
+            for obj in objectList: obj[idKey] = obj[idKey]+self.offsetValue
+        elif self.offsetType == "RANDOMIZE":
+            if self.randomMethod == "EXISTING":
+                randomNumbers = [i for i in range(len(objectList))]
+                random.seed(self.randomSeed)
+                random.shuffle(randomNumbers)
             else:
-                try: random_numbers = random.sample(range(self.random_min, self.random_max), len(object_list))
-                except ValueError: random_numbers = random.sample(range(self.random_min, len(object_list)), len(object_list))
-            for obj in object_list: obj[idkey] = random_numbers[object_list.index(obj)]
-        elif self.offset_type == "REVERSE":
-            if self.remove_gaps:
-                if self.start_at: offset = self.offset_value
-                else: offset = object_list[0][idkey]
-                object_list.reverse()
-                for obj in object_list: obj[idkey] = object_list.index(obj)+offset
+                try: randomNumbers = random.sample(range(self.randomMin, self.randomMax), len(objectList))
+                except ValueError: randomNumbers = random.sample(range(self.randomMin, len(objectList)), len(objectList))
+            for obj in objectList: obj[idKey] = randomNumbers[objectList.index(obj)]
+        elif self.offsetType == "REVERSE":
+            if self.removeGaps:
+                if self.startAt: offset = self.offsetValue
+                else: offset = objectList[0][idKey]
+                objectList.reverse()
+                for obj in objectList: obj[idKey] = objectList.index(obj)+offset
             else:
-                index_list = []
-                for obj in object_list: index_list.append(obj[idkey])
-                index_list.reverse()
-                for obj in object_list: obj[idkey] = index_list[object_list.index(obj)]
-        elif self.offset_type == "FILL":
-            if self.start_at: offset = self.offset_value
-            else: offset = object_list[0][idkey]
-            for obj in object_list: obj[idkey] = object_list.index(obj)+offset
+                indexList = []
+                for obj in objectList: indexList.append(obj[idKey])
+                indexList.reverse()
+                for obj in objectList: obj[idKey] = indexList[objectList.index(obj)]
+        elif self.offsetType == "FILL":
+            if self.startAt: offset = self.offsetValue
+            else: offset = objectList[0][idKey]
+            for obj in objectList: obj[idKey] = objectList.index(obj)+offset
         redrawAll()
-        self.offset_value = 0
+        self.offsetValue = 0
         return {'FINISHED'}
