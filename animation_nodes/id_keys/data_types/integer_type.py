@@ -210,7 +210,7 @@ class IDKeysIntegerOffset(bpy.types.Operator):
              "0, 1, 2, 3\n"
              "After :\n"
              "1, 3, 0, 2"),
-            ('REVERT', "Revert",
+            ('REVERSE', "Reverse",
              "Revert Index for every selected object which have Index Key.\n"
              "Before :\n"
              "0, 1, 2, 3\n"
@@ -258,7 +258,7 @@ class IDKeysIntegerOffset(bpy.types.Operator):
                 row.prop(self, "random_min")
                 row.prop(self, "random_max")
             else: layout.prop(self, "random_seed")
-        elif self.offset_type == "REVERT":
+        elif self.offset_type == "REVERSE":
             layout.prop(self, "remove_gaps")
             if self.remove_gaps:
                 row = layout.row()
@@ -287,7 +287,7 @@ class IDKeysIntegerOffset(bpy.types.Operator):
                 try: random_numbers = random.sample(range(self.random_min, self.random_max), len(object_list))
                 except ValueError: random_numbers = random.sample(range(self.random_min, len(object_list)), len(object_list))
             for obj in object_list: obj[idkey] = random_numbers[object_list.index(obj)]
-        elif self.offset_type == "REVERT":
+        elif self.offset_type == "REVERSE":
             if self.remove_gaps:
                 if self.start_at: offset = self.offset_value
                 else: offset = object_list[0][idkey]
