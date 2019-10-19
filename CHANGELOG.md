@@ -1,6 +1,8 @@
 ## Unreleased
 
+### Fixed
 
+- Fixed sound nodes when sounds are packed in the blend file.
 
 ## 2.1.5
 
