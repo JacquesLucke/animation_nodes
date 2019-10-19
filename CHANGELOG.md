@@ -1,5 +1,9 @@
 ## Unreleased
 
+
+
+## 2.1.5
+
 ### Added
 
 - Added *Include End Point* option to the *Float Range* node.
@@ -9,7 +13,6 @@
 - Added missing nodes to the node menu
 - Added *Collection Operations* node.
 - Added *Rotations* output to the *Particles Data* node.
-- Added List/Vectorized output to *Number Wiggle*, *Euler Wiggle* and *Quaternion Wiggle*.
 
 ### Fixed
 
@@ -23,9 +26,8 @@
 - Fixed *Create Execution Trigger* operators.
 - Fixed *getSelectedObjectNames* function.
 - Fixed the *Offset Vertices* and *Offset Polygons* nodes. Copy the input mesh if needed.
-- Fixed a stepping/precision problem in *Wiggle Falloff*.
-- Fixed header alignment for Subprograms menu and Remove nodetree operator in AN Nodetree area.
-- Fixed Data Input panel in 3d Viewport to give user informations if there is no *Viewport Input* node.
+- Fixed bad precision in the *Wiggle Falloff* node.
+- Fixed header alignment for the *Subprograms* menu and the *Remove* nodetree operator.
 
 ### Changed
 
@@ -36,3 +38,5 @@
 - Made dependent nodes unsearchable like *Loop Generator* and *Group Output* nodes.
 - Changed location of Animation Nodes to Animation Nodes Editor.
 - Allow spline radius to affect the object's scale in the Follow Spline Action.
+- Vectorized the *Number Wiggle*, *Euler Wiggle*, and *Quaternion Wiggle* nodes.
+- Inform the user that no *Viewport Input* node exist in the *Data Input* panel.
