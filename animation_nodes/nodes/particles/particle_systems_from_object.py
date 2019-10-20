@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from ... utils.depsgraph import getEvaluatedObject
+from ... utils.depsgraph import getEvaluatedID
 
 class ParticleSystemsInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticleSystemsFromObjectNode"
@@ -14,6 +14,6 @@ class ParticleSystemsInputNode(bpy.types.Node, AnimationNode):
 
     def execute(self, object):
         if not object: return None, []
-        particleSystems = getEvaluatedObject(object).particle_systems
+        particleSystems = getEvaluatedID(object).particle_systems
         active = particleSystems.active
         return active, list(particleSystems)

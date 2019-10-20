@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from . utils.depsgraph import getActiveDepsgraph
+from . utils.depsgraph import getEvaluatedID
 from . operators.callbacks import executeCallback
 from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
                                FloatList, UShortList, UIntegerList, Vector2DList)
@@ -100,7 +100,7 @@ class ObjectProperties(bpy.types.PropertyGroup):
             return object.data
         else:
             try:
-                if applyModifiers: return object.evaluated_get(getActiveDepsgraph()).to_mesh()
+                if applyModifiers: return getEvaluatedID(object).to_mesh()
                 else: return object.to_mesh()
             except: return None
 

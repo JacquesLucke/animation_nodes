@@ -3,6 +3,7 @@ import bpy
 import aud
 from functools import lru_cache
 from . sound_data import SoundData
+from ... utils.depsgraph import getEvaluatedID
 
 # We define a constant sampleRate to avoid expensive resampling during execution.
 sampleRate = 44100
@@ -36,7 +37,7 @@ def getCachedSoundDataFromPath(path):
 
 @lru_cache(maxsize=16)
 def getCachedSoundDataFromSound(sound):
-    return getSoundData(sound.factory)
+    return getSoundData(getEvaluatedID(sound).factory)
 
 def getSoundData(sound):
     if sound.specs[0] == sampleRate:
