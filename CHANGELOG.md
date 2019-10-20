@@ -3,6 +3,7 @@
 ### Fixed
 
 - Fixed sound nodes when sounds are packed in the blend file.
+- Fixed the *Frame Rate* output of the *Time Info* node.
 
 ## 2.1.5
 

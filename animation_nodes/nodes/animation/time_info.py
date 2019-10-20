@@ -29,6 +29,6 @@ class TimeInfoNode(bpy.types.Node, AnimationNode):
         if "frame" in required:      yield "    frame = scene.frame_current_final"
         if "startFrame" in required: yield "    startFrame = scene.frame_start"
         if "endFrame" in required:   yield "    endFrame = scene.frame_end"
-        if "frameRate" in required:  yield "    frameRate = scene.render.fps"
+        if "frameRate" in required:  yield "    frameRate = scene.render.fps / scene.render.fps_base"
         yield "else:"
         yield "    frame = startFrame = endFrame = frameRate = 0"
