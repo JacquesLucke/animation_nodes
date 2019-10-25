@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... data_structures import DoubleList
-from ... utils.depsgraph import getActiveDepsgraph
 from ... base_types import AnimationNode, VectorizedSocket
 
 modeItems = [
@@ -121,7 +120,7 @@ class VertexGroupInputNode(bpy.types.Node, AnimationNode):
         if scene is None:
             self.raiseErrorMessage(noSceneMessage)
 
-        mesh = object.an.getMesh(getActiveDepsgraph(), applyModifiers = True)
+        mesh = object.an.getMesh(applyModifiers = True)
         index = vertexGroup.index
         weights = DoubleList(length = len(mesh.vertices))
         weights.fill(0)

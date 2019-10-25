@@ -101,7 +101,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "unlinkInstancesFromNode",
             confirm = True,
             text = "Unlink Instances from Node",
-            description = "This will make sure that the objects won't be removed if you remove the Instancer Node.")
+            description = "This will make sure that the objects won't be removed if you remove the Instancer Node")
 
         layout.separator()
         self.invokeFunction(layout, "toggleRelationshipLines",
@@ -278,7 +278,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         instanceData = self.getSourceObjectData(sourceObject)
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
-            newObject.data = instanceData
+            # The following check is due to https://developer.blender.org/T67857
+            # The bug is fixed. This should be removed when 2.81 is released.
+            if instanceData:
+                newObject.data = instanceData
         else:
             newObject = self.createObject(name, instanceData)
 

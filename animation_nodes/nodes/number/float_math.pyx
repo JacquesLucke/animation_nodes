@@ -211,7 +211,7 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "removeQuickSettings", "Remove Quick Settings",
-            description = "Remove quick settings from all Float Math nodes.")
+            description = "Remove quick settings from all Float Math nodes")
 
     def drawLabel(self):
         if not self.hide:

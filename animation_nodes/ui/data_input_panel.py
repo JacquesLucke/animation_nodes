@@ -13,13 +13,17 @@ class ViewportInputPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         nodes = getNodesByType("an_ViewportInputNode")
+        if len(nodes) == 0:
+            layout.label(text="No Viewport Input node.", icon="INFO")
+            return
+        
         for node in nodes:
             box = layout.box()
 
             row = box.row()
             row.label(text = node.label + ":")
             row.operator("an.toogle_viewport_input_box", text="",
-                icon='TRIA_DOWN' if node.hidden else 'TRIA_RIGHT',
+                icon='TRIA_RIGHT' if node.hidden else 'TRIA_DOWN',
                 emboss = False).identifier = node.identifier
 
             if not node.hidden:

@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from ... sockets.info import toIdName
 from ... tree_info import getNodesByType
-from ... ui.info_popups import showTextPopup
 from ... utils.handlers import eventHandler
 from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
@@ -117,9 +116,6 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def edit(self):
         removedLink = self.removeLinks()
-        if removedLink:
-            text = "Please use an 'Invoke Subprogram' node to execute the script node"
-            showTextPopup(text = text, title = "Info", icon = "INFO")
 
     def newInputSocket(self, dataType):
         socket = self.newInput(dataType, dataType)

@@ -14,5 +14,5 @@ class TimecodeGeneratorNode(bpy.types.Node, AnimationNode):
 
     def execute(self, frame, frameRate):
         if frameRate > 0:
-            return smpte_from_frame(frame, fps = frameRate)
-        return smpte_from_frame(0)
+            return smpte_from_frame(frame, fps = frameRate, fps_base = 1)
+        return "00:00:00:00"
