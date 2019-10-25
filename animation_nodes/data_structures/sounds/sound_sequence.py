@@ -9,9 +9,10 @@ from ... utils.depsgraph import getEvaluatedID
 sampleRate = 44100
 
 class SoundSequence:
-    def __init__(self, data, start, end, volume, fps):
+    def __init__(self, data, start, startOffset, end, volume, fps):
         self.data = data
         self.start = start
+        self.startOffset = startOffset
         self.end = end
         self.volume = volume
         self.fps = fps
@@ -28,8 +29,8 @@ class SoundSequence:
 
         sequenceScene = findSceneWithSequence(sequence)
         fps = sequenceScene.render.fps
-        return cls(soundData, sequence.frame_final_start / fps, sequence.frame_final_end / fps,
-            sequence.volume, fps)
+        return cls(soundData, sequence.frame_final_start / fps, sequence.frame_offset_start / fps,
+            sequence.frame_final_end / fps, sequence.volume, fps)
 
 @lru_cache(maxsize=16)
 def getCachedSoundDataFromPath(path):

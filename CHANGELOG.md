@@ -4,6 +4,7 @@
 
 - Fixed sound nodes when sounds are packed in the blend file.
 - Fixed the *Frame Rate* output of the *Time Info* node.
+- Fixed sound evaluation when sound sequences are cut.
 
 ## 2.1.5
 
