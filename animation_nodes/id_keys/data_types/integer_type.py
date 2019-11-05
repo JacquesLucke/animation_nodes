@@ -183,10 +183,10 @@ def getIDKeyIntegerName(name):
     return IDKeyName
 
 def getObjectsIDKeys(idKeyName):
-    object_list = []
+    objectList = []
     for obj in bpy.context.selected_objects:
-        if idKeyName in obj:object_list.append(obj)
-    sorted_list = sorted(object_list, key = lambda obj: obj[idKeyName])
+        if idKeyName in obj:objectList.append(obj)
+    sorted_list = sorted(objectList, key = lambda obj: obj[idKeyName])
     return sorted_list
 
 offsetTypeItems = [
@@ -237,16 +237,16 @@ class IDKeysIntegerOffset(bpy.types.Operator):
     bl_description = "Offset ID Keys of selected Objects."
 
     idKeyName: StringProperty()
-    offsetType: EnumProperty(name="Type", default='ADD',
-                            items=offsetTypeItems)
-    offsetValue: IntProperty(name="Offset value", default=0)
-    randomMethod: EnumProperty(name="Method", default='EXISTING',
+    offsetType: EnumProperty(name = "Type", default = 'ADD',
+                            items = offsetTypeItems)
+    offsetValue: IntProperty(name = "Offset value", default = 0)
+    randomMethod: EnumProperty(name = "Method", default = 'EXISTING',
                                 items=randomMethodItems)
-    randomSeed: IntProperty(name="Seed", default=0)
-    randomMin: IntProperty(name="Min", default=0)
-    randomMax: IntProperty(name="Max", default=10)
-    startAt: BoolProperty(name="Start at", default=False)
-    removeGaps: BoolProperty(name="Remove gaps", default=False)
+    randomSeed: IntProperty(name = "Seed", default = 0)
+    randomMin: IntProperty(name = "Min", default = 0)
+    randomMax: IntProperty(name = "Max", default = 10)
+    startAt: BoolProperty(name = "Start at", default = False)
+    removeGaps: BoolProperty(name = "Remove gaps", default = False)
 
     @classmethod
     def poll(cls, context):
@@ -285,7 +285,8 @@ class IDKeysIntegerOffset(bpy.types.Operator):
         idKey = getIDKeyIntegerName(self.idKeyName)
         objectList = getObjectsIDKeys(idKey)
         if self.offsetType == "ADD":
-            for obj in objectList: obj[idKey] = obj[idKey]+self.offsetValue
+            for obj in objectList: 
+                obj[idKey] = obj[idKey]+self.offsetValue
         elif self.offsetType == "RANDOMIZE":
             if self.randomMethod == "EXISTING":
                 randomNumbers = range(len(objectList))
