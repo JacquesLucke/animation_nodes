@@ -291,8 +291,10 @@ class IDKeysIntegerOffset(bpy.types.Operator):
                 random.seed(self.randomSeed)
                 random.shuffle(randomNumbers)
             else:
-                try: randomNumbers = random.sample(range(self.randomMin, self.randomMax), len(objectList))
-                except ValueError: randomNumbers = random.sample(range(self.randomMin, len(objectList)), len(objectList))
+                if self.randomMax-self.randomMin < len(objectList):
+                    randomNumbers = random.sample(range(self.randomMin, len(objectList)), len(objectList))
+                else: 
+                    randomNumbers = random.sample(range(self.randomMin, self.randomMax), len(objectList))
             for obj in objectList: obj[idKey] = randomNumbers[objectList.index(obj)]
         elif self.offsetType == "REVERSE":
             if self.removeGaps:
