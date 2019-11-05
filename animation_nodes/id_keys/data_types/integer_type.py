@@ -183,11 +183,9 @@ def getIDKeyIntegerName(name):
     return IDKeyName
 
 def getObjectsIDKeys(idKeyName):
-    objectList = []
-    for obj in bpy.context.selected_objects:
-        if idKeyName in obj:objectList.append(obj)
-    sorted_list = sorted(objectList, key = lambda obj: obj[idKeyName])
-    return sorted_list
+    objectList = [i for i in bpy.context.selected_objects if idKeyName in i]
+    sortedList = sorted(objectList, key = lambda obj: obj[idKeyName])
+    return sortedList
 
 offsetTypeItems = [
     ('ADD', "Add",
