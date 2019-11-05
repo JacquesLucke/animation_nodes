@@ -288,7 +288,7 @@ class IDKeysIntegerOffset(bpy.types.Operator):
             for obj in objectList: obj[idKey] = obj[idKey]+self.offsetValue
         elif self.offsetType == "RANDOMIZE":
             if self.randomMethod == "EXISTING":
-                randomNumbers = [i for i in range(len(objectList))]
+                randomNumbers = range(len(objectList))
                 random.seed(self.randomSeed)
                 random.shuffle(randomNumbers)
             else:
