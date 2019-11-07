@@ -84,7 +84,7 @@ except: pass
 if "numpy" not in globals():
     message = ("\n\n"
         "The Animation Nodes addon depends on the numpy library.\n"
-        "Unfortunally the Blender built you are using does not have this library.\n"
+        "Unfortunately the Blender built you are using does not have this library.\n"
         "You can either install numpy manually or use another Blender version\n"
         "that comes with numpy (e.g. the newest official Blender release).")
     raise Exception(message)
