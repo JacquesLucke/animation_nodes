@@ -21,10 +21,10 @@ inputBasedCache = {}
 class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InvokeSubprogramNode"
     bl_label = "Invoke Subprogram"
-    bl_width_default = 170
+    bl_width_default = 160
     dynamicLabelType = "HIDDEN_ONLY"
 
-    subprogramIdentifier = StringProperty(name = "Subprogram Identifier", default = "",
+    subprogramIdentifier: StringProperty(name = "Subprogram Identifier", default = "",
         update = AnimationNode.refresh)
 
     def cacheTypeChanged(self, context):
@@ -32,11 +32,11 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         executionCodeChanged()
         self.showCacheOptions = True
 
-    cacheType = EnumProperty(name = "Cache Type", items = cacheTypeItems, update = cacheTypeChanged)
-    isOutputStorable = BoolProperty(default = False)
-    isInputComparable = BoolProperty(default = False)
+    cacheType: EnumProperty(name = "Cache Type", items = cacheTypeItems, update = cacheTypeChanged)
+    isOutputStorable: BoolProperty(default = False)
+    isInputComparable: BoolProperty(default = False)
 
-    showCacheOptions = BoolProperty(name = "Show Cache Options", default = False,
+    showCacheOptions: BoolProperty(name = "Show Cache Options", default = False,
         description = "Draw cache options in the node for easier access")
 
     def create(self):
@@ -59,7 +59,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
     def getOutputSocketVariables(self):
         return {socket.identifier : "output_" + str(i) for i, socket in enumerate(self.outputs)}
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.subprogramNode is None: return ""
 
         parameterString = ", ".join(["input_" + str(i) for i in range(len(self.inputs))])
@@ -119,7 +119,7 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             props = row.operator("an.change_subprogram", text = text, icon = icon)
             props.nodeIdentifier = self.identifier
 
-        props = row.operator("an.insert_empty_subprogram", icon = "NEW", text = "New Subprogram" if len(networks) == 0 else "")
+        props = row.operator("an.insert_empty_subprogram", icon = "FILE_NEW", text = "New Subprogram" if len(networks) == 0 else "")
         props.targetNodeIdentifier = self.identifier
 
         if self.showCacheOptions or self.cacheType != "DISABLED":
@@ -139,9 +139,9 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
         col.prop(self, "cacheType")
         if not self.canCache:
             col = layout.column(align = True)
-            col.label("This caching method is not available:")
-            if not self.isOutputStorable: col.label("  - The output is not storable")
-            if not self.isInputComparable: col.label("  - The input is not comparable")
+            col.label(text = "This caching method is not available:")
+            if not self.isOutputStorable: col.label(text = "  - The output is not storable")
+            if not self.isInputComparable: col.label(text = "  - The input is not comparable")
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
 
     def checkCachingPossibilities(self):
@@ -182,8 +182,8 @@ class ChangeSubprogram(bpy.types.Operator):
             items.append((network.identifier, network.name, network.description))
         return items
 
-    nodeIdentifier = StringProperty()
-    subprogram = EnumProperty(name = "Subprogram", items = getSubprogramItems)
+    nodeIdentifier: StringProperty()
+    subprogram: EnumProperty(name = "Subprogram", items = getSubprogramItems)
 
     @classmethod
     def poll(cls, context):
@@ -206,7 +206,7 @@ class ChangeSubprogram(bpy.types.Operator):
 
         network = getNetworkByIdentifier(self.subprogram)
         if network:
-            layout.label("Desription: " + network.description)
+            layout.label(text = "Desription: " + network.description)
             layout.separator()
             if network.type == "Group":
                 socketData = network.getGroupInputNode().getSocketData()
@@ -216,19 +216,19 @@ class ChangeSubprogram(bpy.types.Operator):
                 socketData = network.getScriptNode().getSocketData()
 
             col = layout.column()
-            col.label("Inputs:")
+            col.label(text = "Inputs:")
             self.drawSockets(col, socketData.inputs)
 
             col = layout.column()
-            col.label("Outputs:")
+            col.label(text = "Outputs:")
             self.drawSockets(col, socketData.outputs)
 
     def drawSockets(self, layout, sockets):
         col = layout.column(align = True)
         for data in sockets:
             row = col.row()
-            row.label(" "*8 + data.text)
-            row.label("<  {}  >".format(toDataType(data.idName)))
+            row.label(text = " "*8 + data.text)
+            row.label(text = "<  {}  >".format(toDataType(data.idName)))
 
     @property
     def expandSubprograms(self):

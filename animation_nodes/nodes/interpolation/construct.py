@@ -27,11 +27,11 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
     bl_label = "Construct Interpolation"
     bl_width_default = 160
 
-    category = EnumProperty(name = "Category", default = "LINEAR",
+    category: EnumProperty(name = "Category", default = "LINEAR",
         items = categoryItems, update = AnimationNode.refresh)
 
-    easeIn = BoolProperty(name = "Ease In", default = False, update = executionCodeChanged)
-    easeOut = BoolProperty(name = "Ease Out", default = True, update = executionCodeChanged)
+    easeIn: BoolProperty(name = "Ease In", default = False, update = executionCodeChanged)
+    easeOut: BoolProperty(name = "Ease Out", default = True, update = executionCodeChanged)
 
     def create(self):
         c = self.category
@@ -56,7 +56,7 @@ class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
             row.prop(self, "easeIn", text = "", icon = "IPO_EASE_IN")
             row.prop(self, "easeOut", text = "", icon = "IPO_EASE_OUT")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         c = self.category
         if not (self.easeIn or self.easeOut): return "interpolation = self.getLinear()"
         if c == "LINEAR":      return "interpolation = self.getLinear()"

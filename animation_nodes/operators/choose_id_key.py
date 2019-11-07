@@ -16,8 +16,8 @@ class IDKeySearch(bpy.types.Operator):
             items.append((identifier, name, ""))
         return items
 
-    item = EnumProperty(items = getSearchItems)
-    callback = StringProperty()
+    item: EnumProperty(items = getSearchItems)
+    callback: StringProperty()
 
     def invoke(self, context, event):
         bpy.ops.an.update_id_keys_list()

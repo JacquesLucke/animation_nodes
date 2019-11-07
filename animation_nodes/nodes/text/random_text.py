@@ -8,7 +8,7 @@ class RandomTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomTextNode"
     bl_label = "Random Text"
 
-    nodeSeed = IntProperty(name = "Node Seed", update = propertyChanged)
+    nodeSeed: IntProperty(name = "Node Seed", update = propertyChanged)
 
     def setup(self):
         self.randomizeNodeSeed()

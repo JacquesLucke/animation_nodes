@@ -13,14 +13,14 @@ def register():
 
     # Open the context sensitive pie menu
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "W", value = "PRESS")
-    kmi.properties.name = "an.context_pie"
+    kmi.properties.name = "AN_MT_context_pie"
 
     # Move view to subprogram nodes
     km.keymap_items.new("an.network_navigation", type = "TAB", value = "PRESS")
 
     # Selection Pie Menu
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "E", value = "PRESS")
-    kmi.properties.name = "an.selection_pie"
+    kmi.properties.name = "AN_MT_selection_pie"
 
     # Floating Node Settings
     km.keymap_items.new("an.floating_node_settings_panel", type = "U", value = "PRESS")

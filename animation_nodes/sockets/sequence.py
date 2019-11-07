@@ -8,12 +8,11 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SequenceSocket"
     bl_label = "Sequence Socket"
     dataType = "Sequence"
-    allowedInputTypes = ["Sequence"]
     drawColor = (0, 0.644, 0, 1)
     storable = False
     comparable = True
 
-    sequenceName = StringProperty(update = propertyChanged)
+    sequenceName: StringProperty(update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
@@ -23,7 +22,7 @@ class SequenceSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             row.prop_search(self, "sequenceName",  editor, "sequences", icon = "NLA", text = text)
             self.invokeFunction(row, node, "assignActiveSequence", icon = "EYEDROPPER")
         else:
-            row.label("No Sequence Editor")
+            row.label(text = "No Sequence Editor")
 
 
     def getValue(self):
@@ -64,8 +63,7 @@ class SequenceListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_SequenceListSocket"
     bl_label = "Sequence List Socket"
     dataType = "Sequence List"
-    baseDataType = "Sequence"
-    allowedInputTypes = ["Sequence List"]
+    baseType = SequenceSocket
     drawColor = (0, 0.644, 0, 0.5)
     storable = False
     comparable = False

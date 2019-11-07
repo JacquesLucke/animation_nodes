@@ -1,28 +1,32 @@
 import bpy
-from . c_utils import calculateVectorDistances
-from ... base_types import VectorizedNode
+from . c_utils import calculateVectorDistancesVirtual
+from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualVector3DList
 
-class VectorDistanceNode(bpy.types.Node, VectorizedNode):
+class VectorDistanceNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorDistanceNode"
     bl_label = "Vector Distance"
 
-    useListA = VectorizedNode.newVectorizeProperty()
-    useListB = VectorizedNode.newVectorizeProperty()
+    useListA: VectorizedSocket.newProperty()
+    useListB: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Vector", "useListA",
-            ("A", "a"), ("A", "a"))
-        self.newVectorizedInput("Vector", "useListB",
-            ("B", "b"), ("B", "b"))
+        self.newInput(VectorizedSocket("Vector", "useListA",
+            ("A", "a"), ("A", "a")))
+        self.newInput(VectorizedSocket("Vector", "useListB",
+            ("B", "b"), ("B", "b")))
 
-        self.newVectorizedOutput("Float", [("useListA", "useListB")],
-            ("Distance", "distance"), ("Distances", "distances"))
+        self.newOutput(VectorizedSocket("Float", ["useListA", "useListB"],
+            ("Distance", "distance"), ("Distances", "distances")))
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useListA or self.useListB:
             yield "distances = self.calcDistances(a, b)"
         else:
             yield "distance = (a - b).length"
 
     def calcDistances(self, a, b):
-        return calculateVectorDistances(a, b)
+        vectors1 = VirtualVector3DList.create(a, (0, 0, 0))
+        vectors2 = VirtualVector3DList.create(b, (0, 0, 0))
+        amount = VirtualVector3DList.getMaxRealLength(vectors1, vectors2)
+        return calculateVectorDistancesVirtual(amount, vectors1, vectors2)

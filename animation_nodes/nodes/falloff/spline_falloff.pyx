@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... events import propertyChanged
 from ... math cimport Vector3, distanceVec3
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures cimport Spline, PolySpline, BaseFalloff
 
 from . mix_falloffs import MixFalloffs
@@ -14,24 +14,27 @@ mixListTypeItems = [
     ("ADD", "Add", "", "NONE", 1)
 ]
 
-class SplineFalloffNode(bpy.types.Node, VectorizedNode):
+class SplineFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplineFalloffNode"
     bl_label = "Spline Falloff"
     bl_width_default = 160
 
-    resolution = IntProperty(name = "Resolution", default = 5, min = 2,
+    __annotations__ = {}
+
+    __annotations__["resolution"] = IntProperty(name = "Resolution", default = 5, min = 2,
         description = "Poly spline segments per bezier spline segments")
 
-    mixListType = EnumProperty(name = "Mix List Type", default = "MAX",
+    __annotations__["mixListType"] = EnumProperty(name = "Mix List Type", default = "MAX",
         items = mixListTypeItems, update = propertyChanged)
 
-    useSplineList = VectorizedNode.newVectorizeProperty()
+    __annotations__["useSplineList"] = VectorizedSocket.newProperty()
 
     def create(self):
         socketProps = dict(defaultDrawType = "PROPERTY_ONLY", dataIsModified = True)
-        self.newVectorizedInput("Spline", "useSplineList",
+        self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline", socketProps),
-            ("Splines", "splines", socketProps))
+            ("Splines", "splines", socketProps)))
+
         self.newInput("Float", "Distance", "distance", value = 0)
         self.newInput("Float", "Width", "width", value = 1, minValue = 0)
         self.newInput("Interpolation", "Interpolation", "interpolation",
@@ -76,7 +79,7 @@ class SplineFalloffNode(bpy.types.Node, VectorizedNode):
         if spline.type == "POLY":
             falloffSpline = spline
         else:
-            falloffSpline = PolySpline(spline.getSamples(self.resolution * (len(spline.points) - 1)))
+            falloffSpline = PolySpline(spline.getDistributedPoints(self.resolution * (len(spline.points) - 1)))
             falloffSpline.cyclic = spline.cyclic
 
         return SplineFalloff(falloffSpline, distance, width)
@@ -93,10 +96,10 @@ cdef class SplineFalloff(BaseFalloff):
         self.clamped = False
         self.dataType = "Location"
 
-    cdef double evaluate(self, void *point, long index):
+    cdef float evaluate(self, void *point, Py_ssize_t index):
         cdef Vector3 closestPoint
         cdef float parameter = self.spline.project_LowLevel(<Vector3*>point)
-        self.spline.evaluate_LowLevel(parameter, &closestPoint)
+        self.spline.evaluatePoint_LowLevel(parameter, &closestPoint)
         cdef float distance = distanceVec3(<Vector3*>point, &closestPoint)
 
         if distance < self.distance:

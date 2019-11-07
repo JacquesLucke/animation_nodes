@@ -2,7 +2,6 @@ import bpy
 from bpy.props import *
 from ... sockets.info import toIdName
 from ... tree_info import getNodesByType
-from ... ui.info_popups import showTextPopup
 from ... utils.handlers import eventHandler
 from ... utils.names import toInterfaceName
 from ... events import executionCodeChanged
@@ -20,21 +19,21 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         self.errorMessage = ""
         executionCodeChanged()
 
-    executionCode = StringProperty(default = "")
-    textBlockName = StringProperty(default = "")
+    executionCode: StringProperty(default = "")
+    textBlock: PointerProperty(type = bpy.types.Text)
 
-    debugMode = BoolProperty(name = "Debug Mode", default = True,
+    debugMode: BoolProperty(name = "Debug Mode", default = True,
         description = "Give error message inside the node", update = scriptExecutionCodeChanged)
-    errorMessage = StringProperty()
+    errorMessage: StringProperty()
 
-    interactiveMode = BoolProperty(name = "Interactive Mode", default = True,
+    interactiveMode: BoolProperty(name = "Interactive Mode", default = True,
         description = "Recompile the script on each change in the text block")
 
-    initializeMissingOutputs = BoolProperty(name = "Initialize Missing Outputs",
+    initializeMissingOutputs: BoolProperty(name = "Initialize Missing Outputs",
         default = True, description = "Use default values for uninitialized outputs",
         update = scriptExecutionCodeChanged)
 
-    correctOutputTypes = BoolProperty(name = "Correct Output Types", default = True,
+    correctOutputTypes: BoolProperty(name = "Correct Output Types", default = True,
         description = "Try to correct the type of variables, return default otherwise",
         update = scriptExecutionCodeChanged)
 
@@ -50,11 +49,11 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col = layout.column(align = True)
         row = col.row(align = True)
         if self.textBlock is None:
-            self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+            self.invokeFunction(row, "createNewTextBlock", icon = "ADD")
         else:
             self.invokeSelector(row, "AREA", "viewTextBlockInArea",
                 icon = "ZOOM_SELECTED")
-        row.prop_search(self, "textBlockName",  bpy.data, "texts", text = "")
+        row.prop(self, "textBlock", text = "")
         subrow = row.row(align = True)
         subrow.active = self.textBlock is not None
         self.invokeFunction(subrow, "writeToTextBlock", icon = "COPYDOWN",
@@ -81,7 +80,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def drawErrorMessages(self, layout, onlyErrors = False):
         if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
+            layout.label(text = self.errorMessage, icon = "ERROR")
             return
 
         col = layout.column(align = True)
@@ -89,17 +88,17 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
             variableName = socket.text
             if self.initializeMissingOutputs:
                 if not getattr(socket, '["variableInitialized"]', True):
-                    col.label("'{}' - Not Initialized, used default".format(variableName), icon = "ERROR")
+                    col.label(text = "'{}' - Not Initialized, used default".format(variableName), icon = "ERROR")
             if self.correctOutputTypes:
                 correctionType = getattr(socket, '["correctionType"]', 0)
                 if correctionType == 1 and not onlyErrors:
-                    col.label("'{}' - Type Corrected".format(variableName), icon = "INFO")
+                    col.label(text = "'{}' - Type Corrected".format(variableName), icon = "INFO")
                 elif correctionType == 2:
-                    col.label("'{}' - Wrong Type, expected '{}'".format(variableName, socket.dataType), icon = "ERROR")
+                    col.label(text = "'{}' - Wrong Type, expected '{}'".format(variableName, socket.dataType), icon = "ERROR")
 
     def drawAdvanced(self, layout):
         col = layout.column()
-        col.label("Description:")
+        col.label(text = "Description:")
         col.prop(self, "subprogramDescription", text = "")
         layout.prop(self, "interactiveMode")
         col = layout.column(align = True)
@@ -110,16 +109,13 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):
             self.invokeSelector(layout, "DATA_TYPE", "newInputSocket",
-                text = "New Input", icon = "ZOOMIN")
+                text = "New Input", icon = "ADD")
         else:
             self.invokeSelector(layout, "DATA_TYPE", "newOutputSocket",
-                text = "New Output", icon = "ZOOMIN")
+                text = "New Output", icon = "ADD")
 
     def edit(self):
         removedLink = self.removeLinks()
-        if removedLink:
-            text = "Please use an 'Invoke Subprogram' node to execute the script node"
-            showTextPopup(text = text, title = "Info", icon = "INFO")
 
     def newInputSocket(self, dataType):
         socket = self.newInput(dataType, dataType)
@@ -150,7 +146,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def duplicate(self, sourceNode):
         self.randomizeNetworkColor()
-        self.textBlockName = ""
+        self.textBlock = None
 
     def getSocketData(self):
         data = SubprogramData()
@@ -165,7 +161,7 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def createNewTextBlock(self):
         textBlock = bpy.data.texts.new(name = self.subprogramName)
         textBlock.use_tabs_as_spaces = True
-        self.textBlockName = textBlock.name
+        self.textBlock = textBlock
         self.writeToTextBlock()
 
     def viewTextBlockInArea(self, area):
@@ -202,15 +198,15 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     @property
     def textBlock(self):
-        return bpy.data.texts.get(self.textBlockName)
+        return self.textBlock
 
     @property
     def executionUnit(self):
         return getSubprogramUnitByIdentifier(self.identifier)
 
 
-@eventHandler("SCENE_UPDATE_POST")
-def sceneUpdate(scene):
+@eventHandler("ALWAYS")
+def sceneUpdate():
     for node in getNodesByType("an_ScriptNode"):
         if node.interactiveMode:
             node.interactiveUpdate()

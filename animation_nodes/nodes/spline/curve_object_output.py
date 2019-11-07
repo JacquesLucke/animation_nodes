@@ -1,26 +1,24 @@
 import bpy
 from bpy.props import *
-from ... utils.layout import writeText
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures.splines.to_blender import setSplinesOnBlenderObject
 
-class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
+class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CurveObjectOutputNode"
     bl_label = "Curve Object Output"
-    bl_width_default = 175
+    bl_width_default = 180
+    errorHandlingType = "MESSAGE"
 
-    errorMessage = StringProperty()
-
-    useSplineList = VectorizedNode.newVectorizeProperty()
+    useSplineList: VectorizedSocket.newProperty()
 
     def create(self):
         socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "CURVE"
 
-        self.newVectorizedInput("Spline", "useSplineList",
+        self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline", dict(defaultDrawType = "TEXT_ONLY")),
-            ("Splines", "splines", dict(defaultDrawType = "TEXT_ONLY")))
+            ("Splines", "splines", dict(defaultDrawType = "TEXT_ONLY"))))
 
         self.newInput("Float", "Bevel Depth", "bevelDepth", minValue = 0)
         self.newInput("Integer", "Bevel Resolution", "bevelResolution")
@@ -41,14 +39,7 @@ class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
         for socket in self.inputs[4:]:
             socket.hide = True
 
-    def draw(self, layout):
-        if self.errorMessage != "":
-            writeText(layout, self.errorMessage, width = 25, icon = "ERROR")
-
-    def drawAdvanced(self, layout):
-        writeText(layout, "Possible values for 'Fill Mode' are: \n3D Curve: 'FULL', 'HALF', 'BACK' and 'FRONT' \n2D Curve: 'NONE', 'BACK', 'FRONT' and 'BOTH'")
-
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if getattr(object, 'type', '') == 'CURVE':"
         yield "    curve = object.data"
 
@@ -75,9 +66,8 @@ class CurveObjectOutputNode(bpy.types.Node, VectorizedNode):
         isCorrectFillMode = fillMode in ("FULL", "BACK", "FRONT", "HALF") if curve.dimensions == "3D" else fillMode in ("NONE", "BACK", "FRONT", "BOTH")
         if isCorrectFillMode:
             curve.fill_mode = fillMode
-            self.errorMessage = ""
         else:
-            self.errorMessage = "The fill mode is invalid. Look in the advanced panels to see all possible values."
+            self.setErrorMessage("The fill mode is invalid. \n\nPossible values for 'Fill Mode' are: \n3D Curve: 'FULL', 'HALF', 'BACK', 'FRONT' \n2D Curve: 'NONE', 'BACK', 'FRONT', 'BOTH'")
 
     def getBakeCode(self):
         yield "if getattr(object, 'type', '') == 'CURVE':"

@@ -10,5 +10,5 @@ class MoveObjectNode(bpy.types.Node, AnimationNode):
         self.newInput("Vector", "Translation", "translation").defaultDrawType = "PROPERTY_ONLY"
         self.newOutput("Object", "Object", "object")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "if object: object.location += translation"

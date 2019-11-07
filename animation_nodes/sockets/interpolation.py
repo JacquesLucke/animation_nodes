@@ -22,20 +22,19 @@ class InterpolationSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_InterpolationSocket"
     bl_label = "Interpolation Socket"
     dataType = "Interpolation"
-    allowedInputTypes = ["Interpolation"]
     drawColor = (0.7, 0.4, 0.3, 1)
     comparable = True
     storable = True
 
-    category = EnumProperty(name = "Interpolation Category", default = "LINEAR",
+    category: EnumProperty(name = "Interpolation Category", default = "LINEAR",
                             items = categoryItems, update = propertyChanged)
 
-    easeIn = BoolProperty(name = "Ease In", default = False, update = propertyChanged)
-    easeOut = BoolProperty(name = "Ease Out", default = True, update = propertyChanged)
+    easeIn: BoolProperty(name = "Ease In", default = False, update = propertyChanged)
+    easeOut: BoolProperty(name = "Ease Out", default = True, update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)
-        if text != "": col.label(text)
+        if text != "": col.label(text = text)
         row = col.row(align = True)
         row.prop(self, "category", text = "")
         if self.category != "LINEAR":
@@ -69,8 +68,7 @@ class InterpolationListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_InterpolationListSocket"
     bl_label = "Interpolation List Socket"
     dataType = "Interpolation List"
-    baseDataType = "Interpolation"
-    allowedInputTypes = ["Interpolation List"]
+    baseType = InterpolationSocket
     drawColor = (0.7, 0.4, 0.3, 0.5)
     storable = False
     comparable = False

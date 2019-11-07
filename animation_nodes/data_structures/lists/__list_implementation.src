@@ -33,7 +33,7 @@ cdef class LISTNAME(CList):
         if minCapacity < self.capacity:
             return
 
-        cdef Py_ssize_t newCapacity = (self.capacity * 3) / 2 + 1
+        cdef Py_ssize_t newCapacity = self.capacity * 2 + 1
         if newCapacity < minCapacity:
             newCapacity = minCapacity
 
@@ -427,7 +427,7 @@ TO_PYOBJECT_CODE
 
         cdef MEMVIEW[:] memview
         if self.length > 0:
-            memview = <MEMVIEW[:self.length * sizeof(TYPE) / sizeof(MEMVIEW)]><MEMVIEW*>self.data
+            memview = <MEMVIEW[:self.length * sizeof(TYPE) // sizeof(MEMVIEW)]><MEMVIEW*>self.data
         else:
             # hack to make zero-length memview possible
             memview = (<MEMVIEW[:1]><MEMVIEW*>self.data)[1:]
@@ -481,6 +481,14 @@ TO_PYOBJECT_CODE
         for i, value in enumerate(values):
             newList.tryConversion(value, newList.data + i)
         return newList
+
+    @classmethod
+    def fromNumpyArray(cls, MEMVIEW [:] input):
+        cdef MEMVIEW* inputPointer = &input[0]
+        cdef int length = input.shape[0] // (sizeof(TYPE) // sizeof(MEMVIEW))
+        cdef LISTNAME values = LISTNAME(length = length)
+        memcpy(values.data, inputPointer, length * sizeof(TYPE))
+        return values
 
 
     # String Representations

@@ -10,5 +10,5 @@ class VectorDotProductNode(bpy.types.Node, AnimationNode):
         self.newInput("Vector", "B", "b")
         self.newOutput("Float", "Dot Product", "dotProduct")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "dotProduct = a.dot(b)"

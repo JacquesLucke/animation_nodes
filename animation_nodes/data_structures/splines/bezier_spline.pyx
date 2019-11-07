@@ -2,9 +2,15 @@ cimport cython
 from libc.string cimport memcpy
 from numpy.polynomial import Polynomial
 from ... utils.lists cimport findListSegment_LowLevel
-from ... math cimport (subVec3, normalizeVec3_InPlace, lengthVec3, toPyVector3)
+from ... math cimport (
+    subVec3, normalizeVec3_InPlace, lengthVec3,
+    toPyVector3, mixVec3, isCloseVec3
+)
 
 from mathutils import Vector
+from . base_spline import calculateNormalsForTangents
+
+cdef Py_ssize_t normalsResolution = 5
 
 # Great free online book about bezier curves:
 # http://pomax.github.io/bezierinfo/
@@ -15,42 +21,108 @@ cdef class BezierSpline(Spline):
                         Vector3DList leftHandles = None,
                         Vector3DList rightHandles = None,
                         FloatList radii = None,
+                        FloatList tilts = None,
                         bint cyclic = False):
         if points is None: points = Vector3DList()
         if leftHandles is None: leftHandles = points.copy()
         if rightHandles is None: rightHandles = points.copy()
-        if radii is None: radii = FloatList.fromValues([0.1]) * len(points)
+        if radii is None: radii = FloatList.fromValue(0.1, length = points.length)
+        if tilts is None: tilts = FloatList.fromValue(0, length = points.length)
 
-        if not (points.length == leftHandles.length == points.length == radii.length):
+        if not (points.length == leftHandles.length == points.length == radii.length == tilts.length):
             raise ValueError("list lengths have to be equal")
 
         self.points = points
         self.leftHandles = leftHandles
         self.rightHandles = rightHandles
         self.radii = radii
+        self.tilts = tilts
         self.cyclic = cyclic
         self.type = "BEZIER"
         self.markChanged()
 
-    def appendPoint(self, point, leftHandle, rightHandle, double radius = 0):
+    cpdef void markChanged(self):
+        Spline.markChanged(self)
+        self.normalsCache = None
+
+    cpdef bint isEvaluable(self):
+        return self.points.length >= 2
+
+    def appendPoint(self, point, leftHandle, rightHandle, float radius = 0, float tilt = 0):
         self.points.append(point)
         self.leftHandles.append(leftHandle)
         self.rightHandles.append(rightHandle)
         self.radii.append(radius)
+        self.tilts.append(tilt)
         self.markChanged()
 
-    cpdef BezierSpline copy(self):
+    def copy(self):
         return BezierSpline(self.points.copy(),
                             self.leftHandles.copy(),
                             self.rightHandles.copy(),
                             self.radii.copy(),
+                            self.tilts.copy(),
                             self.cyclic)
 
-    cpdef transform(self, matrix):
+    def transform(self, matrix):
         self.points.transform(matrix)
         self.leftHandles.transform(matrix)
         self.rightHandles.transform(matrix)
         self.markChanged()
+
+    # Normals
+    ############################################################
+
+    cdef checkNormals(self):
+        if self.normalsCache is None:
+            raise Exception("normals are not available yet, please call spline.ensureNormals() first")
+
+    cpdef ensureNormals(self):
+        if self.normalsCache is not None:
+            return
+        if not self.isEvaluable():
+            raise Exception("cannot ensure normals when spline is not evaluable")
+
+        cdef Py_ssize_t segments = getSegmentAmount(self)
+        cdef Py_ssize_t amount = segments * normalsResolution
+        cdef Vector3DList tangents = Vector3DList(length = amount)
+
+        cdef Py_ssize_t segment, i
+        cdef Py_ssize_t index = 0
+        cdef Vector3* w[4]
+        cdef float t
+        for segment in range(segments):
+            getSegmentData_Index(self, segment, w)
+            for i in range(normalsResolution):
+                t = i / <float>(normalsResolution - 1)
+                evaluateBezierSegment_Tangent(tangents.data + index, t, w)
+                index += 1
+
+        self.normalsCache = calculateNormalsForTangents(tangents, self.cyclic)
+
+    cdef void evaluateNormal_Approximated(self, float parameter, Vector3 *result):
+        cdef float t
+        cdef Py_ssize_t segment
+        getSegmentIndex(self, parameter, &segment, &t)
+
+        cdef long indices[2]
+        cdef float f
+        findListSegment_LowLevel(normalsResolution, False, t, indices, &f)
+
+        cdef Py_ssize_t offset = segment * normalsResolution
+        mixVec3(result,
+            self.normalsCache.data + offset + indices[0],
+            self.normalsCache.data + offset + indices[1],
+            f)
+
+    cdef float evaluateTilt_LowLevel(self, float parameter):
+        cdef long indices[2]
+        cdef float t
+        findListSegment_LowLevel(self.tilts.length, self.cyclic, parameter, indices, &t)
+        return self.tilts.data[indices[0]] * (1 - t) + self.tilts.data[indices[1]] * t
+
+    # Projection
+    ############################################################
 
     cdef float project_LowLevel(self, Vector3* _point):
         # TODO: Speedup using cython
@@ -58,21 +130,20 @@ cdef class BezierSpline(Spline):
         # maybe implement another numerical method to find the best parameter
         # http://jazzros.blogspot.be/2011/03/projecting-point-on-bezier-curve.html
         cdef:
-            int segmentAmount = self.getSegmentAmount()
-            int i, leftIndex, rightIndex
+            int segmentAmount = getSegmentAmount(self)
+            Py_ssize_t i
+            Vector3 *w[4]
             set possibleParameters = set()
             list coeffs = [0] * 6
 
         point = toPyVector3(_point)
 
         for i in range(segmentAmount):
-            leftIndex = i
-            rightIndex = (i + 1) % (segmentAmount + 1)
-
-            p0 = self.points[leftIndex] - point
-            p1 = self.rightHandles[leftIndex] - point
-            p2 = self.leftHandles[rightIndex] - point
-            p3 = self.points[rightIndex] - point
+            getSegmentData_Index(self, i, w)
+            p0 = toPyVector3(w[0]) - point
+            p1 = toPyVector3(w[1]) - point
+            p2 = toPyVector3(w[2]) - point
+            p3 = toPyVector3(w[3]) - point
 
             a = p3 - 3 * p2 + 3 * p1 - p0
             b = 3 * p2 - 6 * p1 + 3 * p0
@@ -91,91 +162,40 @@ cdef class BezierSpline(Spline):
             segmentParameters = [(i + t) / segmentAmount for t in realRoots]
             possibleParameters.update(segmentParameters)
 
-        sampledData = [(p, (point - self.evaluate(p)).length_squared) for p in possibleParameters]
+        sampledData = [(p, (point - self.evaluatePoint(p)).length_squared) for p in possibleParameters]
         if len(sampledData) > 0:
             return min(sampledData, key = lambda item: item[1])[0]
         return 0
 
-    cdef inline int getSegmentAmount(self):
-        return self.points.length - 1 + self.cyclic
 
-    cpdef bint isEvaluable(self):
-        return self.points.length >= 2
-
-    cdef void evaluate_LowLevel(self, float parameter, Vector3* result):
-        cdef:
-            float t1
-            Vector3* w[4]
-        self.getSegmentData(parameter, &t1, w)
-        cdef:
-            float t2 = t1 * t1
-            float t3 = t2 * t1
-            float mt1 = 1 - t1
-            float mt2 = mt1 * mt1
-            float mt3 = mt2 * mt1
-            float coeff1 = 3 * mt2 * t1
-            float coeff2 = 3 * mt1 * t2
-        result.x = w[0].x*mt3 + w[1].x*coeff1 + w[2].x*coeff2 + w[3].x*t3
-        result.y = w[0].y*mt3 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*t3
-        result.z = w[0].z*mt3 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*t3
+    cdef void evaluatePoint_LowLevel(self, float parameter, Vector3 *result):
+        cdef float t
+        cdef Vector3* w[4]
+        getSegmentData_Parameter(self, parameter, &t, w)
+        evaluateBezierSegment_Point(result, t, w)
 
     cdef void evaluateTangent_LowLevel(self, float parameter, Vector3* result):
-        cdef:
-            float t1
-            Vector3* w[4]
-        self.getSegmentData(parameter, &t1, w)
-        cdef:
-            float t2 = t1 * t1
-            float coeff0 = -3 +  6 * t1 - 3 * t2
-            float coeff1 =  3 - 12 * t1 + 9 * t2
-            float coeff2 =       6 * t1 - 9 * t2
-            float coeff3 =                3 * t2
-        result.x = w[0].x*coeff0 + w[1].x*coeff1 + w[2].x*coeff2 + w[3].x*coeff3
-        result.y = w[0].y*coeff0 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*coeff3
-        result.z = w[0].z*coeff0 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*coeff3
+        cdef float t
+        cdef Vector3* w[4]
+        getSegmentData_Parameter(self, parameter, &t, w)
+        evaluateBezierSegment_Tangent(result, t, w)
 
-    cdef void getSegmentData(self, float parameter, float* t, Vector3** w):
+    cdef float evaluateRadius_LowLevel(self, float parameter):
         cdef long indices[2]
-        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, t)
-        w[0] = (self.points.data) + indices[0]
-        w[1] = (self.rightHandles.data) + indices[0]
-        w[2] = (self.leftHandles.data) + indices[1]
-        w[3] = (self.points.data) + indices[1]
+        cdef float t
+        findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
+        return self.radii.data[indices[0]] * (1 - t) + self.radii.data[indices[1]] * t
 
-    cpdef calculateSmoothHandles(self, float strength = 1/3):
-        cdef:
-            Vector3* _points = self.points.data
-            Vector3* _leftHandles = self.leftHandles.data
-            Vector3* _rightHandles = self.rightHandles.data
-            long indexLeft, i, indexRight
-            long pointAmount = self.points.length
+    def smoothAllHandles(self, float strength = 1/3):
+        cdef Py_ssize_t i
+        for i in range(self.points.length):
+            smoothPoint(self, i, strength)
+        self.markChanged()
 
-        if pointAmount < 2: return
-
-        for i in range(1, pointAmount - 1):
-            calculateSmoothControlPoints(
-                _points + i, _points + i - 1, _points + i + 1, strength,
-                _leftHandles + i, _rightHandles + i)
-
-        # End points need extra consideration
-        cdef long lastIndex = pointAmount - 1
-        if self.cyclic:
-            # Start Point
-            calculateSmoothControlPoints(
-                _points, _points + lastIndex, _points + 1, strength,
-                _leftHandles, _rightHandles)
-            # End Point
-            calculateSmoothControlPoints(
-                _points + lastIndex, _points + lastIndex - 1, _points, strength,
-                _leftHandles + lastIndex, _rightHandles + lastIndex)
-        else:
-            # Start Point
-            _leftHandles[0] = _points[0]
-            _rightHandles[0] = _points[0]
-            # End Point
-            _leftHandles[lastIndex] = _points[lastIndex]
-            _rightHandles[lastIndex] = _points[lastIndex]
-
+    def smoothHandle(self, Py_ssize_t index, float strength = 1/3):
+        if not (0 <= index < self.points.length):
+            raise IndexError("index is out of bounds")
+        smoothPoint(self, index, strength)
         self.markChanged()
 
     cpdef BezierSpline getTrimmedCopy_LowLevel(self, float start, float end):
@@ -195,17 +215,25 @@ cdef class BezierSpline(Spline):
 
         cdef:
             Vector3DList newPoints = Vector3DList(length = newPointAmount)
-            Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)
-            Vector3DList newRightHandles = Vector3DList(length = newPointAmount)
-            FloatList newRadii = FloatList(length = newPointAmount)
             Vector3* _newPoints = newPoints.data
-            Vector3* _newLeftHandles = newLeftHandles.data
-            Vector3* _newRightHandles = newRightHandles.data
-            float *_newRadii = newRadii.data
             Vector3* _oldPoints = self.points.data
+
+            Vector3DList newLeftHandles = Vector3DList(length = newPointAmount)
+            Vector3* _newLeftHandles = newLeftHandles.data
             Vector3* _oldLeftHandles = self.leftHandles.data
+
+            Vector3DList newRightHandles = Vector3DList(length = newPointAmount)
+            Vector3* _newRightHandles = newRightHandles.data
             Vector3* _oldRightHandles = self.rightHandles.data
+
+            FloatList newRadii = FloatList(length = newPointAmount)
+            float *_newRadii = newRadii.data
             float *_oldRadii = self.radii.data
+
+            FloatList newTilts = FloatList(length = newPointAmount)
+            float *_newTilts = newTilts.data
+            float *_oldTilts = self.tilts.data
+
             Vector3 tmp[4]
 
         if startIndices[0] == endIndices[0]: # <- result will contain only one segment
@@ -241,6 +269,9 @@ cdef class BezierSpline(Spline):
             memcpy(_newRadii + 1,
                    _oldRadii + startIndices[1],
                    sizeof(float) * (newPointAmount - 2))
+            memcpy(_newTilts + 1,
+                   _oldTilts + startIndices[1],
+                   sizeof(float) * (newPointAmount - 2))
 
             # Trim first segment
             calcLeftTrimmedSegment(startT,
@@ -262,7 +293,66 @@ cdef class BezierSpline(Spline):
         _newRadii[0] = _oldRadii[startIndices[0]] * (1 - startT) + _oldRadii[startIndices[1]] * startT
         _newRadii[newPointAmount - 1] = _oldRadii[endIndices[0]] * (1 - endT) + _oldRadii[endIndices[1]] * endT
 
-        return BezierSpline(newPoints, newLeftHandles, newRightHandles, newRadii)
+        # calculate tilt of first and last point
+        _newTilts[0] = _oldTilts[startIndices[0]] * (1 - startT) + _oldTilts[startIndices[1]] * startT
+        _newTilts[newPointAmount - 1] = _oldTilts[endIndices[0]] * (1 - endT) + _oldTilts[endIndices[1]] * endT
+
+        return BezierSpline(newPoints, newLeftHandles, newRightHandles, newRadii, newTilts)
+
+    def improveStraightBezierSegments(self):
+        cdef Py_ssize_t i
+        cdef Vector3* w[4]
+        for i in range(getSegmentAmount(self)):
+            getSegmentData_Index(self, i, w)
+            if isCloseVec3(w[0], w[1]) and isCloseVec3(w[2], w[3]):
+                mixVec3(w[1], w[0], w[3], 1.0 / 3.0)
+                mixVec3(w[2], w[0], w[3], 2.0 / 3.0)
+
+cdef smoothPoint(BezierSpline spline, Py_ssize_t index, float strength):
+    if 0 < index < spline.points.length - 1:
+        calculateSmoothControlPoints(spline.points.data + index,
+            spline.points.data + index - 1, spline.points.data + index + 1,
+            strength,
+            spline.leftHandles.data + index, spline.rightHandles.data + index)
+        return
+
+    cdef Py_ssize_t lastIndex = spline.points.length - 1
+
+    if index == 0:
+        if spline.cyclic:
+            calculateSmoothControlPoints(spline.points.data + 0,
+                spline.points.data + lastIndex, spline.points.data + 1,
+                strength,
+                spline.leftHandles.data + 0, spline.rightHandles.data + 0)
+            return
+        else:
+            mixVec3(spline.leftHandles.data + 0,
+                    spline.points.data + 0,
+                    spline.points.data + 1,
+                    -strength)
+            mixVec3(spline.rightHandles.data + 0,
+                    spline.points.data + 0,
+                    spline.points.data + 1,
+                    strength)
+            return
+
+    if index == lastIndex:
+        if spline.cyclic:
+            calculateSmoothControlPoints(spline.points.data + lastIndex,
+                spline.points.data + lastIndex - 1, spline.points.data + 0,
+                strength,
+                spline.leftHandles.data + lastIndex, spline.rightHandles.data + lastIndex)
+            return
+        else:
+            mixVec3(spline.leftHandles.data + lastIndex,
+                    spline.points.data + lastIndex,
+                    spline.points.data + lastIndex - 1,
+                    strength)
+            mixVec3(spline.rightHandles.data + lastIndex,
+                    spline.points.data + lastIndex,
+                    spline.points.data + lastIndex - 1,
+                    -strength)
+            return
 
 @cython.cdivision(True)
 cdef calculateSmoothControlPoints(
@@ -331,3 +421,56 @@ cdef calcRightTrimmedSegment(float t,
     outP4.x = t3 * P4.x - 3 * t2 * (t-1) * P3.x + 3 * t * (t-1) ** 2 * P2.x - (t-1) ** 3 * P1.x
     outP4.y = t3 * P4.y - 3 * t2 * (t-1) * P3.y + 3 * t * (t-1) ** 2 * P2.y - (t-1) ** 3 * P1.y
     outP4.z = t3 * P4.z - 3 * t2 * (t-1) * P3.z + 3 * t * (t-1) ** 2 * P2.z - (t-1) ** 3 * P1.z
+
+
+cdef inline void getSegmentData_Parameter(BezierSpline spline, float parameter,
+                                          float *t, Vector3 **w):
+    cdef long indices[2]
+    findListSegment_LowLevel(spline.points.length, spline.cyclic, parameter, indices, t)
+    w[0] = spline.points.data + indices[0]
+    w[1] = spline.rightHandles.data + indices[0]
+    w[2] = spline.leftHandles.data + indices[1]
+    w[3] = spline.points.data + indices[1]
+
+cdef inline void getSegmentData_Index(BezierSpline spline, Py_ssize_t index, Vector3 **w):
+    cdef Py_ssize_t i1 = index
+    cdef Py_ssize_t i2 = index + 1
+    if i2 == spline.points.length:
+        i2 = 0
+
+    w[0] = spline.points.data + i1
+    w[1] = spline.rightHandles.data + i1
+    w[2] = spline.leftHandles.data + i2
+    w[3] = spline.points.data + i2
+
+cdef inline void getSegmentIndex(BezierSpline spline, float parameter, Py_ssize_t *index, float *t):
+    cdef long indices[2]
+    findListSegment_LowLevel(spline.points.length, spline.cyclic, parameter, indices, t)
+    index[0] = indices[0]
+
+cdef inline int getSegmentAmount(BezierSpline spline):
+    return spline.points.length - 1 + spline.cyclic
+
+cdef inline void evaluateBezierSegment_Point(Vector3 *result, float t, Vector3 **w):
+    cdef:
+        float t2 = t * t
+        float t3 = t2 * t
+        float mt1 = 1 - t
+        float mt2 = mt1 * mt1
+        float mt3 = mt2 * mt1
+        float coeff1 = 3 * mt2 * t
+        float coeff2 = 3 * mt1 * t2
+    result.x = w[0].x*mt3 + w[1].x*coeff1 + w[2].x*coeff2 + w[3].x*t3
+    result.y = w[0].y*mt3 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*t3
+    result.z = w[0].z*mt3 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*t3
+
+cdef inline void evaluateBezierSegment_Tangent(Vector3 *result, float t, Vector3 **w):
+    cdef:
+        float t2 = t * t
+        float coeff0 = -3 +  6 * t - 3 * t2
+        float coeff1 =  3 - 12 * t + 9 * t2
+        float coeff2 =       6 * t - 9 * t2
+        float coeff3 =                3 * t2
+    result.x = w[0].x*coeff0 + w[1].x*coeff1 + w[2].x*coeff2 + w[3].x*coeff3
+    result.y = w[0].y*coeff0 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*coeff3
+    result.z = w[0].z*coeff0 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*coeff3

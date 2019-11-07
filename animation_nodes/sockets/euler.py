@@ -9,16 +9,15 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_EulerSocket"
     bl_label = "Euler Socket"
     dataType = "Euler"
-    allowedInputTypes = ["Euler"]
     drawColor = (0.1, 0.0, 0.4, 1.0)
     storable = True
     comparable = False
 
-    value = FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "EULER")
+    value: FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "EULER")
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)
-        if text != "": col.label(text)
+        if text != "": col.label(text = text)
         col.prop(self, "value", index = 0, text = "X")
         col.prop(self, "value", index = 1, text = "Y")
         col.prop(self, "value", index = 2, text = "Z")
@@ -53,8 +52,7 @@ class EulerListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_EulerListSocket"
     bl_label = "Euler List Socket"
     dataType = "Euler List"
-    baseDataType = "Euler"
-    allowedInputTypes = ["Euler List"]
+    baseType = EulerSocket
     drawColor = (0.1, 0.0, 0.4, 0.5)
     storable = True
     comparable = False

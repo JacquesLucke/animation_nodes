@@ -16,4 +16,4 @@ class ShapeKeysFromObjectNode(bpy.types.Node, AnimationNode):
         if object.data.shape_keys is None: return [], None
 
         reference = object.data.shape_keys.reference_key
-        return list(object.data.shape_keys.key_blocks), reference
+        return list(object.data.shape_keys.key_blocks)[1:], reference

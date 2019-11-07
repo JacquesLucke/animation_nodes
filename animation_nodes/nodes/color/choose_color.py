@@ -7,7 +7,7 @@ class ChooseColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ChooseColorNode"
     bl_label = "Choose Color"
 
-    colorProperty = FloatVectorProperty(
+    colorProperty: FloatVectorProperty(
         default = [0.5, 0.5, 0.5], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0, update = propertyChanged)
 

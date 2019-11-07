@@ -1,7 +1,8 @@
 cimport cython
-from . random cimport randomNumber
+from libc.math cimport sqrt
+from . random cimport randomDouble_UnitRange
 from .. utils.limits cimport INT_MAX
-from .. data_structures cimport Vector3DList
+from .. data_structures cimport Vector3DList, DoubleList, EulerList, Euler3, QuaternionList, Quaternion
 
 # http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
 
@@ -26,6 +27,54 @@ def wiggleVectorList(amount, double evolution, amplitude, int octaves, double pe
         values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * _amplitude[i % 3]
     return result
 
+def wiggleDoubleList(amount, double evolution, double amplitude, int octaves, double persistance):
+    cdef DoubleList result = DoubleList(length = amount)
+    cdef double *values = <double*>result.data
+    cdef Py_ssize_t i
+    for i in range(amount):
+        values[i] = perlinNoise1D(evolution + i * 354623, persistance, octaves) * amplitude
+    return result
+
+def wiggleEulerList(amount, double evolution, amplitude, int octaves, double persistance):
+    cdef EulerList result = EulerList(length = amount)
+    cdef Euler3 *values = <Euler3*>result.data
+    cdef Py_ssize_t i
+    cdef float xAmplitude, yAmplitude, zAmplitude
+    (xAmplitude, yAmplitude, zAmplitude) = amplitude
+    for i in range(amount):
+        values[i].x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * xAmplitude
+        values[i].y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * yAmplitude
+        values[i].z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * zAmplitude
+        values[i].order = 0
+    return result
+
+def wiggleQuaternionList(amount, double evolution, amplitude, int octaves, double persistance):
+    cdef QuaternionList result = QuaternionList(length = amount)
+    cdef Quaternion *values = <Quaternion*>result.data
+    cdef double length
+    cdef double w, x, y, z
+    cdef double wAmplitude, xAmplitude, yAmplitude, zAmplitude
+    (wAmplitude, xAmplitude, yAmplitude, zAmplitude) = amplitude
+    cdef Py_ssize_t i
+    for i in range(amount):
+        w = 1.0
+        x = perlinNoise1D(evolution + i * 354623, persistance, octaves) * xAmplitude
+        y = perlinNoise1D(evolution + i + 0.33 * 354623, persistance, octaves) * yAmplitude
+        z = perlinNoise1D(evolution + i + 0.66 * 354623, persistance, octaves) * zAmplitude
+
+        length = sqrt(x * x + y * y + z * z + w * w)
+        w /= length
+        x /= length
+        y /= length
+        z /= length
+
+        values[i].w = <float>w
+        values[i].x = <float>x
+        values[i].y = <float>y
+        values[i].z = <float>z
+
+    return result
+
 cpdef double perlinNoise1D(double x, double persistance, int octaves):
     cdef:
         double total = 0
@@ -46,12 +95,12 @@ cdef double interpolatedNoise(double x):
     cdef:
         int intX = <int>x
         double fracX = x - intX
-        double v0 = _randomNumber(intX - 2)
-        double v1 = _randomNumber(intX - 1)
-        double v2 = _randomNumber(intX)
-        double v3 = _randomNumber(intX + 1)
-        double v4 = _randomNumber(intX + 2)
-        double v5 = _randomNumber(intX + 3)
+        double v0 = randomDouble_UnitRange(intX - 2)
+        double v1 = randomDouble_UnitRange(intX - 1)
+        double v2 = randomDouble_UnitRange(intX)
+        double v3 = randomDouble_UnitRange(intX + 1)
+        double v4 = randomDouble_UnitRange(intX + 2)
+        double v5 = randomDouble_UnitRange(intX + 3)
 
     return cubicInterpolation(
             v0 / 4.0 + v1 / 2.0 + v2 / 4.0,
@@ -68,8 +117,3 @@ cdef inline double cubicInterpolation(double v0, double v1, double v2, double v3
     s = v1
     x2 = x * x
     return p * x2 * x + q * x2 + r * x + s
-
-cdef inline double _randomNumber(int x):
-    '''Generate a random number between -1 and 1 using a seed'''
-    x = (x<<13) ^ x
-    return 1.0 - ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0

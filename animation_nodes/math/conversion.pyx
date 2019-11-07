@@ -4,6 +4,21 @@ from mathutils import Quaternion as PyQuaternion
 # Vectors
 ##########################################################
 
+cdef Vector2 toVector2(value) except *:
+    cdef Vector2 v
+    setVector2(&v, value)
+    return v
+
+cdef setVector2(Vector2* v, value):
+    if len(value) != 2:
+        raise TypeError("element is not a 2D vector")
+    v.x = value[0]
+    v.y = value[1]
+
+cdef toPyVector2(Vector2* v):
+    return Vector((v.x, v.y))
+
+
 cdef Vector3 toVector3(value) except *:
     cdef Vector3 v
     setVector3(&v, value)

@@ -16,7 +16,7 @@ class BooleanListLogicNode(bpy.types.Node, AnimationNode):
     bl_label = "Boolean List Logic"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    compareType = EnumProperty(name = "Compare Type", default = "ALL_TRUE",
+    compareType: EnumProperty(name = "Compare Type", default = "ALL_TRUE",
         items = compareTypeItems, update = executionCodeChanged)
 
     def create(self):
@@ -29,7 +29,7 @@ class BooleanListLogicNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return compareLabels[self.compareType]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         t = self.compareType
 
         yield "if len(inList) > 0:"

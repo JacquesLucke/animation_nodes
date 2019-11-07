@@ -10,19 +10,18 @@ falloffTypeItems = [
     ("Transformation Matrix", "Transformation Matrix", "", "", 2)
 ]
 
-invalidFalloffMessage = "invalid falloff type"
-
 class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateFalloffNode"
     bl_label = "Evaluate Falloff"
+    errorHandlingType = "EXCEPTION"
 
-    falloffType = EnumProperty(name = "Falloff Type",
+    __annotations__ = {}
+
+    __annotations__["falloffType"] = EnumProperty(name = "Falloff Type",
         items = falloffTypeItems, update = AnimationNode.refresh)
 
-    useList = BoolProperty(name = "Use List", default = False,
+    __annotations__["useList"] = BoolProperty(name = "Use List", default = False,
         update = AnimationNode.refresh)
-
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Falloff", "Falloff", "falloff")
@@ -48,9 +47,6 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
         row.prop(self, "falloffType", text = "")
         row.prop(self, "useList", text = "", icon = "LINENUMBERS_ON")
 
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def getExecutionFunctionName(self):
         if self.useList:
             if self.falloffType == "None":
@@ -64,39 +60,19 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
                 return "execute_Single_Object"
 
     def execute_Single_None(self, Falloff falloff, index):
-        cdef long _index = clampLong(index)
-        cdef FalloffEvaluator evaluator
-
-        self.errorMessage = ""
-        try: evaluator = falloff.getEvaluator("")
-        except:
-            self.errorMessage = invalidFalloffMessage
-            return 0
-
+        cdef Py_ssize_t _index = clampLong(index)
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff, "None")
         return evaluator.evaluate(NULL, _index)
 
     def execute_Single_Object(self, Falloff falloff, object, index):
-        cdef long _index = clampLong(index)
-        cdef FalloffEvaluator evaluator
-
-        self.errorMessage = ""
-        try: evaluator = falloff.getEvaluator(self.falloffType)
-        except:
-            self.errorMessage = invalidFalloffMessage
-            return 0
-
+        cdef Py_ssize_t _index = clampLong(index)
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff, self.falloffType)
         return evaluator(object, _index)
 
     def execute_List_None(self, falloff, amount):
-        cdef FalloffEvaluator _falloff
+        cdef Py_ssize_t i
         cdef DoubleList strengths
-        cdef int i
-
-        self.errorMessage = ""
-        try: _falloff = falloff.getEvaluator("")
-        except:
-            self.errorMessage = invalidFalloffMessage
-            return DoubleList()
+        cdef FalloffEvaluator _falloff = self.getFalloffEvaluator(falloff, "None")
 
         amount = max(amount, 0)
         strengths = DoubleList(length = amount)
@@ -105,20 +81,18 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
         return strengths
 
     def execute_List_CList(self, falloff, myList):
-        cdef FalloffEvaluator _falloff
-        self.errorMessage = ""
-        try: _falloff = falloff.getEvaluator(self.falloffType)
-        except:
-            self.errorMessage = invalidFalloffMessage
-            return DoubleList()
-
+        cdef FalloffEvaluator _falloff = self.getFalloffEvaluator(falloff, self.falloffType)
         return self.evaluate_CList(_falloff, myList)
 
     def evaluate_CList(self, FalloffEvaluator _falloff, CList myList):
-        cdef long i
+        cdef Py_ssize_t i
         cdef char *data = <char*>myList.getPointer()
         cdef int elementSize = myList.getElementSize()
         cdef DoubleList strengths = DoubleList(length = myList.getLength())
         for i in range(myList.getLength()):
             strengths.data[i] = _falloff.evaluate(data + i * elementSize, i)
         return strengths
+
+    def getFalloffEvaluator(self, falloff, type):
+        try: return falloff.getEvaluator(type)
+        except: self.raiseErrorMessage("invalid falloff type")

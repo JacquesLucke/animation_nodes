@@ -14,7 +14,7 @@ class DataInterfaceNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DataInterfaceNode"
     bl_label = "Data Interface"
 
-    dataDirection = EnumProperty(name = "Data Direction", default = "IMPORT",
+    dataDirection: EnumProperty(name = "Data Direction", default = "IMPORT",
         items = dataDirectionItems, update = AnimationNode.refresh)
 
     def create(self):
@@ -26,7 +26,7 @@ class DataInterfaceNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "dataDirection", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.dataDirection == "EXPORT":
             return "self.setValue(value)"
         if self.dataDirection == "IMPORT":

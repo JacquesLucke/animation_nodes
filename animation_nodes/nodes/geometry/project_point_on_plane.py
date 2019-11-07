@@ -1,34 +1,57 @@
 import bpy
-from bpy.props import *
-from ... base_types import AnimationNode
+from mathutils import Vector
+from ... data_structures import VirtualVector3DList
+from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import project_PointOnPlane_List, project_PointOnPlane_Single
 
 class ProjectPointOnPlaneNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ProjectPointOnPlaneNode"
     bl_label = "Project Point on Plane"
-    bl_width_default = 170
+    bl_width_default = 160
     searchTags = ["Distance Point to Plane", "Closest Point on Plane"]
 
+    usePlanePointList: VectorizedSocket.newProperty()
+    usePlaneNormalList: VectorizedSocket.newProperty()
+    usePointList: VectorizedSocket.newProperty()
+
     def create(self):
-        self.newInput("Vector", "Point", "point")
-        self.newInput("Vector", "Plane Point", "planePoint", value = (0, 0, 0))
-        self.newInput("Vector", "Plane Normal", "planeNormal", value = (0, 0, 1))
+        self.newInput(VectorizedSocket("Vector", "usePlanePointList",
+            ("Plane Point", "planePoint", dict(value = (0, 0, 0))),
+            ("Plane Points", "planePoints"),
+            codeProperties = dict(default = (0, 0, 0))))
+        self.newInput(VectorizedSocket("Vector", "usePlaneNormalList",
+            ("Plane Normal", "planeNormal", dict(value = (0, 0, 1))),
+            ("Plane Normals", "planeNormals"),
+            codeProperties = dict(default = (0, 0, 1))))
 
-        self.newOutput("Vector", "Projection", "projection")
-        self.newOutput("Float", "Signed Distance", "distance")
+        self.newInput(VectorizedSocket("Vector", "usePointList",
+            ("Point", "point", dict(value = (0, 0, 1))),
+            ("Points", "points"),
+            codeProperties = dict(default = (0, 0, 1))))
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()):
-            return
+        props = ["usePlanePointList", "usePlaneNormalList", "usePointList"]
 
-        yield "plane_co = planePoint"
-        yield "plane_no = planeNormal if planeNormal.length_squared != 0 else Vector((0, 0, 1))"
+        self.newOutput(VectorizedSocket("Vector", props,
+            ("Projection", "projection"),
+            ("Projections", "projections")))
+        self.newOutput(VectorizedSocket("Float", props,
+            ("Signed Distance", "distance"),
+            ("Signed Distances", "distances")))
 
-        if isLinked["projection"]:
-            yield "intersection = mathutils.geometry.intersect_line_plane(point, point + plane_no, plane_co, plane_no, False)"
-            yield "projection = Vector((0, 0, 0)) if intersection is None else intersection"
-        if isLinked["distance"]:
-            yield "distance = mathutils.geometry.distance_point_to_plane(point, plane_co, plane_no)"
+    def getExecutionFunctionName(self):
+        useList = any((self.usePlanePointList, self.usePlaneNormalList,
+                       self.usePointList))
+        if useList:
+            return "execute_List"
+        else:
+            return "execute_Single"
 
-    def getUsedModules(self):
-        return ["mathutils"]
+    def execute_List(self, planePoints, planeNormals, points):
+        planePoints = VirtualVector3DList.create(planePoints, Vector((0, 0, 0)))
+        planeNormals = VirtualVector3DList.create(planeNormals, Vector((0, 0, 1)))
+        points = VirtualVector3DList.create(points, Vector((0, 0, 1)))
+        amount = VirtualVector3DList.getMaxRealLength(planePoints, planeNormals, points)
+        return project_PointOnPlane_List(amount, planePoints, planeNormals, points)
+
+    def execute_Single(self, planePoint, planeNormal, point):
+        return project_PointOnPlane_Single(planePoint, planeNormal, point)

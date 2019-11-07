@@ -7,11 +7,10 @@ from .. graphics.rectangle import Rectangle
 from .. utils.blender_ui import getDpiFactor
 
 class ProblemsPanel(bpy.types.Panel):
-    bl_idname = "an_problems_panel"
+    bl_idname = "AN_PT_problems_panel"
     bl_label = "Problems"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"
-    bl_category = "Animation Nodes"
 
     @classmethod
     def poll(cls, context):
@@ -20,7 +19,7 @@ class ProblemsPanel(bpy.types.Panel):
         return tree.bl_idname == "an_AnimationNodeTree" and problems.problemsExist()
 
     def draw_header(self, context):
-        self.layout.label("", icon = "ERROR")
+        self.layout.label(text = "", icon = "ERROR")
 
     def draw(self, context):
         layout = self.layout
@@ -38,9 +37,9 @@ class ProblemsPanel(bpy.types.Panel):
         col = layout.column(align = True)
         tree = self.getTree()
         lastExec = tree.lastExecutionInfo
-        col.label("Last successful execution using:")
-        col.label("    Blender:   v{}".format(lastExec.blenderVersionString))
-        col.label("    Animation Nodes:   v{}".format(lastExec.animationNodesVersionString))
+        col.label(text = "Last successful execution using:")
+        col.label(text = "    Blender:   v{}".format(lastExec.blenderVersionString))
+        col.label(text = "    Animation Nodes:   v{}".format(lastExec.animationNodesVersionString))
 
         if lastExec.isDefault:
             writeText(col,
@@ -57,7 +56,8 @@ class ProblemsPanel(bpy.types.Panel):
 def drawWarningOverlay():
     if problems.problemsExist():
         rectangle = Rectangle.fromRegionDimensions(bpy.context.region)
-        rectangle.color = (0, 0, 0, 0)
-        rectangle.borderColor = (0.9, 0.1, 0.1, 0.6)
-        rectangle.borderThickness = 4 * getDpiFactor()
-        rectangle.draw()
+        rectangle.draw(
+            color = (0, 0, 0, 0),
+            borderColor = (0.9, 0.1, 0.1, 0.6),
+            borderThickness = 4 * getDpiFactor()
+        )

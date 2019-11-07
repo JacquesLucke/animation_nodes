@@ -6,7 +6,7 @@ class SwitchTreeOperator(bpy.types.Operator):
     bl_label = "Switch Tree"
     bl_description = "Switch to that tree and view all nodes"
 
-    treeName = StringProperty()
+    treeName: StringProperty()
 
     @classmethod
     def poll(cls, context):

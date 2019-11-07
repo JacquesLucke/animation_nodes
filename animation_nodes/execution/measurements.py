@@ -6,7 +6,6 @@ from .. draw_handler import drawHandler
 from .. graphics.text_box import TextBox
 from .. utils.operators import makeOperator
 from .. preferences import getExecutionCodeType
-from .. utils.blender_ui import iterNodeCornerLocations
 
 class NodeMeasurements:
     __slots__ = ("minTime", "totalTime", "calls")
@@ -47,31 +46,7 @@ def getMinExecutionTimeString(node):
     else:
         return "Not Measured"
 
-@drawHandler("SpaceNodeEditor", "WINDOW")
-def drawMeasurementResults():
-    tree = bpy.context.space_data.edit_tree
-    if tree is None: return
-    if tree.bl_idname != "an_AnimationNodeTree": return
-    if getExecutionCodeType() != "MEASURE": return
-
-    nodes = tree.nodes
-    region = bpy.context.region
-    leftCorners = iterNodeCornerLocations(nodes, region, horizontal = "LEFT")
-    rightCorners = iterNodeCornerLocations(nodes, region, horizontal = "RIGHT")
-
-    for node, leftBottom, rightBottom in zip(nodes, leftCorners, rightCorners):
-        if node.isAnimationNode and not node.hide:
-            if "NO_TIMING" not in node.options:
-                drawMeasurementResultForNode(node, leftBottom, rightBottom)
-
-def drawMeasurementResultForNode(node, leftBottom, rightBottom):
+def getMeasurementResultString(node):
     result = measurementsByNodeIdentifier[node.identifier]
-    if result.calls == 0: text = "Not Measured"
-    else: text = str(result)
-
-    width = rightBottom.x - leftBottom.x
-
-    textBox = TextBox(text, leftBottom, width,
-                      fontSize = width / node.dimensions.x * 11)
-    textBox.padding = 3
-    textBox.draw()
+    if result.calls == 0: return "Not Measured"
+    else: return str(result)

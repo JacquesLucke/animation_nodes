@@ -3,7 +3,6 @@ import itertools
 from . import problems
 from . update import updateEverything
 from . utils.recursion import noRecursion
-from . tree_info import iterSocketsThatNeedUpdate
 from . utils.nodes import iterNodesInAnimationNodeTrees, getAnimationNodeTrees
 from . execution.units import setupExecutionUnits, finishExecutionUnits
 from . execution.auto_execution import iterAutoExecutionNodeTrees, executeNodeTrees, afterExecution
@@ -16,8 +15,6 @@ def update(events):
 
     if didNameChange() or events.intersection({"File", "Addon", "Tree"}):
         updateEverything()
-
-    updateProperties()
 
     if problems.canAutoExecute():
         nodeTrees = list(iterAutoExecutionNodeTrees(events))
@@ -52,10 +49,3 @@ def getNamesHash():
         (tree.name for tree in getAnimationNodeTrees()),
         (node.name for node in iterNodesInAnimationNodeTrees())))
     return names
-
-def updateProperties():
-    for socket in iterSocketsThatNeedUpdate():
-        socket.updateProperty()
-
-    for tree in getAnimationNodeTrees():
-        tree.autoExecution.customTriggers.updateProperties()

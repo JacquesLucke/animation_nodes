@@ -1,0 +1,77 @@
+cdef class VirtualLISTNAME(VirtualList):
+    @classmethod
+    def fromListOrElement(cls, obj, default):
+        if isinstance(obj, LISTNAME):
+            return cls.fromList(obj, default)
+        else:
+            return VirtualLISTNAME_Element(obj)
+
+    @classmethod
+    def fromList(cls, LISTNAME realList, default):
+        if realList.length == 0:
+            return VirtualLISTNAME_Element(default)
+        elif realList.length == 1:
+            return VirtualLISTNAME_Element(realList[0], realLength = 1)
+        else:
+            return VirtualLISTNAME_List(realList)
+
+    @classmethod
+    def fromElement(cls, element):
+        return VirtualLISTNAME_Element(element)
+
+    @classmethod
+    def createMultiple(cls, *elements):
+        cdef list virtualLists = []
+        for src, default in elements:
+            virtualLists.append(VirtualLISTNAME.fromListOrElement(src, default))
+        return virtualLists
+
+    def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
+        cdef LISTNAME newList = LISTNAME(length = length)
+        cdef Py_ssize_t i
+        for i in range(length):
+            newList.data[i] = self.get(i)OPTIONAL_INV_DEREF
+        return newList
+
+    cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
+        raise NotImplementedError()
+
+cdef class VirtualLISTNAME_List(VirtualLISTNAME):
+    cdef LISTNAME realList
+    cdef TYPE *realData
+    cdef Py_ssize_t realLength
+
+    def __cinit__(self, LISTNAME realList):
+        self.realList = realList
+        self.realData = realList.data
+        self.realLength = realList.length
+        assert self.realLength > 0
+
+    @cython.cdivision(True)
+    cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
+        return (self.realData + (i % self.realLength))OPTIONAL_DEREF
+
+    def getRealLength(self):
+        return self.realLength
+
+    def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
+        if canUseOriginal and self.realLength == length:
+            return self.realList
+        else:
+            return super().materialize(length, canUseOriginal)
+
+cdef class VirtualLISTNAME_Element(VirtualLISTNAME):
+    cdef LISTNAME realList
+    cdef TYPE *realData
+    cdef Py_ssize_t realLength
+
+    def __cinit__(self, element, realLength = 0):
+        self.realList = LISTNAME.fromValue(element)
+        self.realData = self.realList.data
+        self.realLength = realLength
+
+    cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
+        return (self.realData)OPTIONAL_DEREF
+
+    def getRealLength(self):
+        return self.realLength

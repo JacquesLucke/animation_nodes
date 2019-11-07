@@ -1,36 +1,78 @@
 import bpy
-from ... base_types import AnimationNode
+from mathutils import Vector
+from ... data_structures import VirtualVector3DList
+from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import intersect_LineLine_List, intersect_LineLine_Single
 
 class IntersectLineLineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectLineLineNode"
     bl_label = "Intersect Line Line"
     bl_width_default = 160
-    searchTags = ["Closest Points on 2 Lines"]
+    searchTags = ["Nearest Points on 2 Lines"]
+
+    useFirstLineStartList: VectorizedSocket.newProperty()
+    useFirstLineEndList: VectorizedSocket.newProperty()
+    useSecondLineStartList: VectorizedSocket.newProperty()
+    useSecondLineEndList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Vector", "Line 1 Start", "lineStart1")
-        self.newInput("Vector", "Line 1 End", "lineEnd1", value = [0, 1, 0])
-        self.newInput("Vector", "Line 2 Start", "lineStart2")
-        self.newInput("Vector", "Line 2 End", "lineEnd2", value = [0, 0, 1])
+        self.newInput(VectorizedSocket("Vector", "useFirstLineStartList",
+            ("First Line Start", "firstLineStart", dict(value = (1, 1, 0))),
+            ("First Line Starts", "firstLineStarts"),
+            codeProperties = dict(default = (1, 1, 0))))
+        self.newInput(VectorizedSocket("Vector", "useFirstLineEndList",
+            ("First Line End", "firstLineEnd", dict(value = (-1, -1, 0))),
+            ("First Line Ends", "firstLineEnds"),
+            codeProperties = dict(default = (-1, -1, 0))))
 
-        self.newOutput("Vector", "Closest On Line 1", "closest1")
-        self.newOutput("Vector", "Closest On Line 2", "closest2")
-        self.newOutput("Boolean", "Is Valid", "isValid")
+        self.newInput(VectorizedSocket("Vector", "useSecondLineStartList",
+            ("Second Line Start", "secondLineStart", dict(value = (1, -1, 0))),
+            ("Second Line Starts", "secondLineStarts"),
+            codeProperties = dict(default = (1, -1, 0))))
+        self.newInput(VectorizedSocket("Vector", "useSecondLineEndList",
+            ("Second Line End", "secondLineEnd", dict(value = (-1, 1, 0))),
+            ("Second Line Ends", "secondLineEnds"),
+            codeProperties = dict(default = (-1, 1, 0))))
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return
+        props = ["useFirstLineStartList", "useFirstLineEndList",
+                 "useSecondLineStartList", "useSecondLineEndList"]
 
-        yield "closestPoints = mathutils.geometry.intersect_line_line(lineStart1, lineEnd1, lineStart2, lineEnd2)"
+        self.newOutput(VectorizedSocket("Vector", props,
+            ("First Nearest Point", "firstNearestPoint"),
+            ("First Nearest Points", "firstNearestPoints")))
+        self.newOutput(VectorizedSocket("Vector", props,
+            ("Second Nearest Point", "secondNearestPoint"),
+            ("Second Nearest Points", "secondNearestPoints")))
 
-        yield "if closestPoints is None:"
-        if isLinked["closest1"]: yield "    closest1 = Vector((0, 0, 0))"
-        if isLinked["closest2"]: yield "    closest2 = Vector((0, 0, 0))"
-        if isLinked["isValid"]:  yield "    isValid = False"
-        yield "else:"
-        if isLinked["closest1"]: yield "    closest1 = closestPoints[0]"
-        if isLinked["closest2"]: yield "    closest2 = closestPoints[1]"
-        if isLinked["isValid"]:  yield "    isValid = True"
+        self.newOutput(VectorizedSocket("Float", props,
+            ("First Parameter", "firstParameter"),
+            ("First Parameters", "firstParameters")))
+        self.newOutput(VectorizedSocket("Float", props,
+            ("Second Parameter", "secondParameter"),
+            ("Second Parameters", "secondParameters")))
 
-    def getUsedModules(self):
-        return ["mathutils"]
+        self.newOutput(VectorizedSocket("Boolean", props,
+            ("Valid", "valid"),
+            ("Valids", "valids")))
+
+    def getExecutionFunctionName(self):
+        useList = any((self.useFirstLineStartList, self.useFirstLineEndList,
+                       self.useSecondLineStartList, self.useSecondLineEndList))
+        if useList:
+            return "execute_List"
+        else:
+            return "execute_Single"
+
+    def execute_List(self, firstLineStarts, firstLineEnds, secondLineStarts, secondLineEnds):
+        starts1, ends1, starts2, ends2 = VirtualVector3DList.createMultiple(
+            (firstLineStarts, (1, 1, 0)),
+            (firstLineEnds, (-1, -1, 0)),
+            (secondLineStarts, (1, -1, 0)),
+            (secondLineEnds, (-1, 1, 0))
+        )
+        amount = VirtualVector3DList.getMaxRealLength(starts1, ends1, starts2, ends2)
+        return intersect_LineLine_List(amount, starts1, ends1, starts2, ends2)
+
+    def execute_Single(self, firstLineStart, firstLineEnd, secondLineStart, secondLineEnd):
+        return intersect_LineLine_Single(firstLineStart, firstLineEnd,
+            secondLineStart, secondLineEnd)

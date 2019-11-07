@@ -2,9 +2,9 @@ import bpy
 from bpy.props import *
 from ... math cimport toPyMatrix4
 from ... sockets.info import isList
-from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
 from ... data_structures cimport Matrix4x4List
+from ... base_types import AnimationNode, VectorizedSocket
 
 outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("LOCAL", "Local", "", "NONE", 1),
@@ -12,38 +12,40 @@ outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("WORLD", "World", "", "NONE", 3) ]
 
 
-class ObjectMatrixOutputNode(bpy.types.Node, VectorizedNode):
+class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMatrixOutputNode"
     bl_label = "Object Matrix Output"
 
-    outputType = EnumProperty(name = "Type", default = "WORLD",
+    __annotations__ = {}
+
+    __annotations__["outputType"] = EnumProperty(name = "Type", default = "WORLD",
         items = outputItems, update = executionCodeChanged)
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
-    useMatrixList = VectorizedNode.newVectorizeProperty()
+    __annotations__["useObjectList"] = VectorizedSocket.newProperty()
+    __annotations__["useMatrixList"] = VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects")))
 
-        self.newVectorizedInput("Matrix", ("useMatrixList", ["useObjectList"]),
-            ("Matrix", "matrix"), ("Matrices", "matrices"))
+        self.newInput(VectorizedSocket("Matrix", ["useMatrixList", "useObjectList"],
+            ("Matrix", "matrix"), ("Matrices", "matrices")))
 
-        self.newVectorizedOutput("Object", "useObjectList",
-            ("Object", "object"), ("Objects", "objects"))
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects")))
 
     def drawAdvanced(self, layout):
         layout.prop(self, "outputType", text = "Type")
         if self.outputType != "WORLD":
-            layout.label("This mode might not work as expected", icon = "INFO")
+            layout.label(text = "This mode might not work as expected", icon = "INFO")
 
     def getExecutionFunctionName(self):
         if isList(self.inputs[1].dataType):
             return "execute_List"
         return None
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         indent = ""
         if isList(self.inputs[0].dataType):
             yield "for object in objects:"

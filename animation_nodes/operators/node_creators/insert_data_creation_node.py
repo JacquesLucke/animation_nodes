@@ -1,13 +1,13 @@
 import bpy
 from bpy.props import *
 from . node_creator import NodeCreator
-from ... sockets.info import isList, toBaseDataType
+from ... sockets.info import isList, toBaseDataType, hasAllowedInputDataTypes
 
 class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
     bl_idname = "an.insert_data_creation_node"
     bl_label = "Insert Data Creation Node"
 
-    socketIndex = IntProperty(default = 0)
+    socketIndex: IntProperty(default = 0)
 
     @property
     def needsMenu(self):
@@ -16,13 +16,13 @@ class InsertDataCreationNode(bpy.types.Operator, NodeCreator):
     def drawMenu(self, layout):
         layout.operator_context = "EXEC_DEFAULT"
         for socket in self.iterPossibleSockets():
-            if len(socket.allowedInputTypes) > 0:
+            if hasAllowedInputDataTypes(socket.dataType):
                 props = layout.operator(self.bl_idname, text = socket.getDisplayedName())
                 props.socketIndex = socket.getIndex()
 
     def iterPossibleSockets(self):
         for socket in self.activeNode.inputs:
-            if not socket.hide and len(socket.allowedInputTypes) > 0:
+            if not socket.hide and hasAllowedInputDataTypes(socket.dataType):
                 yield socket
 
     def insert(self):
@@ -56,6 +56,6 @@ dataCreationNodes = {
     "Euler" : "an_CombineEulerNode",
     "Struct" : "an_SetStructElementsNode",
     "Quaternion" : "an_CombineQuaternionNode",
-    "Mesh Data" : "an_CombineMeshDataNode",
+    "Mesh" : "an_MeshObjectInputNode",
     "Matrix" : "an_ComposeMatrixNode"
 }

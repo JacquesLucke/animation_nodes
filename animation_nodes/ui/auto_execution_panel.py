@@ -4,11 +4,10 @@ from .. utils.layout import writeText
 from .. utils.blender_ui import isViewportRendering
 
 class AutoExecutionPanel(bpy.types.Panel):
-    bl_idname = "an_auto_execution_panel"
+    bl_idname = "AN_PT_auto_execution_panel"
     bl_label = "Auto Execution"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"
-    bl_category = "Animation Nodes"
 
     @classmethod
     def poll(cls, context):
@@ -29,7 +28,7 @@ class AutoExecutionPanel(bpy.types.Panel):
         isRendering = isViewportRendering()
 
         if not canExecute():
-            layout.label("Look in the 'Problems' panel", icon = "INFO")
+            layout.label(text = "Look in the 'Problems' panel", icon = "INFO")
 
         layout.active = autoExecution.enabled
 
@@ -46,13 +45,11 @@ class AutoExecutionPanel(bpy.types.Panel):
 
         layout.prop(autoExecution, "minTimeDifference", slider = True)
 
-        col = layout.column()
-        col.operator("an.add_auto_execution_trigger", text = "New Trigger", icon = "ZOOMIN")
         customTriggers = autoExecution.customTriggers
-
-        subcol = col.column(align = True)
         for i, monitorPropertyTrigger in enumerate(customTriggers.monitorPropertyTriggers):
-            monitorPropertyTrigger.draw(subcol, i)
+            monitorPropertyTrigger.draw(layout, i)
+
+        layout.operator("an.add_auto_execution_trigger", text = "New Trigger", icon = "ADD")
 
     @classmethod
     def getTree(cls):

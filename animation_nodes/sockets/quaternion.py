@@ -9,16 +9,15 @@ class QuaternionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_QuaternionSocket"
     bl_label = "Quaternion Socket"
     dataType = "Quaternion"
-    allowedInputTypes = ["Quaternion"]
     drawColor = (0.8, 0.6, 0.3, 1.0)
     storable = True
     comparable = False
 
-    value = FloatVectorProperty(default = [1, 0, 0, 0], size = 4, update = propertyChanged)
+    value: FloatVectorProperty(default = [1, 0, 0, 0], size = 4, update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         col = layout.column(align = True)
-        if text != "": col.label(text)
+        if text != "": col.label(text = text)
         col.prop(self, "value", index = 0, text = "W")
         col.prop(self, "value", index = 1, text = "X")
         col.prop(self, "value", index = 2, text = "Y")
@@ -54,8 +53,7 @@ class QuaternionListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_QuaternionListSocket"
     bl_label = "Quaternion List Socket"
     dataType = "Quaternion List"
-    baseDataType = "Quaternion"
-    allowedInputTypes = ["Quaternion List"]
+    baseType = QuaternionSocket
     drawColor = (0.8, 0.6, 0.3, 0.5)
     storable = True
     comparable = False

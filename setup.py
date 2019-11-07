@@ -1,365 +1,232 @@
-'''
-Copyright (C) 2016 Jacques Lucke
-mail@jlucke.com
-
-Created by Jacques Lucke
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
-
-'''
-Command Line Arguments:
-    python setup.py
-     --all              # recompile all
-     --export           # make redistributable version
-     --nocopy           # don't copy the build into Blenders addon directory
-     --noversioncheck   # allow to create a build with any Python version
-
-Generate .html files to debug cython code:
-    cython -a path/to/file.pyx
-
-Cleanup Repository:
-    git clean -fdx       # make sure you don't have uncommited files!
-'''
-
 import os
 import sys
-import shutil
-import traceback
-from os.path import abspath, dirname, join, relpath
+import json
+import textwrap
+import subprocess
+from pprint import pprint
+
+currentDirectory = os.path.dirname(os.path.abspath(__file__))
+
+if not os.path.samefile(currentDirectory, os.getcwd()):
+    print("You are not in the correct directory.")
+    print("Expected:", currentDirectory)
+    print("Got:     ", os.getcwd())
+    sys.exit()
+
+if currentDirectory not in sys.path:
+    sys.path.append(currentDirectory)
+
+from _setuputils.generic import *
+from _setuputils.addon_files import *
+from _setuputils.cythonize import execute_Cythonize
+from _setuputils.compilation import execute_Compile
+from _setuputils.copy_addon import execute_CopyAddon
+from _setuputils.pypreprocess import execute_PyPreprocess
+from _setuputils.setup_info_files import getSetupInfoList
+from _setuputils.export import execute_Export, execute_ExportC
+from _setuputils.compile_libraries import execute_CompileLibraries
 
 addonName = "animation_nodes"
-currentDirectory = dirname(abspath(__file__))
-sourceDirectory = join(currentDirectory, addonName)
-configPath = join(currentDirectory, "config.py")
-defaultConfigPath = join(currentDirectory, "config.default.py")
-compilationInfoPath = join(sourceDirectory, "compilation_info.json")
+addonDirectory = os.path.join(currentDirectory, addonName)
+defaultConfigPath = os.path.join(currentDirectory, "conf.default.json")
+configPath = os.path.join(currentDirectory, "conf.json")
+initPath = os.path.join(currentDirectory, addonName, "__init__.py")
 
-config = {}
+if onLinux: currentOS = "linux"
+elif onWindows: currentOS = "windows"
+elif onMacOS: currentOS = "macOS"
+addonVersion = getAddonVersion(initPath)
+exportName = "{}_v{}_{}_{}_py{}{}".format(
+    addonName, *addonVersion[:2], currentOS, *sys.version_info[:2])
 
-initialArgs = sys.argv[:]
+exportPath = os.path.join(currentDirectory, exportName + ".zip")
+exportCPath = os.path.join(currentDirectory, "{}_c.zip".format(addonName))
+exportCSetupPath = os.path.join(currentDirectory, "_export_c_setup.py")
 
-expectedArgs = {"--all", "--export", "--nocopy", "--noversioncheck"}
-unknownArgs = set(initialArgs[1:]) - expectedArgs
-if len(unknownArgs) > 0:
-    print("Unknown arguments:", unknownArgs)
-    print("Allowed arguments:", expectedArgs)
-    sys.exit()
+possibleCommands = ["build", "help", "clean"]
+
+buildOptionDescriptions = [
+    ("--copy", "Copy build to location specified in the conf.json file"),
+    ("--export", "Create installable .zip file"),
+    ("--exportc", "Create build that can be compiled without cython"),
+    ("--nocompile", "Don't compile the extension modules"),
+    ("--noversioncheck", "Don't check the used Python version")
+]
+buildOptions = {option for option, _ in buildOptionDescriptions}
+helpNote = "Use 'python setup.py help' to see the possible commands."
 
 
-v = sys.version_info
-if "--noversioncheck" not in initialArgs and (v.major != 3 or v.minor != 5):
-    print("Blender 2.78/2.79 officially uses Python 3.5.x.")
-    print("You are using: {}".format(sys.version))
-    print()
-    print("Use the --noversioncheck argument to disable this check.")
-    sys.exit()
-else:
-    print(sys.version)
-    print()
+# Main
+####################################################
 
 def main():
-    setupAndReadConfigFile()
-    if canCompile():
-        preprocessor()
-        if "--all" in initialArgs:
-            removeCFiles()
-            removeCompiledFiles()
-        compileCythonFiles()
-        writeCompilationInfoFile()
-        if "--export" in initialArgs:
-            export()
-        if not "--nocopy" in initialArgs:
-            if os.path.isdir(config["addonsDirectory"]):
-                copyToBlender()
-            else:
-                print("The path to Blenders addon directory does not exist")
-                print("Please correct the config.py file.")
-
-def setupAndReadConfigFile():
-    if not os.path.isfile(configPath) and os.path.isfile(defaultConfigPath):
-        shutil.copyfile(defaultConfigPath, configPath)
-        print("Copied the config.default.py file to config.py")
-        print("Please change it manually if needed.")
-        print("Note: git ignores it, so depending on the settings of your editor")
-        print("      it might not be shown inside it.\n\n")
-
-    if os.path.isfile(configPath):
-        configCode = readFile(configPath)
-        exec(configCode, config, config)
+    configs = setupConfigFile()
+    args = sys.argv[1:]
+    if len(args) == 0 or args[0] == "help":
+        main_Help()
+    elif args[0] == "build":
+        main_Build(args[1:], configs)
+    elif args[0] == "clean":
+        main_Clean()
     else:
-        print("Cannot find any of these files: config.py, config.default.py ")
-        print("Make sure that at least the config.default.py exists.")
-        print("Maybe you have to clone the repository again.")
+        print("Invalid command: '{}'\n".format(args[0]))
+        print(helpNote)
         sys.exit()
 
-def canCompile():
-    if "bpy" in sys.modules:
-        return False
-    if not os.path.isdir(sourceDirectory):
-        return False
-    correctSysPath()
-    try:
-        import Cython
-        return True
-    except:
-        print("Cython is not installed for this Python version.")
-        print(sys.version)
-        return False
-
-def correctSysPath():
-    pathsToRemove = [path for path in sys.path if currentDirectory in path]
-    for path in pathsToRemove:
-        sys.path.remove(path)
-        print("Removed from sys.path:", path)
-
-
-
-# Preprocess - execute .pre files
-###################################################################
-
-def preprocessor():
-    for path in iterPathsWithSuffix(".pre"):
-        code = readFile(path)
-        codeBlock = compile(code, path, "exec")
-        context = {
-            "__file__" : abspath(path),
-            "readFile" : readFile,
-            "writeFile" : writeFile,
-            "multiReplace" : multiReplace,
-            "dependenciesChanged" : dependenciesChanged,
-            "changeFileName" : changeFileName}
-        exec(codeBlock, context, context)
-
-
-
-# Translate .pyx to .c files and compile extension modules
-###################################################################
-
-def compileCythonFiles():
-    from distutils.core import setup
-    from Cython.Build import cythonize
-
-    sys.argv = [sys.argv[0], "build_ext", "--inplace"]
-
-    extensions = cythonize(getPathsToCythonFiles())
-    setup(name = 'Animation Nodes', ext_modules = extensions)
-    print("Compilation Successful.")
-
-def getPathsToCythonFiles():
-    return list(iterPathsWithSuffix(".pyx"))
-
-def removeCFiles():
-    for path in iterPathsWithSuffix(".c"):
-        os.remove(path)
-    print("Remove generated .c files.")
-
-def removeCompiledFiles():
-    for path in iterPathsWithSuffix(".so"):
-        os.remove(path)
-    for path in iterPathsWithSuffix(".pyd"):
-        os.remove(path)
-    print("Remove compiled files.")
-
-
-
-# Compilation Info File
-###################################################################
-
-def writeCompilationInfoFile():
-    import Cython
-
-    info = {}
-    info["sys.version"] = sys.version
-    info["sys.platform"] = sys.platform
-    info["sys.api_version"] = sys.api_version
-    info["sys.version_info"] = sys.version_info
-    info["Cython.__version__"] = Cython.__version__
-    info["os.name"] = os.name
-
-    import json
-    writeFile(compilationInfoPath, json.dumps(info, indent = 4))
-
-
-# Copy to Blenders addons directory
-###################################################################
-
-def copyToBlender():
-    print("\n\nCopy changes to addon folder")
-    targetPath = join(config["addonsDirectory"], addonName)
-    try:
-        copyAddonFiles(sourceDirectory, targetPath, verbose = True)
-    except PermissionError:
-        traceback.print_exc()
-        print("\n\nMaybe this error happens because Blender is running.")
+def setupConfigFile():
+    if not fileExists(defaultConfigPath):
+        print("Expected conf.default.json file to exist.")
         sys.exit()
-    print("\nCopied all changes")
+    if not fileExists(configPath):
+        copyFile(defaultConfigPath, configPath)
+        print(textwrap.dedent('''\
+        Copied the conf.default.json file to conf.json.
+        Please change it manually if needed.
+        Note: git ignorers it, so depending on the settings of your editor
+              it might not be shows inside it.
+        '''))
+    return readJsonFile(configPath)
 
 
+# Help
+####################################################
 
-# Export Build
-###################################################################
+def main_Help():
+    print(textwrap.dedent('''\
+    usage: python setup.py <command> [options]
 
-def export():
-    print("\nStart Export")
+    Possible commands:
+        help                Show this help
+        build               Build the addon from sources
+        clean               Remove all untracked files except conf.py
 
-    targetPath = join(currentDirectory, addonName + ".zip")
-    zipAddonDirectory(sourceDirectory, targetPath)
-
-    print("Finished Export")
-    print("Zipped file can be found here:")
-    print("  " + targetPath)
-
-
-
-# Copy Addon Utilities
-###################################################################
-
-def copyAddonFiles(source, target, verbose = False):
-    if not os.path.isdir(target):
-        os.mkdir(target)
-
-    existingFilesInSource = set(iterRelativeAddonFiles(source))
-    existingFilesInTarget = set(iterRelativeAddonFiles(target))
-
-    counter = 0
-
-    filesToRemove = existingFilesInTarget - existingFilesInSource
-    for relativePath in filesToRemove:
-        path = join(target, relativePath)
-        removeFile(path)
-        if verbose: print("Removed File: ", path)
-        counter += 1
-
-    filesToCreate = existingFilesInSource - existingFilesInTarget
-    for relativePath in filesToCreate:
-        sourcePath = join(source, relativePath)
-        targetPath = join(target, relativePath)
-        copyFile(sourcePath, targetPath)
-        if verbose: print("Created File: ", targetPath)
-        counter += 1
-
-    filesToUpdate = existingFilesInSource.intersection(existingFilesInTarget)
-    for relativePath in filesToUpdate:
-        sourcePath = join(source, relativePath)
-        targetPath = join(target, relativePath)
-        sourceModificationTime = os.stat(sourcePath).st_mtime
-        targetModificationTime = os.stat(targetPath).st_mtime
-        if sourceModificationTime > targetModificationTime:
-            overwriteFile(sourcePath, targetPath)
-            if verbose: print("Updated File: ", targetPath)
-            counter += 1
-
-    print("Changed {} files.".format(counter))
-
-def removeFile(path):
-    try:
-        os.remove(path)
-    except:
-        if tryGetFileAccessPermission(path):
-            os.remove(path)
-
-def copyFile(source, target):
-    directory = dirname(target)
-    if not os.path.isdir(directory):
-        os.makedirs(directory)
-    shutil.copyfile(source, target)
-
-def overwriteFile(source, target):
-    removeFile(target)
-    copyFile(source, target)
+    The 'build' command has multiple options:'''))
+    for option, description in buildOptionDescriptions:
+        print("    {:20}{}".format(option, description))
 
 
-def iterRelativeAddonFiles(directory):
-    if not os.path.isdir(directory):
-        return
+# Clean
+####################################################
 
-    for root, folders, files in os.walk(directory, topdown = True):
-        for folder in folders:
-            if ignoreAddonDirectory(folder):
-                folders.remove(folder)
-
-        for fileName in files:
-            if not ignoreAddonFile(fileName):
-                yield relpath(join(root, fileName), directory)
-
-
-def ignoreAddonFile(name):
-    return name.endswith(".c") or name.endswith(".html")
-
-def ignoreAddonDirectory(name):
-    return name in {".git", "__pycache__"}
-
-def tryRemoveDirectory(path):
-    try: shutil.rmtree(path, onerror = handlePermissionError)
-    except FileNotFoundError: pass
-
-def handlePermissionError(function, path, excinfo):
-    if tryGetFileAccessPermission(path):
-        function(path)
+def main_Clean():
+    answer = input("Remove all files? [y/N] ").lower()
+    print()
+    if answer == "y":
+        removedFiles = removeUntrackedFiles(filesToKeep = ["conf.json"])["removed"]
+        print("Cleanup Finished.")
+        print("Removed {} files.".format(len(removedFiles)))
     else:
-        raise
+        print("Operation canceled.")
+        sys.exit()
 
-def tryGetFileAccessPermission(path):
-    import stat
-    if not os.access(path, os.W_OK):
-        os.chmod(path, stat.S_IWUSR)
-        return True
-    return False
+@returnChangedFileStates(currentDirectory)
+def removeUntrackedFiles(filesToKeep):
+    storedFiles = {}
+    for path in filesToKeep:
+        if fileExists(path):
+            storedFiles[path] = readBinaryFile(path)
 
-def zipAddonDirectory(sourcePath, targetPath):
-    try: os.remove(targetPath)
-    except FileNotFoundError: pass
+    try:
+        pipe = subprocess.PIPE
+        subprocess.run(["git", "clean", "-fdx"], stdout = pipe, stderr = pipe)
+    except FileNotFoundError:
+        print("git is required but not installed")
+        sys.exit()
 
-    import zipfile
-    with zipfile.ZipFile(targetPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
-        for relativePath in iterRelativeAddonFiles(sourcePath):
-            absolutePath = join(sourcePath, relativePath)
-            zipFile.write(absolutePath, join(addonName, relativePath))
+    for path, content in storedFiles.items():
+        writeBinaryFile(path, content)
 
 
 
-# Utils
-###################################################################
+# Build
+####################################################
 
-def iterPathsWithSuffix(suffix):
-    for root, dirs, files in os.walk(sourceDirectory):
-        for fileName in files:
-            if fileName.endswith(suffix):
-                yield join(root, fileName)
+def main_Build(options, configs):
+    checkBuildEnvironment(
+        checkCython = True,
+        checkPython = "--noversioncheck" not in options and "--nocompile" not in options
+    )
+    checkBuildOptions(options)
 
-def writeFile(path, content):
-    with open(path, "wt") as f:
-        f.write(content)
-    print("Changed File:", path)
+    changedFileStates = build(skipCompilation = "--nocompile" in options)
+    printChangedFileStates(changedFileStates, currentDirectory)
 
-def readFile(path):
-    with open(path, "rt") as f:
-        return f.read()
+    if "--copy" in options:
+        copyTarget = configs["Copy Target"]
+        if not directoryExists(copyTarget):
+            print("Copy Target not found. Please correct the conf.json file.")
+        else:
+            execute_CopyAddon(addonDirectory, configs["Copy Target"], addonName)
+            print()
+    if "--export" in options:
+        execute_Export(addonDirectory, exportPath, addonName)
+    if "--exportc" in options:
+        execute_ExportC(addonDirectory, exportCPath, exportCSetupPath, addonName)
 
-def changeFileName(path, newName):
-    return join(dirname(path), newName)
+def printChangedFileStates(states, basepath):
+    printHeader("File System Changes")
 
-def multiReplace(text, **replacements):
-    for key, value in replacements.items():
-        text = text.replace(key, value)
-    return text
+    print("New Files:")
+    printIndentedPathList(states["new"], basepath)
+    print("\nRemoved Files:")
+    printIndentedPathList(states["removed"], basepath)
+    print("\nModified Files:")
+    printIndentedPathList(states["changed"], basepath)
 
-def dependenciesChanged(target, dependencies):
-    try: targetTime = os.stat(target).st_mtime
-    except FileNotFoundError: targetTime = 0
-    latestDependencyModification = max(os.stat(path).st_mtime for path in dependencies)
-    return targetTime < latestDependencyModification
+def printIndentedPathList(paths, basepath):
+    if len(paths) == 0:
+        print("  <none>")
+    else:
+        for path in sorted(paths):
+            print("  {}".format(os.path.relpath(path, basepath)))
+
+@returnChangedFileStates(currentDirectory)
+def build(skipCompilation = False):
+    setupInfoList = getSetupInfoList(addonDirectory)
+
+    execute_PyPreprocess(setupInfoList, addonDirectory)
+    execute_Cythonize(setupInfoList, addonDirectory)
+
+    if not skipCompilation:
+        execute_CompileLibraries(setupInfoList, addonDirectory)
+        execute_Compile(setupInfoList, addonDirectory)
+
+def checkBuildEnvironment(checkCython, checkPython):
+    if checkCython:
+        try: import Cython
+        except:
+            print("Cython is not installed for this Python version.")
+            print(sys.version)
+            sys.exit()
+    if checkPython:
+        v = sys.version_info
+        if v.major != 3 or v.minor != 7:
+            print(textwrap.dedent('''\
+            Blender 2.8 officially uses Python 3.7.x.
+            You are using: {}
+
+            Use the --noversioncheck option to disable this check.\
+            '''.format(sys.version)))
+            sys.exit()
+
+def checkBuildOptions(options):
+    options = set(options)
+    invalidOptions = options - buildOptions
+    if len(invalidOptions) > 0:
+        print("Invalid build options: {}\n".format(invalidOptions))
+        print(helpNote)
+        sys.exit()
+
+    if "--nocompile" in options:
+        if "--copy" in options:
+            print("The options --nocompile and --copy don't work together.")
+            sys.exit()
+        if "--export" in options:
+            print("The options --nocompile and --export don't work together.")
+            sys.exit()
+
+
+# Run Main
+###############################################
 
 main()

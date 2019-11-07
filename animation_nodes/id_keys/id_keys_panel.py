@@ -6,10 +6,10 @@ from .. utils.operators import makeOperator
 hiddenIDKeys = set()
 
 class IDKeyPanel(bpy.types.Panel):
-    bl_idname = "an_id_keys_panel"
+    bl_idname = "AN_PT_id_keys_panel"
     bl_label = "ID Keys"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_category = "AN"
 
     def draw(self, context):
@@ -21,7 +21,7 @@ class IDKeyPanel(bpy.types.Panel):
     def drawHeader(self, layout):
         col = layout.column(align = True)
         row = col.row(align = True)
-        row.operator("an.new_id_key", text = "New", icon = "NEW")
+        row.operator("an.new_id_key", text = "New", icon = "FILE_NEW")
         row.operator("an.update_id_keys_list", text = "Update", icon = "FILE_REFRESH")
         self.drawIDKeyList(col)
 
@@ -35,7 +35,7 @@ class IDKeyPanel(bpy.types.Panel):
                                  icon = icon, emboss = False)
             props.dataType = idKey.type
             props.propertyName = idKey.name
-            row.label(idKey.name)
+            row.label(text = idKey.name)
 
             if idKey not in unremovableIDKeys:
                 props = row.operator("an.remove_id_key", text = "", icon = "X", emboss = False)
@@ -56,11 +56,11 @@ class IDKeyPanel(bpy.types.Panel):
 
     def drawIDKeyHeader(self, layout, object, idKey, exists):
         left, right = splitAlignment(layout)
-        left.label(idKey.name)
+        left.label(text = idKey.name)
 
         if exists:
             props = right.operator("an.open_copy_id_key_menu",
-                                   text = "", icon = "GHOST", emboss = False)
+                                   text = "", icon = "COPYDOWN", emboss = False)
             props.keyDataType = idKey.type
             props.keyName = idKey.name
 
@@ -76,14 +76,14 @@ class IDKeyPanel(bpy.types.Panel):
 
 @makeOperator("an.create_id_key_on_selected_objects",
               "Create ID Key", arguments = ["String", "String"],
-              description = "Create this ID Key on selected objects.")
+              description = "Create this ID Key on selected objects")
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.create(dataType, propertyName)
 
 @makeOperator("an.remove_id_key_on_selected_objects",
               "Remove ID Key", arguments = ["String", "String"], confirm = True,
-              description = "Remove this ID Key on selected objects.")
+              description = "Remove this ID Key on selected objects")
 def createIDKeyOnSelectedObjects(dataType, propertyName):
     for object in bpy.context.selected_objects:
         object.id_keys.remove(dataType, propertyName)

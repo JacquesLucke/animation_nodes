@@ -7,7 +7,7 @@ from ... events import executionCodeChanged
 class AnimateDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AnimateDataNode"
     bl_label = "Animate Data"
-    bl_width_default = 150
+    bl_width_default = 160
     dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
@@ -18,7 +18,7 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
                    ("Animate Euler", {"dataType" : repr("Euler")}),
                    ("Animate Quaternion", {"dataType" : repr("Quaternion")}) ]
 
-    dataType = StringProperty(default = "Float", update = AnimationNode.refresh)
+    dataType: StringProperty(default = "Float", update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Float", "Time", "time")
@@ -33,7 +33,7 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "Animate " + self.inputs[1].dataType
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "finalDuration = max(duration, 0.0001)"
         yield "influence = max(min(time / finalDuration, 1.0), 0.0)"
         yield "influence = interpolation(influence)"

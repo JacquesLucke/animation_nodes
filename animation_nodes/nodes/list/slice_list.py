@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
-from ... sockets.info import isBase, toBaseDataType, toListDataType
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... sockets.info import isBase, toBaseDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 sliceEndType = [
     ("END_INDEX", "Index", "", "NONE", 0),
@@ -10,24 +10,26 @@ sliceEndType = [
 class SliceListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SliceListNode"
     bl_label = "Slice List"
-    bl_width_default = 170
+    bl_width_default = 180
 
-    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float")
 
-    useStart = BoolProperty(name = "Start", default = True,
+    useStart: BoolProperty(name = "Start", default = True,
         update = AnimationNode.refresh)
-    useEnd = BoolProperty(name = "End", default = True,
+    useEnd: BoolProperty(name = "End", default = True,
         update = AnimationNode.refresh)
-    useStep = BoolProperty(name = "Step", default = False,
+    useStep: BoolProperty(name = "Step", default = False,
         update = AnimationNode.refresh)
 
-    sliceEndType = EnumProperty(name = "Slice Type", default = "END_INDEX",
+    sliceEndType: EnumProperty(name = "Slice Type", default = "END_INDEX",
         items = sliceEndType, update = AnimationNode.refresh)
 
     def create(self):
-        listDataType = toListDataType(self.assignedType)
+        prop = ("assignedType", "BASE")
 
-        self.newInput(listDataType, "List", "list", dataIsModified  = True)
+        self.newInput(ListTypeSelectorSocket(
+            "List", "list", "LIST", prop, dataIsModified = True))
+
         if self.useStart:
             self.newInput("Integer", "Start", "start")
         if self.useEnd:
@@ -37,12 +39,9 @@ class SliceListNode(bpy.types.Node, AnimationNode):
                 self.newInput("Integer", "Length", "length")
         if self.useStep:
             self.newInput("Integer", "Step", "step", value = 1)
-        self.newOutput(listDataType, "List", "slicedList")
 
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
-            [(self.inputs[0], "LIST"),
-             (self.outputs[0], "LIST")]
-        ))
+        self.newOutput(ListTypeSelectorSocket(
+            "List", "slicedList", "LIST", prop))
 
     def draw(self, layout):
         col = layout.column()
@@ -57,7 +56,7 @@ class SliceListNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(layout, "DATA_TYPE", "assignListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useStart: yield "_start = start"
         else:             yield "_start = 0"
 
@@ -82,3 +81,4 @@ class SliceListNode(bpy.types.Node, AnimationNode):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
+        self.refresh()

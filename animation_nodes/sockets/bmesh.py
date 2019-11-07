@@ -6,8 +6,7 @@ class BMeshSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_BMeshSocket"
     bl_label = "BMesh Socket"
     dataType = "BMesh"
-    allowedInputTypes = ["BMesh"]
-    drawColor = (0.1, 0.4, 0.1, 1) 
+    drawColor = (0.1, 0.4, 0.1, 1)
     storable = False
     comparable = True
 

@@ -22,6 +22,7 @@ def joinInBezierSpline(splines):
     for spline in splines:
         newSpline.points.extend(spline.points)
         newSpline.radii.extend(spline.radii)
+        newSpline.tilts.extend(spline.tilts)
         if isinstance(spline, PolySpline):
             newSpline.leftHandles.extend(spline.points)
             newSpline.rightHandles.extend(spline.points)

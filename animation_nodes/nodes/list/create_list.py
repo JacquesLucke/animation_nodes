@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from ... utils.selection import getSortedSelectedObjectNames
+from ... utils.selection import getSortedSelectedObjects
 from ... sockets.info import getListDataTypes, toBaseDataType, toListDataType
 
 class CreateListNode(bpy.types.Node, AnimationNode):
@@ -18,13 +18,13 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     def assignedTypeChanged(self, context):
         self.recreateSockets()
 
-    assignedType = StringProperty(update = assignedTypeChanged)
+    assignedType: StringProperty(update = assignedTypeChanged)
 
     def hideStatusChanged(self, context):
         for socket in self.inputs:
             socket.hide = self.hideInputs
 
-    hideInputs = BoolProperty(name = "Hide Inputs", default = False, update = hideStatusChanged)
+    hideInputs: BoolProperty(name = "Hide Inputs", default = False, update = hideStatusChanged)
 
     def setup(self):
         self.assignedType = "Float"
@@ -58,7 +58,7 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     def getInputSocketVariables(self):
         return {socket.identifier : "element_" + str(i) for i, socket in enumerate(self.inputs)}
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         variableNames = ["element_" + str(i) for i, socket in enumerate(self.inputs) if socket.dataType != "Node Control"]
         createPyListExpression = "[" + ", ".join(variableNames) + "]"
         createListExpression = self.outputs[0].getFromValuesCode().replace("value", createPyListExpression)
@@ -125,23 +125,23 @@ class CreateListNode(bpy.types.Node, AnimationNode):
     def drawAdvancedTypeSpecific(self, layout):
         if self.assignedType in ("Object", "Spline"):
             self.invokeFunction(layout, "createInputsForSelectedObjects", text = "From Selection", icon = "PLUS")
-        if self.assignedType == "Object Group":
-            self.invokeFunction(layout, "createInputsForSelectedObjectGroups", text = "From Selection", icon = "PLUS")
+        if self.assignedType == "Collection":
+            self.invokeFunction(layout, "createInputsForSelectedObjectCollections", text = "From Selection", icon = "PLUS")
 
     def createInputsForSelectedObjects(self):
-        names = getSortedSelectedObjectNames()
-        for name in names:
+        objects = getSortedSelectedObjects()
+        for obj in objects:
             socket = self.newInputSocket()
-            socket.objectName = name
+            socket.object = obj
 
-    def createInputsForSelectedObjectGroups(self):
-        groups = self.getGroupsOfObjects(bpy.context.selected_objects)
-        for group in groups:
+    def createInputsForSelectedObjectCollections(self):
+        collections = self.getCollectionsOfObjects(bpy.context.selected_objects)
+        for collection in collections:
             socket = self.newInputSocket()
-            socket.groupName = group.name
+            socket.collectionName = collection.name
 
-    def getGroupsOfObjects(self, objects):
-        groups = set()
+    def getCollectionsOfObjects(self, objects):
+        collections = set()
         for object in objects:
-            groups.update(group for group in bpy.data.groups if object.name in group.objects)
-        return list(groups)
+            collections.update(col for col in bpy.data.collections if object.name in col.objects)
+        return list(collections)

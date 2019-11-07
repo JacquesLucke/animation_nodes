@@ -8,11 +8,11 @@ from . c_utils import random_DoubleList
 class RandomNumberNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomNumberNode"
     bl_label = "Random Number"
-    bl_width_default = 150
+    bl_width_default = 160
 
-    nodeSeed = IntProperty(update = propertyChanged)
+    nodeSeed: IntProperty(update = propertyChanged)
 
-    createList = BoolProperty(name = "Create List", default = False,
+    createList: BoolProperty(name = "Create List", default = False,
         description = "Create a list of random numbers",
         update = AnimationNode.refresh)
 
@@ -37,11 +37,11 @@ class RandomNumberNode(bpy.types.Node, AnimationNode):
         row.prop(self, "nodeSeed", text = "Node Seed")
         row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.createList:
             yield "numbers = self.calcRandomNumbers(seed, count, minValue, maxValue)"
         else:
-            yield "number = algorithms.random.uniformRandomNumberWithTwoSeeds(seed, self.nodeSeed, minValue, maxValue)"
+            yield "number = algorithms.random.uniformRandomDoubleWithTwoSeeds(seed, self.nodeSeed, minValue, maxValue)"
 
     def calcRandomNumbers(self, seed, count, minValue, maxValue):
         _seed = seed * 234123 + self.nodeSeed * 1234434

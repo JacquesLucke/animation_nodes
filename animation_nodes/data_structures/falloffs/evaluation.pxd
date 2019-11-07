@@ -1,5 +1,8 @@
 cdef class FalloffEvaluator:
-    '''The evaluator of a falloff is only valid while the falloff exists'''
-    cdef object pyEvaluator
+    cdef str sourceType
 
-    cdef double evaluate(self, void* value, long index)
+    cdef float evaluate(self, void *value, Py_ssize_t index)
+    cdef pyEvaluate(self, object value, Py_ssize_t index)
+
+    cdef void evaluateList_LowLevel(self, void *values, Py_ssize_t startIndex,
+                                    Py_ssize_t amount, float *target)

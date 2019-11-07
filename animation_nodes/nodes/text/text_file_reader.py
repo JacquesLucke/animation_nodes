@@ -11,9 +11,8 @@ cache = {}
 class TextFileReaderNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TextFileReaderNode"
     bl_label = "Text File Reader"
-    bl_width_default = 170
-
-    errorMessage = StringProperty()
+    bl_width_default = 180
+    errorHandlingType = "EXCEPTION"
 
     def create(self):
         self.newInput("Text", "Path", "path", showFileChooser = True)
@@ -24,10 +23,7 @@ class TextFileReaderNode(bpy.types.Node, AnimationNode):
         if self.inputs[0].isUnlinked:
             name = os.path.basename(self.inputs[0].value)
             if name != "":
-                layout.label(name, icon = "FILE_TEXT")
-
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
+                layout.label(text = name, icon = "FILE_TEXT")
 
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "clearCache", text = "Clear Cache")
@@ -36,11 +32,8 @@ class TextFileReaderNode(bpy.types.Node, AnimationNode):
         cache.clear()
 
     def execute(self, path, encoding):
-        self.errorMessage = ""
-
         if not os.path.exists(path):
-            self.errorMessage = "Path does not exist"
-            return ""
+            self.raiseErrorMessage("Path does not exist")
 
         key = (path, encoding)
 
@@ -60,8 +53,8 @@ class TextFileReaderNode(bpy.types.Node, AnimationNode):
                     data = f.read()
                 cache[key] = (lastModification, data)
             except LookupError:
-                self.errorMessage = "Invalid Encoding"
+                self.raiseErrorMessage("Invalid Encoding")
             except:
-                self.errorMessage = "Encoding Error"
+                self.raiseErrorMessage("Encoding Error")
 
         return cache.get(key, (0, ""))[1]

@@ -15,7 +15,7 @@ cdef class CList:
     cdef Py_ssize_t getCapacity(self):
         raise NotImplementedError()
 
-    def repeated(self, *, Py_ssize_t length = -1, Py_ssize_t amount = -1):
+    def repeated(self, *, Py_ssize_t length = -1, Py_ssize_t amount = -1, default = None):
         if length < 0 and amount < 0:
             raise ValueError("'length' or 'amount' has to be non-negative")
         elif length > 0 and amount > 0:
@@ -26,8 +26,14 @@ cdef class CList:
         if amount >= 0:
             length = oldLength * amount
 
-        if oldLength == 0 and length > 0:
-            raise ValueError("Cannot repeat a list with zero elements to something longer")
+        if oldLength == 0:
+            if length == 0:
+                return type(self)()
+            else:
+                if default is None:
+                    raise ValueError("Cannot repeat a list with zero elements to something longer without a default")
+                else:
+                    return type(self).fromValue(default, length = length)
 
         if length <= oldLength:
             return self[:length]

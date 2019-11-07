@@ -6,11 +6,11 @@ class RenameDatablockPopupOperator(bpy.types.Operator):
     bl_idname = "an.rename_datablock_popup"
     bl_label = "Rename Datablock"
 
-    oldName = StringProperty()
-    newName = StringProperty()
+    oldName: StringProperty()
+    newName: StringProperty()
 
-    icon = StringProperty(default = "NONE")
-    path = StringProperty(default = "bpy.data.objects")
+    icon: StringProperty(default = "NONE")
+    path: StringProperty(default = "bpy.data.objects")
 
     def invoke(self, context, event):
         self.newName = self.oldName
@@ -22,7 +22,7 @@ class RenameDatablockPopupOperator(bpy.types.Operator):
     def draw(self, context):
         dataBlock = self.getDatablock()
         if dataBlock is None:
-            self.layout.label("The datablock does not exist.", icon = "INFO")
+            self.layout.label(text = "The datablock does not exist.", icon = "INFO")
         else:
             self.layout.prop(self, "newName", text = "", icon = self.icon)
 

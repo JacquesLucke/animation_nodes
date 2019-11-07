@@ -11,7 +11,7 @@ class EvaluateFCurveNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_EvaluateFCurveNode"
     bl_label = "Evaluate FCurve"
 
-    frameType = EnumProperty(
+    frameType: EnumProperty(
         name = "Frame Type", default = "OFFSET",
         items = frameTypeItems, update = executionCodeChanged)
 
@@ -23,7 +23,7 @@ class EvaluateFCurveNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "frameType", text = "Frame")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "evaluationFrame = frame"
         if self.frameType == "OFFSET":
             yield "evaluationFrame += self.nodeTree.scene.frame_current_final"

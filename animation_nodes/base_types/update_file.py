@@ -1,7 +1,11 @@
 import traceback
 from .. import tree_info
 from .. utils.timing import measureTime
-from .. utils.nodes import getAnimationNodeTrees, iterAnimationNodes
+from .. utils.nodes import (
+    iterAnimationNodes,
+    getAnimationNodeTrees,
+    iterNodesInAnimationNodeTrees
+)
 
 @measureTime
 def updateFile():
@@ -31,7 +35,10 @@ def updateFile():
 ##############################################
 
 def removeUndefinedSockets():
-    for node in iterAnimationNodes():
+    for node in iterNodesInAnimationNodeTrees():
+        if node.bl_idname == "NodeReroute":
+            continue
+
         for socket in node.inputs:
             if not socket.isAnimationNodeSocket:
                 removeSocket(node.inputs, socket)

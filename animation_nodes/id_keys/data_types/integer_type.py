@@ -25,7 +25,7 @@ class IntegerDataType(SingleIDKeyDataType):
 
     @classmethod
     def drawCopyMenu(cls, layout, object, name):
-        props = layout.operator("an.copy_id_key_to_attribute", "to Pass Index")
+        props = layout.operator("an.copy_id_key_to_attribute", text = "to Pass Index")
         props.dataType = "Integer"
         props.propertyName = name
         props.attribute = "pass_index"
@@ -36,11 +36,11 @@ class IntegerDataType(SingleIDKeyDataType):
 ###########################################
 
 sortModeItems = [
-    ("SELECTION_ORDER", "Selection Order", "", "BORDER_RECT", 0),
+    ("SELECTION_ORDER", "Selection Order", "", "BORDERMOVE", 0),
     ("NAME", "Object Name", "Sort objects alphanumerically", "SORTALPHA", 1),
     ("DISTANCE", "Distance", "Sort by distance to active object", "FULLSCREEN_ENTER", 2),
     ("RANDOM", "Random", "", "MOD_PARTICLES", 3),
-    ("AXIS", "Axis", "", "MANIPUL", 4)
+    ("AXIS", "Axis", "", "ORIENTATION_GLOBAL", 4)
 ]
 
 axisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
@@ -53,19 +53,19 @@ locationModeItems = [
 class IDKeysFromSortedObjects(bpy.types.Operator):
     bl_idname = "an.id_keys_from_sorted_objects"
     bl_label = "ID Keys from Sorted Objects"
-    bl_description = "Assign ID Keys based on the selected sorting method."
+    bl_description = "Assign ID Keys based on the selected sorting method"
 
-    idKeyName = StringProperty()
-    sortMode = EnumProperty(name = "Sorting Method", default = "SELECTION_ORDER",
+    idKeyName: StringProperty()
+    sortMode: EnumProperty(name = "Sorting Method", default = "SELECTION_ORDER",
         items = sortModeItems)
 
-    offset = IntProperty(name = "Offset", default = 0)
-    reverse = BoolProperty(name = "Reverse", default = False)
+    offset: IntProperty(name = "Offset", default = 0)
+    reverse: BoolProperty(name = "Reverse", default = False)
 
-    axis = EnumProperty(name = "Axis", default = "X", items = axisItems)
-    threshold = FloatProperty(name = "Threshold", default = 0.01,
+    axis: EnumProperty(name = "Axis", default = "X", items = axisItems)
+    threshold: FloatProperty(name = "Threshold", default = 0.01,
         description = "Objects with similar location should get the same index")
-    locationMode = EnumProperty(name = "Location Mode", default = "ORIGIN",
+    locationMode: EnumProperty(name = "Location Mode", default = "ORIGIN",
         items = locationModeItems)
 
     def invoke(self, context, event):
@@ -84,7 +84,7 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
             layout.prop(self, "threshold")
         elif self.sortMode == "DISTANCE":
             if context.active_object is None:
-                layout.label("No active object.", icon = "INFO")
+                layout.label(text = "No active object.", icon = "INFO")
             else:
                 layout.prop(self, "locationMode", text = "Location")
                 layout.prop(self, "threshold")

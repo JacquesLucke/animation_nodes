@@ -5,7 +5,7 @@ from libc.string cimport memcpy
 from . shuffle import shuffle_CList
 from ... utils.limits cimport INT_MAX
 from ... sockets.info import getSocketClass
-from .. random cimport randomNumber_Positive
+from .. random cimport randomDouble_Positive
 from ... data_structures cimport CList, PolygonIndicesList, IntegerList, LongList
 
 def sample(str dataType, myList, amount, seed):
@@ -104,7 +104,7 @@ cdef void selectUniqueIndices_Naive(int listLength, int amount, int seed, int* i
         while True:
             k += 1
             indexTaken = False
-            index = <int>(randomNumber_Positive(seed + k * 242243 + i * 341345) * _indexFactor)
+            index = <int>(randomDouble_Positive(seed + k * 242243 + i * 341345) * _indexFactor)
 
             for j in range(i):
                 if index == indicesOut[j]:
@@ -130,7 +130,7 @@ cdef void selectUniqueIndices_ReservoirSampling(int listLength, int amount, int 
 
     while elementsToPick > 0:
         propability = elementsToPick / elementsLeft
-        if randomNumber_Positive(seed + i * 6745629) < propability:
+        if randomDouble_Positive(seed + i * 6745629) < propability:
             indicesOut[k] = i
             elementsToPick -= 1
             k += 1

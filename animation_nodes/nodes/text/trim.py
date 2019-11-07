@@ -7,13 +7,13 @@ class TrimTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TrimTextNode"
     bl_label = "Trim Text"
 
-    trimStart = BoolProperty(name = "Trim Start", default = False,
+    trimStart: BoolProperty(name = "Trim Start", default = False,
         update = AnimationNode.refresh)
 
-    trimEnd = BoolProperty(name = "Trim End", default = True,
+    trimEnd: BoolProperty(name = "Trim End", default = True,
         update = AnimationNode.refresh)
 
-    allowNegativeIndex = BoolProperty(name = "Allow Negative Index", default = False,
+    allowNegativeIndex: BoolProperty(name = "Allow Negative Index", default = False,
         update = executionCodeChanged)
 
     def create(self):
@@ -32,7 +32,7 @@ class TrimTextNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "allowNegativeIndex", text = "Negative Indices")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if not self.trimStart:
             yield "start = 0"
         if not self.trimEnd:

@@ -9,7 +9,7 @@ collectionNameByType = {
     "META" : "metaballs",
     "ARMATURE" : "armatures",
     "LATTICE" : "lattices",
-    "LAMP" : "lamps",
+    "LIGHT" : "lights",
     "SPEAKER" : "speakers"
 }
 

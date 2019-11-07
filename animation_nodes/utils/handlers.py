@@ -12,10 +12,10 @@ def validCallback(function):
 # Event Handler System
 ###########################################################
 
+alwaysHandlers = []
 fileSavePreHandlers = []
 fileLoadPostHandlers = []
 addonLoadPostHandlers = []
-sceneUpdatePostHandlers = []
 frameChangePostHandlers = []
 
 renderPreHandlers = []
@@ -25,10 +25,10 @@ renderCompleteHandlers = []
 
 def eventHandler(event):
     def eventHandlerDecorator(function):
+        if event == "ALWAYS": alwaysHandlers.append(function)
         if event == "FILE_SAVE_PRE": fileSavePreHandlers.append(function)
         if event == "FILE_LOAD_POST": fileLoadPostHandlers.append(function)
         if event == "ADDON_LOAD_POST": addonLoadPostHandlers.append(function)
-        if event == "SCENE_UPDATE_POST": sceneUpdatePostHandlers.append(function)
         if event == "FRAME_CHANGE_POST": frameChangePostHandlers.append(function)
 
         if event == "RENDER_INIT": renderInitHandlers.append(function)
@@ -39,16 +39,16 @@ def eventHandler(event):
     return eventHandlerDecorator
 
 addonChanged = False
-@persistent
-def sceneUpdatePost(scene):
-    for handler in sceneUpdatePostHandlers:
-        handler(scene)
+def always():
+    for handler in alwaysHandlers:
+        handler()
 
     global addonChanged
     if addonChanged:
         addonChanged = False
         for handler in addonLoadPostHandlers:
             handler()
+    return 0
 
 @persistent
 def savePre(scene):
@@ -87,7 +87,7 @@ def renderCompleted(scene):
 
 def register():
     bpy.app.handlers.frame_change_post.append(frameChangedPost)
-    bpy.app.handlers.scene_update_post.append(sceneUpdatePost)
+    bpy.app.timers.register(always, persistent = True)
     bpy.app.handlers.load_post.append(loadPost)
     bpy.app.handlers.save_pre.append(savePre)
 
@@ -101,9 +101,9 @@ def register():
 
 def unregister():
     bpy.app.handlers.frame_change_post.remove(frameChangedPost)
-    bpy.app.handlers.scene_update_post.remove(sceneUpdatePost)
     bpy.app.handlers.load_post.remove(loadPost)
     bpy.app.handlers.save_pre.remove(savePre)
+    bpy.app.timers.unregister(always)
 
     bpy.app.handlers.render_complete.remove(renderCompleted)
     bpy.app.handlers.render_init.remove(renderInitialized)

@@ -134,7 +134,7 @@ class LinkedAnimationNodeTreeExists(Problem):
         return False
 
     def draw(self, layout):
-        layout.label("AN doesn't support linked node trees.")
+        layout.label(text = "AN doesn't support linked node trees.")
 
 class UndefinedNodeExists(Problem):
     def __init__(self, nodes):
@@ -169,7 +169,7 @@ class NodeMustNotBeInSubprogram(Problem):
 
     def draw(self, layout):
         node = getNodeByIdentifier(self.nodeIdentifier)
-        layout.label("{} must not be in a subprogram".format(repr(node.name)))
+        layout.label(text = "{} must not be in a subprogram".format(repr(node.name)))
 
 class NodeShouldNotBeUsedInAutoExecution(Problem):
     def __init__(self, nodeIdentifier):
@@ -180,7 +180,7 @@ class NodeShouldNotBeUsedInAutoExecution(Problem):
 
     def draw(self, layout):
         node = getNodeByIdentifier(self.nodeIdentifier)
-        layout.label("{} should not be used with auto execution.".format(repr(node.name)))
+        layout.label(text = "{} should not be used with auto execution.".format(repr(node.name)))
 
 class NodeDoesNotSupportExecution(Problem):
     def __init__(self, nodeIdentifier):
@@ -191,7 +191,7 @@ class NodeDoesNotSupportExecution(Problem):
 
     def draw(self, layout):
         node = getNodeByIdentifier(self.nodeIdentifier)
-        layout.label("{} does not support excecution".format(repr(node.name)))
+        layout.label(text = "{} does not support excecution".format(repr(node.name)))
 
 
 # During Code Creation

@@ -9,6 +9,6 @@ class UpdateObjectMatricesNode(bpy.types.Node, AnimationNode):
         self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
         self.newOutput("Object", "Object", "object")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "if object:"
         yield "    object.matrix_world = animation_nodes.utils.math.composeMatrix(object.location, object.rotation_euler, object.scale)"

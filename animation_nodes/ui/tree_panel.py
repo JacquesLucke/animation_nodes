@@ -5,11 +5,10 @@ from .. utils.timing import prettyTime
 from .. preferences import getExecutionCodeSettings
 
 class TreePanel(bpy.types.Panel):
-    bl_idname = "an_tree_panel"
+    bl_idname = "AN_PT_tree_panel"
     bl_label = "Animation Node Tree"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "TOOLS"
-    bl_category = "Animation Nodes"
 
     @classmethod
     def poll(cls, context):
@@ -27,14 +26,14 @@ class TreePanel(bpy.types.Panel):
         props.name = tree.name
 
         if not canExecute():
-            layout.label("Look in the 'Problems' panel", icon = "INFO")
+            layout.label(text = "Look in the 'Problems' panel", icon = "INFO")
 
         row = layout.row(align = True)
-        row.label(prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
+        row.label(text = prettyTime(tree.lastExecutionInfo.executionTime), icon = "TIME")
         row.prop(getExecutionCodeSettings(), "measureExecution", text = "Details", emboss = False)
 
         layout.separator()
-        layout.prop_search(tree, "sceneName", bpy.data, "scenes", icon = "SCENE_DATA", text = "Scene")
+        layout.prop(tree, "globalScene", icon = "SCENE_DATA", text = "Scene")
         layout.prop(tree, "editNodeLabels")
 
 

@@ -1,21 +1,26 @@
+import os
 import bpy
 from bpy.props import *
 from ... draw_handler import drawHandler
 from ... base_types import AnimationNode
 from ... tree_info import getNodesByType
 from ... utils.blender_ui import redrawAll
-from ... graphics.c_utils import drawVector3DListPoints, drawMatrix4x4List
-from ... graphics.opengl import createDisplayList, drawDisplayList, freeDisplayList
 
 from mathutils import Vector, Matrix
 from ... data_structures import Vector3DList, Matrix4x4List
 
+import gpu
+from bgl import *
+from gpu_extras.batch import batch_for_shader
+from ... graphics.import_shader import getShader
+from ... graphics.c_utils import getMatricesVBOandIBO
+
 dataByIdentifier = {}
 
 class DrawData:
-    def __init__(self, data, displayList):
+    def __init__(self, data, drawFunction):
         self.data = data
-        self.displayList = displayList
+        self.drawFunction = drawFunction
 
 drawableDataTypes = (Vector3DList, Matrix4x4List, Vector, Matrix)
 
@@ -30,16 +35,13 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
     def redrawViewport(self, context):
         redrawAll()
 
-    enabled = BoolProperty(name = "Enabled", default = True,
-        update = redrawViewport)
+    enabled: BoolProperty(name = "Enabled", default = True, update = redrawViewport)
 
-    pointSize = IntProperty(name = "Point Size", default = 2, min = 1,
-        update = drawPropertyChanged)
+    width: IntProperty(name = "Size", default = 2, min = 1, update = drawPropertyChanged)
 
-    matrixSize = FloatProperty(name = "Matrix Size", default = 1, min = 0,
-        update = drawPropertyChanged)
+    matrixScale: FloatProperty(name = "Scale", default = 1, update = drawPropertyChanged)
 
-    drawColor = FloatVectorProperty(name = "Draw Color",
+    drawColor: FloatVectorProperty(name = "Draw Color",
         default = [0.9, 0.9, 0.9], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0,
         update = drawPropertyChanged)
@@ -49,77 +51,72 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         data = self.getCurrentData()
-
         if data is None:
             return
 
         col = layout.column()
         row = col.row(align = True)
-        row.prop(self, "drawColor", text = "")
+        row.prop(self, "width", text = "Width")
         icon = "LAYER_ACTIVE" if self.enabled else "LAYER_USED"
         row.prop(self, "enabled", text = "", icon = icon)
 
-        if isinstance(data, (Matrix, Matrix4x4List)):
-            col.prop(self, "matrixSize", text = "Size")
-        elif isinstance(data, (Vector, Vector3DList)):
-            col.prop(self, "pointSize", text = "Size")
+        if isinstance(data, (Vector, Vector3DList)):
+            col.prop(self, "drawColor", text = "")
+        elif isinstance(data, (Matrix, Matrix4x4List)):
+            col.prop(self, "matrixScale", text = "Scale")
 
     def execute(self, data):
         self.freeDrawingData()
-        if isinstance(data, drawableDataTypes):
-            displayList = None
+        if not isinstance(data, drawableDataTypes):
+            return
+        if isinstance(data, Vector3DList):
+            dataByIdentifier[self.identifier] = DrawData(data, self.drawVectors)
+        elif isinstance(data, Vector):
+            dataByIdentifier[self.identifier] = DrawData(Vector3DList.fromValues([data]), self.drawVectors)
+        elif isinstance(data, Matrix4x4List):
+            dataByIdentifier[self.identifier] = DrawData(data, self.drawMatrices)
+        elif isinstance(data, Matrix):
+            dataByIdentifier[self.identifier] = DrawData(Matrix4x4List.fromValues([data]), self.drawMatrices)
 
-            if isinstance(data, Vector3DList):
-                displayList = createDisplayList(drawVectors, data, self.pointSize, self.drawColor)
-            elif isinstance(data, Matrix4x4List):
-                displayList = createDisplayList(drawMatrices, data, self.matrixSize, self.drawColor)
-            elif isinstance(data, Vector):
-                displayList = createDisplayList(drawVector, data, self.pointSize, self.drawColor)
-            elif isinstance(data, Matrix):
-                displayList = createDisplayList(drawMatrix, data, self.matrixSize, self.drawColor)
+    def drawVectors(self, vectors):
+        shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+        batch = batch_for_shader(shader, 'POINTS', {"pos": vectors.asNumpyArray().reshape(-1, 3)})
 
-            if displayList is not None:
-                dataByIdentifier[self.identifier] = DrawData(data, displayList)
+        shader.bind()
+        shader.uniform_float("color", (*self.drawColor, 1))
+
+        glPointSize(self.width)
+        batch.draw(shader)
+
+    def drawMatrices(self, matrices):
+        shader = getShader(os.path.join(os.path.dirname(__file__), "matrix_shader.glsl"))
+        vbo, ibo = getMatricesVBOandIBO(matrices, self.matrixScale)
+        batch = batch_for_shader(shader, 'LINES',
+            {"pos": vbo.asNumpyArray().reshape(-1, 3)},
+            indices = ibo.asNumpyArray().reshape(-1, 2))
+
+        shader.bind()
+        viewMatrix = bpy.context.region_data.perspective_matrix
+        shader.uniform_float("u_ViewProjectionMatrix", viewMatrix)
+        shader.uniform_int("u_Count", len(matrices))
+
+        glLineWidth(self.width)
+        batch.draw(shader)
 
     def delete(self):
         self.freeDrawingData()
 
     def freeDrawingData(self):
         if self.identifier in dataByIdentifier:
-            freeDisplayList(dataByIdentifier[self.identifier].displayList)
             del dataByIdentifier[self.identifier]
 
     def getCurrentData(self):
         if self.identifier in dataByIdentifier:
             return dataByIdentifier[self.identifier].data
 
-
-from bgl import *
-
-def drawVector(vector, pointSize, color):
-    drawVectors(Vector3DList.fromValues([vector]), pointSize, color)
-
-def drawMatrix(matrix, size, color):
-    drawMatrices(Matrix4x4List.fromValues([matrix]), size, color)
-
-def drawVectors(vectors, pointSize, color):
-    glEnable(GL_POINT_SIZE)
-    glEnable(GL_POINT_SMOOTH)
-    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST)
-    glPointSize(pointSize)
-    glColor3f(*color)
-
-    drawVector3DListPoints(vectors)
-
-    glDisable(GL_POINT_SIZE)
-    glDisable(GL_POINT_SMOOTH)
-
-def drawMatrices(matrices, size, color):
-    glColor3f(*color)
-    drawMatrix4x4List(matrices, size)
-
 @drawHandler("SpaceView3D", "WINDOW", "POST_VIEW")
 def draw():
     for node in getNodesByType("an_Viewer3DNode"):
         if node.enabled and node.identifier in dataByIdentifier:
-            drawDisplayList(dataByIdentifier[node.identifier].displayList)
+            drawData = dataByIdentifier[node.identifier]
+            drawData.drawFunction(drawData.data)

@@ -15,12 +15,18 @@ class ConstantFalloffNode(bpy.types.Node, AnimationNode):
 
 
 cdef class ConstantFalloff(BaseFalloff):
-    cdef double value
+    cdef float value
 
-    def __cinit__(self, double value):
+    def __cinit__(self, float value):
         self.value = value
         self.clamped = 0 <= value <= 1
-        self.dataType = "All"
+        self.dataType = "None"
 
-    cdef double evaluate(self, void* object, long index):
+    cdef float evaluate(self, void *object, Py_ssize_t index):
         return self.value
+
+    cdef void evaluateList(self, void *values, Py_ssize_t startIndex,
+                           Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        for i in range(amount):
+            target[i] = self.value

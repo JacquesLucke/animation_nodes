@@ -12,10 +12,10 @@ class InsertEmptySubprogram(bpy.types.Operator, NodeCreator):
     bl_idname = "an.insert_empty_subprogram"
     bl_label = "Insert Empty Subprogram"
 
-    subprogramType = EnumProperty(name = "Subprogram Type", items = subprogramTypeItems)
+    subprogramType: EnumProperty(name = "Subprogram Type", items = subprogramTypeItems)
 
     # optional
-    targetNodeIdentifier = StringProperty(default = "")
+    targetNodeIdentifier: StringProperty(default = "")
 
     def drawDialog(self, layout):
         layout.prop(self, "subprogramType")

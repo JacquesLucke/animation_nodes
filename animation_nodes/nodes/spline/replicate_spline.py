@@ -2,26 +2,26 @@ import bpy
 from bpy.props import *
 from mathutils import Matrix
 from ... data_structures import Spline
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 
 transformationTypeItems = [
     ("Matrix List", "Matrices", "", "NONE", 0),
     ("Vector List", "Vectors", "", "NONE", 1)
 ]
 
-class ReplicateSplineNode(bpy.types.Node, VectorizedNode):
+class ReplicateSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReplicateSplineNode"
     bl_label = "Replicate Spline"
 
-    useSplineList = VectorizedNode.newVectorizeProperty()
+    useSplineList: VectorizedSocket.newProperty()
 
-    transformationType = EnumProperty(name = "Transformation Type", default = "Matrix List",
-        items = transformationTypeItems, update = VectorizedNode.refresh)
+    transformationType: EnumProperty(name = "Transformation Type", default = "Matrix List",
+        items = transformationTypeItems, update = AnimationNode.refresh)
 
     def create(self):
-        self.newVectorizedInput("Spline", "useSplineList",
+        self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Splines", "splines"))
+            ("Splines", "splines")))
 
         self.newInput(self.transformationType, "Transformations", "transformations")
 

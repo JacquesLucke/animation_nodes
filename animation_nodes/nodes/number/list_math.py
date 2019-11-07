@@ -14,7 +14,7 @@ class NumberListMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_NumberListMathNode"
     bl_label = "Number List Math"
 
-    operation = EnumProperty(name = "Operation", default = "ADD",
+    operation: EnumProperty(name = "Operation", default = "ADD",
         items = operationItems, update = executionCodeChanged)
 
     def create(self):
@@ -24,7 +24,7 @@ class NumberListMathNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.operation == "ADD":
             yield "result = numbers.getSumOfElements()"
         elif self.operation == "MULTIPLY":

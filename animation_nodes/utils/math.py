@@ -8,7 +8,7 @@ def composeMatrix(location, rotation, scale):
     scaleMatrix[2][2] = scale[2]
 
     # Rotation
-    matrix = (rotation.to_matrix() * scaleMatrix).to_4x4()
+    matrix = (rotation.to_matrix() @ scaleMatrix).to_4x4()
 
     # Translation
     matrix[0][3] = location[0]
@@ -22,8 +22,8 @@ def extractRotation(matrix):
 
 def rotationMatrix(rotation):
     matrix = Matrix.Rotation(rotation[2], 4, 'Z')
-    matrix *= Matrix.Rotation(rotation[1], 4, 'Y')
-    matrix *= Matrix.Rotation(rotation[0], 4, 'X')
+    matrix @= Matrix.Rotation(rotation[1], 4, 'Y')
+    matrix @= Matrix.Rotation(rotation[0], 4, 'X')
     return matrix
 
 def scaleMatrix(scale):

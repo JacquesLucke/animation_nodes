@@ -13,8 +13,8 @@ def getSortedSelectedObjects():
 def getSortedSelectedObjectNames():
     return sortedSelectionNames
 
-@eventHandler("SCENE_UPDATE_POST")
-def updateSelectionSorting(scene):
+@eventHandler("ALWAYS")
+def updateSelectionSorting():
     global sortedSelectionNames
 
     selectedNames = getSelectedObjectNames()
@@ -30,13 +30,11 @@ def updateSelectionSorting(scene):
         for name in selectedNames:
             if name not in newSortedSelection:
                 newSortedSelection.append(name)
-                
+
         sortedSelectionNames = newSortedSelection
     else:
         sortedSelectionNames = selectedNames
 
 def getSelectedObjectNames():
-    selectedNames = []
-    for object in getattr(bpy.context, "selected_objects", []):
-        selectedNames.append(object.name)
-    return selectedNames
+    viewLayer = bpy.data.window_managers[0].windows[0].view_layer
+    return [obj.name for obj in viewLayer.objects if obj.select_get(view_layer = viewLayer)]

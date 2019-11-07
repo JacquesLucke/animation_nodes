@@ -1,14 +1,22 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
-from ... math cimport (Vector3, toVector3,
-                       absoluteVec3, addVec3, subVec3, multVec3, divideVec3,
-                       crossVec3, projectVec3, reflectVec3, normalizeLengthVec3,
-                       scaleVec3, snapVec3)
-from ... data_structures cimport Vector3DList, DoubleList
+from ... base_types import AnimationNode, VectorizedSocket
+
+from ... math cimport (
+    Vector3,
+    absoluteVec3, addVec3, subVec3, multVec3, divideVec3,
+    crossVec3, projectVec3, reflectVec3, normalizeLengthVec3,
+    scaleVec3, snapVec3
+)
+
+from ... data_structures cimport (
+    Vector3DList,
+    VirtualVector3DList,
+    VirtualDoubleList
+)
 
 ctypedef void (*SingleVectorFunction)(Vector3* target, Vector3* source)
-ctypedef void (*DoubleVectorFunction)(Vector3* target, Vector3* a, Vector3* b)
+ctypedef void (*VectorVectorFunction)(Vector3* target, Vector3* a, Vector3* b)
 ctypedef void (*VectorFloatFunction)(Vector3* target, Vector3* a, float b)
 
 cdef class Operation:
@@ -41,79 +49,32 @@ cdef class Operation:
     #####################################################
 
     def execute_vA_vB(self, a, b):
-        if isinstance(a, Vector3DList) and isinstance(b, Vector3DList):
-            if len(a) == len(b):
-                return self._execute_vA_vB_Both(a, b)
-            else:
-                raise ValueError("lists have different length")
-        elif isinstance(a, Vector3DList):
-            return self._execute_vA_vB_Left(a, b)
-        elif isinstance(b, Vector3DList):
-            return self._execute_vA_vB_Right(a, b)
+        cdef VirtualVector3DList _a = VirtualVector3DList.create(a, (0, 0, 0))
+        cdef VirtualVector3DList _b = VirtualVector3DList.create(b, (0, 0, 0))
+        cdef Py_ssize_t amount = VirtualVector3DList.getMaxRealLength(_a, _b)
 
-    cdef _execute_vA_vB_Both(self, Vector3DList a, Vector3DList b):
-        cdef Vector3DList result = Vector3DList(length = a.length)
-        cdef DoubleVectorFunction f = <DoubleVectorFunction>self.function
-        cdef long i
-        for i in range(result.length):
-            f(result.data + i, a.data + i, b.data + i)
-        return result
+        cdef VectorVectorFunction f = <VectorVectorFunction>self.function
+        cdef Vector3DList result = Vector3DList(length = amount)
 
-    cdef _execute_vA_vB_Left(self, Vector3DList a, b):
-        cdef Vector3 _b = toVector3(b)
-        cdef Vector3DList result = Vector3DList(length = a.length)
-        cdef DoubleVectorFunction f = <DoubleVectorFunction>self.function
-        cdef long i
-        for i in range(result.length):
-            f(result.data + i, a.data + i, &_b)
-        return result
-
-    cdef _execute_vA_vB_Right(self, a, Vector3DList b):
-        cdef Vector3 _a = toVector3(a)
-        cdef Vector3DList result = Vector3DList(length = b.length)
-        cdef DoubleVectorFunction f = <DoubleVectorFunction>self.function
-        cdef long i
-        for i in range(result.length):
-            f(result.data + i, &_a, b.data + i)
+        cdef Py_ssize_t i
+        for i in range(amount):
+            f(result.data + i, _a.get(i), _b.get(i))
         return result
 
     # Vector and Float as Input
     #####################################################
 
     def execute_vA_fB(self, a, b):
-        if isinstance(a, Vector3DList) and isinstance(b, DoubleList):
-            if len(a) == len(b):
-                return self._execute_vA_fB_Both(a, b)
-            else:
-                raise ValueError("lists have different length")
-        elif isinstance(a, Vector3DList):
-            return self._execute_vA_fB_Left(a, b)
-        elif isinstance(b, DoubleList):
-            return self._execute_vA_fB_Right(a, b)
+        cdef VirtualVector3DList _a = VirtualVector3DList.create(a, (0, 0, 0))
+        cdef VirtualDoubleList _b = VirtualDoubleList.create(b, 0)
+        cdef Py_ssize_t amount = VirtualVector3DList.getMaxRealLength(_a, _b)
 
-    cdef _execute_vA_fB_Both(self, Vector3DList a, DoubleList b):
-        cdef Vector3DList result = Vector3DList(length = a.length)
         cdef VectorFloatFunction f = <VectorFloatFunction>self.function
-        cdef long i
-        for i in range(result.length):
-            f(result.data + i, a.data + i, b.data[i])
-        return result
+        cdef Vector3DList result = Vector3DList(length = amount)
 
-    cdef _execute_vA_fB_Left(self, Vector3DList a, float b):
-        cdef Vector3DList result = Vector3DList(length = a.length)
-        cdef VectorFloatFunction f = <VectorFloatFunction>self.function
-        cdef long i
-        for i in range(result.length):
-            f(result.data + i, a.data + i, b)
-        return result
-
-    cdef _execute_vA_fB_Right(self, a, DoubleList b):
-        cdef Vector3 _a = toVector3(a)
-        cdef Vector3DList result = Vector3DList(length = b.length)
-        cdef VectorFloatFunction f = <VectorFloatFunction>self.function
-        cdef long i
-        for i in range(result.length):
-            f(result.data + i, &_a, b.data[i])
+        cdef Py_ssize_t i
+        for i in range(amount):
+            f(result.data + i, _a.get(i), _b.get(i))
         return result
 
 
@@ -166,22 +127,22 @@ searchItems = {
     "Multiply Vectors" : "Multiply",
     "Normalize Vector" : "Normalize"}
 
-class VectorMathNode(bpy.types.Node, VectorizedNode):
+class VectorMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
     dynamicLabelType = "HIDDEN_ONLY"
     searchTags = [(name, {"operation" : repr(op)}) for name, op in searchItems.items()]
 
-    operation = EnumProperty(name = "Operation", default = "Add",
-        items = operationItems, update = VectorizedNode.refresh)
+    __annotations__ = {}
 
-    useListA = VectorizedNode.newVectorizeProperty()
-    useListB = VectorizedNode.newVectorizeProperty()
-    useListLength = VectorizedNode.newVectorizeProperty()
-    useListFactor = VectorizedNode.newVectorizeProperty()
-    useListStep = VectorizedNode.newVectorizeProperty()
+    __annotations__["operation"] = EnumProperty(name = "Operation", default = "Add",
+        items = operationItems, update = AnimationNode.refresh)
 
-    errorMessage = StringProperty()
+    __annotations__["useListA"] = VectorizedSocket.newProperty()
+    __annotations__["useListB"] = VectorizedSocket.newProperty()
+    __annotations__["useListLength"] = VectorizedSocket.newProperty()
+    __annotations__["useListFactor"] = VectorizedSocket.newProperty()
+    __annotations__["useListStep"] = VectorizedSocket.newProperty()
 
     def create(self):
         usedProperties = []
@@ -192,38 +153,31 @@ class VectorMathNode(bpy.types.Node, VectorizedNode):
             usedProperties.append(listProperty)
             baseType, *_ = dataTypeById[socketData[0]]
 
-            self.newVectorizedInput(baseType, listProperty,
-                (name, name.lower()), (name, name.lower()))
+            self.newInput(VectorizedSocket(baseType, listProperty,
+                (name, name.lower()), (name, name.lower())))
 
-        self.newVectorizedOutput("Vector", [usedProperties],
-            ("Result", "result"), ("Results", "results"))
+        self.newOutput(VectorizedSocket("Vector", usedProperties,
+            ("Result", "result"), ("Results", "results")))
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawLabel(self):
         return self._operation.label
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.generatesList:
             currentType = self._operation.type
-            yield "try:"
-            yield "    self.errorMessage = ''"
             if currentType == "vA":
-                yield "    results = self._operation.execute_vA(a)"
+                yield "results = self._operation.execute_vA(a)"
             if currentType == "vA_vB":
-                yield "    results = self._operation.execute_vA_vB(a, b)"
+                yield "results = self._operation.execute_vA_vB(a, b)"
             elif currentType == "vA_fLength":
-                yield "    results = self._operation.execute_vA_fB(a, length)"
+                yield "results = self._operation.execute_vA_fB(a, length)"
             elif currentType == "vA_fFactor":
-                yield "    results = self._operation.execute_vA_fB(a, factor)"
+                yield "results = self._operation.execute_vA_fB(a, factor)"
             elif currentType == "vA_vStep":
-                yield "    results = self._operation.execute_vA_vB(a, step)"
-            yield "except Exception as e:"
-            yield "    self.errorMessage = str(e)"
-            yield "    results = self.outputs[0].getDefaultValue()"
+                yield "results = self._operation.execute_vA_vB(a, step)"
         else:
             yield self._operation.expression
 
