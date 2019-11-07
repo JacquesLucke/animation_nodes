@@ -1,12 +1,13 @@
 import bpy
 from bpy.props import *
 from . node_creator import NodeCreator
+from ... sockets.info import hasAllowedInputDataTypes
 
 class InsertViewerNode(bpy.types.Operator, NodeCreator):
     bl_idname = "an.insert_viewer_node"
     bl_label = "Insert Viewer Node"
 
-    socketIndex = IntProperty(default = 0)
+    socketIndex: IntProperty(default = 0)
 
     @property
     def needsMenu(self):
@@ -20,7 +21,7 @@ class InsertViewerNode(bpy.types.Operator, NodeCreator):
 
     def iterPossibleSockets(self):
         for socket in self.activeNode.outputs:
-            if not socket.hide and len(socket.allowedInputTypes) > 0:
+            if not socket.hide and hasAllowedInputDataTypes(socket.dataType):
                 yield socket
 
     def insert(self):

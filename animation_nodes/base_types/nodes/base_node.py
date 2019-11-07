@@ -2,22 +2,37 @@ import re
 import bpy
 import types
 import random
+import functools
 from bpy.props import *
 from collections import defaultdict
+from ... import tree_info
 from ... utils.handlers import eventHandler
 from ... ui.node_colors import colorAllNodes
+from .. socket_templates import SocketTemplate
+from . node_ui_extension import TextUIExtension, ErrorUIExtension
 from ... preferences import getExecutionCodeType
 from ... operators.callbacks import newNodeCallback
 from ... sockets.info import toIdName as toSocketIdName
-from ... utils.blender_ui import iterNodeCornerLocations
-from ... execution.measurements import getMinExecutionTimeString
+from ... utils.attributes import setattrRecursive, getattrRecursive
 from ... operators.dynamic_operators import getInvokeFunctionOperator
-from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes
-from ... tree_info import (getNetworkWithNode, getOriginNodes,
-                           getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
-                           iterUnlinkedInputSockets, keepNodeState)
+from ... utils.nodes import getAnimationNodeTrees, iterAnimationNodes, idToSocket
+from .. effects import PrependCodeEffect, ReturnDefaultsOnExceptionCodeEffect
 
-socketEffectsByIdentifier = defaultdict(list)
+from ... utils.blender_ui import (
+    getNodeCornerLocation_BottomLeft,
+    getNodeCornerLocation_BottomRight
+)
+
+from ... execution.measurements import (
+    getMinExecutionTimeString,
+    getMeasurementResultString
+)
+from ... tree_info import (
+    getNetworkWithNode, getOriginNodes,
+    getLinkedInputsDict, getLinkedOutputsDict, iterLinkedOutputSockets,
+    iterUnlinkedInputSockets, getDirectlyLinkedSocketsIDs
+)
+
 
 class AnimationNode:
     bl_width_min = 40
@@ -28,22 +43,33 @@ class AnimationNode:
         colorAllNodes()
 
     # unique string for each node; don't change it at all
-    identifier = StringProperty(name = "Identifier", default = "")
-    inInvalidNetwork = BoolProperty(name = "In Invalid Network", default = False)
-    useNetworkColor = BoolProperty(name = "Use Network Color", default = True, update = useNetworkColorChanged)
+    identifier: StringProperty(name = "Identifier", default = "")
+    inInvalidNetwork: BoolProperty(name = "In Invalid Network", default = False)
+    useNetworkColor: BoolProperty(name = "Use Network Color", default = True, update = useNetworkColorChanged)
 
     # used for the listboxes in the sidebar
-    activeInputIndex = IntProperty()
-    activeOutputIndex = IntProperty()
+    activeInputIndex: IntProperty()
+    activeOutputIndex: IntProperty()
 
     searchTags = []
     onlySearchTags = False
+
     # can contain: 'NO_EXECUTION', 'NOT_IN_SUBPROGRAM',
-    #              'NO_AUTO_EXECUTION', 'NO_TIMING',
+    #              'NO_AUTO_EXECUTION'
     options = set()
 
     # can be "NONE", "ALWAYS" or "HIDDEN_ONLY"
     dynamicLabelType = "NONE"
+
+    # can be "CUSTOM", "MESSAGE" or "EXCEPTION"
+    errorHandlingType = "CUSTOM"
+    class ControlledExecutionException(Exception):
+        pass
+
+    # should be a list of functions
+    # each function takes a node as input
+    # it should always return a CodeEffect
+    codeEffects = []
 
     @classmethod
     def poll(cls, nodeTree):
@@ -54,12 +80,6 @@ class AnimationNode:
     ######################################
 
     def setup(self):
-        pass
-
-    def preCreate(self):
-        pass
-
-    def postCreate(self):
         pass
 
     # may be defined in nodes
@@ -85,7 +105,7 @@ class AnimationNode:
         return self.bl_label
 
     def drawAdvanced(self, layout):
-        layout.label("Has no advanced settings")
+        layout.label(text = "Has no advanced settings")
 
     def socketRemoved(self):
         self.socketChanged()
@@ -106,7 +126,7 @@ class AnimationNode:
     def getExecutionFunctionName(self):
         return "execute"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return []
 
     def getCodeEffects(self):
@@ -118,9 +138,12 @@ class AnimationNode:
     def getUsedModules(self):
         return []
 
+    def getUIExtensions(self):
+        return None
+
     def drawControlSocket(self, layout, socket):
         layout.alignment = "LEFT" if socket.isInput else "RIGHT"
-        layout.label(socket.name)
+        layout.label(text = socket.name)
 
     @classmethod
     def getSearchTags(cls):
@@ -143,17 +166,15 @@ class AnimationNode:
 
     def copy(self, sourceNode):
         self.identifier = createIdentifier()
-        self.copySocketEffects(sourceNode)
+        infoByNode[self.identifier] = infoByNode[sourceNode.identifier].clone()
         self.duplicate(sourceNode)
-        for socket, sourceSocket in zip(self.sockets, sourceNode.sockets):
-            socket.alternativeIdentifiers = sourceSocket.alternativeIdentifiers
 
     def free(self):
         self.delete()
         self._clear()
 
     def draw_buttons(self, context, layout):
-        if self.inInvalidNetwork: layout.label("Invalid Network", icon = "ERROR")
+        if self.inInvalidNetwork: layout.label(text = "Invalid Network", icon = "ERROR")
         if self.nodeTree.editNodeLabels: layout.prop(self, "label", text = "")
         self.draw(layout)
 
@@ -175,14 +196,15 @@ class AnimationNode:
     ####################################################
 
     def updateNode(self):
-        self.applySocketEffects()
+        self._applySocketTemplates()
+        tree_info.updateIfNecessary()
         self.edit()
 
     def refresh(self, context = None):
         if not self.isRefreshable:
             raise Exception("node is not refreshable")
 
-        @keepNodeState
+        @AnimationNode.keepNodeState
         def refreshAndKeepNodeState(self):
             self._refresh()
 
@@ -194,34 +216,75 @@ class AnimationNode:
 
     def _clear(self):
         self.clearSockets()
-        self._clearSocketEffects()
+        infoByNode[self.identifier].clearCurrentStateData()
 
     def _create(self):
-        self.preCreate()
         self.create()
-        self.postCreate()
+        infoByNode[self.identifier].codeEffects = list(self._iterNewCodeEffects())
+
+    def _iterNewCodeEffects(self):
+        for createCodeEffect in self.codeEffects:
+            yield createCodeEffect(self)
+        yield from self.getCodeEffects()
 
     @property
     def isRefreshable(self):
         return hasattr(self, "create")
 
+    @classmethod
+    def keepNodeState(cls, function):
+        @functools.wraps(function)
+        def wrapper(self, *args, **kwargs):
+            infoByNode[self.identifier].fullState.update(self)
+            result = function(self, *args, **kwargs)
+            infoByNode[self.identifier].fullState.tryToReapplyState(self)
+            return result
+        return wrapper
 
-    # Socket Effects
+
+
+
+    # Socket Templates
     ####################################################
 
-    def applySocketEffects(self):
-        for effect in socketEffectsByIdentifier[self.identifier]:
-            effect.apply(self)
+    def _applySocketTemplates(self):
+        propertyUpdates = dict()
+        fixedProperties = set()
 
-    def _clearSocketEffects(self):
-        if self.identifier in socketEffectsByIdentifier:
-            del socketEffectsByIdentifier[self.identifier]
+        for socket, template in self.iterSocketsWithTemplate():
+            if template is None:
+                continue
+            # check if the template can actually influence the result
+            if len(template.getRelatedPropertyNames() - fixedProperties) > 0:
+                result = template.applyWithContext(self, socket, propertyUpdates, fixedProperties)
+                if result is None: continue
+                updates, fixed = result
+                for name, value in updates.items():
+                    if name not in fixedProperties:
+                        propertyUpdates[name] = value
+                fixedProperties.update(fixed)
 
-    def copySocketEffects(self, sourceNode):
-        socketEffectsByIdentifier[self.identifier] = socketEffectsByIdentifier[sourceNode.identifier]
+        propertiesChanged = False
+        for name, value in propertyUpdates.items():
+            if getattrRecursive(self, name) != value:
+                setattrRecursive(self, name, value)
+                propertiesChanged = True
+        if propertiesChanged:
+            self.refresh()
 
-    def newSocketEffect(self, effect):
-        socketEffectsByIdentifier[self.identifier].append(effect)
+    def iterSocketsWithTemplate(self):
+        yield from self.iterInputSocketsWithTemplate()
+        yield from self.iterOutputSocketsWithTemplate()
+
+    def iterInputSocketsWithTemplate(self):
+        inputsInfo = infoByNode[self.identifier].inputs
+        for socket in self.inputs:
+            yield (socket, inputsInfo[socket.identifier].template)
+
+    def iterOutputSocketsWithTemplate(self):
+        outputsInfo = infoByNode[self.identifier].outputs
+        for socket in self.outputs:
+            yield (socket, outputsInfo[socket.identifier].template)
 
 
     # Remove Utilities
@@ -241,55 +304,41 @@ class AnimationNode:
     # Create/Update/Remove Sockets
     ####################################################
 
-    def newInput(self, type, name, identifier = None, alternativeIdentifier = None, **kwargs):
-        idName = toSocketIdName(type)
-        if idName is None:
-            raise ValueError("Socket type does not exist: {}".format(repr(type)))
-        if identifier is None: identifier = name
-        socket = self.inputs.new(idName, name, identifier)
-        self._setAlternativeIdentifier(socket, alternativeIdentifier)
+    def newInput(self, *args, **kwargs):
+        if len(args) == 1:
+            if isinstance(args[0], SocketTemplate):
+                template = args[0]
+                socket = template.createInput(self)
+                socketData = infoByNode[self.identifier].inputs[socket.identifier]
+                socketData.initialize(template)
+        elif len(args) == 2:
+            socket = self.inputs.new(toSocketIdName(args[0]), args[1], identifier = args[1])
+        elif len(args) == 3:
+            socket = self.inputs.new(toSocketIdName(args[0]), args[1], identifier = args[2])
+        else:
+            raise Exception("invalid arguments")
         self._setSocketProperties(socket, kwargs)
         return socket
 
-    def newOutput(self, type, name, identifier = None, alternativeIdentifier = None, **kwargs):
-        idName = toSocketIdName(type)
-        if idName is None:
-            raise ValueError("Socket type does not exist: {}".format(repr(type)))
-        if identifier is None: identifier = name
-        socket = self.outputs.new(idName, name, identifier)
-        self._setAlternativeIdentifier(socket, alternativeIdentifier)
-        self._setSocketProperties(socket, kwargs)
+    def newOutput(self, *args, **kwargs):
+        if len(args) == 1:
+            if isinstance(args[0], SocketTemplate):
+                template = args[0]
+                socket = template.createOutput(self)
+                socketData = infoByNode[self.identifier].outputs[socket.identifier]
+                socketData.initialize(template)
+        elif len(args) == 2:
+            socket = self.outputs.new(toSocketIdName(args[0]), args[1], identifier = args[1])
+        elif len(args) == 3:
+            socket = self.outputs.new(toSocketIdName(args[0]), args[1], identifier = args[2])
+        else:
+            raise Exception("invalid arguments")
+        socket.setAttributes(kwargs)
         return socket
-
-    def _setAlternativeIdentifier(self, socket, alternativeIdentifier):
-        if isinstance(alternativeIdentifier, str):
-            socket.alternativeIdentifiers = [alternativeIdentifier]
-        elif isinstance(alternativeIdentifier, (list, tuple, set)):
-            socket.alternativeIdentifiers = list(alternativeIdentifier)
 
     def _setSocketProperties(self, socket, properties):
         for key, value in properties.items():
             setattr(socket, key, value)
-
-    def newInputGroup(self, selector, *socketsData):
-        return self._newSocketGroup(int(selector), socketsData, self.newInput)
-
-    def newOutputGroup(self, selector, *socketsData):
-        return self._newSocketGroup(int(selector), socketsData, self.newOutput)
-
-    def _newSocketGroup(self, index, socketsData, newSocketFunction):
-        if 0 <= index < len(socketsData):
-            data = socketsData[index]
-            if len(data) == 3:
-                socket = newSocketFunction(data[0], data[1], data[2])
-            elif len(data) == 4:
-                socket = newSocketFunction(data[0], data[1], data[2], **data[3])
-            else:
-                raise ValueError("invalid socket data")
-            socket.alternativeIdentifiers = [data[2] for data in socketsData]
-            return socket
-        else:
-            raise ValueError("invalid selector")
 
     def clearSockets(self):
         self.clearInputs()
@@ -384,6 +433,49 @@ class AnimationNode:
         return newNodeCallback(self, functionName)
 
 
+    # UI Extensions
+    ####################################################
+
+    def getAllUIExtensions(self):
+        extensions = []
+
+        if getExecutionCodeType() == "MEASURE":
+            text = getMeasurementResultString(self)
+            extensions.append(TextUIExtension(text))
+
+        errorType = self.getErrorHandlingType()
+        if errorType in ("MESSAGE", "EXCEPTION"):
+            data = infoByNode[self.identifier]
+            message = data.errorMessage
+            if message is not None and data.showErrorMessage:
+                extensions.append(ErrorUIExtension(message))
+
+        extraExtensions = self.getUIExtensions()
+        if extraExtensions is not None:
+            extensions.extend(extraExtensions)
+
+        return extensions
+
+
+    # Error Handling
+    ####################################################
+
+    def getErrorHandlingType(self):
+        return self.errorHandlingType
+
+    def resetErrorMessage(self):
+        infoByNode[self.identifier].errorMessage = None
+
+    def setErrorMessage(self, message, show = True):
+        data = infoByNode[self.identifier]
+        data.errorMessage = message
+        data.showErrorMessage = show
+
+    def raiseErrorMessage(self, message, show = True):
+        self.setErrorMessage(message, show)
+        raise self.ControlledExecutionException(message)
+
+
     # More Utilities
     ####################################################
 
@@ -400,6 +492,13 @@ class AnimationNode:
         for identifier, variable in self.getOutputSocketVariables().items():
             if variable in names:
                 yield (names[variable], identifier)
+
+    def getAllIdentifiersOfSocket(self, socket):
+        ident = socket.identifier
+        if socket.is_output:
+            return infoByNode[self.identifier].outputs[ident].extraIdentifiers | {ident}
+        else:
+            return infoByNode[self.identifier].inputs[ident].extraIdentifiers | {ident}
 
     @property
     def nodeTree(self):
@@ -453,7 +552,7 @@ class AnimationNode:
     # Code Generation
     ####################################################
 
-    def getLocalExecutionCode(self):
+    def getLocalExecutionCode(self, required, bake = False):
         inputVariables = self.getInputSocketVariables()
         outputVariables = self.getOutputSocketVariables()
 
@@ -461,9 +560,12 @@ class AnimationNode:
         if functionName is not None and hasattr(self, self.getExecutionFunctionName()):
             code = self.getLocalExecutionCode_ExecutionFunction(inputVariables, outputVariables)
         else:
-            code = self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables)
+            code = self.getLocalExecutionCode_GetExecutionCode(inputVariables, outputVariables, required)
 
-        return self.applyCodeEffects(code)
+        if bake:
+            code = "\n".join((code, toString(self.getBakeCode())))
+
+        return self.applyCodeEffects(code, required)
 
     def getLocalExecutionCode_ExecutionFunction(self, inputVariables, outputVariables):
         parameterString = ", ".join(inputVariables[socket.identifier] for socket in self.inputs)
@@ -474,20 +576,129 @@ class AnimationNode:
         if outputString == "": return executionString
         else: return "{} = {}".format(outputString, executionString)
 
-    def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables):
-        return toString(self.getExecutionCode())
+    def getLocalExecutionCode_GetExecutionCode(self, inputVariables, outputVariables, required):
+        return toString(self.getExecutionCode(required))
 
-    def getLocalBakeCode(self):
-        return self.applyCodeEffects(toString(self.getBakeCode()))
-
-    def applyCodeEffects(self, code):
-        for effect in self.getCodeEffects():
-            code = toString(effect.apply(self, code))
+    def applyCodeEffects(self, code, required):
+        for effect in self.iterCodeEffectsToApply():
+            code = toString(effect.apply(self, code, required))
         return code
 
+    def iterCodeEffectsToApply(self):
+        yield from infoByNode[self.identifier].codeEffects
 
-@eventHandler("SCENE_UPDATE_POST")
-def createMissingIdentifiers(scene = None):
+        errorType = self.getErrorHandlingType()
+        if errorType in ("MESSAGE", "EXCEPTION"):
+            yield PrependCodeEffect("self.resetErrorMessage()")
+        if errorType == "EXCEPTION":
+            yield ReturnDefaultsOnExceptionCodeEffect("self.ControlledExecutionException")
+
+
+
+# Non-Persistent data (will be removed when Blender is closed)
+###########################################################################
+
+nodeLabelMode = "DEFAULT"
+
+def updateNodeLabelMode():
+    global nodeLabelMode
+    nodeLabelMode = "DEFAULT"
+    if getExecutionCodeType() == "MEASURE":
+        nodeLabelMode = "MEASURE"
+
+
+class CurrentSocketData:
+    def __init__(self):
+        self.extraIdentifiers = set()
+        self.template = None
+
+    def initialize(self, template):
+        self.extraIdentifiers = template.getSocketIdentifiers()
+        self.template = template
+
+class SocketPropertyState:
+    @classmethod
+    def fromSocket(cls, node, socket):
+        self = cls()
+        self.hide = socket.hide
+        self.isUsed = socket.isUsed
+        self.data = socket.getProperty()
+        self.allIdentifiers = node.getAllIdentifiersOfSocket(socket)
+        return self
+
+class FullNodeState:
+    def __init__(self):
+        self.inputProperties = dict()
+        self.outputProperties = dict()
+        self.inputStates = dict()
+        self.outputStates = dict()
+
+    def update(self, node):
+        for socket in node.inputs:
+            self.inputProperties[(socket.identifier, socket.dataType)] = socket.getProperty()
+            linkedSocketIDs = getDirectlyLinkedSocketsIDs(socket)
+            for identifier in node.getAllIdentifiersOfSocket(socket):
+                self.inputStates[identifier] = (socket.hide, socket.isUsed, linkedSocketIDs)
+
+        for socket in node.outputs:
+            self.outputProperties[(socket.identifier, socket.dataType)] = socket.getProperty()
+            linkedSocketIDs = getDirectlyLinkedSocketsIDs(socket)
+            for identifier in node.getAllIdentifiersOfSocket(socket):
+                self.outputStates[identifier] = (socket.hide, socket.isUsed, linkedSocketIDs)
+
+    def tryToReapplyState(self, node):
+        for socket in node.inputs:
+            self.tryToReapplySocketState(socket, self.inputProperties, self.inputStates)
+        for socket in node.outputs:
+            self.tryToReapplySocketState(socket, self.outputProperties, self.outputStates)
+
+    def tryToReapplySocketState(self, socket, propertyData, stateData):
+        if (socket.identifier, socket.dataType) in propertyData:
+            socket.setProperty(propertyData[(socket.identifier, socket.dataType)])
+
+        if socket.identifier in stateData:
+            data = stateData[socket.identifier]
+            socket.hide = data[0]
+            socket.isUsed = data[1]
+            for socketID in data[2]:
+                try:
+                    otherSocket = idToSocket(socketID)
+                    if otherSocket.is_output or not otherSocket.is_linked:
+                        socket.linkWith(idToSocket(socketID))
+                except: pass
+
+class NonPersistentNodeData:
+    def __init__(self):
+        self.clearCurrentStateData()
+        self.fullState = FullNodeState()
+
+    def clearCurrentStateData(self):
+        '''data that can be cleared during every refresh'''
+        self.inputs = defaultdict(CurrentSocketData)
+        self.outputs = defaultdict(CurrentSocketData)
+        self.codeEffects = []
+        self.errorMessage = None
+        self.showErrorMessage = True
+
+    def clone(self):
+        newData = NonPersistentNodeData()
+        for (k, v) in self.inputs.items():
+            newData.inputs[k] = v
+
+        for (k, v) in self.outputs.items():
+            newData.outputs[k] = v
+
+        return newData
+
+infoByNode = defaultdict(NonPersistentNodeData)
+
+
+
+# Identifiers
+#####################################################
+
+@eventHandler("ALWAYS")
+def createMissingIdentifiers():
     def unidentifiedNodes():
         for tree in getAnimationNodeTrees():
             for node in tree.nodes:
@@ -517,15 +728,6 @@ def callSaveMethods():
         node.save()
 
 
-nodeLabelMode = "DEFAULT"
-
-def updateNodeLabelMode():
-    global nodeLabelMode
-    nodeLabelMode = "DEFAULT"
-    if getExecutionCodeType() == "MEASURE":
-        nodeLabelMode = "MEASURE"
-
-
 
 # Register
 ###############################################################
@@ -543,14 +745,14 @@ def getViewLocation(node):
     location = node.location.copy()
     while node.parent:
         node = node.parent
-        location += node.location.copy()
+        location += node.location
     return location
 
 def getRegionBottomLeft(node, region):
-    return next(iterNodeCornerLocations([node], region, horizontal = "LEFT"))
+    return getNodeCornerLocation_BottomLeft(node, region)
 
 def getRegionBottomRight(node, region):
-    return next(iterNodeCornerLocations([node], region, horizontal = "RIGHT"))
+    return getNodeCornerLocation_BottomRight(node, region)
 
 def register():
     bpy.types.Node.toID = nodeToID

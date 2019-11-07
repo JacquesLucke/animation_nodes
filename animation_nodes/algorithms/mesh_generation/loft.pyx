@@ -1,7 +1,6 @@
 from ... math cimport Vector3, mixVec3Arrays
 from ... data_structures cimport Vector3DList, Spline, BezierSpline
 from ... utils.lists cimport findListSegment_LowLevel, findListSegment
-from ... data_structures.splines.base_spline cimport SplineEvaluationFunction
 
 from . import grid
 
@@ -108,14 +107,11 @@ cdef class LinearLoft:
         return vertices
 
     cdef writeSplineLine(self, Spline spline, Vector3* target):
-        cdef SplineEvaluationFunction evaluateFunction
-        if self.distributionType == "RESOLUTION":
-            evaluateFunction = spline.evaluate_LowLevel
-        elif self.distributionType == "UNIFORM":
-            evaluateFunction = spline.evaluateUniform_LowLevel
-            spline.ensureUniformConverter(self.uniformResolution)
-        spline.sampleEvaluationFunction_LowLevel(evaluateFunction, self.splineSamples,
-                                                 0.0, 1.0, target)
+        if self.distributionType == "UNIFORM":
+            self.ensureUniformConverter(self.uniformResolution)
+
+        spline.calcDistributedPoints_LowLevel(self.splineSamples, target,
+            0, 1, self.distributionType)
 
     cdef writeMixedLine(self, Vector3* target, Vector3* sourceA, Vector3* sourceB, float factor):
         mixVec3Arrays(target, sourceA, sourceB, self.splineSamples, factor)
@@ -198,7 +194,7 @@ cdef class SmoothLoft:
 
         for i in range(self.splineSamples):
             self.createSurfaceSpline(i, surfaceSplinePoints.data)
-            surfaceSpline.calculateSmoothHandles(self.smoothness)
+            surfaceSpline.smoothAllHandles(self.smoothness)
             self.sampleSurfaceSpline(surfaceSpline, vertices.data + i * self.surfaceSamples)
 
         return vertices
@@ -210,23 +206,20 @@ cdef class SmoothLoft:
             float t
             float tCyclic = index / <float>self.splineSamples
             float tNormal = index / <float>(self.splineSamples - 1)
-        if self.splineDistributionType == "RESOLUTION":
-            for k in range(len(self.splines)):
-                spline = self.splines[k]
-                t = tCyclic if spline.cyclic else tNormal
-                spline.evaluate_LowLevel(t, _surfaceSplinePoints + k)
-        elif self.splineDistributionType == "UNIFORM":
-            for k in range(len(self.splines)):
-                spline = self.splines[k]
-                t = tCyclic if spline.cyclic else tNormal
-                spline.evaluateUniform_LowLevel(t, _surfaceSplinePoints + k)
+            bint useUniform = self.splineDistributionType == "UNIFORM"
+
+        for k in range(len(self.splines)):
+            spline = self.splines[k]
+            t = tCyclic if spline.cyclic else tNormal
+            if useUniform:
+                t = spline.toUniformParameter_LowLevel(t)
+            spline.evaluatePoint_LowLevel(t, _surfaceSplinePoints + k)
 
     cdef sampleSurfaceSpline(self, BezierSpline spline, Vector3* output):
         if self.surfaceDistributionType == "UNIFORM":
             spline.ensureUniformConverter(self.uniformResolution)
-            spline.getUniformSamples_LowLevel(self.surfaceSamples, self.start, self.end, output)
-        else:
-            spline.getSamples_LowLevel(self.surfaceSamples, self.start, self.end, output)
+        spline.calcDistributedPoints_LowLevel(self.surfaceSamples, output,
+            self.start, self.end, self.surfaceDistributionType)
 
     def calcEdgeIndices(self):
         return grid.quadEdges(

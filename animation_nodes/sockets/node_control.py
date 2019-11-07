@@ -11,18 +11,18 @@ class NodeControlSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    margin = FloatProperty(default = 0.0001, min = 0.0001)
+    margin: FloatProperty(default = 0.0001, min = 0.0001)
 
     def draw(self, context, layout, node, text):
         col = layout.column()
         subcol = col.column()
-        subcol.label("")
+        subcol.label(text = "")
         subcol.scale_y = self.margin
 
         node.drawControlSocket(col, self)
 
         subcol = col.column()
-        subcol.label("")
+        subcol.label(text = "")
         subcol.scale_y = self.margin
 
     @classmethod

@@ -21,7 +21,7 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
     def targetTypeChanged(self, context):
         self.recreateOutputs()
 
-    targetType = EnumProperty(name = "Target Type", items = targetTypeItems,
+    targetType: EnumProperty(name = "Target Type", items = targetTypeItems,
         default = "RGB", update = AnimationNode.refresh)
 
     def create(self):
@@ -51,7 +51,7 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "{}a from Color".format(self.targetType)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.targetType == "RGB":    yield "r, g, b = color[0], color[1], color[2]"
         elif self.targetType == "HSV":  yield "h, s, v = colorsys.rgb_to_hsv(color[0], color[1], color[2])"
         elif self.targetType == "HSL":  yield "h, l, s = colorsys.rgb_to_hls(color[0], color[1], color[2])"

@@ -14,7 +14,7 @@ class FindClosePointsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FindClosePointsNode"
     bl_label = "Find Close Points"
 
-    mode = EnumProperty(name = "Mode", default = "AMOUNT",
+    mode: EnumProperty(name = "Mode", default = "AMOUNT",
         items = modeItems, update = AnimationNode.refresh)
 
     def create(self):
@@ -31,7 +31,7 @@ class FindClosePointsNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "mode")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.mode == "AMOUNT":
             yield "edges = self.execute_Amount(points, amount)"
         elif self.mode == "DISTANCE":

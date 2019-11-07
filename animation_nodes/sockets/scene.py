@@ -8,34 +8,33 @@ class SceneSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_SceneSocket"
     bl_label = "Scene Socket"
     dataType = "Scene"
-    allowedInputTypes = ["Scene"]
     drawColor = (0.2, 0.3, 0.4, 1)
     storable = False
     comparable = True
 
-    sceneName = StringProperty(name = "Scene", update = propertyChanged)
-    useGlobalScene = BoolProperty(name = "Use Global Scene", default = True,
+    scene: PointerProperty(type = Scene, update = propertyChanged)
+    useGlobalScene: BoolProperty(name = "Use Global Scene", default = True,
         description = "Use the global scene for this node tree", update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         if self.useGlobalScene:
             if text != "": text += ": "
-            row.label(text + repr(self.nodeTree.scene.name))
+            row.label(text = text + repr(self.nodeTree.scene.name))
         else:
-            row.prop_search(self, "sceneName",  bpy.data, "scenes", text = text)
+            row.prop(self, "scene", text = text)
         row.prop(self, "useGlobalScene", text = "", icon = "WORLD")
 
     def getValue(self):
         if self.useGlobalScene:
             return self.nodeTree.scene
-        return bpy.data.scenes.get(self.sceneName)
+        return self.scene
 
     def setProperty(self, data):
-        self.sceneName, self.useGlobalScene = data
+        self.scene, self.useGlobalScene = data
 
     def getProperty(self):
-        return self.sceneName, self.useGlobalScene
+        return self.scene, self.useGlobalScene
 
     @classmethod
     def getDefaultValue(cls):
@@ -52,23 +51,22 @@ class SceneListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_SceneListSocket"
     bl_label = "Scene List Socket"
     dataType = "Scene List"
-    baseDataType = "Scene"
-    allowedInputTypes = ["Scene List"]
+    baseType = SceneSocket
     drawColor = (0.2, 0.3, 0.4, 0.5)
     storable = False
     comparable = False
 
-    useGlobalScene = BoolProperty(name = "Use Global Scene", default = True,
+    useGlobalScene: BoolProperty(name = "Use Global Scene", default = True,
         description = "Use the global scene for this node tree", update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         if self.useGlobalScene:
             if text != "": text += ": "
-            row.label(text + "[{}]".format(repr(self.nodeTree.scene.name)))
+            row.label(text = text + "[{}]".format(repr(self.nodeTree.scene.name)))
         else:
             if text is "": text = self.text
-            row.label(text)
+            row.label(text = text)
         row.prop(self, "useGlobalScene", icon = "WORLD", text = "")
 
     def getValue(self):

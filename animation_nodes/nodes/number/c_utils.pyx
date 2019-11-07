@@ -6,15 +6,7 @@ from ... data_structures cimport (
 
 from ... utils.limits cimport INT_MAX
 from ... utils.clamp cimport clamp, clampLong
-from ... algorithms.random cimport uniformRandomNumber
-
-def clamp_DoubleList(DoubleList values, double minValue, double maxValue):
-    cdef Py_ssize_t i
-    for i in range(len(values)):
-        if values.data[i] < minValue:
-            values.data[i] = minValue
-        elif values.data[i] > maxValue:
-            values.data[i] = maxValue
+from ... algorithms.random cimport randomDouble_Range
 
 def range_LongList_StartStep(amount, start, step):
     cdef long long _amount = clampLong(amount)
@@ -50,7 +42,7 @@ def random_DoubleList(seed, amount, double minValue, double maxValue):
     cdef Py_ssize_t i
 
     for i in range(len(newList)):
-        newList.data[i] = uniformRandomNumber(_seed + i, minValue, maxValue)
+        newList.data[i] = randomDouble_Range(_seed + i, minValue, maxValue)
     return newList
 
 def mapRange_DoubleList(DoubleList values, bint clamped,

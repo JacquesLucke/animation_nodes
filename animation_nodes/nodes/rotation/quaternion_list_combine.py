@@ -13,4 +13,4 @@ class QuaternionListCombineNode(bpy.types.Node, AnimationNode):
         self.newOutput("Quaternion", "Result", "result")
 
     def execute(self, quaternions):
-        return functools.reduce(operator.mul, reversed(quaternions), Quaternion((1, 0, 0, 0)))
+        return functools.reduce(operator.matmul, reversed(quaternions), Quaternion((1, 0, 0, 0)))

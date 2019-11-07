@@ -8,7 +8,7 @@ from ... utils.data_blocks import removeNotUsedDataBlock
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleMeshName,
                              getPossibleCameraName,
-                             getPossibleLampName,
+                             getPossibleLightName,
                              getPossibleCurveName)
 
 lastSourceHashes = {}
@@ -18,19 +18,19 @@ objectTypeItems = [
     ("Mesh", "Mesh", "", "MESH_DATA", 0),
     ("Text", "Text", "", "FONT_DATA", 1),
     ("Camera", "Camera", "", "CAMERA_DATA", 2),
-    ("Point Lamp", "Point Lamp", "", "LAMP_POINT", 3),
+    ("Point Lamp", "Point Lamp", "", "LIGHT_POINT", 3),
     ("Curve 2D", "Curve 2D", "", "FORCE_CURVE", 4),
     ("Curve 3D", "Curve 3D", "", "CURVE_DATA", 5),
     ("Empty", "Empty", "", "EMPTY_DATA", 6) ]
 
-emptyDrawTypeItems = []
-for item in bpy.types.Object.bl_rna.properties["empty_draw_type"].enum_items:
-    emptyDrawTypeItems.append((item.identifier, item.name, ""))
+emptyDisplayTypeItems = []
+for item in bpy.types.Object.bl_rna.properties["empty_display_type"].enum_items:
+    emptyDisplayTypeItems.append((item.identifier, item.name, ""))
 
 class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
     bl_idname = "an_ObjectNamePropertyGroup"
-    objectName = StringProperty(name = "Object Name", default = "", update = propertyChanged)
-    objectIndex = IntProperty(name = "Object Index", default = 0, update = propertyChanged)
+    objectName: StringProperty(name = "Object Name", default = "", update = propertyChanged)
+    objectIndex: IntProperty(name = "Object Index", default = 0, update = propertyChanged)
 
 class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectInstancerNode"
@@ -46,31 +46,31 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.resetInstances = True
         propertyChanged()
 
-    linkedObjects = CollectionProperty(type = ObjectNamePropertyGroup)
-    resetInstances = BoolProperty(default = False, update = propertyChanged)
+    linkedObjects: CollectionProperty(type = ObjectNamePropertyGroup)
+    resetInstances: BoolProperty(default = False, update = propertyChanged)
 
-    copyFromSource = BoolProperty(name = "Copy from Source",
+    copyFromSource: BoolProperty(name = "Copy from Source",
         default = True, update = copyFromSourceChanged)
 
-    deepCopy = BoolProperty(name = "Deep Copy", default = False, update = resetInstancesEvent,
+    deepCopy: BoolProperty(name = "Deep Copy", default = False, update = resetInstancesEvent,
         description = "Make the instances independent of the source object (e.g. copy mesh)")
 
-    objectType = EnumProperty(name = "Object Type", default = "Mesh",
+    objectType: EnumProperty(name = "Object Type", default = "Mesh",
         items = objectTypeItems, update = resetInstancesEvent)
 
-    copyObjectProperties = BoolProperty(name = "Copy Full Object", default = False,
-        description = "Enable this to copy modifiers/constraints/... from the source object.",
+    copyObjectProperties: BoolProperty(name = "Copy Full Object", default = False,
+        description = "Enable this to copy modifiers/constraints/... from the source object",
         update = resetInstancesEvent)
 
-    removeAnimationData = BoolProperty(name = "Remove Animation Data", default = True,
+    removeAnimationData: BoolProperty(name = "Remove Animation Data", default = True,
         description = "Remove the active action on the instance; This is useful when you want to animate the object yourself",
         update = resetInstancesEvent)
 
-    parentInstances = BoolProperty(name = "Parent to Main Container",
+    addToMainContainer: BoolProperty(name = "Add To Main Container",
         default = True, update = resetInstancesEvent)
 
-    emptyDrawType = EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
-        items = emptyDrawTypeItems, update = resetInstancesEvent)
+    emptyDisplayType: EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
+        items = emptyDisplayTypeItems, update = resetInstancesEvent)
 
     def create(self):
         self.newInput("Integer", "Instances", "instancesAmount", minValue = 0)
@@ -89,10 +89,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         else:
             layout.prop(self, "objectType", text = "")
             if self.objectType == "Empty":
-                layout.prop(self, "emptyDrawType", text = "")
+                layout.prop(self, "emptyDisplayType", text = "")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "parentInstances")
+        layout.prop(self, "addToMainContainer")
         layout.prop(self, "removeAnimationData")
 
         self.invokeFunction(layout, "resetObjectDataOnAllInstances",
@@ -101,14 +101,14 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.invokeFunction(layout, "unlinkInstancesFromNode",
             confirm = True,
             text = "Unlink Instances from Node",
-            description = "This will make sure that the objects won't be removed if you remove the Instancer Node.")
+            description = "This will make sure that the objects won't be removed if you remove the Instancer Node")
 
         layout.separator()
-        self.invokeFunction(layout, "hideRelationshipLines",
-            text = "Hide Relationship Lines",
+        self.invokeFunction(layout, "toggleRelationshipLines",
+            text = "Toggle Relationship Lines",
             icon = "RESTRICT_VIEW_OFF")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         # support for older nodes which didn't have a scene list input
         if "Scenes" in self.inputs: yield "_scenes = set(scenes)"
         else: yield "_scenes = {scene}"
@@ -225,8 +225,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             self.removeObject(object)
 
     def removeObject(self, object):
-        self.unlinkInstance(object)
-        if object.users == 0:
+        if object.users < 2:
             data = object.data
             type = object.type
             self.removeShapeKeys(object)
@@ -260,8 +259,16 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def appendNewObject(self, name, sourceObject, scenes):
         object = self.newInstance(name, sourceObject, scenes)
-        for scene in scenes:
-            if scene is not None: scene.objects.link(object)
+        if self.addToMainContainer:
+            for scene in scenes:
+                if scene is not None:
+                    getMainObjectContainer(scene).objects.link(object)
+                    break
+        else:
+            for scene in scenes:
+                if scene is not None:
+                    scene.collection.objects.link(object)
+                    break
         linkedItem = self.linkedObjects.add()
         linkedItem.objectName = object.name
         linkedItem.objectIndex = bpy.data.objects.find(object.name)
@@ -271,22 +278,20 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         instanceData = self.getSourceObjectData(sourceObject)
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
-            newObject.data = instanceData
+            # The following check is due to https://developer.blender.org/T67857
+            # The bug is fixed. This should be removed when 2.81 is released.
+            if instanceData:
+                newObject.data = instanceData
         else:
             newObject = self.createObject(name, instanceData)
 
-        if self.parentInstances:
-            for scene in scenes:
-                if scene is not None:
-                    newObject.parent = getMainObjectContainer(scene)
-                    break
         if self.removeAnimationData and newObject.animation_data is not None:
             newObject.animation_data.action = None
-        newObject.select = False
-        newObject.hide = False
+        newObject.hide_select = False
+        newObject.hide_viewport = False
         newObject.hide_render = False
         if not self.copyFromSource and self.objectType == "Empty":
-            newObject.empty_draw_type = self.emptyDrawType
+            newObject.empty_display_type = self.emptyDisplayType
         return newObject
 
     def createObject(self, name, instanceData):
@@ -307,7 +312,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             elif self.objectType == "Camera":
                 data = bpy.data.cameras.new(getPossibleCameraName("instance camera"))
             elif self.objectType == "Point Lamp":
-                data = bpy.data.lamps.new(getPossibleLampName("instance lamp"), type = "POINT")
+                data = bpy.data.lights.new(getPossibleLightName("instance lamp"), type = "POINT")
             elif self.objectType.startswith("Curve"):
                 data = bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
                 data.dimensions = self.objectType[-2:]
@@ -317,13 +322,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         else:
             data.an_data.removeOnZeroUsers = True
             return data
-
-    def unlinkInstance(self, object):
-        if bpy.context.mode != "OBJECT" and bpy.context.active_object == object:
-            bpy.ops.object.mode_set(mode = "OBJECT")
-        for scene in bpy.data.scenes:
-            if object.name in scene.objects:
-                scene.objects.unlink(object)
 
     def resetObjectDataOnAllInstances(self):
         self.resetInstances = True
@@ -338,6 +336,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     def duplicate(self, sourceNode):
         self.linkedObjects.clear()
 
-    def hideRelationshipLines(self):
+    def toggleRelationshipLines(self):
         for space in iterActiveSpacesByType("VIEW_3D"):
-            space.show_relationship_lines = False
+            space.overlay.show_relationship_lines = not space.overlay.show_relationship_lines

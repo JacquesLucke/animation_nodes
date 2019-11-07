@@ -1,51 +1,51 @@
 import bpy
 from bpy.props import *
 from ... events import executionCodeChanged
-from ... base_types import AnimationNode, AutoSelectListDataType
-from ... sockets.info import isBase, toBaseDataType, toListDataType
+from ... sockets.info import isBase, toBaseDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class GetListElementNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetListElementNode"
     bl_label = "Get List Element"
-    bl_width_default = 170
+    bl_width_default = 180
     dynamicLabelType = "HIDDEN_ONLY"
 
-    assignedType = StringProperty(default = "Float", update = AnimationNode.refresh)
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float")
 
-    clampIndex = BoolProperty(name = "Clamp Index", default = False,
+    clampIndex: BoolProperty(name = "Clamp Index", default = False,
         description = "Clamp the index between the lowest and highest possible index",
         update = executionCodeChanged)
 
-    allowNegativeIndex = BoolProperty(name = "Allow Negative Index",
+    allowNegativeIndex: BoolProperty(name = "Allow Negative Index",
         description = "-2 means the second last list element",
         update = executionCodeChanged, default = True)
 
-    makeCopy = BoolProperty(name = "Make Copy", default = True,
+    makeCopy: BoolProperty(name = "Make Copy", default = True,
         description = "Output a copy of the list element to make it independed",
         update = executionCodeChanged)
 
-    useIndexList = BoolProperty(name = "Use Index List", default = False,
+    useIndexList: BoolProperty(name = "Use Index List", default = False,
         update = AnimationNode.refresh)
 
     def create(self):
-        baseDataType = self.assignedType
-        listDataType = toListDataType(self.assignedType)
+        prop = ("assignedType", "BASE")
+        self.newInput(ListTypeSelectorSocket(
+            "List", "inList", "LIST", prop))
 
-        self.newInput(listDataType, "List", "inList")
-        self.newInputGroup(self.useIndexList,
-            ("Integer", "Index", "index"),
-            ("Integer List", "Indices", "indices"))
-        self.newInput(baseDataType, "Fallback", "fallback", hide = True)
+        if not self.useIndexList:
+            self.newInput("Integer", "Index", "index")
+        else:
+            self.newInput("Integer List", "Indices", "indices")
 
-        self.newOutputGroup(self.useIndexList,
-            (baseDataType, "Element", "element"),
-            (listDataType, "Elements", "elements"))
+        self.newInput(ListTypeSelectorSocket(
+            "Fallback", "fallback", "BASE", prop, hide = True))
 
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "BASE",
-            [(self.inputs[0], "LIST"),
-             (self.inputs[2], "BASE"),
-             (self.outputs[0], "LIST" if self.useIndexList else "BASE")]
-        ))
+        if not self.useIndexList:
+            self.newOutput(ListTypeSelectorSocket(
+                "Element", "element", "BASE", prop))
+        else:
+            self.newOutput(ListTypeSelectorSocket(
+                "Elements", "elements", "LIST", prop))
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -64,7 +64,7 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
                 return "List[{}]".format(self.inputs["Index"].value)
         return "Get List Element"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useIndexList:
             yield from self.getExecutionCode_List()
         else:
@@ -109,3 +109,4 @@ class GetListElementNode(bpy.types.Node, AnimationNode):
         if not isBase(baseDataType): return
         if baseDataType == self.assignedType: return
         self.assignedType = baseDataType
+        self.refresh()

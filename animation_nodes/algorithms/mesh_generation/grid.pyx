@@ -1,4 +1,19 @@
-from ... data_structures cimport Vector3DList, EdgeIndicesList, PolygonIndicesList
+from ... data_structures cimport (
+    Mesh, Vector3DList, EdgeIndicesList, PolygonIndicesList
+)
+
+def getGridMesh_Step(float xDistance, float yDistance, int xDivisions, int yDivisions):
+    vertices = vertices_Step(xDistance, yDistance, xDivisions, yDivisions)
+    edges = innerQuadEdges(xDivisions, yDivisions)
+    polygons = innerQuadPolygons(xDivisions, yDivisions)
+    return Mesh(vertices, edges, polygons, skipValidation = True)
+
+def getGridMesh_Size(float length, float width, int xDivisions, int yDivisions):
+    vertices = vertices_Size(length, width, xDivisions, yDivisions)
+    edges = innerQuadEdges(xDivisions, yDivisions)
+    polygons = innerQuadPolygons(xDivisions, yDivisions)
+    return Mesh(vertices, edges, polygons, skipValidation = True)
+
 
 # Vertices
 ############################################
@@ -103,8 +118,8 @@ def innerQuadPolygons(long xDivisions, long yDivisions):
     cdef long i, j, offset = 0
     for i in range(yDivisions - 1):
         for j in range(xDivisions - 1):
-            polygons.polyStarts.data[offset / 4] = offset
-            polygons.polyLengths.data[offset / 4] = 4
+            polygons.polyStarts.data[offset // 4] = offset
+            polygons.polyLengths.data[offset // 4] = 4
             polygons.indices.data[offset + 0] = (j + 1) * yDivisions + i
             polygons.indices.data[offset + 1] = (j + 1) * yDivisions + i + 1
             polygons.indices.data[offset + 2] = (j + 0) * yDivisions + i + 1
@@ -126,4 +141,4 @@ def joinVerticalEdgesQuadPolygons(xDivisions, yDivisions):
     return polygons
 
 def joinCornersWithQuad(xDivisions, yDivisions):
-    return (0, yDivisions - 1, yDivisions * xDivisions - 1, yDivisions * (xDivisions - 1))
+    return (yDivisions * (xDivisions - 1), yDivisions * xDivisions - 1, yDivisions - 1, 0)

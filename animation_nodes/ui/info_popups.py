@@ -6,5 +6,5 @@ def showTextPopup(text, title = "", icon = "NONE"):
 def getPopupDrawer(text):
     def drawPopup(menu, context):
         layout = menu.layout
-        layout.label(text)
+        layout.label(text = text)
     return drawPopup

@@ -7,12 +7,12 @@ class BakeAnimation(bpy.types.Operator):
     bl_label = "Bake to Keyframes"
     bl_description = "Playback animation and make keyframes (only supported nodes)"
 
-    startFrame = IntProperty(default = 1)
-    endFrame = IntProperty(default = 250)
+    startFrame: IntProperty(default = 1)
+    endFrame: IntProperty(default = 250)
 
     def invoke(self, context, event):
         context.window_manager.modal_handler_add(self)
-        self.timer = context.window_manager.event_timer_add(0.001, context.window)
+        self.timer = context.window_manager.event_timer_add(0.001, window = context.window)
 
         getPreferences().executionCode.type = "BAKE"
 
@@ -28,7 +28,7 @@ class BakeAnimation(bpy.types.Operator):
 
         if event.type == "TIMER":
             self.scene.frame_set(currentFrame + 1)
-            self.scene.update()
+            context.view_layer.update()
 
         if self.scene.frame_current == self.endFrame:
             return self.finish()

@@ -14,7 +14,7 @@ class RevolveSplineNode(bpy.types.Node, AnimationNode):
     bl_label = "Revolve Spline"
     bl_width_default = 160
 
-    projectionType = EnumProperty(name = "Projection Type", default = "PROJECT",
+    projectionType: EnumProperty(name = "Projection Type", default = "PROJECT",
         items = projectionTypeItems, update = propertyChanged)
 
     def create(self):

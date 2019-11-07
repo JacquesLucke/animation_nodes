@@ -1,7 +1,7 @@
 import bpy
 from ... data_structures cimport BaseFalloff
 from ... base_types import AnimationNode
-from ... algorithms.random cimport uniformRandomNumber
+from ... algorithms.random cimport randomDouble_Range
 
 class RandomFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomFalloffNode"
@@ -20,14 +20,14 @@ class RandomFalloffNode(bpy.types.Node, AnimationNode):
 cdef class RandomFalloff(BaseFalloff):
     cdef:
         int seed
-        double minValue, maxValue
+        float minValue, maxValue
 
-    def __cinit__(self, int seed, double minValue, double maxValue):
+    def __cinit__(self, int seed, float minValue, float maxValue):
         self.seed = (seed * 534523) % 0x7fffffff
         self.minValue = minValue
         self.maxValue = maxValue
-        self.dataType = "All"
+        self.dataType = "None"
         self.clamped = 0 <= min(minValue, maxValue) <= max(minValue, maxValue) <= 1
 
-    cdef double evaluate(self, void* object, long index):
-        return uniformRandomNumber((self.seed + index) % 0x7fffffff, self.minValue, self.maxValue)
+    cdef float evaluate(self, void *object, Py_ssize_t index):
+        return randomDouble_Range((self.seed + index) % 0x7fffffff, self.minValue, self.maxValue)

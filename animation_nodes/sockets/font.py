@@ -8,31 +8,30 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_FontSocket"
     bl_label = "Font Socket"
     dataType = "Font"
-    allowedInputTypes = ["Font"]
     drawColor = (0.444, 0.444, 0, 1)
     storable = False
     comparable = True
 
-    fontName = StringProperty(update = propertyChanged)
+    font: PointerProperty(type = VectorFont, update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
-        row.prop_search(self, "fontName",  bpy.data, "fonts", icon = "NONE", text = text)
+        row.prop(self, "font", text = text)
         self.invokeFunction(row, node, "assignFontOfActiveObject", icon = "EYEDROPPER")
 
     def getValue(self):
-        return bpy.data.fonts.get(self.fontName)
+        return self.font
 
     def setProperty(self, data):
-        self.fontName = data
+        self.font = data
 
     def getProperty(self):
-        return self.fontName
+        return self.font
 
     def assignFontOfActiveObject(self):
         object = bpy.context.active_object
         if getattr(object, "type", "") == "FONT":
-            self.fontName = object.data.font.name
+            self.font = object.data.font
 
     @classmethod
     def getDefaultValue(cls):
@@ -49,8 +48,7 @@ class FontListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_idname = "an_FontListSocket"
     bl_label = "Font List Socket"
     dataType = "Font List"
-    baseDataType = "Font"
-    allowedInputTypes = ["Font List"]
+    baseType = FontSocket
     drawColor = (0.444, 0.444, 0, 0.5)
     storable = False
     comparable = False

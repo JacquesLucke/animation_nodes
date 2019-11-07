@@ -26,11 +26,11 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def drawAdvanced(self, layout):
         col = layout.column()
-        col.label("Description:")
+        col.label(text = "Description:")
         col.prop(self, "subprogramDescription", text = "")
 
         col = layout.column()
-        col.label("Parameter Defaults:")
+        col.label(text = "Parameter Defaults:")
         box = col.box()
         for socket in list(self.outputs)[:-1]:
             socket.drawSocket(box, socket.text, node = self, drawType = "TEXT_PROPERTY_OR_NONE")
@@ -38,8 +38,8 @@ class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
         self.invokeSelector(left, "DATA_TYPE", "newGroupInput",
-            icon = "ZOOMIN", emboss = False)
-        right.label(socket.name)
+            icon = "ADD", emboss = False)
+        right.label(text = socket.name)
 
     def edit(self):
         for target in self.outputs[-1].dataTargets:

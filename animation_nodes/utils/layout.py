@@ -19,14 +19,14 @@ def writeText(layout, text, width = 30, icon = "NONE", autoWidth = False):
     col.scale_y = 0.85
     prefix = " "
     for paragraph in text.split("\n"):
-        lines = textwrap.wrap(paragraph, width)
+        lines = textwrap.wrap(paragraph, int(width))
 
         if len(lines) == 0:
             subcol = col.column()
             subcol.scale_y = 0.3
-            subcol.label("")
+            subcol.label(text = "")
 
         for line in lines:
-            col.label(prefix + line, icon = icon)
+            col.label(text = prefix + line, icon = icon)
             if icon != "NONE": prefix = "     "
             icon = "NONE"

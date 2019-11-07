@@ -18,16 +18,16 @@ class LoftSplinesNode(bpy.types.Node, AnimationNode):
     bl_label = "Loft Splines"
     bl_width_default = 160
 
-    interpolationType = EnumProperty(name = "Interpolation Type", default = "LINEAR",
+    interpolationType: EnumProperty(name = "Interpolation Type", default = "LINEAR",
         items = interpolationTypeItems, update = AnimationNode.refresh)
 
-    resolution = IntProperty(name = "Resolution", default = 5, min = 2,
+    resolution: IntProperty(name = "Resolution", default = 5, min = 2,
         description = "Increase to have a more accurate uniform evaluation", update = propertyChanged)
 
-    splineDistributionType = EnumProperty(name = "Spline Distribution", default = "RESOLUTION",
+    splineDistributionType: EnumProperty(name = "Spline Distribution", default = "RESOLUTION",
         items = sampleDistributionTypeItems, update = propertyChanged)
 
-    surfaceDistributionType = EnumProperty(name = "Surface Distribution", default = "RESOLUTION",
+    surfaceDistributionType: EnumProperty(name = "Surface Distribution", default = "RESOLUTION",
         items = sampleDistributionTypeItems, update = propertyChanged)
 
     def create(self):

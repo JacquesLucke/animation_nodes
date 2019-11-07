@@ -1,25 +1,27 @@
 import bpy
 from bpy.props import *
-from ... base_types import AnimationNode
 from ... events import propertyChanged
+from ... base_types import AnimationNode
+from ... utils.path import getResolvedNestedPath
 
 pathTypes = ("Custom", "Location", "Rotation", "Scale", "LocRotScale")
 pathTypeItems = [(pathType, pathType, "") for pathType in pathTypes]
 
 class KeyframePath(bpy.types.PropertyGroup):
     bl_idname = "an_KeyframePath"
-    path = StringProperty(default = "", update = propertyChanged, description = "Path to the property")
-    index = IntProperty(default = -1, update = propertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
+    path: StringProperty(default = "", update = propertyChanged, description = "Path to the property")
+    index: IntProperty(default = -1, update = propertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
 
 class SetKeyframesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetKeyframesNode"
     bl_label = "Set Keyframes"
     bl_width_default = 200
+    errorHandlingType = "MESSAGE"
 
-    paths = CollectionProperty(type = KeyframePath)
+    paths: CollectionProperty(type = KeyframePath)
 
-    selectedPathType = EnumProperty(default = "Location", items = pathTypeItems, name = "Path Type")
-    attributePath = StringProperty(default = "", name = "Attribute Path")
+    selectedPathType: EnumProperty(default = "Location", items = pathTypeItems, name = "Path Type")
+    attributePath: StringProperty(default = "", name = "Attribute Path")
 
     def create(self):
         self.newInput("Boolean", "Enable", "enable", value = False)
@@ -35,7 +37,7 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
         col = layout.column(align = True)
         for i, item in enumerate(self.paths):
             row = col.row(align = True)
-            split = row.split(align = True, percentage = 0.7)
+            split = row.split(align = True, factor = 0.7)
             split.prop(item, "path", text = "")
             split.prop(item, "index", text = "")
             self.invokeFunction(row, "removeItemFromList", icon = "X", data = str(i))
@@ -46,22 +48,17 @@ class SetKeyframesNode(bpy.types.Node, AnimationNode):
         if setKeyframe:
             for item in self.paths:
                 try:
-                    obj, path = self.getResolvedNestedPath(object, item.path)
+                    obj, path = getResolvedNestedPath(object, item.path)
                     obj.keyframe_insert(data_path = path, frame = frame, index = item.index)
-                except: pass
+                except:
+                    self.setErrorMessage("Could not set keyframe.")
         elif removeUnwanted:
             for item in self.paths:
                 try:
-                    obj, path = self.getResolvedNestedPath(object, item.path)
+                    obj, path = getResolvedNestedPath(object, item.path)
                     obj.keyframe_delete(data_path = path, frame = frame, index = item.index)
-                except: pass
-
-    def getResolvedNestedPath(self, object, path):
-        index = path.find(".")
-        if index == -1: return object, path
-        else:
-            data = eval("object." + path[:index])
-            return data, path[index+1:]
+                except:
+                    self.setErrorMessage("Could not remove keyframe.")
 
     def newPath(self, path, index = -1):
         item = self.paths.add()

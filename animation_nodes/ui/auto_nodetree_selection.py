@@ -4,8 +4,8 @@ from .. utils.nodes import getAnimationNodeTrees
 
 treeNameBySpace = {}
 
-@eventHandler("SCENE_UPDATE_POST")
-def updateAutoNodeTreeSelection(scene):
+@eventHandler("ALWAYS")
+def updateAutoNodeTreeSelection():
     nodeTrees = getAnimationNodeTrees()
     if len(nodeTrees) == 0: return
 

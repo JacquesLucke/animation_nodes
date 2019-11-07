@@ -21,9 +21,9 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
     onlySearchTags = True
     searchTags = [(tag, {"dataType" : repr(type)}) for type, tag in nodeTypes.items()]
 
-    dataType = StringProperty(update = AnimationNode.refresh, default = "Float")
+    dataType: StringProperty(update = AnimationNode.refresh, default = "Float")
 
-    repeat = BoolProperty(name = "Repeat", default = False,
+    repeat: BoolProperty(name = "Repeat", default = False,
         description = "Repeat the factor for values above and below 0-1", update = executionCodeChanged)
 
     def create(self):
@@ -39,7 +39,7 @@ class MixDataListNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return nodeTypes[self.dataType]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "length = len(dataList)"
         yield "if length > 0:"
         yield "    f = (factor{}) * (length - 1)".format(" % 1" if self.repeat else "")

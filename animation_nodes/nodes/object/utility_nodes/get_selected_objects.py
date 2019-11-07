@@ -17,7 +17,8 @@ class GetSelectedObjectsNode(bpy.types.Node, AnimationNode):
         if isRendering():
             return [], None
         else:
-            return getSortedSelectedObjects(), bpy.context.active_object
+            return (getSortedSelectedObjects(),
+                    bpy.data.window_managers[0].windows[0].view_layer.objects.active)
 
     def draw(self, layout):
-        layout.label("Disabled During Rendering", icon = "INFO")
+        layout.label(text = "Disabled During Rendering", icon = "INFO")

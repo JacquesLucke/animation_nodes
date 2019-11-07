@@ -18,7 +18,7 @@ class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
     def caseTypeChanges(self, context):
         executionCodeChanged()
 
-    caseType = EnumProperty(
+    caseType: EnumProperty(
         name = "Case Type", default = "CAPITALIZE",
         items = caseTypeItems, update = caseTypeChanges)
 
@@ -29,7 +29,7 @@ class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "caseType", text = "")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.caseType == "CAPWORDS":
             return "outText = string.capwords(inText)"
         return "outText = inText.{}()".format(caseTypeCode[self.caseType])

@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import PolySpline, BezierSpline, Vector3DList
 
 splineTypeItems = [
@@ -9,19 +9,19 @@ splineTypeItems = [
     ("POLY", "Poly", "Linear interpolation between the spline points", "NOCURVE", 1)
 ]
 
-class ParticleSystemHairDataNode(bpy.types.Node, VectorizedNode):
+class ParticleSystemHairDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticleSystemHairDataNode"
     bl_label = "Hair Data"
 
-    useParticleSystemList = VectorizedNode.newVectorizeProperty()
+    useParticleSystemList: VectorizedSocket.newProperty()
 
-    splineType = EnumProperty(name = "Spline Type", default = "POLY",
+    splineType: EnumProperty(name = "Spline Type", default = "POLY",
         items = splineTypeItems, update = propertyChanged)
 
     def create(self):
-        self.newVectorizedInput("Particle System", "useParticleSystemList",
+        self.newInput(VectorizedSocket("Particle System", "useParticleSystemList",
             ("Particle System", "particleSystem"),
-            ("Particle Systems", "particleSystems"))
+            ("Particle Systems", "particleSystems")))
 
         self.newInput("Boolean", "Use World Space", "useWorldSpace", value = True)
 

@@ -35,7 +35,7 @@ def drawPanel(self, context):
     prefs = getMeshIndicesSettings()
 
     col = self.layout.column(align = True)
-    col.label("Show Mesh Indices:")
+    col.label(text = "Show Mesh Indices:")
 
     row = col.row(align = True)
     row.prop(prefs, "drawVertices", text = "Vertices", icon = "VERTEXSEL")
@@ -56,7 +56,7 @@ def drawPanel(self, context):
     subRow.prop(prefs, "polygonsColor", text = "")
 
 def register():
-    bpy.types.VIEW3D_PT_view3d_display.append(drawPanel)
+    bpy.types.VIEW3D_PT_overlay_geometry.append(drawPanel)
 
 def unregister():
-    bpy.types.VIEW3D_PT_view3d_display.remove(drawPanel)
+    bpy.types.VIEW3D_PT_overlay_geometry.remove(drawPanel)

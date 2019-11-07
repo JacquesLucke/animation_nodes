@@ -12,15 +12,14 @@ modeItems = [
 class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CreatePolygonIndicesNode"
     bl_label = "Create Polygon Indices"
-    bl_width_default = 150
+    bl_width_default = 160
+    errorHandlingType = "MESSAGE"
 
-    mode = EnumProperty(name = "Mode", default = "VERTEX_AMOUNT",
+    mode: EnumProperty(name = "Mode", default = "VERTEX_AMOUNT",
         items = modeItems, update = AnimationNode.refresh)
 
-    useList = BoolProperty(name = "Use List", default = False,
+    useList: BoolProperty(name = "Use List", default = False,
         update = AnimationNode.refresh)
-
-    errorMessage = StringProperty()
 
     def create(self):
         if self.mode == "INDICES":
@@ -40,9 +39,6 @@ class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
         if self.mode == "VERTEX_AMOUNT":
             row.prop(self, "useList", text = "", icon = "LINENUMBERS_ON")
 
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def getExecutionFunctionName(self):
         if self.mode == "INDICES":
             return "execute_Indices"
@@ -54,27 +50,24 @@ class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
 
     def execute_Indices(self, indices):
         if len(indices) < 3:
-            self.errorMessage = "less than 3 indices"
+            self.setErrorMessage("less than 3 indices")
             return (0, 1, 2)
         elif any(index < 0 for index in indices):
-            self.errorMessage = "index < 0"
+            self.setErrorMessage("index < 0")
             return (0, 1, 2)
         else:
-            self.errorMessage = ""
             return tuple(indices)
 
     def execute_VertexAmount_Single(self, vertexAmount):
         if vertexAmount < 3:
-            self.errorMessage = "less than 3 indices"
+            self.setErrorMessage("less than 3 indices")
             return (0, 1, 2)
         else:
-            self.errorMessage = ""
             return tuple(range(vertexAmount))
 
     def execute_VertexAmount_List(self, lengths):
         try:
-            self.errorMessage = ""
             return polygonIndicesListFromVertexAmounts(lengths)
         except Exception as e:
-            self.errorMessage = str(e)
+            self.setErrorMessage(str(e))
             return PolygonIndicesList()

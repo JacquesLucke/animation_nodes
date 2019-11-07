@@ -13,9 +13,15 @@ def drawNodeEditorHud():
     setTextDrawingDpi(getDpi())
     dpiFactor = getDpiFactor()
 
-    region = bpy.context.region
-    top = region.height
+    for region in bpy.context.area.regions:
+        if region.type == "WINDOW":
+            windowRegion = region
+        elif region.type == "TOOLS":
+            toolsRegion = region
+
+    top = windowRegion.height
+    left = toolsRegion.width
 
     executionTime = prettyTime(tree.lastExecutionInfo.executionTime)
-    drawText(executionTime, 10 * dpiFactor, top - 20 * dpiFactor,
+    drawText(executionTime, left + 10 * dpiFactor, top - 20 * dpiFactor,
         size = 11, color = (1, 1, 1, 0.5))

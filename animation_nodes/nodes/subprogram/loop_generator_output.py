@@ -1,26 +1,27 @@
 import bpy
 import random
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... sockets.info import toBaseDataType
 from ... tree_info import getNodeByIdentifier
+from ... base_types import AnimationNode, VectorizedSocket
 from . subprogram_sockets import subprogramInterfaceChanged
 
-class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
+class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
     dynamicLabelType = "ALWAYS"
+    onlySearchTags = True
 
     def settingChanged(self, context):
         self.refresh()
         subprogramInterfaceChanged()
 
-    outputName = StringProperty(name = "Generator Name", update = settingChanged)
-    loopInputIdentifier = StringProperty(update = settingChanged)
-    sortIndex = IntProperty(default = 0)
+    outputName: StringProperty(name = "Generator Name", update = settingChanged)
+    loopInputIdentifier: StringProperty(update = settingChanged)
+    sortIndex: IntProperty(default = 0)
 
-    listDataType = StringProperty(default = "Vector List", update = settingChanged)
-    useList = VectorizedNode.newVectorizeProperty()
+    listDataType: StringProperty(default = "Vector List", update = settingChanged)
+    useList: VectorizedSocket.newProperty()
 
     def setup(self):
         self.sortIndex = getRandomInt()
@@ -33,23 +34,23 @@ class LoopGeneratorOutputNode(bpy.types.Node, VectorizedNode):
         if self.listDataType == "Generic List":
             self.newInput("Generic", "Generic", "input")
         else:
-            self.newVectorizedInput(baseDataType, "useList",
+            self.newInput(VectorizedSocket(baseDataType, "useList",
                 (baseDataType, "input", dict(defaultDrawType = "TEXT_ONLY")),
-                (listDataType, "input", dict(defaultDrawType = "TEXT_ONLY")))
+                (listDataType, "input", dict(defaultDrawType = "TEXT_ONLY"))))
 
         self.newInput("Boolean", "Condition", "condition", value = True, hide = True)
 
     def draw(self, layout):
         node = self.loopInputNode
         if node is not None:
-            layout.label(node.subprogramName, icon = "GROUP_VERTEX")
+            layout.label(text = node.subprogramName, icon = "GROUP_VERTEX")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "outputName", text = "Name")
         self.invokeSelector(layout, "DATA_TYPE", "setListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
-        layout.label("No vectorization for generic type.", icon = "INFO")
+        layout.label(text = "No vectorization for generic type.", icon = "INFO")
 
     def drawLabel(self):
         return self.outputName

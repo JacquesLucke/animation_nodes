@@ -74,9 +74,8 @@ def getLinkedSockets(socket):
     linkedIDs = _forestData.linkedSockets[socketID]
     return [idToSocket(linkedID) for linkedID in linkedIDs]
 
-def iterSocketsThatNeedUpdate():
-    for socketID in _forestData.socketsThatNeedUpdate:
-        yield idToSocket(socketID)
+def getDirectlyLinkedSocketsIDs(socket):
+    return _forestData.linkedSocketsWithReroutes[socket.toID()]
 
 def getUndefinedNodes(nodeByID):
     return [nodeByID[nodeID] for nodeID in _forestData.nodesByType["NodeUndefined"]]
@@ -170,85 +169,8 @@ def iterLinkedInputSocketsWithOriginDataType(node):
             yield socket, _forestData.dataTypeBySocket[linkedSockets[0]]
 
 
-# keep node state
-
-def keepNodeState(function):
-    @functools.wraps(function)
-    def wrapper(node, *args, **kwargs):
-        return keepNodeLinks(keepSocketValues(function))(node, *args, **kwargs)
-    return wrapper
-
-# keep node links
-
-def keepNodeLinks(function):
-    @functools.wraps(function)
-    def wrapper(node, *args, **kwargs):
-        connections = getNodeConnections(node)
-        output = function(node, *args, **kwargs)
-        setConnections(connections)
-        return output
-    return wrapper
-
-def getNodeConnections(node):
-    inputIDs, outputIDs = _forestData.socketsByNode[node.toID()]
-
-    connections = []
-    for socketID, socket in zip(chain(inputIDs, outputIDs), node.sockets):
-        for linkedID in _forestData.linkedSocketsWithReroutes[socketID]:
-            connections.append((socketID, linkedID))
-
-            for identifier in socket.alternativeIdentifiers:
-                connections.append(((socketID[0], socketID[1], identifier), linkedID))
-    return connections
-
-def setConnections(connections):
-    for id1, id2 in connections:
-        try: idToSocket(id1).linkWith(idToSocket(id2))
-        except: pass
-
-# keep socket values
-
-def keepSocketValues(function):
-    @functools.wraps(function)
-    def wrapper(node, *args, **kwargs):
-        inputs, outputs = getSocketValues(node)
-        output = function(node, *args, **kwargs)
-        setSocketValues(node, inputs, outputs)
-        return output
-    return wrapper
-
-def getSocketValues(node):
-    inputs = [data for socket in node.inputs for data in getSocketData(socket)]
-    outputs = [data for socket in node.outputs for data in getSocketData(socket)]
-    return inputs, outputs
-
-def getSocketData(socket):
-    s = socket
-    yield (s.identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
-    for identifier in socket.alternativeIdentifiers:
-        yield (identifier, s.dataType, s.getProperty(), s.hide, s.isUsed, s.dataIsModified)
-
-def setSocketValues(node, inputs, outputs):
-    inputsByIdentifier = node.inputsByIdentifier
-    for identifier, dataType, value, hide, isUsed, dataIsModified in inputs:
-        socket = inputsByIdentifier.get(identifier)
-        if socket is None: continue
-        socket.hide = hide
-        socket.isUsed = isUsed
-        if socket.dataType == dataType:
-            socket.setProperty(value)
-            socket.dataIsModified = dataIsModified
-
-    outputsByIdentifier = node.outputsByIdentifier
-    for identifier, dataType, value, hide, isUsed, dataIsModified in outputs:
-        socket = outputsByIdentifier.get(identifier)
-        if socket is None: continue
-        socket.hide = hide
-        if socket.dataType == dataType:
-            socket.setProperty(value)
-            socket.isUsed = isUsed
-            socket.dataIsModified = dataIsModified
-
+# Network Utilities
+##################################################
 
 def getNetworkWithNode(node):
     return _networks.networkByNode[node.toID()]

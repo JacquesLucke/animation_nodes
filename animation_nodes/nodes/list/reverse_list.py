@@ -1,28 +1,25 @@
 import bpy
-from bpy.props import *
 from ... sockets.info import isList
-from ... base_types import AnimationNode, AutoSelectListDataType
+from ... base_types import AnimationNode, ListTypeSelectorSocket
 
 class ReverseListNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ReverseListNode"
     bl_label = "Reverse List"
 
-    assignedType = StringProperty(update = AnimationNode.refresh, default = "Float List")
+    assignedType: ListTypeSelectorSocket.newProperty(default = "Float List")
 
     def create(self):
-        listDataType = self.assignedType
-        self.newInput(listDataType, "List", "inList", dataIsModified = True)
-        self.newOutput(listDataType, "Reversed List", "reversedList")
+        prop = ("assignedType", "LIST")
+        self.newInput(ListTypeSelectorSocket(
+            "List", "inList", "LIST", prop, dataIsModified = True))
+        self.newOutput(ListTypeSelectorSocket(
+            "Reversed List", "reversedList", "LIST", prop))
 
-        self.newSocketEffect(AutoSelectListDataType("assignedType", "LIST",
-            [(self.inputs[0], "LIST"),
-             (self.outputs[0], "LIST")]
-        ))
-
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "reversedList = AN.algorithms.lists.reverse('%s', inList)" % self.assignedType
 
     def assignType(self, listDataType):
         if not isList(listDataType): return
         if listDataType == self.assignedType: return
         self.assignedType = listDataType
+        self.refresh()

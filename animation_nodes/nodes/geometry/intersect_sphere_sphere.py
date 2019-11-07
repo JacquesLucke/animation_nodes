@@ -1,52 +1,76 @@
 import bpy
-from ... base_types import AnimationNode
+from mathutils import Vector
+from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualVector3DList, VirtualDoubleList
+from . c_utils import intersect_SphereSphere_List, intersect_SphereSphere_Single
 
 class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_IntersectSphereSphereNode"
     bl_label = "Intersect Sphere Sphere"
     bl_width_default = 160
 
+    useFirstSphereCenterList: VectorizedSocket.newProperty()
+    useFirstSphereRadiusList: VectorizedSocket.newProperty()
+    useSecondSphereCenterList: VectorizedSocket.newProperty()
+    useSecondSphereRadiusList: VectorizedSocket.newProperty()
+
     def create(self):
-        self.newInput("Vector", "Sphere 1 Center", "center1")
-        self.newInput("Float", "Sphere 1 Radius", "radius1", value = 1)
-        self.newInput("Vector", "Sphere 2 Center", "center2", value = (0, 0, 1))
-        self.newInput("Float", "Sphere 2 Radius", "radius2", value = 1)
+        self.newInput(VectorizedSocket("Vector", "useFirstSphereCenterList",
+            ("First Sphere Center", "firstSphereCenter", dict(value = (0, 0, -0.5))),
+            ("First Sphere Centers", "firstSphereCenters"),
+            codeProperties = dict(default = (0, 0, -0.5))))
+        self.newInput(VectorizedSocket("Float", "useFirstSphereRadiusList",
+            ("First Sphere Radius", "firstSphereRadius", dict(value = 1)),
+            ("First Sphere Radii", "firstSphereRadii"),
+            codeProperties = dict(default = 1)))
 
-        self.newOutput("Vector", "Circle Center", "center")
-        self.newOutput("Vector", "Circle Normal", "normal")
-        self.newOutput("Float", "Circle Radius", "radius")
-        self.newOutput("Boolean", "Is Valid", "isValid", hide = True)
+        self.newInput(VectorizedSocket("Vector", "useSecondSphereCenterList",
+            ("Second Sphere Center", "secondSphereCenter", dict(value = (0, 0, 0.5))),
+            ("Second Sphere Centers", "secondSphereCenters"),
+            codeProperties = dict(default = (0, 0, 0.5))))
+        self.newInput(VectorizedSocket("Float", "useSecondSphereRadiusList",
+            ("Second Sphere Radius", "secondSphereRadius", dict(value = 1)),
+            ("Second Sphere Radii", "secondSphereRadii"),
+            codeProperties = dict(default = 1)))
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()): return ""
+        props = ["useSecondSphereCenterList", "useSecondSphereRadiusList",
+                 "useFirstSphereCenterList", "useFirstSphereRadiusList"]
 
-        center  = isLinked["center"]
-        normal  = isLinked["normal"]
-        radius  = isLinked["radius"]
-        isValid = isLinked["isValid"]
+        self.newOutput(VectorizedSocket("Vector", props,
+            ("Circle Center", "circleCenter"),
+            ("Circle Centers", "circleCenters")))
+        self.newOutput(VectorizedSocket("Vector", props,
+            ("Circle Normal", "circleNormal"),
+            ("Circle Normals", "circleNormals")))
+        self.newOutput(VectorizedSocket("Float", props,
+            ("Circle Radius", "circleRadius"),
+            ("Circle Radii", "circleRadii")))
 
-        yield "if center1 == center2: "
-        if center : yield "    center = Vector((0,0,0))"
-        if normal : yield "    normal = Vector((0,0,0))"
-        if radius : yield "    radius = 0"
-        if isValid: yield "    isValid = False"
+        self.newOutput(VectorizedSocket("Boolean", props,
+            ("Valid", "valid"),
+            ("Valids", "valids")))
 
-        yield "else:"
-        yield "    dif = (center2 - center1)"
-        yield "    dist = dif.length"
-        yield "    _, intx = mathutils.geometry.intersect_sphere_sphere_2d( (0, 0), radius1, (dist, 0), radius2)"
+    def getExecutionFunctionName(self):
+        useList = any((self.useSecondSphereCenterList, self.useSecondSphereRadiusList,
+                       self.useFirstSphereCenterList, self.useFirstSphereRadiusList))
+        if useList:
+            return "execute_List"
+        else:
+            return "execute_Single"
 
-        yield "    if intx is not None:"
-        if center : yield "        center = center1.lerp(center2, intx[0]/dist)"
-        if normal : yield "        normal = dif.normalized()"
-        if radius : yield "        radius = intx[1]"
-        if isValid: yield "        isValid = True"
-        yield "    else:"
-        if center : yield "        center = Vector((0,0,0))"
-        if normal : yield "        normal = Vector((0,0,0))"
-        if radius : yield "        radius = 0"
-        if isValid: yield "        isValid = False"
+    def execute_List(self, firstSphereCenters, firstSphereRadii,
+                           secondSphereCenters, secondSphereRadii):
+        firstSphereCenters = VirtualVector3DList.create(firstSphereCenters, Vector((0, 0, -0.5)))
+        firstSphereRadii = VirtualDoubleList.create(firstSphereRadii, 1)
+        secondSphereCenters = VirtualVector3DList.create(secondSphereCenters, Vector((0, 0, 0.5)))
+        secondSphereRadii = VirtualDoubleList.create(secondSphereRadii, 1)
+        amount = VirtualVector3DList.getMaxRealLength(firstSphereCenters, firstSphereRadii,
+                                                      secondSphereCenters, secondSphereRadii)
+        return intersect_SphereSphere_List(amount,
+            firstSphereCenters, firstSphereRadii,
+            secondSphereCenters, secondSphereRadii)
 
-    def getUsedModules(self):
-        return ["mathutils"]
+    def execute_Single(self, firstSphereCenter, firstSphereRadius,
+                             secondSphereCenter, secondSphereRadius):
+        return intersect_SphereSphere_Single(firstSphereCenter, firstSphereRadius,
+                                             secondSphereCenter, secondSphereRadius)

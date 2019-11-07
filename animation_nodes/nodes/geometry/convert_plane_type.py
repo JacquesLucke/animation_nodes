@@ -9,12 +9,12 @@ conversionTypeItems = [
 class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertPlaneTypeNode"
     bl_label = "Convert Plane Type"
-    bl_width_default = 170
+    bl_width_default = 180
     dynamicLabelType = "HIDDEN_ONLY"
 
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
-    conversionType = EnumProperty(name = "Conversion Type", default = "MATRIX_TO_POINT_NORMAL",
+    conversionType: EnumProperty(name = "Conversion Type", default = "MATRIX_TO_POINT_NORMAL",
         items = conversionTypeItems, update = AnimationNode.refresh)
 
     def create(self):
@@ -34,14 +34,11 @@ class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
         for item in conversionTypeItems:
             if self.conversionType == item[0]: return item[1]
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-        if not any(isLinked.values()):
-            return
+    def getExecutionCode(self, required):
 
         if self.conversionType == "POINT_NORMAL_TO_MATRIX":
             yield "if planeNormal.length_squared == 0: planeNormal = Vector((0, 0, 1))"
-            yield "matrix = Matrix.Translation(planePoint) * planeNormal.to_track_quat('Z', 'Y').to_matrix().to_4x4()"
+            yield "matrix = Matrix.Translation(planePoint) @ planeNormal.to_track_quat('Z', 'Y').to_matrix().to_4x4()"
         if self.conversionType == "MATRIX_TO_POINT_NORMAL":
-            if isLinked["planePoint"]: yield "planePoint = matrix.to_translation()"
-            if isLinked["planeNormal"]: yield "planeNormal = matrix.to_3x3() * Vector((0, 0, 1))"
+            if "planePoint" in required: yield "planePoint = matrix.to_translation()"
+            if "planeNormal" in required: yield "planeNormal = matrix.to_3x3() @ Vector((0, 0, 1))"

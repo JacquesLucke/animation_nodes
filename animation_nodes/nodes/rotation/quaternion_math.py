@@ -41,7 +41,7 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
     bl_label = "Quaternion Math"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    operation = EnumProperty(name = "Operation", default = "ADD",
+    operation: EnumProperty(name = "Operation", default = "ADD",
         items = operationItems, update = AnimationNode.refresh)
 
     def create(self):
@@ -51,7 +51,7 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
         if self.operation in operationsWithFloat:
             self.newInput("Float", "Scale", "scale").value = 1.0
         if self.operation in operationsWithStepQuaternion:
-            self.newInput("Quaternion", "Step Size", "stepSize").value = (0.1, 0.1, 0.1)
+            self.newInput("Quaternion", "Step Size", "stepSize").value = (0.1, 0.1, 0.1, 0.1)
 
         self.newOutput("Quaternion", "Result", "result")
 
@@ -61,12 +61,12 @@ class QuaternionMathNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return operationLabels[self.operation]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         op = self.operation
 
         if op == "ADD": return "result = a + b"
         elif op == "SUBTRACT": return "result = a - b"
-        elif op == "COMBINE": return "result = a * b"
+        elif op == "COMBINE": return "result = a @ b"
         elif op == "ROTATION_DIFFERENCE": return "result = a.rotation_difference(b)"
         elif op == "MULTIPLY": return "result = Quaternion((A * B for A, B in zip(a, b)))"
         elif op == "DIVIDE": return ("result = Quaternion((1, 0, 0, 0))",

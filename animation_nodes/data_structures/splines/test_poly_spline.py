@@ -75,39 +75,39 @@ class TestEvaluate(TestCase):
         self.spline.appendPoint((2, 10, 8))
 
     def testZero(self):
-        testEqual(self, self.spline.evaluate(0), (0, 0, 0))
+        testEqual(self, self.spline.evaluatePoint(0), (0, 0, 0))
 
     def testOne(self):
-        testEqual(self, self.spline.evaluate(1), (2, 10, 8))
+        testEqual(self, self.spline.evaluatePoint(1), (2, 10, 8))
 
     def testMiddle(self):
-        testEqual(self, self.spline.evaluate(0.25), (1, 2, 3))
-        testEqual(self, self.spline.evaluate(0.50), (2, 4, 6))
-        testEqual(self, self.spline.evaluate(0.75), (2, 7, 7))
+        testEqual(self, self.spline.evaluatePoint(0.25), (1, 2, 3))
+        testEqual(self, self.spline.evaluatePoint(0.50), (2, 4, 6))
+        testEqual(self, self.spline.evaluatePoint(0.75), (2, 7, 7))
 
     def testWrongType(self):
         with self.assertRaises(TypeError):
-            self.spline.evaluate("abc")
+            self.spline.evaluatePoint("abc")
 
     def testInvalidValue(self):
         with self.assertRaises(ValueError):
-            self.spline.evaluate(-1)
+            self.spline.evaluatePoint(-1)
         with self.assertRaises(ValueError):
-            self.spline.evaluate(1.5)
+            self.spline.evaluatePoint(1.5)
 
     def testEmptySpline(self):
         spline = PolySpline()
         with self.assertRaises(Exception):
-            spline.evaluate(0)
+            spline.evaluatePoint(0)
 
     def testCyclic(self):
         self.spline.cyclic = True
-        testEqual(self, self.spline.evaluate(0.0), (0, 0, 0))
-        testEqual(self, self.spline.evaluate(1/3), (2, 4, 6))
-        testEqual(self, self.spline.evaluate(0.5), (2, 7, 7))
-        testEqual(self, self.spline.evaluate(2/3), (2, 10, 8))
-        testEqual(self, self.spline.evaluate(5/6), (1, 5, 4))
-        testEqual(self, self.spline.evaluate(1.0), (0, 0, 0))
+        testEqual(self, self.spline.evaluatePoint(0.0), (0, 0, 0))
+        testEqual(self, self.spline.evaluatePoint(1/3), (2, 4, 6))
+        testEqual(self, self.spline.evaluatePoint(0.5), (2, 7, 7))
+        testEqual(self, self.spline.evaluatePoint(2/3), (2, 10, 8))
+        testEqual(self, self.spline.evaluatePoint(5/6), (1, 5, 4))
+        testEqual(self, self.spline.evaluatePoint(1.0), (0, 0, 0))
 
 class TestEvaluateTangent(TestCase):
     def setUp(self):
@@ -161,7 +161,7 @@ class TestGetSamples(TestCase):
         self.spline.appendPoint((10, 2, 10))
 
     def testNormal(self):
-        samples = self.spline.getSamples(4)
+        samples = self.spline.getDistributedPoints(4)
         self.assertEqual(len(samples), 4)
         testEqual(self, samples[0], (0, 0, 0))
         testEqual(self, samples[1], (4, 0, 0))
@@ -169,22 +169,22 @@ class TestGetSamples(TestCase):
         testEqual(self, samples[3], (10, 2, 10))
 
     def testZeroSamples(self):
-        samples = self.spline.getSamples(0)
+        samples = self.spline.getDistributedPoints(0)
         self.assertEqual(len(samples), 0)
 
     def testOneSample(self):
-        samples = self.spline.getSamples(1)
+        samples = self.spline.getDistributedPoints(1)
         self.assertEqual(len(samples), 1)
         testEqual(self, samples[0], (4, 1, 0))
 
     def testCyclicSimple(self):
         self.spline.cyclic = True
-        samples = self.spline.getSamples(2)
+        samples = self.spline.getDistributedPoints(2)
         testEqual(self, samples[0], (0, 0, 0))
         testEqual(self, samples[1], (4, 2, 0))
 
     def testStartEnd(self):
-        samples = self.spline.getSamples(5, start = 1/3, end = 2/3)
+        samples = self.spline.getDistributedPoints(5, start = 1/3, end = 2/3)
         testEqual(self, samples[0], (4, 0.0, 0))
         testEqual(self, samples[1], (4, 0.5, 0))
         testEqual(self, samples[2], (4, 1.0, 0))
@@ -192,7 +192,7 @@ class TestGetSamples(TestCase):
         testEqual(self, samples[4], (4, 2.0, 0))
 
     def testSwitchedParameters(self):
-        samples = self.spline.getSamples(4, start = 1, end = 0.5)
+        samples = self.spline.getDistributedPoints(4, start = 1, end = 0.5)
         testEqual(self, samples[0], (10, 2, 10))
         testEqual(self, samples[1], (7, 2, 5))
         testEqual(self, samples[2], (4, 2, 0))
@@ -200,25 +200,25 @@ class TestGetSamples(TestCase):
 
     def testNegativeAmount(self):
         with self.assertRaises(ValueError):
-            self.spline.getSamples(-1)
+            self.spline.getDistributedPoints(-1)
 
     def testParametersNotInRange(self):
         with self.assertRaises(ValueError):
-            self.spline.getSamples(5, start = -0.5)
+            self.spline.getDistributedPoints(5, start = -0.5)
         with self.assertRaises(ValueError):
-            self.spline.getSamples(5, start = 1.5)
+            self.spline.getDistributedPoints(5, start = 1.5)
         with self.assertRaises(ValueError):
-            self.spline.getSamples(5, end = -0.5)
+            self.spline.getDistributedPoints(5, end = -0.5)
         with self.assertRaises(ValueError):
-            self.spline.getSamples(5, end = 1.5)
+            self.spline.getDistributedPoints(5, end = 1.5)
 
     def testNotEvaluableSpline(self):
         spline = PolySpline()
         with self.assertRaises(Exception):
-            spline.getSamples(5)
+            spline.getDistributedPoints(5)
         spline.appendPoint((0, 0, 0))
         with self.assertRaises(Exception):
-            spline.getSamples(5)
+            spline.getDistributedPoints(5)
 
 class TestGetTangentSamples(TestCase):
     def setUp(self):
@@ -229,7 +229,7 @@ class TestGetTangentSamples(TestCase):
         self.spline.appendPoint((10, 2, 10))
 
     def testNormal(self):
-        samples = self.spline.getTangentSamples(5)
+        samples = self.spline.getDistributedTangents(5)
         self.assertEqual(len(samples), 5)
         testEqual(self, samples[0], (4, 0, 0))
         testEqual(self, samples[1], (4, 0, 0))

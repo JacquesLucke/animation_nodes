@@ -9,6 +9,6 @@ class GetAllSequencesNode(bpy.types.Node, AnimationNode):
         self.newInput("Scene", "Scene", "scene", hide = True)
         self.newOutput("Sequence List", "Sequences", "sequences")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         yield "editor = scene.sequence_editor if scene else None"
         yield "sequences = list(getattr(editor, 'sequences', []))"

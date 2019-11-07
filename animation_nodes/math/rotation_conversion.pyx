@@ -1,4 +1,4 @@
-from libc.math cimport atan2, sqrt, hypot
+from libc.math cimport atan2, sqrt, hypot, cos, sin
 from . matrix cimport normalizeMatrix_3x3_Part
 from . conversion cimport toPyEuler3
 
@@ -101,3 +101,24 @@ cdef void normalizedMatrixToQuaternion(Quaternion* q, Matrix3_or_Matrix4* m):
         q.w = -s * (m.a12 - m.a21)
         q.x = s * (m.a31 + m.a13)
         q.y = s * (m.a32 + m.a23)
+
+# Axis Angle to Matrix
+###########################################
+
+cdef void normalizedAxisAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, float angle):
+    normalizedAxisCosAngleToMatrix(m, axis, cos(angle))
+
+cdef void normalizedAxisCosAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, float cosAngle):
+    cdef float c = cosAngle
+    cdef float s = sqrt(1.0 - c * c)
+    cdef float t = 1 - c
+    cdef float x, y, z
+    x, y, z = axis.x, axis.y, axis.z
+
+    m.a11, m.a12, m.a13 = t*x*x+c,    t*x*y-z*s,  t*x*z+y*s
+    m.a21, m.a22, m.a23 = t*x*y+z*s,  t*y*y+c,    t*y*z-x*s
+    m.a31, m.a32, m.a33 = t*x*z-y*s,  t*y*z+x*s,  t*z*z+c
+
+    if Matrix3_or_Matrix4 is Matrix4:
+        m.a14, m.a24, m.a34 = 0, 0, 0
+        m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1

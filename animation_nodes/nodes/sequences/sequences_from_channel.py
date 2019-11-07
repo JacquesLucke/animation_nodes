@@ -10,6 +10,6 @@ class SequencesFromChannelNode(bpy.types.Node, AnimationNode):
         self.newInput("Scene", "Scene", "scene", hide = True)
         self.newOutput("Sequence List", "Sequences", "sequences")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return ("editor = scene.sequence_editor if scene else None",
                 "sequences = [sequence for sequence in getattr(editor, 'sequences', []) if sequence.channel == channel]")

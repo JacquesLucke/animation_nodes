@@ -8,11 +8,10 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeInputNode"
     bl_label = "Object Attribute Input"
     bl_width_default = 160
+    errorHandlingType = "MESSAGE"
 
-    attribute = StringProperty(name = "Attribute", default = "",
+    attribute: StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
-
-    errorMessage = StringProperty()
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
@@ -20,26 +19,22 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "attribute", text = "")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         code = self.evaluationExpression
 
         if not isCodeValid(code):
-            self.errorMessage = "Invalid Syntax"
+            yield "self.setErrorMessage('Invalid Syntax', show = len(self.attribute.strip()) > 0)"
             yield "value = None"
             return
-        else: self.errorMessage = ""
 
         yield "try:"
-        yield "    self.errorMessage = ''"
         yield "    " + code
         yield "except:"
-        yield "    if object: self.errorMessage = 'Attribute not found'"
+        yield "    if object: self.setErrorMessage('Attribute not found')"
         yield "    value = None"
 
     @property
@@ -50,5 +45,5 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     def createAutoExecutionTrigger(self):
         item = self.nodeTree.autoExecution.customTriggers.new("MONITOR_PROPERTY")
         item.idType = "OBJECT"
-        item.dataPath = self.attribute
-        item.idObjectName = self.inputs["Object"].objectName
+        item.dataPaths = self.attribute
+        item.object = self.inputs["Object"].object

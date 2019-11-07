@@ -4,7 +4,7 @@ from ... base_types import AnimationNode
 from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
 
-dataTypes = ["Object", "Scene", "Object Group", "Text Block"]
+dataTypes = ["Object", "Scene", "Text Block", "Collection"]
 
 filterTypeItems = [("STARTS_WITH", "Starts With", "All Objects with names starting with"),
                    ("ENDS_WITH", "Ends With", "All Objects with names ending with")]
@@ -12,20 +12,20 @@ filterTypeItems = [("STARTS_WITH", "Starts With", "All Objects with names starti
 class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FilterBlendDataListByNameNode"
     bl_label = "Filter Blend Data List By Name"
-    bl_width_default = 170
+    bl_width_default = 180
     dynamicLabelType = "ALWAYS"
 
     onlySearchTags = True
     searchTags = [("Filter {} List by Name".format(name), {"dataType" : repr(name)}) for name in dataTypes]
 
     # Should be set only on node creation
-    dataType = StringProperty(name = "Data Type", default = "Object",
+    dataType: StringProperty(name = "Data Type", default = "Object",
         update = AnimationNode.refresh)
 
-    filterType = EnumProperty(name = "Filter Type", default = "STARTS_WITH",
+    filterType: EnumProperty(name = "Filter Type", default = "STARTS_WITH",
         items = filterTypeItems, update = executionCodeChanged)
 
-    caseSensitive = BoolProperty(name = "Case Sensitive", default = False,
+    caseSensitive: BoolProperty(name = "Case Sensitive", default = False,
         update = executionCodeChanged)
 
     def create(self):
@@ -41,7 +41,7 @@ class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return "Filter {} List".format(self.dataType)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         operation = "startswith" if self.filterType == "STARTS_WITH" else "endswith"
 
         if self.caseSensitive:

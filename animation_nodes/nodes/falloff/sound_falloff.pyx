@@ -1,18 +1,15 @@
 import bpy
+import numpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from . constant_falloff import ConstantFalloff
+from ... algorithms.interpolations import Linear
+from ... data_structures cimport DoubleList, FloatList, BaseFalloff
 from . interpolate_list_falloff import createIndexBasedFalloff, createFalloffBasedFalloff
-from ... data_structures cimport (AverageSound, BaseFalloff, CompoundFalloff,
-                                  DoubleList, Interpolation)
+from .. sound.sound_spectrum import reductionFunctionItems, reductionFunctions, isValidRange
 
-soundTypeItems = [
+typeItems = [
     ("AVERAGE", "Average", "", "FORCE_TURBULENCE", 0),
     ("SPECTRUM", "Spectrum", "", "RNDCURVE", 1)
-]
-
-averageFalloffTypeItems = [
-    ("INDEX_OFFSET", "Index Offset", "", "NONE", 0)
 ]
 
 spectrumFalloffTypeItems = [
@@ -20,7 +17,7 @@ spectrumFalloffTypeItems = [
     ("FALLOFF_FREQUENCY", "Falloff Frequency", "NONE", 1)
 ]
 
-indexFrequencyExtensionTypeItems = [
+indexFrequencyExtensionItems = [
     ("LOOP", "Loop", "", "NONE", 0),
     ("MIRROR", "Mirror", "", "NONE", 1),
     ("EXTEND", "Extend Last", "NONE", 2)
@@ -29,112 +26,158 @@ indexFrequencyExtensionTypeItems = [
 class SoundFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SoundFalloffNode"
     bl_label = "Sound Falloff"
+    errorHandlingType = "EXCEPTION"
 
-    soundType = EnumProperty(name = "Sound Type", default = "AVERAGE",
-        items = soundTypeItems, update = AnimationNode.refresh)
+    __annotations__ = {}
 
-    averageFalloffType = EnumProperty(name = "Average Falloff Type", default = "INDEX_OFFSET",
-        items = averageFalloffTypeItems, update = AnimationNode.refresh)
+    __annotations__["type"] = EnumProperty(name = "Type", default = "SPECTRUM",
+        items = typeItems, update = AnimationNode.refresh)
+    __annotations__["spectrumFalloffType"] = EnumProperty(name = "Spectrum Falloff Type",
+        default = "INDEX_FREQUENCY", items = spectrumFalloffTypeItems, update = AnimationNode.refresh)
+    __annotations__["indexFrequencyExtensionType"] = EnumProperty(name = "Index Frequency Extension",
+        default = "LOOP", items = indexFrequencyExtensionItems, update = AnimationNode.refresh)
 
-    spectrumFalloffType = EnumProperty(name = "Spectrum Falloff Type", default = "INDEX_FREQUENCY",
-        items = spectrumFalloffTypeItems, update = AnimationNode.refresh)
+    __annotations__["fadeLowToZero"] = BoolProperty(name = "Fade Low Frequencies to Zero", 
+        default = False)
+    __annotations__["fadeHighToZero"] = BoolProperty(name = "Fade High Frequencies to Zero",
+        default = False)
 
-    indexFrequencyExtensionType = EnumProperty(name = "Index Frequency Extension Type", default = "LOOP",
-        items = indexFrequencyExtensionTypeItems, update = AnimationNode.refresh)
-
-    fadeLowFrequenciesToZero = BoolProperty(name = "Fade Low Frequencies to Zero", default = False)
-    fadeHighFrequenciesToZero = BoolProperty(name = "Fade High Frequencies to Zero", default = False)
-
-    useCurrentFrame = BoolProperty(name = "Use Current Frame", default = True,
-        update = AnimationNode.refresh)
+    __annotations__["reductionFunction"] = EnumProperty(name = "Reduction Function", default = "MAX",
+        description = "The function used to sample frequency bins", items = reductionFunctionItems)
+    __annotations__["smoothingSamples"] = IntProperty(name = "Smoothing Samples", default = 10, min = 0,
+        description = ("The number of frames computed to smooth the output."
+        " High value corresponds to more accurate results but with higher execution time"))
+    __annotations__["kaiserBeta"] = FloatProperty(name = "Kaiser Beta", default = 6, min = 0,
+        description = ("Beta parameter of the Kaiser window function."
+        " High value corresponds to higher main-lobe leaking and lower side-lobe leaking"))
 
     def create(self):
-        self.newInput("Sound", "Sound", "sound",
-            typeFilter = self.soundType, defaultDrawType = "PROPERTY_ONLY")
-        if not self.useCurrentFrame:
-            self.newInput("Float", "Frame", "frame")
+        self.newInput("Sound", "Sound", "sound")
+        self.newInput("Float", "Frame", "frame")
+        self.newInput("Float", "Attack", "attack", value = 0.005, minValue = 0, maxValue = 1)
+        self.newInput("Float", "Release", "release", value = 0.6, minValue = 0, maxValue = 1)
+        self.newInput("Float", "Amplitude", "amplitude", value = 10)
+        self.newInput("Float", "Low", "low", value = 0, minValue = 0, maxValue = 1, hide = True)
+        self.newInput("Float", "High", "high", value = 1, minValue = 0, maxValue = 1, hide = True)
 
-        if self.soundType == "AVERAGE":
-            if self.averageFalloffType == "INDEX_OFFSET":
-                self.newInput("Integer", "Offset", "offset", value = 1, minValue = 0)
-        elif self.soundType == "SPECTRUM":
+        if self.type == "AVERAGE":
+            self.newInput("Float", "Scale", "scale", value = 1, minValue = 0)
+        elif self.type == "SPECTRUM":
+            self.newInput("Integer", "Count", "count", value = 20, minValue = 1)
+            self.newInput("Interpolation", "Interpolation", "interpolation",
+                defaultDrawType = "PROPERTY_ONLY", category = "EXPONENTIAL",
+                easeIn = True, easeOut = False, hide = True)
             if self.spectrumFalloffType == "INDEX_FREQUENCY":
-                self.newInput("Float", "Length", "length", value = 10, minValue = 1)
+                self.newInput("Float", "Length", "length", value = 20, minValue = 1)
                 self.newInput("Float", "Offset", "offset")
             elif self.spectrumFalloffType == "FALLOFF_FREQUENCY":
                 self.newInput("Falloff", "Falloff", "falloff")
-            self.newInput("Interpolation", "Interpolation", "interpolation",
-                defaultDrawType = "PROPERTY_ONLY", category = "QUADRATIC",
-                easeIn = True, easeOut = True)
-
+        
+        self.newInput("Scene", "Scene", "scene", hide = True)
         self.newOutput("Falloff", "Falloff", "outFalloff")
 
     def draw(self, layout):
         col = layout.column()
-        col.prop(self, "soundType", text = "")
-        if self.soundType == "AVERAGE":
-            col.prop(self, "averageFalloffType", text = "")
-        else:
+        col.prop(self, "type", text = "")
+        if self.type == "SPECTRUM":
             col.prop(self, "spectrumFalloffType", text = "")
             if self.spectrumFalloffType == "INDEX_FREQUENCY":
                 col.prop(self, "indexFrequencyExtensionType", text = "")
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
-        col.label("Fade to zero:")
-        col.prop(self, "fadeLowFrequenciesToZero", text = "Low Frequencies")
-        col.prop(self, "fadeHighFrequenciesToZero", text = "High Frequencies")
+        col.label(text = "Fade to zero:")
+        col.prop(self, "fadeLowToZero", text = "Low Frequencies")
+        col.prop(self, "fadeHighToZero", text = "High Frequencies")
 
-    def getExecutionCode(self):
-        yield "if sound is not None and sound.type == self.soundType:"
-        if self.useCurrentFrame: yield "    _frame = self.nodeTree.scene.frame_current_final"
-        else:                    yield "    _frame = frame"
+        col = layout.column()
+        col.prop(self, "reductionFunction", text = "")
+        col.prop(self, "smoothingSamples")
+        col.prop(self, "kaiserBeta")
 
-        if self.soundType == "AVERAGE":
-            if self.averageFalloffType == "INDEX_OFFSET":
-                yield "    outFalloff = self.execute_Average_IndexOffset(sound, _frame, offset)"
-        elif self.soundType == "SPECTRUM":
-            if self.spectrumFalloffType == "INDEX_FREQUENCY":
-                yield "    outFalloff = self.execute_Spectrum_IndexFrequency(sound, _frame, length, offset, interpolation)"
-            elif self.spectrumFalloffType == "FALLOFF_FREQUENCY":
-                yield "    outFalloff = self.execute_Spectrum_FalloffFrequency(sound, _frame, falloff, interpolation)"
+    def getExecutionFunctionName(self):
+        if self.type == "AVERAGE": return "execute_Average_IndexOffset"
+        if self.spectrumFalloffType == "INDEX_FREQUENCY":
+            return "execute_Spectrum_IndexFrequency"
+        elif self.spectrumFalloffType == "FALLOFF_FREQUENCY":
+            return "execute_Spectrum_FalloffFrequency"
 
-        yield "else: outFalloff = self.getConstantFalloff(0)"
+    def execute_Average_IndexOffset(self, sound, frame, attack, release, amplitude,
+        low, high, scale, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
+        if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
 
-    def getConstantFalloff(self, value = 0):
-        return ConstantFalloff(value)
+        return Average_Index_SoundFalloff(sound, frame, scale, attack, release, amplitude,
+            low, high, scene.render.fps, self.smoothingSamples, self.kaiserBeta,
+            reductionFunctions[self.reductionFunction])
 
-    def execute_Average_IndexOffset(self, sound, frame, offset):
-        return Average_IndexOffset_SoundFalloff(sound, frame, offset)
-
-    def execute_Spectrum_IndexFrequency(self, sound, frame, length, offset, interpolation):
+    def execute_Spectrum_IndexFrequency(self, sound, frame, attack, release, amplitude,
+        low, high, count, interpolation, length, offset, scene):
         type = self.indexFrequencyExtensionType
-        myList = self.getFrequenciesAtFrame(sound, frame)
-        return createIndexBasedFalloff(type, myList, length, offset, interpolation)
+        frequencies = self.getFrequenciesAtFrame(sound, frame, attack, release, amplitude,
+            low, high, count, interpolation, scene)
+        return createIndexBasedFalloff(type, frequencies, length, offset, Linear())
 
-    def execute_Spectrum_FalloffFrequency(self, sound, frame, falloff, interpolation):
-        myList = self.getFrequenciesAtFrame(sound, frame)
-        return createFalloffBasedFalloff(falloff, myList, interpolation)
+    def execute_Spectrum_FalloffFrequency(self, sound, frame, attack, release, amplitude,
+        low, high, count, interpolation, falloff, scene):
+        frequencies = self.getFrequenciesAtFrame(sound, frame, attack, release, amplitude,
+            low, high, count, interpolation, scene)
+        return createFalloffBasedFalloff(falloff, frequencies, Linear())
 
-    def getFrequenciesAtFrame(self, sound, frame):
-        myList = DoubleList.fromValues(sound.evaluate(frame))
-        if self.fadeLowFrequenciesToZero:
-            myList = [0] + myList
-        if self.fadeHighFrequenciesToZero:
-            myList = myList + [0]
-        return myList
+    def getFrequenciesAtFrame(self, sound, frame, attack, release, amplitude, low, high,
+        count, interpolation, scene):
+        if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
+        if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
+        if count < 1: self.raiseErrorMessage("Invalid count!")
 
-cdef class Average_IndexOffset_SoundFalloff(BaseFalloff):
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
+            (frame + 1) / scene.render.fps, attack, release, self.smoothingSamples, self.kaiserBeta)
+        maxFrequency = len(spectrum) - 1
+
+        pins = interpolation.evaluateList(DoubleList.fromNumpyArray(numpy.linspace(
+            low, high, num = count - self.fadeLowToZero - self.fadeHighToZero + 1)))
+
+        bins = FloatList(count)
+        reductionFunction = reductionFunctions[self.reductionFunction]
+        for i in range(len(pins) - 1):
+            x, y = int(pins[i] * maxFrequency), int(pins[i + 1] * maxFrequency)
+            if x == y: y = x + 1
+            bins[i + self.fadeLowToZero] = reductionFunction(spectrum[x:y]) * amplitude
+
+        if self.fadeLowToZero: bins[0] = 0
+        if self.fadeHighToZero: bins[len(bins) - 1] = 0
+        return bins
+
+cdef class Average_Index_SoundFalloff(BaseFalloff):
     cdef:
-        AverageSound sound
-        float frame, offsetInverse
+        int fps, smoothingSamples
+        object sound, reductionFunction
+        float frame, scale, attack, release, amplitude, low, high, kaiserBeta
 
-    def __cinit__(self, AverageSound sound, float frame, offset):
+    def __cinit__(self, object sound, float frame, float scale,
+        float attack, float release, float amplitude, float low, float high,
+        int fps, int smoothingSamples, float kaiserBeta, object reductionFunction):
         self.sound = sound
         self.frame = frame
-        self.offsetInverse = 1 / offset if offset != 0 else 0
-        self.dataType = "All"
+        self.scale = scale
+        self.attack = attack
+        self.release = release
+        self.amplitude = amplitude
+        self.low = low
+        self.high = high
+        self.fps = fps
+        self.smoothingSamples = smoothingSamples
+        self.kaiserBeta = kaiserBeta
+        self.reductionFunction = reductionFunction
+        self.dataType = "None"
         self.clamped = False
 
-    cdef double evaluate(self, void *object, long index):
-        return self.sound.evaluate(self.frame - index * self.offsetInverse)
+    cdef float evaluate(self, void *object, Py_ssize_t index):
+        spectrum = self.sound.computeTimeSmoothedSpectrum(
+            (self.frame - index * self.scale) / self.fps,
+            (self.frame + 1 - index * self.scale) / self.fps,
+            self.attack, self.release, self.smoothingSamples, self.kaiserBeta)
+        cdef int maxFrequency = len(spectrum) - 1
+
+        return self.reductionFunction(
+            spectrum[int(self.low * maxFrequency):int(self.high * maxFrequency)]) * self.amplitude

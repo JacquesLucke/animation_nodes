@@ -10,7 +10,7 @@ class NodeCreator:
     nodeOffset = (0, 0)
     menuWidth = 400
 
-    usedMenu = BoolProperty(default = False)
+    usedMenu: BoolProperty(default = False)
 
     @classmethod
     def poll(cls, context):

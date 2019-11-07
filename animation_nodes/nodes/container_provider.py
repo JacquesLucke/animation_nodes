@@ -6,20 +6,12 @@ helperMaterialName = "Helper Material for Animation Nodes"
 
 
 def getMainObjectContainer(scene):
-    objectContainer = bpy.data.objects.get(mainObjectContainerName)
+    objectContainer = bpy.data.collections.get(mainObjectContainerName)
     if objectContainer is None:
-        objectContainer = newMainObjectContainer()
-    if objectContainer.name not in scene.objects:
-        scene.objects.link(objectContainer)
+        objectContainer = bpy.data.collections.new(mainObjectContainerName)
+    if objectContainer.name not in scene.collection.children:
+        scene.collection.children.link(objectContainer)
     return objectContainer
-
-def newMainObjectContainer():
-    objectContainer = bpy.data.objects.new(mainObjectContainerName, None)
-    objectContainer.hide = True
-    objectContainer.hide_render = True
-    objectContainer.hide_select = True
-    return objectContainer
-
 
 def getHelperMaterial():
     helperMaterial = bpy.data.materials.get(helperMaterialName)

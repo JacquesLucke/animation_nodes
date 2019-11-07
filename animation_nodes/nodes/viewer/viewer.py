@@ -1,33 +1,31 @@
 import bpy
+import math
 from bpy.props import *
 from itertools import chain
 from functools import lru_cache
-from ... base_types import AnimationNode
-from ... draw_handler import drawHandler
-from ... graphics.text_box import TextBox
+from ... base_types import AnimationNode, TextUIExtension
 
 drawTextByIdentifier = {}
 
 class ViewerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ViewerNode"
     bl_label = "Viewer"
-    bl_width_default = 190
-    options = {"NO_TIMING"}
+    bl_width_default = 180
 
-    maxRows = IntProperty(name = "Max Rows", default = 150, min = 0,
-        description = "Max amount of lines visible in the floating text box.")
-    fontSize = IntProperty(name = "Font Size", default = 12, min = 1, max = 1000)
+    maxRows: IntProperty(name = "Max Rows", default = 150, min = 0,
+        description = "Max amount of lines visible in the floating text box")
+    fontSize: IntProperty(name = "Font Size", default = 12, min = 1, max = 1000)
 
-    maxListStartElements = IntProperty(name = "Max List Start Elements", default = 15, min = 0)
-    maxListEndElements = IntProperty(name = "Max List End Elements", default = 0, min = 0)
+    maxListStartElements: IntProperty(name = "Max List Start Elements", default = 15, min = 0)
+    maxListEndElements: IntProperty(name = "Max List End Elements", default = 0, min = 0)
 
-    outputConsole = BoolProperty(name = "Console Output", default = False,
-        description = "Output data in the terminal/console. May slow down execution a lot.")
+    outputConsole: BoolProperty(name = "Console Output", default = False,
+        description = "Output data in the terminal/console. May slow down execution a lot")
 
-    outputTextBlock = BoolProperty(name = "Text Block Output", default = False,
-        description = "Output data in a text block. May slow down execution a lot.")
+    outputTextBlock: BoolProperty(name = "Text Block Output", default = False,
+        description = "Output data in a text block. May slow down execution a lot")
 
-    textBlockName = StringProperty(name = "Text Block Name")
+    textBlockName: StringProperty(name = "Text Block Name")
 
     def create(self):
         self.newInput("Generic", "None", "data")
@@ -40,23 +38,32 @@ class ViewerNode(bpy.types.Node, AnimationNode):
                 self.invokeSelector(row, "AREA", "viewTextBlockInArea",
                     icon = "ZOOM_SELECTED")
             else:
-                self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+                self.invokeFunction(row, "createNewTextBlock", icon = "ADD")
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
-        col.label("Display Settings:")
+        col.label(text = "Display Settings:")
         col.prop(self, "fontSize")
         col.prop(self, "maxRows")
 
         col = layout.column(align = True)
-        col.label("List Settings:")
+        col.label(text = "List Settings:")
         col.prop(self, "maxListStartElements", text = "Start")
         col.prop(self, "maxListEndElements", text = "End")
 
         col = layout.column(align = True)
-        col.label("Output Settings:")
-        col.prop(self, "outputConsole", "Console")
-        col.prop(self, "outputTextBlock", "Text Block")
+        col.label(text = "Output Settings:")
+        col.prop(self, "outputConsole", text = "Console")
+        col.prop(self, "outputTextBlock", text = "Text Block")
+
+    def getUIExtensions(self):
+        if self.hide:
+            return
+        text = drawTextByIdentifier.get(self.identifier, "")
+        if len(text) == 0:
+            return
+
+        return [TextUIExtension(text, self.fontSize, self.maxRows)]
 
     def execute(self, data):
         if handleDataAsList(data):
@@ -196,8 +203,13 @@ def handleNonList_Integer(number):
 def handleNonList_Vector(vector):
     return str(vector), "", 260
 
+radiansToDegreesFactor = 180 / math.pi
 def handleNonList_Euler(euler):
-    return str(euler), "", 340
+    return "<Euler (x={:.2f}°, y={:.2f}°, z={:.2f}°), order={}>".format(
+        euler[0] * radiansToDegreesFactor,
+        euler[1] * radiansToDegreesFactor,
+        euler[2] * radiansToDegreesFactor,
+        euler.order), "", 340
 
 def handleNonList_Matrix(matrix):
     return "Type: {}x{} Matrix".format(len(matrix.row), len(matrix.col)), str(matrix), 330
@@ -232,39 +244,14 @@ def handleListElement_Vector(vector):
     return "V({:>7.3f}, {:>7.3f}, {:>7.3f})".format(*vector)
 
 def handleListElement_Euler(euler):
-    return "E({:>7.3f}, {:>7.3f}, {:>7.3f}, order = {})".format(*euler, euler.order)
+    return "E({:>7.2f}°, {:>7.2f}°, {:>7.2f}°, order = {})".format(
+        euler[0] * radiansToDegreesFactor,
+        euler[1] * radiansToDegreesFactor,
+        euler[2] * radiansToDegreesFactor,
+        euler.order)
 
 def handleListElement_Quaternion(quaternion):
     return "Q({:>7.3f}, {:>7.3f}, {:>7.3f}, {:>7.3f})".format(*quaternion)
 
 def handleListElement_Float(number):
     return "{:>10.5f}".format(number)
-
-
-# Drawing
-##################################
-
-@drawHandler("SpaceNodeEditor", "WINDOW")
-def drawTextBoxes():
-    tree = bpy.context.getActiveAnimationNodeTree()
-    if tree is None:
-        return
-
-    for node in tree.nodes:
-        if node.bl_idname == "an_ViewerNode" and not node.hide:
-            drawTextBoxForNode(node)
-
-def drawTextBoxForNode(node):
-    text = drawTextByIdentifier.get(node.identifier, "")
-    if text == "":
-        return
-
-    region = bpy.context.region
-    leftBottom = node.getRegionBottomLeft(region)
-    rightBottom = node.getRegionBottomRight(region)
-    width = rightBottom.x - leftBottom.x
-
-    textBox = TextBox(text, leftBottom, width,
-                      fontSize = node.fontSize / node.dimensions.x * width,
-                      maxRows = node.maxRows)
-    textBox.draw()

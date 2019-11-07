@@ -7,9 +7,9 @@ class MoveViewToNode(bpy.types.Operator):
     bl_label = "Move View to Node"
     bl_description = ""
 
-    nodeIdentifier = StringProperty(default = "")
-    treeName = StringProperty()
-    nodeName = StringProperty()
+    nodeIdentifier: StringProperty(default = "")
+    treeName: StringProperty()
+    nodeName: StringProperty()
 
     @classmethod
     def poll(cls, context):

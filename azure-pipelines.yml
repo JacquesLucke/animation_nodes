@@ -1,0 +1,58 @@
+trigger:
+- master
+
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-latest'
+    mac:
+      imageName: 'macOS-latest'
+    windows:
+      imageName: 'windows-latest'
+
+pool:
+  vmImage: $(imageName)
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.7'
+    addToPath: true
+    architecture: 'x64'
+  displayName: 'Set Python Version'
+
+- script: |
+    python -m pip install --upgrade pip setuptools wheel
+    pip install Cython --install-option="--no-cython-compile"
+  displayName: 'Install Cython'
+  
+- script: |
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+    python setup.py build --export
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+  env:
+    DISTUTILS_USE_SDK: 1
+    PY_VCRUNTIME_REDIST: No
+  displayName: 'Build Windows'
+
+- task: PythonScript@0
+  condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
+  inputs:
+    scriptSource: 'filePath'
+    scriptPath: 'setup.py'
+    arguments: 'build --export'
+  displayName: 'Build Linux/MacOS'
+
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'JacquesLucke'
+    repositoryName: 'JacquesLucke/animation_nodes'
+    action: 'edit'
+    target: '$(Build.SourceVersion)'
+    tag: 'daily'
+    releaseNotesSource: 'inline'
+    assets: '$(Build.SourcesDirectory)/*.zip'
+    assetUploadMode: 'replace'
+    isPreRelease: true
+    addChangeLog: false
+  displayName: 'Update Release'

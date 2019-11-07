@@ -10,7 +10,7 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
     bl_label = "Loop Viewer"
     bl_width_default = 160
 
-    textBlockName = StringProperty(name = "Text")
+    textBlockName: StringProperty(name = "Text")
 
     def setup(self):
         self.newInput("Node Control", "...", "control")
@@ -37,12 +37,12 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
             row = layout.row(align = True)
             row.prop_search(self, "textBlockName", bpy.data, "texts", text = "")
             if self.textBlock is None:
-                self.invokeFunction(row, "createNewTextBlock", icon = "ZOOMIN")
+                self.invokeFunction(row, "createNewTextBlock", icon = "ADD")
             else:
                 self.invokeSelector(row, "AREA", "viewTextBlockInArea",
                     icon = "ZOOM_SELECTED")
         else:
-            layout.label("Has to be in a loop", icon = "INFO")
+            layout.label(text = "Has to be in a loop", icon = "INFO")
 
     def drawAdvanced(self, layout):
         col = layout.column(align = True)
@@ -52,7 +52,7 @@ class LoopViewerNode(bpy.types.Node, AnimationNode):
     def getInputSocketVariables(self):
         return {socket.identifier : "data_" + str(i) for i, socket in enumerate(self.inputs)}
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.network.type == "Loop":
             names = ["data_" + str(i) for i in range(len(self.inputs[:-1]))]
             return "self.newOutputLine({})".format(", ".join(names))

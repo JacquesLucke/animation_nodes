@@ -6,7 +6,7 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CharacterPropertiesOutputNode"
     bl_label = "Character Properties Output"
 
-    allowNegativeIndex = BoolProperty(default = True)
+    allowNegativeIndex: BoolProperty(default = True)
 
     def create(self):
         self.newInput("Object", "Text Object", "object", defaultDrawType = "PROPERTY_ONLY")
@@ -31,7 +31,7 @@ class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "allowNegativeIndex")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         lines = []
 
         if any([socket.isUsed for socket in self.inputs[3:]]):

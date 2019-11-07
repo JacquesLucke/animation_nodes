@@ -19,8 +19,8 @@ class NewIDKey(bpy.types.Operator):
     bl_idname = "an.new_id_key"
     bl_label = "New ID Key"
 
-    keyName = StringProperty(name = "Key Name")
-    keyDataType = EnumProperty(name = "Key Data Type", items = keyDataTypeItems)
+    keyName: StringProperty(name = "Key Name")
+    keyDataType: EnumProperty(name = "Key Data Type", items = keyDataTypeItems)
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self, width = 250 * getDpiFactor())

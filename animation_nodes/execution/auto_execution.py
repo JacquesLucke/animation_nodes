@@ -16,7 +16,8 @@ def executeNodeTrees(nodeTrees):
 
 def afterExecution():
     for scene in bpy.data.scenes:
-        scene.update()
+        for viewLayer in scene.view_layers:
+            viewLayer.update()
 
     from .. events import isRendering
     if not isRendering():

@@ -14,10 +14,7 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         return [(socket.dataType + " Input", {"assignedType" : repr(socket.dataType)})
                  for socket in getSocketClasses() if socket.hasProperty()]
 
-    assignedType = StringProperty(default = "Float", update = AnimationNode.refresh)
-
-    showInViewport = BoolProperty(default = False, name = "Show in Viewport",
-        description = "Draw the input of that node in the 'AN' category of the 3D view (Use the node label as name)")
+    assignedType: StringProperty(default = "Float", update = AnimationNode.refresh)
 
     def create(self):
         socket = self.newInput(self.assignedType, "Input", "value",
@@ -37,7 +34,7 @@ class DataInputNode(bpy.types.Node, AnimationNode):
             if hasattr(inputSocket, "drawProperty"):
                 inputSocket.drawProperty(layout, "", self)
             else:
-                layout.label("Default Used", icon = "INFO")
+                layout.label(text = "Default Used", icon = "INFO")
 
     def drawLabel(self):
         return self.inputs[0].dataType + " Input"
@@ -46,11 +43,7 @@ class DataInputNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(layout, "DATA_TYPE", "assignSocketType",
             text = "Change Type", icon = "TRIA_RIGHT")
 
-        col = layout.column()
-        col.active = self.inputs[0].hasProperty()
-        col.prop(self, "showInViewport")
-
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         # needs no execution, because no value is changed
         return []
 

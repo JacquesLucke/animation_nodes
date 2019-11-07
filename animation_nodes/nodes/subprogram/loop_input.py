@@ -29,19 +29,19 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         layout.separator()
         left, right = splitAlignment(layout)
         self.invokeSelector(left, "DATA_TYPE", "createGeneratorOutputNode",
-            dataTypes = "LIST", text = "", icon = "ZOOMIN", emboss = False)
-        right.label("New Generator Output")
+            dataTypes = "LIST", text = "", icon = "ADD", emboss = False)
+        right.label(text = "New Generator Output")
         layout.prop(self, "subprogramName", text = "", icon = "GROUP_VERTEX")
 
     def drawAdvanced(self, layout):
         col = layout.column()
-        col.label("Description:")
+        col.label(text = "Description:")
         col.prop(self, "subprogramDescription", text = "")
 
         layout.separator()
 
         col = layout.column()
-        col.label("Iterator Sockets:")
+        col.label(text = "Iterator Sockets:")
         box = col.box()
         for socket in self.getIteratorSockets():
             box.prop(socket.loop, "useAsOutput", text = "Use {} as Output".format(repr(socket.text)))
@@ -51,12 +51,12 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         layout.separator()
 
         col = layout.column()
-        col.label("Parameter Sockets:")
+        col.label(text = "Parameter Sockets:")
         box = col.box()
         for socket in self.getParameterSockets():
             subcol = box.column(align = False)
             row = subcol.row()
-            row.label(repr(socket.text))
+            row.label(text = repr(socket.text))
             self.invokeFunction(row, "createReassignParameterNode", text = "Reassign", data = socket.identifier)
             row = subcol.row()
             row.prop(socket.loop, "useAsInput", text = "Input")
@@ -71,12 +71,12 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         layout.separator()
 
         col = layout.column()
-        col.label("List Generators:")
+        col.label(text = "List Generators:")
         box = col.box()
         subcol = box.column(align = True)
         for i, node in enumerate(self.getSortedGeneratorNodes()):
             row = subcol.row(align = True)
-            row.label("{} - {}".format(repr(node.outputName), node.listDataType))
+            row.label(text = "{} - {}".format(repr(node.outputName), node.listDataType))
             self.invokeFunction(row, "moveGeneratorOutput", data = "{};-1".format(i), icon = "TRIA_UP")
             self.invokeFunction(row, "moveGeneratorOutput", data = "{};1".format(i), icon = "TRIA_DOWN")
         self.invokeSelector(box, "DATA_TYPE", "createGeneratorOutputNode",
@@ -106,8 +106,8 @@ class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
         left, right = splitAlignment(layout)
         self.invokeSelector(left, "DATA_TYPE", function,
-            dataTypes = dataTypes, icon = "ZOOMIN", emboss = False)
-        right.label(socket.name)
+            dataTypes = dataTypes, icon = "ADD", emboss = False)
+        right.label(text = socket.name)
 
 
     def newIterator(self, listDataType, name = None):

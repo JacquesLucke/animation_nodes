@@ -5,7 +5,7 @@ from ... base_types import AnimationNode
 dataTypes = {
     "Object" : "objects",
     "Scene" : "scenes",
-    "Object Group" : "groups",
+    "Collection" : "collections",
     "Text Block" : "texts" }
 
 class BlendDataByNameNode(bpy.types.Node, AnimationNode):
@@ -17,7 +17,7 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     searchTags = [(name + " by Name", {"dataType" : repr(name)}) for name in dataTypes.keys()]
 
     # Should be set only on node creation
-    dataType = StringProperty(name = "Data Type", default = "Object",
+    dataType: StringProperty(name = "Data Type", default = "Object",
         update = AnimationNode.refresh)
 
     def create(self):
@@ -27,5 +27,5 @@ class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     def drawLabel(self):
         return self.dataType + " by Name"
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         return "output = bpy.data.{}.get(name)".format(dataTypes[self.dataType])

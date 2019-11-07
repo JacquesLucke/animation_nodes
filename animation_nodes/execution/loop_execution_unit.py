@@ -145,7 +145,7 @@ class LoopExecutionUnit:
         for i, node in enumerate(inputNode.getSortedGeneratorNodes(nodeByID)):
             name = "loop_generator_output_" + str(i)
             variables[node] = name
-            yield "{} = bpy.types.{}.getDefaultValue()".format(name, toIdName(node.listDataType))
+            yield "{} = AN.sockets.info.getDefaultValue({})".format(name, repr(node.listDataType))
             yield "{0}_{1} = {1}.{0}".format(node.generatorType, name)
 
     def iter_InitializeParametersLines(self, inputNode, variables):

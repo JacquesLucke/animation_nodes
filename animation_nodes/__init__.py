@@ -23,11 +23,11 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node based visual scripting system designed for motion graphics in Blender.",
     "author":      "Jacques Lucke",
-    "version":     (2, 0, 4),
-    "blender":     (2, 78, 0),
-    "location":    "Node Editor",
+    "version":     (2, 1, 5),
+    "blender":     (2, 80, 0),
+    "location":    "Animation Nodes Editor",
     "category":    "Node",
-    "warning":     ""
+    "warning":     "This version is still in development."
 }
 
 
@@ -38,10 +38,18 @@ bl_info = {
 import os
 import sys
 import traceback
-from os.path import dirname, join, abspath
+from os.path import dirname, join, abspath, basename
 currentDirectory = dirname(abspath(__file__))
 addonsDirectory = dirname(currentDirectory)
 compilationInfoPath = join(currentDirectory, "compilation_info.json")
+addonName = basename(currentDirectory)
+
+
+if addonName != "animation_nodes":
+    message = ("\n\n"
+        "The name of the folder containing this addon has to be 'animation_nodes'.\n"
+        "Please rename it.")
+    raise Exception(message)
 
 
 counter = 0
@@ -52,15 +60,17 @@ for name in os.listdir(addonsDirectory):
 
 if counter > 1:
     message = ("\n\n"
-        "There are multiple versions of the Animation Nodes addon installed\n"
-        "Please uninstall/remove all older versions of the addon\n")
+        "There are multiple versions of the Animation Nodes addon installed.\n"
+        "Please uninstall/remove all older versions of the addon.\n\n"
+        "Animation Nodes has been found more than once in this folder:\n"
+        "  {}").format(addonsDirectory)
     raise Exception(message)
 
 
-try: from . import import_modules
+try: from . import auto_load
 except: pass
 
-if "import_modules" not in globals():
+if "auto_load" not in globals():
     message = ("\n\n"
         "The Animation Nodes addon cannot be registered correctly.\n"
         "Please try to remove and install it again.\n"
@@ -138,50 +148,30 @@ if "test_compile" not in globals():
         "  2. If you are on windows you can try to install a library called\n"
         "     'Visual C++ 2015 Redistributable'. Should be easy to find using\n"
         "     your search engine of choice.\n"
-        "  3. It is possible that you have a build for the correct platform\n"
+        "  3. Try to use an official Blender release downloaded from blender.org.\n"
+        "  4. It is possible that you have a build for the correct platform\n"
         "     but it still does not work. We experienced this mainly on linux.\n"
         "     Try to find another build for your platform.\n"
         "     If it still does not work, you have to compile AN yourself.\n"
-        "  4. Make a bug report on Github and give as much information\n"
+        "  5. Make a bug report on Github and give as much information\n"
         "     as you can. Specifically the full error message, your OS, version, ...")
     raise Exception(message)
-
-
-
-# Load all submodules
-##################################
-
-from . import import_modules
-modules = import_modules.importAllSubmodules(__path__[0], __package__)
-
-if "bpy" in locals():
-    print("Animation Nodes can't be reloaded.")
-
-
-
-# Initialization
-##################################
-
-from . sockets.info import updateSocketInfo
-updateSocketInfo()
 
 
 
 # register
 ##################################
 
-import bpy
+from . import auto_load
+auto_load.init()
+
+from . sockets.info import updateSocketInfo
+updateSocketInfo()
 
 def register():
-    bpy.utils.register_module(__name__)
-    for module in modules:
-        if hasattr(module, "register"):
-            module.register()
-    print("Registered Animation Nodes with {} modules.".format(len(modules)))
+    auto_load.register()
+    print("Registered Animation Nodes")
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-    for module in modules:
-        if hasattr(module, "unregister"):
-            module.unregister()
-    print("Unregistered Animation Nodes.")
+    auto_load.unregister()
+    print("Unregistered Animation Nodes")

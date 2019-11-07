@@ -1,27 +1,27 @@
 import bpy
-from ... base_types import VectorizedNode
 from ... data_structures import FloatList
+from ... base_types import AnimationNode, VectorizedSocket
 
-class SetSplineRadiusNode(bpy.types.Node, VectorizedNode):
+class SetSplineRadiusNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetSplineRadiusNode"
     bl_label = "Set Spline Radius"
 
-    useSplineList = VectorizedNode.newVectorizeProperty()
-    useRadiusList = VectorizedNode.newVectorizeProperty()
+    useSplineList: VectorizedSocket.newProperty()
+    useRadiusList: VectorizedSocket.newProperty()
 
     def create(self):
-        socket = self.newVectorizedInput("Spline", "useSplineList",
-            ("Spline", "spline"), ("Splines", "splines"))
+        socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
+            ("Spline", "spline"), ("Splines", "splines")))
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.dataIsModified = True
 
-        self.newVectorizedInput("Float", "useRadiusList",
+        self.newInput(VectorizedSocket("Float", "useRadiusList",
             ("Radius", "radius", dict(value = 0.1, minValue = 0)),
-            ("Radii", "radii"))
+            ("Radii", "radii")))
 
-        self.newVectorizedOutput("Spline", "useSplineList",
+        self.newOutput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline"),
-            ("Splines", "splines"))
+            ("Splines", "splines")))
 
     def getExecutionFunctionName(self):
         if self.useSplineList:
@@ -57,6 +57,9 @@ class SetSplineRadiusNode(bpy.types.Node, VectorizedNode):
         if len(radii) == length:
             return FloatList.fromValues(radii)
         elif len(radii) < length:
-            return FloatList.fromValues(radii) + FloatList.fromValue(0, length = length - len(radii))
+            if len(radii) == 0:
+                return FloatList.fromValue(0, length = length)
+            else:
+                return FloatList.fromValues(radii).repeated(length = length)
         else:
             return FloatList.fromValues(radii[:length])

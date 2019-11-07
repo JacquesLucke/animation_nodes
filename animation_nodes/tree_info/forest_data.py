@@ -20,7 +20,6 @@ class ForestData:
         self.reroutePairs = defaultdict(list)
 
         self.dataTypeBySocket = dict()
-        self.socketsThatNeedUpdate = set()
 
     def update(self):
         self._reset()
@@ -42,7 +41,6 @@ class ForestData:
         reroutePairs = self.reroutePairs
         dataTypeBySocket = self.dataTypeBySocket
         animationNodes = self.animationNodes
-        socketsThatNeedUpdate = self.socketsThatNeedUpdate
 
         for node in nodes:
             nodeID = (treeName, node.name)
@@ -69,9 +67,7 @@ class ForestData:
                 chainedSockets = chain(node.inputs, node.outputs)
                 chainedSocketIDs = chain(inputIDs, outputIDs)
                 for socket, socketID in zip(chainedSockets, chainedSocketIDs):
-                        dataTypeBySocket[socketID] = socket.dataType
-                        if hasattr(socket, "updateProperty"):
-                            socketsThatNeedUpdate.add(socketID)
+                    dataTypeBySocket[socketID] = socket.dataType
 
 
     def insertLinks(self, links, treeName):

@@ -1,6 +1,6 @@
 from libc.string cimport memcpy
 from ... utils.limits cimport INT_MAX
-from .. random cimport uniformRandomInteger
+from .. random cimport randomInt_Range
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from ... data_structures cimport CList, PolygonIndicesList, LongList
 random = __import__("random") # to avoid cython name clashes
@@ -40,7 +40,7 @@ def shuffle_CList(CList myList, seed):
         raise MemoryError()
 
     for i in range(length - 1, -1, -1):
-        offset = uniformRandomInteger(_seed + i, 0, i) * elementSize
+        offset = randomInt_Range(_seed + i, 0, i) * elementSize
 
         memcpy(tmp, data + offset, elementSize)
         memcpy(data + offset, data + i * elementSize, elementSize)

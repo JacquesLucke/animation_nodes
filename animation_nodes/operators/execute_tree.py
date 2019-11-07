@@ -8,7 +8,7 @@ class ExecuteNodeTree(bpy.types.Operator):
     bl_label = "Execute Node Tree"
     bl_description = "Execute all main networks in the tree"
 
-    name = StringProperty(name = "Node Tree Name")
+    name: StringProperty(name = "Node Tree Name")
 
     @classmethod
     def poll(cls, context):

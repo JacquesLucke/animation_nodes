@@ -17,15 +17,20 @@ class TextBox:
         self.lineHeight = self.fontSize * lineHeightFactor * getDpiFactor() * 1.2
 
         self.boundary = Rectangle()
-        self.boundary.color = (0.9, 0.9, 0.9, 0.6)
-        self.boundary.borderThickness = -1
-        self.boundary.borderColor = (0.9, 0.76, 0.4, 1.0)
+
+        self.color = (0.9, 0.9, 0.9, 0.6)
+        self.borderColor = (0.9, 0.76, 0.4, 1.0)
+        self.borderThickness = -1
 
     def draw(self):
         self.prepareFontDrawing()
         self.separateLines()
         self.calculateBoundaries()
-        self.boundary.draw()
+        self.boundary.draw(
+            color = self.color,
+            borderColor = self.borderColor,
+            borderThickness = self.borderThickness
+        )
         self.drawLines()
 
     def prepareFontDrawing(self):
@@ -60,11 +65,14 @@ class TextBox:
 
         self.boundary.resetPosition(x1, y1, x2, y2)
 
+    def getHeight(self):
+        return self.boundary.height
+
     def drawLines(self):
         offset = blf.dimensions(font, "Vg")[1]
         textBoundary = self.boundary.getInsetRectangle(self.padding)
 
-        glColor4f(0, 0, 0, 1)
+        blf.color(font, 0, 0, 0, 1)
         for i, line in enumerate(self.lines):
             blf.position(font, textBoundary.left, textBoundary.top - i * self.lineHeight - offset, 0)
             blf.draw(font, line)

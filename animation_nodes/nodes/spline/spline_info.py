@@ -12,7 +12,7 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SplineInfoNode"
     bl_label = "Spline Info"
 
-    splineType = EnumProperty(name = "Spline Type", default = "POLY",
+    splineType: EnumProperty(name = "Spline Type", default = "POLY",
         items = splineTypeItems, update = AnimationNode.refresh)
 
     def create(self):
@@ -22,26 +22,27 @@ class SplineInfoNode(bpy.types.Node, AnimationNode):
             self.newOutput("Vector List", "Left Handles", "leftHandles")
             self.newOutput("Vector List", "Right Handles", "rightHandles")
         self.newOutput("Float List", "Radii", "radii")
+        self.newOutput("Float List", "Tilts", "tilts")
         self.newOutput("Boolean", "Cyclic", "cyclic")
         self.newOutput("Integer", "Point Amount", "pointAmount")
 
     def draw(self, layout):
         layout.prop(self, "splineType", text = "")
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
-
-        if isLinked["points"]:
+    def getExecutionCode(self, required):
+        if "points" in required:
             yield "points = spline.points"
-        if isLinked["radii"]:
+        if "radii" in required:
             yield "radii = DoubleList.fromValues(spline.radii)"
-        if isLinked["cyclic"]:
+        if "tilts" in required:
+            yield "tilts = DoubleList.fromValues(spline.tilts)"
+        if "cyclic" in required:
             yield "cyclic = spline.cyclic"
-        if isLinked["pointAmount"]:
+        if "pointAmount" in required:
             yield "pointAmount = len(spline.points)"
 
         if self.splineType == "BEZIER":
-            if isLinked["leftHandles"]:
+            if "leftHandles" in required:
                 yield "leftHandles = spline.leftHandles if spline.type == 'BEZIER' else Vector3DList()"
-            if isLinked["rightHandles"]:
+            if "rightHandles" in required:
                 yield "rightHandles = spline.rightHandles if spline.type == 'BEZIER' else Vector3DList()"

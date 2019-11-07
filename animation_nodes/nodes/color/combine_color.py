@@ -18,7 +18,7 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
     bl_label = "Combine Color"
     dynamicLabelType = "HIDDEN_ONLY"
 
-    sourceType = EnumProperty(name = "Source Type", default = "RGB",
+    sourceType: EnumProperty(name = "Source Type", default = "RGB",
         items = sourceTypeItems, update = AnimationNode.refresh)
 
     def create(self):
@@ -46,12 +46,12 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "sourceType", expand = True)
 
     def drawAdvanced(self, layout):
-        layout.label("Uses linear color space", icon = "INFO")
+        layout.label(text = "Uses linear color space", icon = "INFO")
 
     def drawLabel(self):
         return "Color from {}a".format(self.sourceType)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.sourceType == "RGB":    yield "color = [red, green, blue, alpha]"
         elif self.sourceType == "HSV":  yield "color = [*colorsys.hsv_to_rgb(hue, saturation, value), alpha]"
         elif self.sourceType == "HSL":  yield "color = [*colorsys.hls_to_rgb(hue, lightness, saturation), alpha]"

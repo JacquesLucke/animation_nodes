@@ -11,12 +11,13 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GroupOutputNode"
     bl_label = "Group Output"
     bl_width_default = 180
+    onlySearchTags = True
 
     def inputNodeIdentifierChanged(self, context):
         subprogramInterfaceChanged()
         treeChanged()
 
-    groupInputIdentifier = StringProperty(update = inputNodeIdentifierChanged)
+    groupInputIdentifier: StringProperty(update = inputNodeIdentifierChanged)
 
     def setup(self):
         self.newInput("Node Control", "New Output", margin = 0.15)
@@ -31,15 +32,15 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         layout.separator()
 
         inputNode = self.network.getGroupInputNode()
-        if inputNode: layout.label(inputNode.subprogramName, icon = "GROUP_VERTEX")
+        if inputNode: layout.label(text = inputNode.subprogramName, icon = "GROUP_VERTEX")
         else: self.invokeFunction(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
         layout.separator()
 
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
-        left.label(socket.name)
+        left.label(text = socket.name)
         self.invokeSelector(right, "DATA_TYPE", "newGroupOutput",
-            icon = "ZOOMIN", emboss = False)
+            icon = "ADD", emboss = False)
 
     def edit(self):
         self.changeInputIdentifierIfNecessary()

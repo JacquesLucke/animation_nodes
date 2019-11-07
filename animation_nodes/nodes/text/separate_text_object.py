@@ -3,6 +3,7 @@ import random
 from bpy.props import *
 from mathutils import Vector, Matrix
 from ... base_types import AnimationNode
+from ... utils.objects import enterObjectMode
 from ... nodes.container_provider import getMainObjectContainer
 from ... utils.blender_ui import executeInAreaType, iterActiveSpacesByType
 
@@ -25,15 +26,14 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
     bl_label = "Separate Text Object"
     bl_width_default = 200
 
-    sourceObjectName = StringProperty(name = "Source Object")
-    currentID = IntProperty(default = 0)
-    objectCount = IntProperty(default = 0)
-    parentLetters = BoolProperty(name = "Parent to Main Container", default = True)
-    materialName = StringProperty(name = "Material", default = "")
+    sourceObjectName: StringProperty(name = "Source Object")
+    currentID: IntProperty(default = 0)
+    objectCount: IntProperty(default = 0)
+    materialName: StringProperty(name = "Material", default = "")
 
-    outputType = EnumProperty(name = "Output Type", default = "MESH",
+    outputType: EnumProperty(name = "Output Type", default = "MESH",
         items = outputTypeItems)
-    originType = EnumProperty(name = "Origin Type", default = "ORIGIN_CENTER_OF_MASS",
+    originType: EnumProperty(name = "Origin Type", default = "ORIGIN_CENTER_OF_MASS",
         items = originTypeItems)
 
     def create(self):
@@ -47,7 +47,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
         source = self.getSourceObject()
         if source is not None:
-            row.prop(source, "hide", text = "")
+            row.prop(source, "hide_viewport", text = "")
 
         layout.prop_search(self, "materialName", bpy.data, "materials", text = "Material", icon = "MATERIAL_DATA")
         layout.prop(self, "originType", text = "Origin")
@@ -58,23 +58,17 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             description = "Recreate the individual characters from the source object",
             icon = "FILE_REFRESH")
 
-    def drawAdvanced(self, layout):
-        layout.prop(self, "parentLetters")
-
-        self.invokeFunction(layout, "hideRelationshipLines",
-            text = "Hide Relationship Lines",
-            icon = "RESTRICT_VIEW_OFF")
-
     def assignActiveObject(self):
         self.sourceObjectName = getattr(bpy.context.active_object, "name", "")
 
     def execute(self):
         textObjects = [None] * self.objectCount
-        for object in bpy.context.scene.objects:
-            if self.isObjectPartOfThisNode(object):
-                index = getattr(object, '["{}"]'.format(indexPropertyName), -1)
-                if 0 <= index < self.objectCount:
-                    textObjects[index] = object
+        for scene in bpy.data.scenes:
+            for object in scene.objects:
+                if self.isObjectPartOfThisNode(object):
+                    index = getattr(object, '["{}"]'.format(indexPropertyName), -1)
+                    if 0 <= index < self.objectCount:
+                        textObjects[index] = object
         return textObjects
 
     def updateSeparation(self):
@@ -84,7 +78,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         source = self.getSourceObject()
         if source is None: return
         if source.data is None: return
-        source.hide = False
+        source.hide_viewport = False
 
         objects = splitTextObject(source)
         originalTexts = [object.data.body for object in objects]
@@ -96,10 +90,8 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if self.originType != "DEFAULT":
             setOriginType(self.originType)
 
-        if self.parentLetters:
-            parentObjectsToMainController(objects)
-
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
+            object.hide_select = True
             object[idPropertyName] = self.currentID
             object[indexPropertyName] = i
             object.id_keys.set("Text", "Initial Text", originalCharacter)
@@ -113,7 +105,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if material:
             setMaterialOnObjects(objects, material)
 
-        source.hide = True
+        source.hide_viewport = True
         source.hide_render = True
 
     def removeExistingObjects(self):
@@ -136,14 +128,13 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if getattr(source, "type", "") == "FONT": return source
         return None
 
-    def hideRelationshipLines(self):
-        for space in iterActiveSpacesByType("VIEW_3D"):
-            space.show_relationship_lines = False
-
     def duplicate(self, sourceNode):
         self.createNewNodeID()
 
+@executeInAreaType("VIEW_3D")
 def splitTextObject(sourceObject):
+    enterObjectMode()
+
     objects = []
     # each character can consist of multiple splines
     # but the splines for one character are in a specific order
@@ -171,7 +162,7 @@ def newCharacterObject(name, sourceData, index):
     copyTextCharacterFormat(sourceData.body_format[index], newTextData.body_format[0])
 
     characterObject = bpy.data.objects.new(name, newTextData)
-    bpy.context.scene.objects.link(characterObject)
+    getMainObjectContainer(bpy.context.scene).objects.link(characterObject)
     return characterObject
 
 def copyTextCharacterFormat(source, target):
@@ -183,7 +174,7 @@ def copyTextCharacterFormat(source, target):
 
 def setCharacterPosition(charObject, source, sourceSplinePosition, offsetPosition):
     characterOffset = sourceSplinePosition - offsetPosition
-    charObject.matrix_world = source.matrix_world * Matrix.Translation(characterOffset)
+    charObject.matrix_world = source.matrix_world @ Matrix.Translation(characterOffset)
 
 def getSplinePositions(textObject):
     makeObjectActive(textObject)
@@ -194,33 +185,30 @@ def getSplinePositions(textObject):
 
 def makeObjectActive(object):
     bpy.ops.object.select_all(action = "DESELECT")
-    bpy.context.scene.objects.active = object
-    object.select = True
+    bpy.context.view_layer.objects.active = object
+    object.select_set(True)
 
 def onlySelectList(objects):
     bpy.ops.object.select_all(action = "DESELECT")
     if len(objects) == 0:
-        bpy.context.scene.objects.active = None
+        bpy.context.view_layer.objects.active = None
     else:
-        bpy.context.scene.objects.active = objects[0]
+        bpy.context.view_layer.objects.active = objects[0]
     for object in objects:
-        object.select = True
+        object.select_set(True)
 
 def newCurveFromActiveObject():
     bpy.ops.object.convert(target = "CURVE", keep_original = True)
-    return bpy.context.scene.objects.active
+    return bpy.context.view_layer.objects.active
 
-@executeInAreaType("VIEW_3D")
 def convertSelectedObjects(type = "MESH"):
     bpy.ops.object.convert(target = type)
 
-@executeInAreaType("VIEW_3D")
 def setOriginType(type = "ORIGIN_GEOMETRY"):
     bpy.ops.object.origin_set(type = type)
 
 def removeObject(object):
     if object.mode != "OBJECT": bpy.ops.object.mode_set(mode = "OBJECT")
-    bpy.context.scene.objects.unlink(object)
     objectType = object.type
     data = object.data
     bpy.data.objects.remove(object)
@@ -228,11 +216,6 @@ def removeObject(object):
         bpy.data.curves.remove(data)
     elif objectType == "MESH":
         bpy.data.meshes.remove(data)
-
-def parentObjectsToMainController(objects):
-    mainController = getMainObjectContainer(bpy.context.scene)
-    for object in objects:
-        object.parent = mainController
 
 def setMaterialOnObjects(objects, material):
     for object in objects:

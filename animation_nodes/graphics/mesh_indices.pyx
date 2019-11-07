@@ -1,7 +1,6 @@
 cimport cython
 
 import bpy
-import bgl
 import blf
 from .. utils.blender_ui import getDpi
 from .. data_structures cimport Vector3DList, EdgeIndicesList
@@ -36,14 +35,14 @@ cdef drawPointIndices(object, Vector3DList points, color, fontSize):
     cdef Matrix4 transformation = getTransformationMatrix(object)
 
     blf.size(0, fontSize, int(getDpi()))
-    bgl.glColor3f(*color)
+    blf.color(0, *color, 1)
     for i in range(len(points)):
         drawAtPoint(points.data + i, str(i), &transformation, width, height)
 
 cdef Matrix4 getTransformationMatrix(object) except *:
     viewMatrix = bpy.context.space_data.region_3d.perspective_matrix
     objectMatrix = object.matrix_world
-    return toMatrix4(viewMatrix * objectMatrix)
+    return toMatrix4(viewMatrix @ objectMatrix)
 
 blfDraw = blf.draw
 blfPosition = blf.position

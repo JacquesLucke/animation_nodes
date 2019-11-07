@@ -17,7 +17,7 @@ def drawNodeSettings(layout, node):
     if debuggingIsEnabled():
         layout.separator()
         drawGenericNodeProperties(layout, node)
-        layout.label("Identifier: " + node.identifier)
+        layout.label(text = "Identifier: " + node.identifier)
 
 def drawGenericNodeProperties(layout, node):
     layout.prop(node, "width", text = "Width")
@@ -34,30 +34,30 @@ def drawSocketLists(layout, node):
     if len(node.inputs) > 0:
         col = row.column()
         subrow = col.row(align = True)
-        subrow.label("Inputs")
+        subrow.label(text = "Inputs")
         subrow.operator("an.move_input", text = "", icon = "TRIA_UP").moveUp = True
         subrow.operator("an.move_input", text = "", icon = "TRIA_DOWN").moveUp = False
-        col.template_list("an_SocketUiList_Normal", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
+        col.template_list("AN_UL_SocketUiList_Normal", "", node, "inputs", node, "activeInputIndex", rows = size, maxrows = size)
 
     if len(node.outputs) > 0:
         col = row.column()
         subrow = col.row(align = True)
-        subrow.label("Outputs")
+        subrow.label(text = "Outputs")
         subrow.operator("an.move_output", text = "", icon = "TRIA_UP").moveUp = True
         subrow.operator("an.move_output", text = "", icon = "TRIA_DOWN").moveUp = False
-        col.template_list("an_SocketUiList_Normal", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
+        col.template_list("AN_UL_SocketUiList_Normal", "", node, "outputs", node, "activeOutputIndex", rows = size, maxrows = size)
 
 
 class SocketUiList_Normal(bpy.types.UIList):
-    bl_idname = "an_SocketUiList_Normal"
+    bl_idname = "AN_UL_SocketUiList_Normal"
 
     def draw_item(self, context, layout, node, socket, icon, activeData, activePropname):
         if not isinstance(socket, AnimationNodeSocket):
-            layout.label("No Animation Node Socket")
+            layout.label(text = "No Animation Node Socket")
             return
         if socket.textProps.editable:
             layout.prop(socket, "text", emboss = False, text = "")
-        else: layout.label(socket.getDisplayedName())
+        else: layout.label(text = socket.getDisplayedName())
 
         if socket.removeable:
             socket.invokeFunction(layout, node, "remove", icon = "X", emboss = False)
@@ -70,7 +70,7 @@ class MoveInputSocket(bpy.types.Operator):
     bl_idname = "an.move_input"
     bl_label = "Move Input"
 
-    moveUp = BoolProperty()
+    moveUp: BoolProperty()
 
     @classmethod
     def poll(cls, context):
@@ -84,7 +84,7 @@ class MoveOutputSocket(bpy.types.Operator):
     bl_idname = "an.move_output"
     bl_label = "Move Output"
 
-    moveUp = BoolProperty()
+    moveUp: BoolProperty()
 
     @classmethod
     def poll(cls, context):

@@ -1,13 +1,14 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
 from ... algorithms.lists import mask_CList
-from ... data_structures import BooleanList, Vector3DList, DoubleList, FloatList
+from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import BooleanList, Vector3DList, DoubleList, FloatList, QuaternionList
 
 particleAttributes = [
     ("Locations", "locations", "location", "Vector List", Vector3DList),
     ("Velocities", "velocities", "velocity", "Vector List", Vector3DList),
+    ("Rotations", "rotations", "rotation", "Quaternion List", QuaternionList),
     ("Sizes", "sizes", "size", "Float List", FloatList),
     ("Birth Times", "birthTimes", "birth_time", "Float List", FloatList),
     ("Die Times", "dieTimes", "die_time", "Float List", FloatList)
@@ -16,21 +17,25 @@ particleAttributes = [
 outputsData = [(type, name, identifier) for name, identifier, _, type, *_ in particleAttributes]
 executionData = [(identifier, attribute, CListType) for _, identifier, attribute, _, CListType in particleAttributes]
 
-class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
+class ParticleSystemParticlesDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticleSystemParticlesDataNode"
     bl_label = "Particles Data"
 
-    includeUnborn = BoolProperty(name = "Include Unborn", default = False, update = executionCodeChanged)
-    includeAlive = BoolProperty(name = "Include Alive", default = True, update = executionCodeChanged)
-    includeDying = BoolProperty(name = "Include Dying", default = False, update = executionCodeChanged)
-    includeDead = BoolProperty(name = "Include Dead", default = False, update = executionCodeChanged)
+    includeUnborn: BoolProperty(name = "Include Unborn", default = False,
+        update = executionCodeChanged)
+    includeAlive: BoolProperty(name = "Include Alive", default = True,
+        update = executionCodeChanged)
+    includeDying: BoolProperty(name = "Include Dying", default = False,
+        update = executionCodeChanged)
+    includeDead: BoolProperty(name = "Include Dead", default = False,
+        update = executionCodeChanged)
 
-    useParticleSystemList = VectorizedNode.newVectorizeProperty()
+    useParticleSystemList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Particle System", "useParticleSystemList",
+        self.newInput(VectorizedSocket("Particle System", "useParticleSystemList",
             ("Particle System", "particleSystem"),
-            ("Particle Systems", "particleSystems"))
+            ("Particle Systems", "particleSystems")))
 
         for dataType, name, identifier in outputsData:
             self.newOutput(dataType, name, identifier)
@@ -47,13 +52,12 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
         row.prop(self, "includeDying", text = "Dying", toggle = True)
         row.prop(self, "includeDead", text = "Dead", toggle = True)
 
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+    def getExecutionCode(self, required):
         if not self.useParticleSystemList:
             yield "particleSystems = [particleSystem]"
 
         for identifier, attribute, CListType in executionData:
-            if isLinked[identifier]:
+            if identifier in required:
                 yield "{} = {}()".format(identifier, CListType.__name__)
 
         yield "for system in particleSystems:"
@@ -62,13 +66,17 @@ class ParticleSystemParticlesDataNode(bpy.types.Node, VectorizedNode):
 
         yield "    _mask = self.getParticlesMask(system.particles)"
         for identifier, attribute, CListType in executionData:
-            if not isLinked[identifier]: continue
+            if not identifier in required: continue
             yield "    values = self.getParticleProperties(system, '{}', {}, _mask)".format(attribute, CListType.__name__)
             yield "    {}.extend(values)".format(identifier)
 
-        # convert FloatList to DoubleList
         for identifier, attribute, CListType in executionData:
-            if isLinked[identifier]:
+            if identifier in required:
+                # Correct particle rotations.
+                if attribute == "rotation":
+                    yield "{0} = AN.nodes.particles.c_utils.correctParticleRotations({0})".format(identifier)
+                
+                # Convert FloatList to DoubleList.
                 if CListType is FloatList:
                     yield "{0} = DoubleList.fromValues({0})".format(identifier)
 

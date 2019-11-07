@@ -8,10 +8,10 @@ from ... base_types import AnimationNode
 class SetVertexColorNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetVertexColorNode"
     bl_label = "Set Vertex Color"
+    errorHandlingType = "EXCEPTION"
 
-    vertexColorName = StringProperty(name = "Vertex Color Group", default = "Col", update = propertyChanged)
-    checkIfColorIsSet = BoolProperty(default = True)
-    errorMessage = StringProperty()
+    vertexColorName: StringProperty(name = "Vertex Color Group", default = "Col", update = propertyChanged)
+    checkIfColorIsSet: BoolProperty(default = True)
 
     def create(self):
         self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
@@ -20,25 +20,22 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "vertexColorName", text = "", icon = "GROUP_VCOL")
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "checkIfColorIsSet", text = "Check Color")
 
     def execute(self, object, color):
-        self.errorMessage = ""
         if object is None: return object
         if object.type != "MESH": return object
         if object.mode == "EDIT":
-            self.errorMessage = "Object is in edit mode"
+            self.raiseErrorMessage("Object is in edit mode")
             return object
 
         mesh = object.data
 
         # Vertex Colors are internally stored with 8 bytes
         # I compress the color already here for an easier comparison
-        newColor = tuple(min(max(int(x * 255) / 255, 0), 1) for x in color[:3])
+        newColor = tuple(min(max(int(x * 255) / 255, 0), 1) for x in color)
 
         colorLayer = getVertexColorLayer(mesh, self.vertexColorName)
         if len(colorLayer.data) == 0: return object
@@ -59,7 +56,7 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
 def getVertexColorLayer(mesh, name):
     try: return mesh.vertex_colors[name]
-    except: return mesh.vertex_colors.new(name)
+    except: return mesh.vertex_colors.new(name = name)
 
 def colorsAreEqual(a, b):
     return abs((a[0] * 100 + a[1] * 10 + a[2])

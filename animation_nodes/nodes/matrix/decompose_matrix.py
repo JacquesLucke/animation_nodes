@@ -1,39 +1,39 @@
 import bpy
-from ... base_types import VectorizedNode
-from . c_utils import (extractMatrixTranslations,
-                                    extractMatrixRotations,
-                                    extractMatrixScales)
+from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import (
+    extractMatrixTranslations,
+    extractMatrixRotations,
+    extractMatrixScales
+)
 
-class DecomposeMatrixNode(bpy.types.Node, VectorizedNode):
+class DecomposeMatrixNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DecomposeMatrixNode"
     bl_label = "Decompose Matrix"
 
-    useMatrixList = VectorizedNode.newVectorizeProperty()
+    useMatrixList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Matrix", "useMatrixList",
-            ("Matrix", "matrix"), ("Matrices", "matrices"))
+        self.newInput(VectorizedSocket("Matrix", "useMatrixList",
+            ("Matrix", "matrix"), ("Matrices", "matrices")))
 
-        self.newVectorizedOutput("Vector", "useMatrixList",
-            ("Translation", "translation"), ("Translations", "translations"))
+        self.newOutput(VectorizedSocket("Vector", "useMatrixList",
+            ("Translation", "translation"), ("Translations", "translations")))
 
-        self.newVectorizedOutput("Euler", "useMatrixList",
-            ("Rotation", "rotation"), ("Rotations", "rotations"))
+        self.newOutput(VectorizedSocket("Euler", "useMatrixList",
+            ("Rotation", "rotation"), ("Rotations", "rotations")))
 
-        self.newVectorizedOutput("Vector", "useMatrixList",
-            ("Scale", "scale"), ("Scales", "scales"))
+        self.newOutput(VectorizedSocket("Vector", "useMatrixList",
+            ("Scale", "scale"), ("Scales", "scales")))
 
-
-    def getExecutionCode(self):
-        isLinked = self.getLinkedOutputsDict()
+    def getExecutionCode(self, required):
         if self.useMatrixList:
-            if isLinked["translations"]: yield "translations = self.toTranslations(matrices)"
-            if isLinked["rotations"]:    yield "rotations = self.toRotations(matrices)"
-            if isLinked["scales"]:       yield "scales = self.toScales(matrices)"
+            if "translations" in required: yield "translations = self.toTranslations(matrices)"
+            if "rotations" in required:    yield "rotations = self.toRotations(matrices)"
+            if "scales" in required:       yield "scales = self.toScales(matrices)"
         else:
-            if isLinked["translation"]: yield "translation = matrix.to_translation()"
-            if isLinked["rotation"]:    yield "rotation = matrix.to_euler()"
-            if isLinked["scale"]:       yield "scale = matrix.to_scale()"
+            if "translation" in required: yield "translation = matrix.to_translation()"
+            if "rotation" in required:    yield "rotation = matrix.to_euler()"
+            if "scale" in required:       yield "scale = matrix.to_scale()"
 
     def toTranslations(self, matrices):
         return extractMatrixTranslations(matrices)

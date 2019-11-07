@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
 from collections import OrderedDict
-from ... base_types import VectorizedNode
 from ... utils.handlers import validCallback
+from ... base_types import AnimationNode, VectorizedSocket
 
 from ... data_structures cimport DoubleList
 from ... math cimport min as minNumber
@@ -41,21 +41,25 @@ cdef class Operation:
 
     def execute_A_B(self, a, b):
         if isinstance(a, DoubleList) and isinstance(b, DoubleList):
-            if len(a) == len(b):
-                return self._execute_A_B_Both(a, b)
-            else:
-                raise ValueError("lists have different length")
+            return self._execute_A_B_Both(a, b)
         elif isinstance(a, DoubleList):
             return self._execute_A_B_Left(a, b)
         elif isinstance(b, DoubleList):
             return self._execute_A_B_Right(a, b)
 
     def _execute_A_B_Both(self, DoubleList a, DoubleList b):
-        cdef DoubleList result = DoubleList(length = a.length)
+        cdef Py_ssize_t resultLength = max(a.length, b.length)
+        cdef DoubleList result = DoubleList(length = resultLength)
         cdef DoubleInputFunction f = <DoubleInputFunction>self.function
-        cdef long i
-        for i in range(result.length):
-            result.data[i] = f(a.data[i], b.data[i])
+        cdef Py_ssize_t i
+        if a.length == b.length:
+            for i in range(resultLength):
+                result.data[i] = f(a.data[i], b.data[i])
+        else:
+            if a.length == 0: a = DoubleList.fromValue(0)
+            if b.length == 0: b = DoubleList.fromValue(0)
+            for i in range(resultLength):
+                result.data[i] = f(a.data[i % a.length], b.data[i % b.length])
         return result
 
     def _execute_A_B_Left(self, DoubleList a, double b):
@@ -150,7 +154,7 @@ searchItems = {
 
 justCopiedIdentifiers = set()
 
-class FloatMathNode(bpy.types.Node, VectorizedNode):
+class FloatMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FloatMathNode"
     bl_label = "Float Math"
     dynamicLabelType = "ALWAYS"
@@ -162,17 +166,17 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
             justCopiedIdentifiers.remove(self.identifier)
         self.refresh()
 
-    operation = EnumProperty(name = "Operation", default = "Multiply",
+    __annotations__ = {}
+
+    __annotations__["operation"] = EnumProperty(name = "Operation", default = "Multiply",
         description = "Operation to perform on the inputs",
         items = operationItems, update = operationChanged)
 
-    errorMessage = StringProperty()
-
-    useListA = VectorizedNode.newVectorizeProperty()
-    useListB = VectorizedNode.newVectorizeProperty()
-    useListBase = VectorizedNode.newVectorizeProperty()
-    useListExponent = VectorizedNode.newVectorizeProperty()
-    useListStep = VectorizedNode.newVectorizeProperty()
+    __annotations__["useListA"] = VectorizedSocket.newProperty()
+    __annotations__["useListB"] = VectorizedSocket.newProperty()
+    __annotations__["useListBase"] = VectorizedSocket.newProperty()
+    __annotations__["useListExponent"] = VectorizedSocket.newProperty()
+    __annotations__["useListStep"] = VectorizedSocket.newProperty()
 
     def create(self):
         usedProperties = []
@@ -181,11 +185,11 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
             listProperty = "useList" + name
             usedProperties.append(listProperty)
 
-            self.newVectorizedInput("Float", listProperty,
-                (name, name.lower()), (name, name.lower()))
+            self.newInput(VectorizedSocket("Float", listProperty,
+                (name, name.lower()), (name, name.lower())))
 
-        self.newVectorizedOutput("Float", [usedProperties],
-            ("Result", "result"), ("Results", "results"))
+        self.newOutput(VectorizedSocket("Float", usedProperties,
+            ("Result", "result"), ("Results", "results")))
 
     def draw(self, layout):
         showQuickOptions = self.identifier in justCopiedIdentifiers
@@ -205,12 +209,9 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
             self.invokeFunction(row, "setOperation", "Mul", data = "Multiply")
             self.invokeFunction(row, "setOperation", "Div", data = "Divide")
 
-        if self.errorMessage != "":
-            layout.label(self.errorMessage, icon = "ERROR")
-
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "removeQuickSettings", "Remove Quick Settings",
-            description = "Remove quick settings from all Float Math nodes.")
+            description = "Remove quick settings from all Float Math nodes")
 
     def drawLabel(self):
         if not self.hide:
@@ -226,24 +227,19 @@ class FloatMathNode(bpy.types.Node, VectorizedNode):
     def setOperation(self, operation):
         self.operation = operation
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.generatesList:
             currentType = self._operation.type
-            yield "try:"
-            yield "    self.errorMessage = ''"
             if currentType == "A":
-                yield "    results = self._operation.execute_A(a)"
+                yield "results = self._operation.execute_A(a)"
             elif currentType == "A_B":
-                yield "    results = self._operation.execute_A_B(a, b)"
+                yield "results = self._operation.execute_A_B(a, b)"
             elif currentType == "Base_Exponent":
-                yield "    results = self._operation.execute_A_B(base, exponent)"
+                yield "results = self._operation.execute_A_B(base, exponent)"
             elif currentType == "A_Step":
-                yield "    results = self._operation.execute_A_B(a, step)"
+                yield "results = self._operation.execute_A_B(a, step)"
             elif currentType == "A_Base":
-                yield "    results = self._operation.execute_A_B(a, base)"
-            yield "except Exception as e:"
-            yield "    self.errorMessage = str(e)"
-            yield "    results = self.outputs[0].getDefaultValue()"
+                yield "results = self._operation.execute_A_B(a, base)"
         else:
             yield self._operation.expression
 

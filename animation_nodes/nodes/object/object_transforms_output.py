@@ -1,46 +1,48 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
+from ... base_types import AnimationNode, VectorizedSocket
 from ... events import executionCodeChanged
 
-class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
+class ObjectTransformsOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectTransformsOutputNode"
     bl_label = "Object Transforms Output"
-    bl_width_default = 165
-    autoVectorizeExecution = True
+    bl_width_default = 180
+    codeEffects = [VectorizedSocket.CodeEffect]
 
     def checkedPropertiesChanged(self, context):
         self.updateSocketVisibility()
         executionCodeChanged()
 
-    useLocation = BoolVectorProperty(update = checkedPropertiesChanged)
-    useRotation = BoolVectorProperty(update = checkedPropertiesChanged)
-    useScale = BoolVectorProperty(update = checkedPropertiesChanged)
+    useLocation: BoolVectorProperty(update = checkedPropertiesChanged)
+    useRotation: BoolVectorProperty(update = checkedPropertiesChanged)
+    useScale: BoolVectorProperty(update = checkedPropertiesChanged)
 
-    deltaTransforms = BoolProperty(name = "Delta Transforms", default = False,
+    deltaTransforms: BoolProperty(name = "Delta Transforms", default = False,
         description = "Apply changes on delta transforms",
         update = executionCodeChanged)
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
-    useLocationList = VectorizedNode.newVectorizeProperty()
-    useRotationList = VectorizedNode.newVectorizeProperty()
-    useScaleList = VectorizedNode.newVectorizeProperty()
+    useObjectList: VectorizedSocket.newProperty()
+    useLocationList: VectorizedSocket.newProperty()
+    useRotationList: VectorizedSocket.newProperty()
+    useScaleList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects"),
+            dict(allowListExtension = False)))
 
-        self.newVectorizedInput("Vector", ("useLocationList", ["useObjectList"]),
-            ("Location", "location"), ("Locations", "locations"))
-        self.newVectorizedInput("Euler", ("useRotationList", ["useObjectList"]),
-            ("Rotation", "rotation"), ("Rotations", "rotations"))
-        self.newVectorizedInput("Vector", ("useScaleList", ["useObjectList"]),
+        self.newInput(VectorizedSocket("Vector", ["useLocationList", "useObjectList"],
+            ("Location", "location"), ("Locations", "locations")))
+        self.newInput(VectorizedSocket("Euler", ["useRotationList", "useObjectList"],
+            ("Rotation", "rotation"), ("Rotations", "rotations")))
+        self.newInput(VectorizedSocket("Vector", ["useScaleList", "useObjectList"],
             ("Scale", "scale", dict(value = (1, 1, 1))),
-            ("Scales", "scales"))
+            ("Scales", "scales"),
+            dict(default = (1, 1, 1))))
 
-        self.newVectorizedOutput("Object", "useObjectList",
-            ("Object", "object"), ("Objects", "objects"))
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object"), ("Objects", "objects")))
 
         self.updateSocketVisibility()
 
@@ -48,28 +50,28 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
         col = layout.column()
 
         row = col.row()
-        row.label("", icon = "MAN_TRANS")
+        row.label(text = "", icon = "EXPORT")
         subrow = row.row(align = True)
         subrow.prop(self, "useLocation", index = 0, text = "X", toggle = True)
         subrow.prop(self, "useLocation", index = 1, text = "Y", toggle = True)
         subrow.prop(self, "useLocation", index = 2, text = "Z", toggle = True)
 
         row = col.row()
-        row.label("", icon = "MAN_ROT")
+        row.label(text = "", icon = "FILE_REFRESH")
         subrow = row.row(align = True)
         subrow.prop(self, "useRotation", index = 0, text = "X", toggle = True)
         subrow.prop(self, "useRotation", index = 1, text = "Y", toggle = True)
         subrow.prop(self, "useRotation", index = 2, text = "Z", toggle = True)
 
         row = col.row()
-        row.label("", icon = "MAN_SCALE")
+        row.label(text = "", icon = "FULLSCREEN_ENTER")
         subrow = row.row(align = True)
         subrow.prop(self, "useScale", index = 0, text = "X", toggle = True)
         subrow.prop(self, "useScale", index = 1, text = "Y", toggle = True)
         subrow.prop(self, "useScale", index = 2, text = "Z", toggle = True)
 
         if self.deltaTransforms:
-            col.label("Delta Transforms", icon = "INFO")
+            col.label(text = "Delta Transforms", icon = "INFO")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "deltaTransforms")
@@ -79,7 +81,7 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
         self.inputs[2].hide = not any(self.useRotation)
         self.inputs[3].hide = not any(self.useScale)
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         useLoc = self.useLocation
         useRot = self.useRotation
         useScale = self.useScale
@@ -112,6 +114,7 @@ class an_ObjectTransformsOutputNode(bpy.types.Node, VectorizedNode):
 
     def getBakeCode(self):
         yield "if object is not None:"
+        yield "    pass"
 
         for i in range(3):
             if self.useLocation[i]:

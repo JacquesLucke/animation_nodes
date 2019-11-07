@@ -1,14 +1,14 @@
 import bpy
 from bpy.props import *
-from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
 from . c_utils import vectorsToEulers, eulersToVectors
+from ... base_types import AnimationNode, VectorizedSocket
 
 conversionTypeItems = [
     ("VECTOR_TO_EULER", "Vector to Euler", "", "NONE", 0),
     ("EULER_TO_VECTOR", "Euler to Vector", "", "NONE", 1)]
 
-class ConvertVectorAndEulerNode(bpy.types.Node, VectorizedNode):
+class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertVectorAndEulerNode"
     bl_label = "Convert Vector and Euler"
     dynamicLabelType = "ALWAYS"
@@ -16,25 +16,25 @@ class ConvertVectorAndEulerNode(bpy.types.Node, VectorizedNode):
     onlySearchTags = True
     searchTags = [(name, {"conversionType" : repr(type)}) for type, name, _,_,_ in conversionTypeItems]
 
-    useDegree = BoolProperty(name = "Use Degree", default = False,
+    useDegree: BoolProperty(name = "Use Degree", default = False,
         update = executionCodeChanged)
 
-    conversionType = EnumProperty(name = "Conversion Type", default = "EULER_TO_VECTOR",
-        update = VectorizedNode.refresh, items = conversionTypeItems)
+    conversionType: EnumProperty(name = "Conversion Type", default = "EULER_TO_VECTOR",
+        update = AnimationNode.refresh, items = conversionTypeItems)
 
-    useList = VectorizedNode.newVectorizeProperty()
+    useList: VectorizedSocket.newProperty()
 
     def create(self):
         if self.conversionType == "VECTOR_TO_EULER":
-            self.newVectorizedInput("Vector", "useList",
-                ("Vector", "vector"), ("Vectors", "vectors"))
-            self.newVectorizedOutput("Euler", "useList",
-                ("Euler", "euler"), ("Eulers", "eulers"))
+            self.newInput(VectorizedSocket("Vector", "useList",
+                ("Vector", "vector"), ("Vectors", "vectors")))
+            self.newOutput(VectorizedSocket("Euler", "useList",
+                ("Euler", "euler"), ("Eulers", "eulers")))
         if self.conversionType == "EULER_TO_VECTOR":
-            self.newVectorizedInput("Euler", "useList",
-                ("Euler", "euler"), ("Eulers", "eulers"))
-            self.newVectorizedOutput("Vector", "useList",
-                ("Vector", "vector"), ("Vectors", "vectors"))
+            self.newInput(VectorizedSocket("Euler", "useList",
+                ("Euler", "euler"), ("Eulers", "eulers")))
+            self.newOutput(VectorizedSocket("Vector", "useList",
+                ("Vector", "vector"), ("Vectors", "vectors")))
         self.inputs[0].defaultDrawType = "PROPERTY_ONLY"
 
     def draw(self, layout):
@@ -45,7 +45,7 @@ class ConvertVectorAndEulerNode(bpy.types.Node, VectorizedNode):
         for item in conversionTypeItems:
             if self.conversionType == item[0]: return item[1]
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         if self.useList:
             if self.conversionType == "VECTOR_TO_EULER":
                 return "eulers = self.vectorsToEulers(vectors)"

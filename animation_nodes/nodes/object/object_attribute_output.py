@@ -1,75 +1,71 @@
 import bpy
 from bpy.props import *
 from ... utils.code import isCodeValid
-from ... base_types import VectorizedNode
 from ... events import executionCodeChanged
+from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectAttributeOutputNode(bpy.types.Node, VectorizedNode):
+class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
-    bl_width_default = 175
+    bl_width_default = 180
+    errorHandlingType = "MESSAGE"
 
-    attribute = StringProperty(name = "Attribute", default = "",
+    attribute: StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
 
-    useObjectList = VectorizedNode.newVectorizeProperty()
-    useValueList = BoolProperty(update = VectorizedNode.refresh)
+    useObjectList: VectorizedSocket.newProperty()
+    useValueList: BoolProperty(update = AnimationNode.refresh)
 
-    errorMessage = StringProperty()
 
     def create(self):
-        self.newVectorizedInput("Object", "useObjectList",
+        self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects")))
 
-        self.newInputGroup(self.useValueList and self.useObjectList,
-            ("Generic", "Value", "value"),
-            ("Generic List", "Values", "values"))
+        if self.useValueList and self.useObjectList:
+            self.newInput("Generic List", "Values", "values")
+        else:
+            self.newInput("Generic", "Value", "value")
 
-        self.newVectorizedOutput("Object", "useObjectList",
+        self.newOutput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"))
+            ("Objects", "objects")))
 
     def draw(self, layout):
         col = layout.column()
         col.prop(self, "attribute", text = "")
         if self.useObjectList:
             col.prop(self, "useValueList", text = "Multiple Values")
-        if self.errorMessage != "" and self.attribute != "":
-            layout.label(self.errorMessage, icon = "ERROR")
 
-    def getExecutionCode(self):
+    def getExecutionCode(self, required):
         code = self.evaluationExpression
 
         if not isCodeValid(code):
-            self.errorMessage = "Invalid Syntax"
+            yield "self.setErrorMessage('Invalid Syntax', show = len(self.attribute.strip()) > 0)"
             return
-        else: self.errorMessage = ""
 
         yield "try:"
-        yield "    self.errorMessage = ''"
         if self.useObjectList:
             if self.useValueList:
-                yield "    if len(objects) != len(values):"
-                yield "        self.errorMessage = 'Lists have different length'"
-                yield "        raise Exception()"
-                yield "    for object, value in zip(objects, values):"
+                yield "    _values = [None] if len(values) == 0 else values"
+                yield "    _values = itertools.cycle(_values)"
+                yield "    for object, value in zip(objects, _values):"
             else:
                 yield "    for object in objects:"
             yield "        " + code
         else:
             yield "    " + code
         yield "except AttributeError:"
-        yield "    if object: self.errorMessage = 'Attribute not found'"
+        yield "    if object: self.setErrorMessage('Attribute not found')"
         yield "except KeyError:"
-        yield "    if object: self.errorMessage = 'Key not found'"
+        yield "    if object: self.setErrorMessage('Key not found')"
         yield "except IndexError:"
-        yield "    if object: self.errorMessage = 'Index not found'"
+        yield "    if object: self.setErrorMessage('Index not found')"
         yield "except (ValueError, TypeError):"
-        yield "    if object: self.errorMessage = 'Value has a wrong type'"
+        yield "    if object: self.setErrorMessage('Value has a wrong type')"
         yield "except:"
-        yield "    if object and self.errorMessage == '':"
-        yield "        self.errorMessage = 'Unknown error'"
+        yield "    if object:"
+        yield "        self.setErrorMessage('Unknown error')"
 
     @property
     def evaluationExpression(self):

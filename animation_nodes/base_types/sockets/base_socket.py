@@ -12,16 +12,16 @@ from ... tree_info import (isSocketLinked, getLinkedSockets, getDirectlyLinkedSo
 
 class SocketTextProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketTextProperties"
-    unique = BoolProperty(default = False)
-    editable = BoolProperty(default = False)
-    variable = BoolProperty(default = False)
+    unique: BoolProperty(default = False)
+    editable: BoolProperty(default = False)
+    variable: BoolProperty(default = False)
 
 class SocketDisplayProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketDisplayProperties"
-    text = BoolProperty(default = False)
-    textInput = BoolProperty(default = False)
-    moveOperators = BoolProperty(default = False)
-    removeOperator = BoolProperty(default = False)
+    text: BoolProperty(default = False)
+    textInput: BoolProperty(default = False)
+    moveOperators: BoolProperty(default = False)
+    removeOperator: BoolProperty(default = False)
 
 class SocketLoopProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketLoopProperties"
@@ -30,16 +30,15 @@ class SocketLoopProperties(bpy.types.PropertyGroup):
         subprogramInterfaceChanged()
         executionCodeChanged()
 
-    useAsInput = BoolProperty(default = False, update = socketLoopPropertyChanged)
-    useAsOutput = BoolProperty(default = False, update = socketLoopPropertyChanged)
-    copyAlways = BoolProperty(default = False, update = socketLoopPropertyChanged)
+    useAsInput: BoolProperty(default = False, update = socketLoopPropertyChanged)
+    useAsOutput: BoolProperty(default = False, update = socketLoopPropertyChanged)
+    copyAlways: BoolProperty(default = False, update = socketLoopPropertyChanged)
 
 class SocketExecutionProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketExecutionProperties"
-    neededCopies = IntProperty(default = 0, min = 0)
+    neededCopies: IntProperty(default = 0, min = 0)
 
 colorOverwritePerSocket = dict()
-alternativeIdentifiersPerSocket = defaultdict(list)
 
 class AnimationNodeSocket:
     storable = True
@@ -49,23 +48,23 @@ class AnimationNodeSocket:
     def textChanged(self, context):
         updateText(self)
 
-    text = StringProperty(default = "custom name", update = textChanged)
-    removeable = BoolProperty(default = False)
-    moveable = BoolProperty(default = False)
-    moveGroup = IntProperty(default = 0)
+    text: StringProperty(default = "custom name", update = textChanged)
+    removeable: BoolProperty(default = False)
+    moveable: BoolProperty(default = False)
+    moveGroup: IntProperty(default = 0)
 
-    isUsed = BoolProperty(name = "Is Used", default = True,
+    isUsed: BoolProperty(name = "Is Used", default = True,
         description = "Enable this socket (orange point means that the socket will be evaluated)",
         update = executionCodeChanged)
-    useIsUsedProperty = BoolProperty(default = False)
+    useIsUsedProperty: BoolProperty(default = False)
 
-    display = PointerProperty(type = SocketDisplayProperties)
-    textProps = PointerProperty(type = SocketTextProperties)
-    loop = PointerProperty(type = SocketLoopProperties)
-    execution = PointerProperty(type = SocketExecutionProperties)
+    display: PointerProperty(type = SocketDisplayProperties)
+    textProps: PointerProperty(type = SocketTextProperties)
+    loop: PointerProperty(type = SocketLoopProperties)
+    execution: PointerProperty(type = SocketExecutionProperties)
 
-    dataIsModified = BoolProperty(default = False, update = executionCodeChanged)
-    defaultDrawType = StringProperty(default = "TEXT_PROPERTY")
+    dataIsModified: BoolProperty(default = False, update = executionCodeChanged)
+    defaultDrawType: StringProperty(default = "TEXT_PROPERTY")
 
 
     # Overwrite in subclasses
@@ -91,10 +90,6 @@ class AnimationNodeSocket:
         '''
         raise NotImplementedError("All sockets have to define a correctValue method")
 
-    @classmethod
-    def getConversionCode(cls, dataType):
-        return None
-
 
     # Drawing
     ##########################################################
@@ -110,7 +105,7 @@ class AnimationNodeSocket:
                 self.drawSocket(row, displayText, node, self.defaultDrawType)
             else:
                 if self.isOutput: row.alignment = "RIGHT"
-                row.label(displayText)
+                row.label(text = displayText)
 
         if self.moveable and self.display.moveOperators:
             row.separator()
@@ -123,8 +118,8 @@ class AnimationNodeSocket:
 
         if self.useIsUsedProperty:
             if self.is_linked and not self.isUsed:
-                row.label("", icon = "QUESTION")
-                row.label("", icon = "TRIA_RIGHT")
+                row.label(text = "", icon = "QUESTION")
+                row.label(text = "", icon = "TRIA_RIGHT")
             icon = "LAYER_ACTIVE" if self.isUsed else "LAYER_USED"
             row.prop(self, "isUsed", text = "", icon = icon)
 
@@ -146,11 +141,11 @@ class AnimationNodeSocket:
 
         if drawType == "TEXT_PROPERTY":
             if self.hasProperty(): self.drawProperty(layout, text, node)
-            else: layout.label(text)
+            else: layout.label(text = text)
         elif drawType == "PROPERTY_ONLY":
             if self.hasProperty(): self.drawProperty(layout, text = "", node = node)
         elif drawType == "TEXT_ONLY":
-            layout.label(text)
+            layout.label(text = text)
 
     def getDisplayedName(self):
         if self.display.text or (self.textProps.editable and self.display.textInput):
@@ -211,24 +206,18 @@ class AnimationNodeSocket:
     ##########################################################
 
     def free(self):
-        try: del alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()]
-        except: pass
         try: del colorOverwritePerSocket[self.getTemporaryIdentifier()]
         except: pass
-
-    @property
-    def alternativeIdentifiers(self):
-        return alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()]
-
-    @alternativeIdentifiers.setter
-    def alternativeIdentifiers(self, value):
-        alternativeIdentifiersPerSocket[self.getTemporaryIdentifier()] = value
 
     def setTemporarySocketTransparency(self, transparency):
         colorOverwritePerSocket[self.getTemporaryIdentifier()] = list(self.drawColor[:3]) + [transparency]
 
     def getTemporaryIdentifier(self):
         return str(hash(self)) + self.identifier
+
+    def setAttributes(self, properties):
+        for key, value in properties.items():
+            setattr(self, key, value)
 
 
     # Move Utilities
