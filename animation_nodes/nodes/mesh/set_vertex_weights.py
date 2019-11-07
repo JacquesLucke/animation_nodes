@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 
-textModeTypeItems = [
+vertexModeTypeItems = [
     ("ADD_MODE", "ADD", "", "NONE", 0),
     ("SUBTRACT_MODE", "SUBTRACT", "", "NONE", 1),
     ("REPLACE_MODE", "REPLACE", "", "NONE", 2)    
@@ -14,8 +14,8 @@ class VertexWeights(bpy.types.Node, AnimationNode):
 
     useFloatList: VectorizedSocket.newProperty()
  
-    textModeType: EnumProperty(name = "Vertex Weight Mode Type", default = "REPLACE_MODE",
-        items = textModeTypeItems, update = AnimationNode.refresh)
+    vertexModeType: EnumProperty(name = "Vertex Weight Mode Type", default = "REPLACE_MODE",
+        items = vertexModeTypeItems, update = AnimationNode.refresh)
     
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
@@ -25,7 +25,7 @@ class VertexWeights(bpy.types.Node, AnimationNode):
         self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
-        layout.prop(self, "textModeType", text = "")
+        layout.prop(self, "vertexModeType", text = "")
 
     def getExecutionFunctionName(self):
         if self.useFloatList:
@@ -39,14 +39,14 @@ class VertexWeights(bpy.types.Node, AnimationNode):
             bpy.data.objects[object.name].vertex_groups.new()
         vertexWeightGroup = self.getVertexWeightGroup(object, vertexWeightIndex)
         if vertexWeightGroup is None: return
-        if self.textModeType == "REPLACE_MODE":
+        if self.vertexModeType == "REPLACE_MODE":
             modes = "REPLACE"
-        elif self.textModeType == "ADD_MODE":
+        elif self.vertexModeType == "ADD_MODE":
             modes = "ADD"
-        elif self.textModeType == "SUBTRACT_MODE":
+        elif self.vertexModeType == "SUBTRACT_MODE":
             modes = "SUBTRACT"
-        for i in range(len(object.data.vertices)):
-            object.vertex_groups[vertexWeightIndex].add([i], weight, modes)
+        indices = list(range(0, len(object.data.vertices)))
+        object.vertex_groups[vertexWeightIndex].add(indices, weight, modes)
         object.data.update()    
         return object
 
@@ -56,15 +56,16 @@ class VertexWeights(bpy.types.Node, AnimationNode):
             bpy.data.objects[object.name].vertex_groups.new()
         vertexWeightGroup = self.getVertexWeightGroup(object, vertexWeightIndex)
         if vertexWeightGroup is None: return
-        if self.textModeType == "REPLACE_MODE":
+        if self.vertexModeType == "REPLACE_MODE":
             modes = "REPLACE"
-        elif self.textModeType == "ADD_MODE":
+        elif self.vertexModeType == "ADD_MODE":
             modes = "ADD"
-        elif self.textModeType == "SUBTRACT_MODE":
+        elif self.vertexModeType == "SUBTRACT_MODE":
             modes = "SUBTRACT"
-        for i in range(len(weights)):
-            if i >= len(object.data.vertices): return  
-            object.vertex_groups[vertexWeightIndex].add([i], weights[i], modes)
+        totalVertices = len(object.data.vertices)    
+        for i, weight in enumerate(weights):
+            if i >= totalVertices: return  
+            object.vertex_groups[vertexWeightIndex].add([i], weight, modes)
         object.data.update()
         return object            
      
