@@ -17,6 +17,7 @@
 - Added missing nodes to the node menu
 - Added *Collection Operations* node.
 - Added *Rotations* output to the *Particles Data* node.
+- Added *Set Vertex Weights* node.
 
 ### Fixed
 
