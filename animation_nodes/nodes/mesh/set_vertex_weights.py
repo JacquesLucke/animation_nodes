@@ -1,12 +1,5 @@
 import bpy
-from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
-
-vertexModeTypeItems = [
-    ("ADD_MODE", "ADD", "", "NONE", 0),
-    ("SUBTRACT_MODE", "SUBTRACT", "", "NONE", 1),
-    ("REPLACE_MODE", "REPLACE", "", "NONE", 2)    
-]
 
 class VertexWeights(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetVertexWeights"
@@ -14,18 +7,12 @@ class VertexWeights(bpy.types.Node, AnimationNode):
 
     useFloatList: VectorizedSocket.newProperty()
  
-    vertexModeType: EnumProperty(name = "Vertex Weight Mode Type", default = "REPLACE_MODE",
-        items = vertexModeTypeItems, update = AnimationNode.refresh)
-    
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Integer", "Vertex Group Index", "vertexWeightIndex")
         self.newInput(VectorizedSocket("Float", "useFloatList",
             ("Weight", "weight"), ("Weights", "weights")))
         self.newOutput("Object", "Object", "object")
-
-    def draw(self, layout):
-        layout.prop(self, "vertexModeType", text = "")
 
     def getExecutionFunctionName(self):
         if self.useFloatList:
@@ -39,14 +26,8 @@ class VertexWeights(bpy.types.Node, AnimationNode):
             bpy.data.objects[object.name].vertex_groups.new()
         vertexWeightGroup = self.getVertexWeightGroup(object, vertexWeightIndex)
         if vertexWeightGroup is None: return
-        if self.vertexModeType == "REPLACE_MODE":
-            modes = "REPLACE"
-        elif self.vertexModeType == "ADD_MODE":
-            modes = "ADD"
-        elif self.vertexModeType == "SUBTRACT_MODE":
-            modes = "SUBTRACT"
         indices = list(range(0, len(object.data.vertices)))
-        object.vertex_groups[vertexWeightIndex].add(indices, weight, modes)
+        object.vertex_groups[vertexWeightIndex].add(indices, weight, "REPLACE")
         object.data.update()    
         return object
 
@@ -56,16 +37,10 @@ class VertexWeights(bpy.types.Node, AnimationNode):
             bpy.data.objects[object.name].vertex_groups.new()
         vertexWeightGroup = self.getVertexWeightGroup(object, vertexWeightIndex)
         if vertexWeightGroup is None: return
-        if self.vertexModeType == "REPLACE_MODE":
-            modes = "REPLACE"
-        elif self.vertexModeType == "ADD_MODE":
-            modes = "ADD"
-        elif self.vertexModeType == "SUBTRACT_MODE":
-            modes = "SUBTRACT"
         totalVertices = len(object.data.vertices)    
         for i, weight in enumerate(weights):
             if i >= totalVertices: return  
-            object.vertex_groups[vertexWeightIndex].add([i], weight, modes)
+            object.vertex_groups[vertexWeightIndex].add([i], weight, "REPLACE")
         object.data.update()
         return object            
      
