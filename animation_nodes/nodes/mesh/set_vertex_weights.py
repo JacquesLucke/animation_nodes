@@ -43,10 +43,7 @@ class VertexWeights(bpy.types.Node, AnimationNode):
         if self.mode == "INDEX":
             self.newInput(VectorizedSocket("Integer", "useIndexList",
                 ("Index", "index"), ("Indices", "indices")))
-            self.newInput(VectorizedSocket("Float", "useWeightsList",
-                ("Weight", "weight"), ("Weights", "weights")))
-        elif self.mode == "ALL":
-            self.newInput(VectorizedSocket("Float", "useWeightsList",
+        self.newInput(VectorizedSocket("Float", "useWeightsList",
                 ("Weight", "weight"), ("Weights", "weights")))
         
         self.newOutput("Object", "Object", "object")
@@ -74,14 +71,7 @@ class VertexWeights(bpy.types.Node, AnimationNode):
 
     def execute_Index(self, object, identifier, index, weight):
         if object is None: return
-        if object.type != "MESH": 
-            self.raiseErrorMessage(noMeshMessage)
-        if object.mode == "EDIT":
-            self.raiseErrorMessage(editMeshMessage)
-
-        vertexGroup = self.getVertexGroup(object, identifier)
-        if vertexGroup is None:
-            self.raiseErrorMessage(groupNotFoundMessage)
+        vertexGroup = self.check(object, identifier)
 
         vertexGroup.add([index], weight, "REPLACE")
         object.data.update()    
@@ -89,14 +79,7 @@ class VertexWeights(bpy.types.Node, AnimationNode):
 
     def execute_IndicesSingle(self, object, identifier, indices, weight):
         if object is None: return
-        if object.type != "MESH": 
-            self.raiseErrorMessage(noMeshMessage)
-        if object.mode == "EDIT":
-            self.raiseErrorMessage(editMeshMessage)
-
-        vertexGroup = self.getVertexGroup(object, identifier)
-        if vertexGroup is None:
-            self.raiseErrorMessage(groupNotFoundMessage)
+        vertexGroup = self.check(object, identifier)
 
         vertexGroup.add(indices, weight, "REPLACE")
         object.data.update()    
@@ -104,15 +87,9 @@ class VertexWeights(bpy.types.Node, AnimationNode):
 
     def execute_IndicesList(self, object, identifier, indices, weights):
         if object is None: return
-        if object.type != "MESH": 
-            self.raiseErrorMessage(noMeshMessage)
-        if object.mode == "EDIT":
-            self.raiseErrorMessage(editMeshMessage)
+        vertexGroup = self.check(object, identifier)
 
-        vertexGroup = self.getVertexGroup(object, identifier)
-        if vertexGroup is None:
-            self.raiseErrorMessage(groupNotFoundMessage)
-
+        weights = VirtualDoubleList.create(weights, 0).materialize(len(indices))
         for i, index in enumerate(indices):
             vertexGroup.add([index], weights[i], "REPLACE")
         object.data.update()    
@@ -120,14 +97,7 @@ class VertexWeights(bpy.types.Node, AnimationNode):
 
     def execute_AllSingle(self, object, identifier, weight):
         if object is None: return
-        if object.type != "MESH": 
-            self.raiseErrorMessage(noMeshMessage)
-        if object.mode == "EDIT":
-            self.raiseErrorMessage(editMeshMessage)
-
-        vertexGroup = self.getVertexGroup(object, identifier)
-        if vertexGroup is None:
-            self.raiseErrorMessage(groupNotFoundMessage)
+        vertexGroup = self.check(object, identifier)
 
         indices = list(range(len(object.data.vertices)))
 
@@ -137,6 +107,15 @@ class VertexWeights(bpy.types.Node, AnimationNode):
 
     def execute_AllList(self, object, identifier, weights):
         if object is None: return
+        vertexGroup = self.check(object, identifier)
+
+        weights = VirtualDoubleList.create(weights, 0).materialize(len(object.data.vertices))
+        for i, weight in enumerate(weights):
+            vertexGroup.add([i], weight, "REPLACE") 
+        object.data.update()
+        return object            
+
+    def check(self, object, identifier):
         if object.type != "MESH": 
             self.raiseErrorMessage(noMeshMessage)
         if object.mode == "EDIT":
@@ -145,13 +124,8 @@ class VertexWeights(bpy.types.Node, AnimationNode):
         vertexGroup = self.getVertexGroup(object, identifier)
         if vertexGroup is None:
             self.raiseErrorMessage(groupNotFoundMessage)
+        return vertexGroup    
 
-        weights = VirtualDoubleList.create(weights, 0).materialize(len(object.data.vertices))
-        for i, weight in enumerate(weights):
-            vertexGroup.add([i], weight, "REPLACE") 
-        object.data.update()
-        return object            
-     
     def getVertexGroup(self, object, identifier):
         try: return object.vertex_groups[identifier]
         except: return None
