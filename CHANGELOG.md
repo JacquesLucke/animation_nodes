@@ -1,10 +1,16 @@
 ## Unreleased
 
+### Added
+
 ### Fixed
 
 - Fixed sound nodes when sounds are packed in the blend file.
 - Fixed the *Frame Rate* output of the *Time Info* node.
 - Fixed sound evaluation when sound sequences are cut.
+
+### Changed
+
+- Allow getting items from virtual lists in Python.
 
 ## 2.1.5
 
