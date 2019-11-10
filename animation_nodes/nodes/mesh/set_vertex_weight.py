@@ -14,9 +14,9 @@ groupIdentifierTypeItems = [
     ("NAME", "Name", "Get vertex group based on the name", "NONE", 1)
 ]
 
-class VertexWeights(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SetVertexWeights"
-    bl_label = "Set Vertex Weights"
+class SetVertexWeightNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetVertexWeightNode"
+    bl_label = "Set Vertex Weight"
     errorHandlingType = "EXCEPTION"
 
     mode: EnumProperty(name = "Mode", default = "ALL",
@@ -87,7 +87,7 @@ class VertexWeights(bpy.types.Node, AnimationNode):
         if object is None: return
         vertexGroup = self.getVertexGroup(object, identifier)
 
-        weights = VirtualDoubleList.create(weights, 0).materialize(len(indices))
+        weights = VirtualDoubleList.create(weights, 0)
         for i, index in enumerate(indices):
             vertexGroup.add([index], weights[i], "REPLACE")
         object.data.update()    
@@ -107,9 +107,9 @@ class VertexWeights(bpy.types.Node, AnimationNode):
         if object is None: return
         vertexGroup = self.getVertexGroup(object, identifier)
 
-        weights = VirtualDoubleList.create(weights, 0).materialize(len(object.data.vertices))
-        for i, weight in enumerate(weights):
-            vertexGroup.add([i], weight, "REPLACE") 
+        weights = VirtualDoubleList.create(weights, 0)
+        for i in range(len(object.data.vertices)):
+            vertexGroup.add([i], weights[i], "REPLACE") 
         object.data.update()
         return object            
 
@@ -121,4 +121,4 @@ class VertexWeights(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Object is not in object mode.")
 
         try: return object.vertex_groups[identifier]
-        except: return self.raiseErrorMessage("Group is not found.")
+        except: self.raiseErrorMessage("Group is not found.")
