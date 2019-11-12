@@ -372,7 +372,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_MeshFromSplineNode", "Mesh From Spline")
         layout.separator()
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
-        insertNode(layout, "an_SetVertexWeight", "Set Vertex Weight")
+        insertNode(layout, "an_SetVertexWeightNode", "Set Vertex Weight")
         insertNode(layout, "an_VertexColorInputNode", "Vertex Color Input")
         insertNode(layout, "an_SetVertexColorsNode", "Set Vertex Colors")
         insertNode(layout, "an_SetBevelVertexWeights", "Set Bevel Vertex Weights")
