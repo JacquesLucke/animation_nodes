@@ -5,7 +5,7 @@ class MIDITrackSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MIDITrackSocket"
     bl_label = "MIDI Track Socket"
     dataType = "MIDITrack"
-    drawColor = (0.2, 0.2, 0.8, 1)
+    drawColor = (0.9, 0.7, 0.4, 1)
     storable = True
     comparable = False
 
@@ -34,7 +34,7 @@ class MIDITrackListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_label = "MIDITrackListSocket"
     dataType = "MIDITrackList"
     baseType = MIDITrackSocket
-    drawColor = (0.2, 0.2, 0.8, 0.5)
+    drawColor = (0.9, 0.7, 0.4, 1)
     storable = True
     comparable = False
 
@@ -46,7 +46,7 @@ class MIDINoteSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MIDINoteSocket"
     bl_label = "MIDI Note Socket"
     dataType = "MIDINote"
-    drawColor = (0.2, 0.2, 0.8, 1)
+    drawColor = (0.9, 0.7, 0.4, 1)
     storable = True
     comparable = False
 
@@ -75,7 +75,7 @@ class MIDINoteListSocket(bpy.types.NodeSocket, PythonListSocket):
     bl_label = "MIDINoteListSocket"
     dataType = "MIDINoteList"
     baseType = MIDINoteSocket
-    drawColor = (0.2, 0.2, 0.8, 0.5)
+    drawColor = (0.9, 0.7, 0.4, 1)
     storable = True
     comparable = False
 

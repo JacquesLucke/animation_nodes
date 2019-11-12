@@ -1,10 +1,7 @@
 import os
 import bpy
-import collections
-from bpy.props import *
-from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... utils.MIDI_Utils import MIDI_ParseFile
+from ... utils.midi import MIDI_ParseFile
 
 # path : last modification, content
 cache = {}
@@ -49,12 +46,10 @@ class MIDIFile(bpy.types.Node, AnimationNode):
         if loadFile:
             try:
                 tracks = MIDI_ParseFile(path)
-                # print("D1 - len = " + str(len(tracks)))
                 cache[key] = (lastModification, tracks)
             except LookupError:
                 self.raiseErrorMessage("Invalid Encoding")
         else:
             tracks = None
 
-        # tracks => [1]
         return cache.get(key)[1]

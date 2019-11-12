@@ -92,7 +92,7 @@ def MIDI_ParseFile(filemid):
     Tracks = []
     # Main LOOP to "play" and memorize MIDI msg in their realtime
     for TrackIndex, curTracks in enumerate(mid.tracks):
-        Track = MIDITrack_Class(TrackIndex,curTracks.name)
+        Track = MIDITrack_Class(TrackIndex, curTracks.name)
 
         # Initialize the time cumul in ticks
         time_in_ticks_cumul = 0
@@ -109,14 +109,14 @@ def MIDI_ParseFile(filemid):
             # ignore meta msg
             if msg.is_meta: continue
 
-            # Check if note_on with velocity 0 will become note_off
+            # Fix note_on with velocity 0 to become a real note_off
             if (msg.type == 'note_on') and (msg.velocity == 0):
                 msgtype = 'note_off'
             else:
                 msgtype = msg.type
 
             current_time = time_map.get_realtime(time_in_ticks_cumul, ppq)
-            # If note_on then memorize til note_off become
+            # If note_on then memorize til next note_off
             if msgtype == 'note_on':
                 lastNoteOn[msg.note] = [msg.channel, current_time, msg.velocity / 127]
 

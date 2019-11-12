@@ -1,12 +1,9 @@
 import bpy
-from bpy.props import *
-from ... sockets.info import isBase, toBaseDataType
-from ... events import propertyChanged
 from ... base_types import AnimationNode, ListTypeSelectorSocket, VectorizedSocket
 from ... data_structures import DoubleList
 
 def FilterByNote(self, notesIn, number, time, attack_time, attack_interpolation, release_time, release_interpolation):
-    if self.useList:
+    if self.useNumberList:
         # Filter by note list
         # notesTmp = unique note founded in time and from list number (list(set()) mean distinct)
         notesInTime = [note for note in notesIn for n in number if (time >= note.time_on and time <= (note.time_off + release_time) and note.number == n)]
@@ -45,60 +42,24 @@ def FilterByNote(self, notesIn, number, time, attack_time, attack_interpolation,
 
 class MidiNoteEvaluateNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MidiNoteEvaluateNode"
-    bl_label = "MIDI Note Evaluate V3"
+    bl_label = "MIDI Note Evaluate"
     bl_width_default = 180
 
-    usefilterByChannel: BoolProperty(name = "Channel Filter", default = False,
-        update = AnimationNode.refresh)
-    usefilterByNote: BoolProperty(name = "Note Filter", default = False,
-        update = AnimationNode.refresh)
-
-    useList: VectorizedSocket.newProperty()
+    useNumberList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("MIDINoteList", "Notes", "notesIn")
-        if self.usefilterByChannel:
-            self.newInput("Integer", "Channel", "channel")
-        if self.usefilterByNote:
-            # self.newInput("Integer", "Note", "number")
-            self.newInput(VectorizedSocket("Integer", "useList",
-                ("number", "number"), ("numbers", "numbers")))
-        # self.newOutput("Float", "Note(s) Played", "notesplayed")
+        self.newInput("Integer", "Channel", "channel")
+        self.newInput(VectorizedSocket("Integer", "useNumberList",
+            ("number", "number"), ("numbers", "numbers")))
         self.newInput("Float", "Time", "time")
         self.newInput("Float", "Attack Time", "attack_time")
         self.newInput("Interpolation", "Attack Interpolation", "attack_interpolation")
         self.newInput("Float", "Release Time", "release_time")
         self.newInput("Interpolation", "Release Interpolation", "release_interpolation")
-        self.newOutput(VectorizedSocket("Float", "useList",
+        self.newOutput(VectorizedSocket("Float", "useNumberList",
             ("noteplayed", "note played"), ("notesplayed", "notes played")))
 
-    def draw(self, layout):
-        layout.prop(self, "usefilterByChannel")
-        layout.prop(self, "usefilterByNote")
-
-    def getExecutionFunctionName(self):
-        if self.usefilterByChannel:
-            if self.usefilterByNote:
-                return "execute_FilterByChannelAndNote"
-            else:
-                return "execute_FilterByChannel"
-        else:
-            if self.usefilterByNote:
-                return "execute_FilterByNote"
-            else:
-                return "execute_NoFilter"
-
-    def execute_FilterByChannelAndNote(self, notesIn, channel, number, time, attack_time, attack_interpolation, release_time, release_interpolation):
+    def execute(self, notesIn, channel, number, time, attack_time, attack_interpolation, release_time, release_interpolation):
         notesChannel = [note for note in notesIn if note.channel == channel]
         return FilterByNote(self, notesChannel, number, time, attack_time, attack_interpolation, release_time, release_interpolation)
-
-    def execute_FilterByNote(self, notesIn, number, time, attack_time, attack_interpolation, release_time, release_interpolation):
-        return FilterByNote(self, notesIn, number, time, attack_time, attack_interpolation, release_time, release_interpolation)
-
-    def execute_FilterByChannel(self, notesIn, channel, time, attack_time, attack_interpolation, release_time, release_interpolation):
-        notesChannel = [note for note in notesIn if note.channel == channel]
-        return (len(notesChannel) != 0) * 1.0
-
-    def execute_NoFilter(self, notesIn, time, attack_time, attack_interpolation, release_time, release_interpolation):
-        notesInTime = [note for note in notesIn if (time >= note.time_on and time <= note.time_off)]
-        return (len(notesInTime) != 0) * 1.0
