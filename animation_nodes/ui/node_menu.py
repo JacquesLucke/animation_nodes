@@ -31,6 +31,7 @@ def drawMenu(self, context):
     layout.menu("AN_MT_object_menu", text = "Object", icon = "OBJECT_DATAMODE")
     layout.menu("AN_MT_mesh_menu", text = "Mesh", icon = "MESH_DATA")
     layout.menu("AN_MT_spline_menu", text = "Spline", icon = "CURVE_DATA")
+    layout.menu("AN_MT_gpencil_menu", text = "Grease Pencil", icon = "OUTLINER_OB_GREASEPENCIL")
     layout.menu("AN_MT_particle_system_menu", text = "Particle System", icon = "PARTICLE_DATA")
     layout.separator()
     layout.menu("AN_MT_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
@@ -39,6 +40,7 @@ def drawMenu(self, context):
     layout.menu("AN_MT_action_menu", text = "Action", icon = "ANIM_DATA")
     layout.menu("AN_MT_fcurve_menu", text = "FCurves", icon = "FCURVE")
     layout.menu("AN_MT_material_menu", text = "Material", icon = "NODE_MATERIAL")
+    layout.menu("AN_MT_texture_menu", text = "Texture", icon = "TEXTURE_DATA")
     layout.menu("AN_MT_sound_menu", text = "Sound", icon = "SPEAKER")
     layout.menu("AN_MT_sequence_menu", text = "Sequence", icon = "SEQUENCE")
     layout.separator()
@@ -460,6 +462,30 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "an_LoftSplinesNode", "Loft")
         insertNode(layout, "an_RevolveSplineNode", "Revolve")
 
+class GPencilMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_gpencil_menu"
+    bl_label = "GPencil Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_GPencilObjectInputNode", "Object Input")
+        insertNode(layout, "an_GPencilLayerInputNode", "Layer Input")
+        insertNode(layout, "an_GPencilStrokeInputNode", "Stroke Input")
+        layout.separator()
+        insertNode(layout, "an_GPencilObjectMaterialOutputNode", "Objcet Material Output")
+        insertNode(layout, "an_GPencilMaterialOutputNode", "Material Output")
+        insertNode(layout, "an_GPencilStrokeMaterialIndexNode", "Material Index")
+        layout.separator()
+        insertNode(layout, "an_GPencilStrokeLineWidthNode", "Line Width")
+        insertNode(layout, "an_GPencilStrokeTransformNode", "Transform")
+        insertNode(layout, "an_GPencilStrokeCyclicNode", "Cyclic")
+        insertNode(layout, "an_GPencilStrokeStartCapNode", "Start Cap")
+        insertNode(layout, "an_GPencilStrokeEndCapNode", "End Cap")
+        insertNode(layout, "an_GPencilStrokeDisplayModeNode", "Display Mode")
+        layout.separator()
+        insertNode(layout, "an_GPencilStrokeOutputNode", "Stroke Output")
+        insertNode(layout, "an_GPencilObjectOutputNode", "Object Output")
+
 class ActionMenu(bpy.types.Menu):
     bl_idname = "AN_MT_action_menu"
     bl_label = "Action Menu"
@@ -545,6 +571,18 @@ class MaterialMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
+        insertNode(layout, "an_MaterialAttributeInputNode", "Material Attribute Input")
+        insertNode(layout, "an_MaterialAttributeOutputNode", "Material Attribute Output")
+        layout.separator()
+        insertNode(layout, "an_MaterialInstancerNode", "Material Instancer")
+
+class TexturelMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_texture_menu"
+    bl_label = "Texture Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_TextureInputNode", "Texture Input")
 
 class ParticleSystemMenu(bpy.types.Menu):
     bl_idname = "AN_MT_particle_system_menu"
@@ -555,6 +593,7 @@ class ParticleSystemMenu(bpy.types.Menu):
         insertNode(layout, "an_ParticleSystemsFromObjectNode", "From Object")
         insertNode(layout, "an_ParticleSystemParticlesDataNode", "Particles Data")
         insertNode(layout, "an_ParticleSystemHairDataNode", "Hair Data")
+        insertNode(layout, "an_ParticlesOutputNode", "Particles Data Output")
 
 class FCurveMenu(bpy.types.Menu):
     bl_idname = "AN_MT_fcurve_menu"

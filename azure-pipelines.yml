@@ -1,5 +1,5 @@
 trigger:
-- master
+- extranodes
 
 strategy:
   matrix:
@@ -45,8 +45,8 @@ steps:
 
 - task: GitHubRelease@1
   inputs:
-    gitHubConnection: 'JacquesLucke'
-    repositoryName: 'JacquesLucke/animation_nodes'
+    gitHubConnection: '3DSinghVFX'
+    repositoryName: '3DSinghVFX/animation_nodes'
     action: 'edit'
     target: '$(Build.SourceVersion)'
     tag: 'daily'
