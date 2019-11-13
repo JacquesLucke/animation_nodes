@@ -1,1 +1,0 @@
-addonsDirectory = "C:\\Users\\patoc\\AppData\\Roaming\\Blender Foundation\\Blender\\2.80\\scripts\\addons"
