@@ -1,6 +1,6 @@
 import bpy
-from ... base_types import AnimationNode, ListTypeSelectorSocket, VectorizedSocket
 from ... data_structures import DoubleList
+from ... base_types import AnimationNode, ListTypeSelectorSocket, VectorizedSocket
 
 def filterByNote(self, notesIn, noteNumber, time, attackTime, attackInterpolation, releaseTime, releaseInterpolation):
     if self.useNoteNumberList:
