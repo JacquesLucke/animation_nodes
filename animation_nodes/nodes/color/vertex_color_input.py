@@ -31,9 +31,9 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
 
         if self.colorLayerIdentifierType == "INDEX":
-            self.newInput("Integer", "Color Index", "groupIndex")
+            self.newInput("Integer", "Color Index", "colorLayerIndex")
         elif self.colorLayerIdentifierType == "NAME":
-            self.newInput("Text", "Name", "groupName")
+            self.newInput("Text", "Name", "colorLayerName")
 
         if self.mode == "INDEX":
             self.newInput(VectorizedSocket("Integer", "useIndexList",
@@ -60,43 +60,42 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
 
     def execute_Index(self, object, identifier, index):
         if object is None:
-            return [], []
+            return []
 
         colorLayer = self.getVertexColorLayer(object, identifier)
             
-        getColor, vertexFlatColors = self.getColorList(colorLayer) 
-        try: return getColor[index], vertexFlatColors
-        except: return [], vertexFlatColors
+        getColor = self.getColorList(colorLayer) 
+        try: return getColor[index]
+        except: return []
 
     def execute_Indices(self, object, identifier, indices):
         if object is None:
-            return [], []
+            return []
         colorLayer = self.getVertexColorLayer(object, identifier)
 
-        getColor, vertexFlatColors = self.getColorList(colorLayer)
+        getColor = self.getColorList(colorLayer)
         colors = []
         for index in indices:
             try: colors.append(getColor[index])
-            except: colors.append([0, 0, 0, 0])
-        return colors, vertexFlatColors
+            except: colors.append([0., 0., 0., 0.])
+        return colors
 
     def execute_All(self, object, identifier):
         if object is None:
-            return [], []
+            return []
 
         colorLayer = self.getVertexColorLayer(object, identifier)
-
         return self.getColorList(colorLayer)
 
     def getColorList(self, colorLayer):
         colorFlatList = self.getVertexColors(colorLayer)
         colorlist = []
-        for i in range(int(len(colorFlatList)/4)):
-            colorlist.append(colorFlatList[i*4: (i+1)*4])
-        return colorlist, colorFlatList
+        for i in range(int(len(colorFlatList) / 4)):
+            colorlist.append(colorFlatList[i * 4 : (i + 1) * 4])
+        return colorlist
             
     def getVertexColors(self, colorLayer):
-        colorFlatList = [0.]*len(colorLayer.data)*4
+        colorFlatList = [0.] * len(colorLayer.data) * 4
         colorLayer.data.foreach_get("color", colorFlatList)
         return colorFlatList
 
