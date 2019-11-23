@@ -52,11 +52,11 @@ class SeparateColorNode(bpy.types.Node, AnimationNode):
         return "{}a from Color".format(self.targetType)
 
     def getExecutionCode(self, required):
-        if self.targetType == "RGB":    yield "r, g, b = color[0], color[1], color[2]"
-        elif self.targetType == "HSV":  yield "h, s, v = colorsys.rgb_to_hsv(color[0], color[1], color[2])"
-        elif self.targetType == "HSL":  yield "h, l, s = colorsys.rgb_to_hls(color[0], color[1], color[2])"
-        elif self.targetType == "YIQ":  yield "y, i, q = colorsys.rgb_to_yiq(color[0], color[1], color[2])"
-        yield "alpha = color[3]"
+        if self.targetType == "RGB":    yield "r, g, b = color.r, color.g, color.b"
+        elif self.targetType == "HSV":  yield "h, s, v = colorsys.rgb_to_hsv(color.r, color.g, color.b)"
+        elif self.targetType == "HSL":  yield "h, l, s = colorsys.rgb_to_hls(color.r, color.g, color.b)"
+        elif self.targetType == "YIQ":  yield "y, i, q = colorsys.rgb_to_yiq(color.r, color.g, color.b)"
+        yield "alpha = color.a"
 
     def getUsedModules(self):
         return ["colorsys"]

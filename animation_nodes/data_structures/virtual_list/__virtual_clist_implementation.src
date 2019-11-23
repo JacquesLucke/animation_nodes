@@ -51,6 +51,10 @@ cdef class VirtualLISTNAME_List(VirtualLISTNAME):
     cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
         return (self.realData + (i % self.realLength))OPTIONAL_DEREF
 
+    def __getitem__(self, Py_ssize_t i):
+        cdef TYPE value = self.get(i)OPTIONAL_INV_DEREF
+        return self.realList.toPyObject(&value)
+
     def getRealLength(self):
         return self.realLength
 
@@ -72,6 +76,10 @@ cdef class VirtualLISTNAME_Element(VirtualLISTNAME):
 
     cdef TYPE OPTIONAL_STAR get(self, Py_ssize_t i):
         return (self.realData)OPTIONAL_DEREF
+
+    def __getitem__(self, Py_ssize_t i):
+        cdef TYPE value = self.get(i)OPTIONAL_INV_DEREF
+        return self.realList.toPyObject(&value)
 
     def getRealLength(self):
         return self.realLength

@@ -1,10 +1,21 @@
 ## Unreleased
 
+### Added
+
+- Added *Set Vertex Weight* node.
+- Added CList and VirtualList for colors.
+
 ### Fixed
 
 - Fixed sound nodes when sounds are packed in the blend file.
 - Fixed the *Frame Rate* output of the *Time Info* node.
 - Fixed sound evaluation when sound sequences are cut.
+- Fixed *Set Vertex Color* node when alpha value change.
+
+### Changed
+
+- Allow getting items from virtual lists in Python.
+- Allow choosing alpha in Color socket.
 
 ## 2.1.5
 

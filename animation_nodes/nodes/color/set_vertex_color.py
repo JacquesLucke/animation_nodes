@@ -122,5 +122,11 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
         try: return object.data.vertex_colors[identifier]
         except: self.raiseErrorMessage("Color Layer is not found.")
 
+<<<<<<< HEAD
 def colorsFlatList(self, colors):
     return list(chain.from_iterable(colors))
+=======
+def colorsAreEqual(a, b):
+    return abs((a[0] * 1000 + a[1] * 100 + a[2] * 10 + a[3])
+              -(b[0] * 1000 + b[1] * 100 + b[2] * 10 + b[3])) < 0.001
+>>>>>>> master
