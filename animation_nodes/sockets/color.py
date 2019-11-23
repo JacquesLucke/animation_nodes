@@ -1,7 +1,8 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
-from .. base_types import AnimationNodeSocket, PythonListSocket
+from .. data_structures import Color, ColorList
+from .. base_types import AnimationNodeSocket, CListSocket
 
 class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_ColorSocket"
@@ -12,7 +13,7 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     comparable = False
 
     value: FloatVectorProperty(
-        default = [0.5, 0.5, 0.5], subtype = "COLOR",
+        default = [0.5, 0.5, 0.5, 1.0], subtype = "COLOR", size = 4,
         soft_min = 0.0, soft_max = 1.0,
         update = propertyChanged)
 
@@ -20,29 +21,29 @@ class ColorSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         layout.prop(self, "value", text = text)
 
     def getValue(self):
-        return list(self.value) + [1.0]
+        return Color(self.value)
 
     def setProperty(self, data):
-        self.value = data[:3]
+        self.value = data
 
     def getProperty(self):
         return self.value[:]
 
     @classmethod
     def getDefaultValue(cls):
-        return [0, 0, 0, 1]
+        return Color((0, 0, 0, 1))
 
     @classmethod
     def getCopyExpression(cls):
-        return "value[:]"
+        return "value.copy()"
 
     @classmethod
     def correctValue(cls, value):
-        if isColor(value): return value, 0
+        if isinstance(value, Color): return value, 0
         else: return cls.getDefaultValue(), 2
 
 
-class ColorListSocket(bpy.types.NodeSocket, PythonListSocket):
+class ColorListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_ColorListSocket"
     bl_label = "Color List Socket"
     dataType = "Color List"
@@ -50,20 +51,4 @@ class ColorListSocket(bpy.types.NodeSocket, PythonListSocket):
     drawColor = (0.8, 0.8, 0.2, 0.5)
     storable = True
     comparable = False
-
-    @classmethod
-    def getCopyExpression(cls):
-        return "[element[:] for element in value]"
-
-    @classmethod
-    def correctValue(cls, value):
-        if isinstance(value, list):
-            if all(isColor(element) for element in value):
-                return value, 0
-        return cls.getDefaultValue(), 2
-
-
-def isColor(value):
-    if isinstance(value, list):
-        return len(value) == 4 and all(isinstance(element, (int, float)) for element in value)
-    return False
+    listClass = ColorList

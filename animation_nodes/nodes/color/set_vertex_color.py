@@ -1,7 +1,6 @@
 import bpy
 import numpy
 from bpy.props import *
-from mathutils import Color
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
@@ -59,5 +58,5 @@ def getVertexColorLayer(mesh, name):
     except: return mesh.vertex_colors.new(name = name)
 
 def colorsAreEqual(a, b):
-    return abs((a[0] * 100 + a[1] * 10 + a[2])
-              -(b[0] * 100 + b[1] * 10 + b[2])) < 0.001
+    return abs((a[0] * 1000 + a[1] * 100 + a[2] * 10 + a[3])
+              -(b[0] * 1000 + b[1] * 100 + b[2] * 10 + b[3])) < 0.001
