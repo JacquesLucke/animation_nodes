@@ -16,6 +16,7 @@
 
 - Allow getting items from virtual lists in Python.
 - Allow choosing alpha in Color socket.
+- Update initialization error messages.
 
 ## 2.1.5
 
