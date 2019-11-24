@@ -1,8 +1,7 @@
 import bpy
-import numpy
 from bpy.props import *
-from itertools import chain
 from ... events import propertyChanged
+from ... data_structures import VirtualColorList
 from ... base_types import AnimationNode, VectorizedSocket
 
 modeItems = [
@@ -58,9 +57,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
         if object is None: return
         colorLayer = self.getVertexColorLayer(object, identifier)
 
-        colorsList = numpy.tile(numpy.array(color, dtype = "f"), len(colorLayer.data))
-        
-        colorLayer.data.foreach_set("color", colorsList)
+        colorsList = VirtualColorList.create(color, 0).materialize(len(colorLayer.data))
+
+        colorLayer.data.foreach_set("color", colorsList.asNumpyArray())
         object.data.update()
         return object  
         
@@ -79,12 +78,14 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
     def setVertexColorForLoops(self, object, identifier, colors):
         colorLayer = self.getVertexColorLayer(object, identifier)
         
-        loops = object.data.loops
-        if len(colors) < len(loops): return object
+        if len(colors) == 0: return object
 
+        colorsList = VirtualColorList.create(colors, 0) 
+
+        loops = object.data.loops
         loopsColors = []
         for loop in loops:
-            loopsColors.extend(colors[loop.vertex_index])
+            loopsColors.extend(colorsList[loop.vertex_index])
       
         colorLayer.data.foreach_set("color", loopsColors)
         object.data.update()
@@ -93,20 +94,24 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
     def setVertexColorForVertices(self, object, identifier, colors):
         colorLayer = self.getVertexColorLayer(object, identifier)
         
-        if len(colors) < len(colorLayer.data): return object
+        if len(colors) == 0: return object
 
-        colorLayer.data.foreach_set("color", colorsFlatList(self, colors))
+        colorsList = VirtualColorList.create(colors, 0).materialize(len(colorLayer.data))
+
+        colorLayer.data.foreach_set("color", colorsList.asNumpyArray())
         object.data.update()
         return object
 
     def setVertexColorForPolygons(self, object, identifier, colors):
         colorLayer = self.getVertexColorLayer(object, identifier)
         
-        if len(colors) < len(object.data.polygons): return object
+        if len(colors) == 0: return object
+
+        colorsList = VirtualColorList.create(colors, 0)
 
         polygonsColors = []
         for i, polygon in enumerate(object.data.polygons):
-            polygonsColors.extend(list(colors[i])*len(polygon.loop_indices))
+            polygonsColors.extend(list(colorsList[i]) * len(polygon.loop_indices))
        
         colorLayer.data.foreach_set("color", polygonsColors)
         object.data.update()
@@ -121,12 +126,3 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
         try: return object.data.vertex_colors[identifier]
         except: self.raiseErrorMessage("Color Layer is not found.")
-
-<<<<<<< HEAD
-def colorsFlatList(self, colors):
-    return list(chain.from_iterable(colors))
-=======
-def colorsAreEqual(a, b):
-    return abs((a[0] * 1000 + a[1] * 100 + a[2] * 10 + a[3])
-              -(b[0] * 1000 + b[1] * 100 + b[2] * 10 + b[3])) < 0.001
->>>>>>> master
