@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import DoubleList
+from ... data_structures import Color, ColorList, VirtualColorList
 from ... base_types import AnimationNode, VectorizedSocket
 
 modeItems = [
@@ -60,44 +60,35 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
 
     def execute_Index(self, object, identifier, index):
         if object is None:
-            return []
+            return None
 
-        colorLayer = self.getVertexColorLayer(object, identifier)
-            
-        getColor = self.getColorList(colorLayer) 
-        try: return getColor[index]
-        except: return []
+        colorsList = VirtualColorList.create(self.getVertexColors(object, identifier), 0)
+        return colorsList[index]
 
     def execute_Indices(self, object, identifier, indices):
         if object is None:
-            return []
-        colorLayer = self.getVertexColorLayer(object, identifier)
+            return ColorList()
 
-        getColor = self.getColorList(colorLayer)
-        colors = []
-        for index in indices:
-            try: colors.append(getColor[index])
-            except: colors.append([0., 0., 0., 0.])
+        colorsList = VirtualColorList.create(self.getVertexColors(object, identifier), 0)
+        colors = ColorList(length = len(indices))
+        
+        for i, index in enumerate(indices):
+            colors[i] = colorsList[index]
         return colors
 
     def execute_All(self, object, identifier):
         if object is None:
-            return []
+            return ColorList()
+        return self.getVertexColors(object, identifier)
 
+    def getVertexColors(self, object, identifier):
         colorLayer = self.getVertexColorLayer(object, identifier)
-        return self.getColorList(colorLayer)
-
-    def getColorList(self, colorLayer):
-        colorFlatList = self.getVertexColors(colorLayer)
-        colorlist = []
-        for i in range(int(len(colorFlatList) / 4)):
-            colorlist.append(colorFlatList[i * 4 : (i + 1) * 4])
-        return colorlist
-            
-    def getVertexColors(self, colorLayer):
-        colorFlatList = [0.] * len(colorLayer.data) * 4
-        colorLayer.data.foreach_get("color", colorFlatList)
-        return colorFlatList
+        
+        color = Color((0., 0., 0., 1.))
+        colorsList = VirtualColorList.create(color, 0).materialize(len(colorLayer.data))
+        
+        colorLayer.data.foreach_get("color", colorsList.asNumpyArray())
+        return colorsList
 
     def getVertexColorLayer(self, object, identifier):
         if object.type != "MESH": 
