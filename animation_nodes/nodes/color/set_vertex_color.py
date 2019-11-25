@@ -80,14 +80,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
         
         if len(colors) == 0: return object
 
-        colorsList = VirtualColorList.create(colors, 0) 
+        colorsList = VirtualColorList.create(colors, 0).materialize(len(colorLayer.data))
 
-        loops = object.data.loops
-        loopsColors = []
-        for loop in loops:
-            loopsColors.extend(colorsList[loop.vertex_index])
-      
-        colorLayer.data.foreach_set("color", loopsColors)
+        colorLayer.data.foreach_set("color", colorsList.asNumpyArray())
         object.data.update()
         return object
 
@@ -96,9 +91,14 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
         
         if len(colors) == 0: return object
 
-        colorsList = VirtualColorList.create(colors, 0).materialize(len(colorLayer.data))
+        colorsList = VirtualColorList.create(colors, 0) 
 
-        colorLayer.data.foreach_set("color", colorsList.asNumpyArray())
+        loops = object.data.loops
+        loopsColors = []
+        for loop in loops:
+            loopsColors.extend(colorsList[loop.vertex_index])
+      
+        colorLayer.data.foreach_set("color", loopsColors)
         object.data.update()
         return object
 
