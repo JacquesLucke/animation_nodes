@@ -1,27 +1,26 @@
-# cython: profile=True
-cimport cython
-
 from ... data_structures cimport (
     ColorList,
     VirtualColorList,
     PolygonIndicesList
 )
 
-def loopsColorsList(long Amount, PolygonIndicesList polygons, VirtualColorList colors, 
-                    ColorList loopsColors):
+def getLoopColorsFromVertexColors(PolygonIndicesList polygons, VirtualColorList colors):
     cdef long i
+    cdef Amount = len(polygons.indices)
+    cdef ColorList loopsColors = ColorList(length = Amount)
+
     for i in range(Amount):
-        loopsColors[i] = colors[polygons.indices[i]]
+        loopsColors.data[i] = colors.get(polygons.indices[i])[0]
     return loopsColors
     
-def polygonsColorsList(long Amount, PolygonIndicesList polygons, VirtualColorList colors,
-                       ColorList polygonsColors):
+def getLoopColorsFromPolygonColors(PolygonIndicesList polygons, VirtualColorList colors):
     cdef long i, j, index
-    cdef long polygonsAmount = len(polygons)
-    index = 0    
-    for i in range(polygonsAmount):
-        for j in range(len(polygons[i])):
-            polygonsColors[index] = colors[i]
+    cdef ColorList loopsColors = ColorList(length = len(polygons.indices))
+    
+    index = 0 
+    for i in range(len(polygons)):
+        for j in range(polygons.polyLengths[i]):
+            loopsColors.data[index] = colors.get(i)[0]
             index += 1
-    return polygonsColors
+    return loopsColors
     

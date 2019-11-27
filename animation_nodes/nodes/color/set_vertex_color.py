@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from . c_utils import loopsColorsList, polygonsColorsList
-from ... data_structures import VirtualColorList, ColorList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualColorList, ColorList
+from . c_utils import getLoopColorsFromVertexColors, getLoopColorsFromPolygonColors
 
 modeItems = [
     ("LOOPS", "Loops", "Set color of every loop vertex", "NONE", 0),
@@ -94,12 +94,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
         sourceMesh = object.an.getMesh(False)
         polygonIndices = sourceMesh.an.getPolygonIndices()
-        Amount = len(polygonIndices.indices)
         
         verticesColors = VirtualColorList.create(colors, 0)
-        loopsColors = ColorList(length = Amount)
-
-        colorsList = loopsColorsList(Amount, polygonIndices, verticesColors, loopsColors) 
+        colorsList = getLoopColorsFromVertexColors(polygonIndices, verticesColors) 
 
         colorLayer.data.foreach_set("color", colorsList.asNumpyArray())
         object.data.update()
@@ -112,12 +109,9 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
         sourceMesh = object.an.getMesh(False)
         polygonIndices = sourceMesh.an.getPolygonIndices()
-        Amount = len(polygonIndices.indices)
-
+        
         polygonsColors = VirtualColorList.create(colors, 0)
-        loopsColors = ColorList(length = Amount)
-
-        colorsList = polygonsColorsList(Amount, polygonIndices, polygonsColors, loopsColors)
+        colorsList = getLoopColorsFromPolygonColors(polygonIndices, polygonsColors)
         
         colorLayer.data.foreach_set("color", colorsList.asNumpyArray())
         object.data.update()
@@ -132,3 +126,4 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
 
         try: return object.data.vertex_colors[identifier]
         except: self.raiseErrorMessage("Color Layer is not found.")
+
