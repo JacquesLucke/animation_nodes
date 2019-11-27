@@ -1,7 +1,8 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import VirtualColorList
+from . c_utils import loopsColorsList, polygonsColorsList
+from ... data_structures import VirtualColorList, ColorList
 from ... base_types import AnimationNode, VectorizedSocket
 
 modeItems = [
@@ -91,14 +92,16 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
         
         if len(colors) == 0: return object
 
-        colorsList = VirtualColorList.create(colors, 0) 
+        sourceMesh = object.an.getMesh(False)
+        polygonIndices = sourceMesh.an.getPolygonIndices()
+        Amount = len(polygonIndices.indices)
+        
+        verticesColors = VirtualColorList.create(colors, 0)
+        loopsColors = ColorList(length = Amount)
 
-        loops = object.data.loops
-        loopsColors = []
-        for loop in loops:
-            loopsColors.extend(colorsList[loop.vertex_index])
-      
-        colorLayer.data.foreach_set("color", loopsColors)
+        colorsList = loopsColorsList(Amount, polygonIndices, verticesColors, loopsColors) 
+
+        colorLayer.data.foreach_set("color", colorsList.asNumpyArray())
         object.data.update()
         return object
 
@@ -107,13 +110,16 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
         
         if len(colors) == 0: return object
 
-        colorsList = VirtualColorList.create(colors, 0)
+        sourceMesh = object.an.getMesh(False)
+        polygonIndices = sourceMesh.an.getPolygonIndices()
+        Amount = len(polygonIndices.indices)
 
-        polygonsColors = []
-        for i, polygon in enumerate(object.data.polygons):
-            polygonsColors.extend(list(colorsList[i]) * len(polygon.loop_indices))
-       
-        colorLayer.data.foreach_set("color", polygonsColors)
+        polygonsColors = VirtualColorList.create(colors, 0)
+        loopsColors = ColorList(length = Amount)
+
+        colorsList = polygonsColorsList(Amount, polygonIndices, polygonsColors, loopsColors)
+        
+        colorLayer.data.foreach_set("color", colorsList.asNumpyArray())
         object.data.update()
         return object 
 
