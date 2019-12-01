@@ -1,12 +1,19 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import Color, ColorList, VirtualColorList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import Color, ColorList, VirtualColorList, LongList
+from . c_utils import getVertexColorsFromLoopColors, getPolygonColorsFromLoopColors
 
 modeItems = [
     ("ALL", "All", "Get color of every vertex", "NONE", 0),
     ("INDEX", "Index", "Get color of a specific vertex", "NONE", 1)
+]
+
+colorModeItems = [
+    ("LOOP", "Loop", "Set color of every loop vertex", "NONE", 0),
+    ("VERTEX", "Vertex", "Set color of every vertex", "NONE", 1),
+    ("POLYGON", "Polygon", "Set color of every polgon", "NONE", 2)    
 ]
 
 colorLayerIdentifierTypeItems = [
@@ -21,6 +28,9 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
 
     mode: EnumProperty(name = "Mode", default = "ALL",
         items = modeItems, update = AnimationNode.refresh)
+
+    colorMode: EnumProperty(name = "Color Mode", default = "LOOP",
+        items = colorModeItems, update = AnimationNode.refresh)
 
     colorLayerIdentifierType: EnumProperty(name = "Color Layer Identifier Type", default = "INDEX",
         items = colorLayerIdentifierTypeItems, update = AnimationNode.refresh)
@@ -45,6 +55,7 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
+        layout.prop(self, "colorMode", text = "")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "colorLayerIdentifierType", text = "Type")
@@ -62,14 +73,16 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
         if object is None:
             return None
 
-        colorsList = VirtualColorList.create(self.getVertexColors(object, identifier), 0)
+        defaultColor = Color((0, 0, 0, 1))
+        colorsList = VirtualColorList.create(self.getVertexColors(object, identifier), defaultColor)
         return colorsList[index]
 
     def execute_Indices(self, object, identifier, indices):
         if object is None:
             return ColorList()
 
-        colorsList = VirtualColorList.create(self.getVertexColors(object, identifier), 0)
+        defaultColor = Color((0, 0, 0, 1))
+        colorsList = VirtualColorList.create(self.getVertexColors(object, identifier), defaultColor)
         colors = ColorList(length = len(indices))
         
         for i, index in enumerate(indices):
@@ -79,17 +92,34 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
     def execute_All(self, object, identifier):
         if object is None:
             return ColorList()
+        
         return self.getVertexColors(object, identifier)
 
     def getVertexColors(self, object, identifier):
         colorLayer = self.getVertexColorLayer(object, identifier)
+        defaultColor = Color((0, 0, 0, 1))
         
-        color = Color((0., 0., 0., 1.))
-        colorsList = VirtualColorList.create(color, 0).materialize(len(colorLayer.data))
-        
+        colorsList = ColorList(length = len(colorLayer.data))
         colorLayer.data.foreach_get("color", colorsList.asNumpyArray())
-        return colorsList
 
+        if self.colorMode == "LOOP":
+            return colorsList
+
+        elif self.colorMode == "VERTEX":
+            sourceMesh = object.an.getMesh(False)
+            polygonIndices = sourceMesh.an.getPolygonIndices()
+            vertexCount = len(sourceMesh.vertices)
+            
+            colorsList = VirtualColorList.create(colorsList, defaultColor)
+            return getVertexColorsFromLoopColors(vertexCount, polygonIndices, colorsList)
+
+        elif self.colorMode == "POLYGON":
+            sourceMesh = object.an.getMesh(False)
+            polygonIndices = sourceMesh.an.getPolygonIndices()
+
+            colorsList = VirtualColorList.create(colorsList, defaultColor)
+            return getPolygonColorsFromLoopColors(polygonIndices, colorsList)
+        
     def getVertexColorLayer(self, object, identifier):
         if object.type != "MESH": 
             self.raiseErrorMessage("No mesh object.")
@@ -99,3 +129,4 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
 
         try: return object.data.vertex_colors[identifier]
         except: self.raiseErrorMessage("Color Layer is not found.")
+        
