@@ -1,3 +1,4 @@
+import cython
 from ... math cimport (
     addColor,
     scaleColor_Inplace
@@ -30,10 +31,11 @@ def getLoopColorsFromPolygonColors(PolygonIndicesList polygons, VirtualColorList
             index += 1
     return loopsColors
 
+@cython.cdivision(True)
 def getVertexColorsFromLoopColors(long vertexCount, PolygonIndicesList polygons, VirtualColorList colors):
     cdef long i, index
     cdef Color vertexColor
-    cdef ColorList vertexsColors = ColorList.fromValue((0, 0, 0, 0), length = vertexCount)
+    cdef ColorList vertexsColors = ColorList.fromValue((0.0, 0.0, 0.0, 0.0), length = vertexCount)
     cdef LongList loopCounts = LongList.fromValue(0, length = vertexCount)        
     
     for i in range(len(polygons.indices)):
@@ -44,7 +46,7 @@ def getVertexColorsFromLoopColors(long vertexCount, PolygonIndicesList polygons,
         loopCounts[index] += 1
 
     for i in range(vertexCount):
-        scaleColor_Inplace(&vertexsColors.data[i], 1/loopCounts[i])
+        scaleColor_Inplace(&vertexsColors.data[i], 1.0 / loopCounts[i])
     return vertexsColors
 
 def getPolygonColorsFromLoopColors(PolygonIndicesList polygons, VirtualColorList colors):
@@ -55,12 +57,12 @@ def getPolygonColorsFromLoopColors(PolygonIndicesList polygons, VirtualColorList
     
     index = 0 
     for i in range(polygonsCount):
-        color = Color(0, 0, 0, 0)
+        color = Color(0.0, 0.0, 0.0, 0.0)
         polyLength = polygons.polyLengths[i]
         for j in range(polyLength):
             addColor(&color, &color, &colors.get(polygons.indices[index])[0])
             index += 1
-        scaleColor_Inplace(&color, 1/polyLength)
+        scaleColor_Inplace(&color, 1.0 / polyLength)
         polygonsColors.data[i] = color
     return polygonsColors
 

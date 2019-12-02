@@ -2,13 +2,8 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import Color, ColorList, VirtualColorList, LongList
+from ... data_structures import Color, ColorList, VirtualColorList
 from . c_utils import getVertexColorsFromLoopColors, getPolygonColorsFromLoopColors
-
-modeItems = [
-    ("ALL", "All", "Get color of every vertex", "NONE", 0),
-    ("INDEX", "Index", "Get color of a specific vertex", "NONE", 1)
-]
 
 colorModeItems = [
     ("LOOP", "Loop", "Set color of every loop vertex", "NONE", 0),
@@ -26,9 +21,6 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Vertex Color Input"
     errorHandlingType = "EXCEPTION"
 
-    mode: EnumProperty(name = "Mode", default = "ALL",
-        items = modeItems, update = AnimationNode.refresh)
-
     colorMode: EnumProperty(name = "Color Mode", default = "LOOP",
         items = colorModeItems, update = AnimationNode.refresh)
 
@@ -45,57 +37,17 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
         elif self.colorLayerIdentifierType == "NAME":
             self.newInput("Text", "Name", "colorLayerName")
 
-        if self.mode == "INDEX":
-            self.newInput(VectorizedSocket("Integer", "useIndexList",
-                ("Index", "index"), ("Indices", "indices")))
-            self.newOutput(VectorizedSocket("Color", "useIndexList",
-                ("Color", "color"), ("Colors", "colors")))
-        elif self.mode == "ALL":
-            self.newOutput("Color List", "Colors", "colors")        
+        self.newOutput("Color List", "Colors", "colors")        
 
     def draw(self, layout):
-        layout.prop(self, "mode", text = "")
         layout.prop(self, "colorMode", text = "")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "colorLayerIdentifierType", text = "Type")
 
-    def getExecutionFunctionName(self):
-        if self.mode == "INDEX":
-            if self.useIndexList:
-                return "execute_Indices"
-            else:
-                return "execute_Index"
-        elif self.mode == "ALL":
-            return "execute_All"
-
-    def execute_Index(self, object, identifier, index):
-        if object is None:
-            return None
-
-        defaultColor = Color((0, 0, 0, 1))
-        colorsList = VirtualColorList.create(self.getVertexColors(object, identifier), defaultColor)
-        return colorsList[index]
-
-    def execute_Indices(self, object, identifier, indices):
-        if object is None:
-            return ColorList()
-
-        defaultColor = Color((0, 0, 0, 1))
-        colorsList = VirtualColorList.create(self.getVertexColors(object, identifier), defaultColor)
-        colors = ColorList(length = len(indices))
+    def execute(self, object, identifier):
+        if object is None: return
         
-        for i, index in enumerate(indices):
-            colors[i] = colorsList[index]
-        return colors
-
-    def execute_All(self, object, identifier):
-        if object is None:
-            return ColorList()
-        
-        return self.getVertexColors(object, identifier)
-
-    def getVertexColors(self, object, identifier):
         colorLayer = self.getVertexColorLayer(object, identifier)
         defaultColor = Color((0, 0, 0, 1))
         
