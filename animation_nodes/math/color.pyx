@@ -12,4 +12,3 @@ cdef void scaleColor_Inplace(Color* c, float factor):
   c.b *= factor
   c.a *= factor
 
-    
