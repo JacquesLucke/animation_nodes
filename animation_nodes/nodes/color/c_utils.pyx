@@ -49,6 +49,7 @@ def getVertexColorsFromLoopColors(long vertexCount, PolygonIndicesList polygons,
         scaleColor_Inplace(&vertexsColors.data[i], 1.0 / loopCounts[i])
     return vertexsColors
 
+@cython.cdivision(True)
 def getPolygonColorsFromLoopColors(PolygonIndicesList polygons, VirtualColorList colors):
     cdef Color color
     cdef long i, j, index, polyLength
