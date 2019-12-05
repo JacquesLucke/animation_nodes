@@ -12,6 +12,7 @@
 - Fixed sound evaluation when sound sequences are cut.
 - Fixed *Set Vertex Color* node when alpha value change.
 - Fixed time measurement. `time.clock()` was removed in python 3.8.
+- Fixed the Node Editor's HUD position.
 
 ### Changed
 
