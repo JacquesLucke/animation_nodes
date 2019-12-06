@@ -56,7 +56,6 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
 
         if self.colorMode == "LOOP":
             return colorsList
-
         elif self.colorMode == "VERTEX":
             sourceMesh = object.an.getMesh(False)
             polygonIndices = sourceMesh.an.getPolygonIndices()
@@ -64,7 +63,6 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
             
             colorsList = VirtualColorList.create(colorsList, defaultColor)
             return getVertexColorsFromLoopColors(vertexCount, polygonIndices, colorsList)
-
         elif self.colorMode == "POLYGON":
             sourceMesh = object.an.getMesh(False)
             polygonIndices = sourceMesh.an.getPolygonIndices()
