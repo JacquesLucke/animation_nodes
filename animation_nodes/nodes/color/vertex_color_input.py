@@ -6,9 +6,9 @@ from ... data_structures import Color, ColorList, VirtualColorList
 from . c_utils import getVertexColorsFromLoopColors, getPolygonColorsFromLoopColors
 
 colorModeItems = [
-    ("LOOP", "Loop", "Set color of every loop vertex", "NONE", 0),
-    ("VERTEX", "Vertex", "Set color of every vertex", "NONE", 1),
-    ("POLYGON", "Polygon", "Set color of every polgon", "NONE", 2)    
+    ("LOOP", "Loop", "Get color of every loop vertex", "NONE", 0),
+    ("VERTEX", "Vertex", "Get color of every vertex", "NONE", 1),
+    ("POLYGON", "Polygon", "Get color of every polgon", "NONE", 2)    
 ]
 
 colorLayerIdentifierTypeItems = [

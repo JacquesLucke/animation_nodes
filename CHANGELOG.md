@@ -1,4 +1,5 @@
 ## Unreleased
+- Added Vertex Color Input node.
 
 ### Added
 
@@ -21,6 +22,7 @@
 - Update initialization error messages.
 - Normalize Quaternion in the *Combine Quaternion* node.
 - Normalize Quaternion in the *Convert Rotations* node.
+- Vectorized Set Vertex Color node and color modes are added.
 
 ## 2.1.5
 

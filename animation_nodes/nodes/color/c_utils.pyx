@@ -1,6 +1,7 @@
 import cython
 from ... math cimport (
     addColor,
+    addColor_Inplace,
     scaleColor_Inplace
 )
 from ... data_structures cimport (
@@ -24,10 +25,12 @@ def getLoopColorsFromPolygonColors(PolygonIndicesList polygons, VirtualColorList
     cdef ColorList loopsColors = ColorList(length = len(polygons.indices))
     
     cdef long i, j, index
+    cdef Color polygonColor
     index = 0 
     for i in range(len(polygons)):
+        polygonColor = colors.get(i)[0]
         for j in range(polygons.polyLengths[i]):
-            loopsColors.data[index] = colors.get(i)[0]
+            loopsColors.data[index] = polygonColor
             index += 1
     return loopsColors
 
@@ -36,17 +39,14 @@ def getVertexColorsFromLoopColors(long vertexCount, PolygonIndicesList polygons,
     cdef ColorList vertexsColors = ColorList.fromValue((0.0, 0.0, 0.0, 0.0), length = vertexCount)
     cdef LongList loopCounts = LongList.fromValue(0, length = vertexCount)        
     
-    cdef Color vertexColor
     cdef long i, index
     for i in range(len(polygons.indices)):
         index = polygons.indices[i]
-        vertexColor = vertexsColors.data[index]
-        addColor(&vertexColor, &vertexColor, colors.get(polygons.indices[i]))
-        vertexsColors.data[index] = vertexColor
+        addColor_Inplace(vertexsColors.data + index, colors.get(polygons.indices[i]))
         loopCounts[index] += 1
 
     for i in range(vertexCount):
-        scaleColor_Inplace(&vertexsColors.data[i], 1.0 / loopCounts[i])
+        scaleColor_Inplace(vertexsColors.data + i, 1.0 / loopCounts[i])
     return vertexsColors
 
 @cython.cdivision(True)
@@ -61,7 +61,7 @@ def getPolygonColorsFromLoopColors(PolygonIndicesList polygons, VirtualColorList
         color = Color(0.0, 0.0, 0.0, 0.0)
         polyLength = polygons.polyLengths[i]
         for j in range(polyLength):
-            addColor(&color, &color, colors.get(polygons.indices[index]))
+            addColor_Inplace(&color, colors.get(polygons.indices[index]))
             index += 1
         scaleColor_Inplace(&color, 1.0 / polyLength)
         polygonsColors.data[i] = color
