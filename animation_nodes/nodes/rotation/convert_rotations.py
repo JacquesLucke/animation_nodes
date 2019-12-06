@@ -75,7 +75,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
             return "quaternion = euler.to_quaternion()"
 
         if self.conversionType == "QUATERNION_TO_MATRIX":
-            return "matrix = quaternion.to_matrix().to_4x4()"
+            return "matrix = quaternion.normalized().to_matrix().to_4x4()"
         if self.conversionType == "MATRIX_TO_QUATERNION":
             return "quaternion = matrix.to_quaternion()"
 

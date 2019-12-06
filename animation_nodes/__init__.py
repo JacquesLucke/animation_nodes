@@ -91,9 +91,9 @@ if "numpy" not in globals():
 
 
 from . preferences import getBlenderVersion
-if getBlenderVersion() < (2, 76, 0):
+if getBlenderVersion() < (2, 80, 0):
     message = ("\n\n"
-        "The Animation Nodes addon requires at least Blender 2.77.\n"
+        "The Animation Nodes addon requires at least Blender 2.80.\n"
         "Your are using an older version.\n"
         "Please download the latest official release.")
     raise Exception(message)
@@ -128,8 +128,8 @@ if currentPythonVersion[:2] != addonPythonVersion[:2]:
         "Your Blender build uses: {}\n"
         "Animation Nodes has been compiled for: {}\n\n"
         "You have three options:\n"
-        "  1. Try make Blender use another Python version.\n"
-        "     (Blender 2.78/2.79 officially uses Python 3.5.x)\n"
+        "  1. Try to make Blender use another Python version.\n"
+        "     (Blender 2.80/2.81 officially uses Python 3.7.x)\n"
         "  2. Compile Animation Nodes yourself using the correct Python version.\n"
         "     (Look in the developer manual for more information)\n"
         "  3. Create an issue on Github and ask if someone can create a build for you."
@@ -146,8 +146,8 @@ if "test_compile" not in globals():
         "  1. Check if the build you downloaded has been compiled for the OS\n"
         "     you are using. If not, download another one.\n"
         "  2. If you are on windows you can try to install a library called\n"
-        "     'Visual C++ 2015 Redistributable'. Should be easy to find using\n"
-        "     your search engine of choice.\n"
+        "     'vc_redist.x64'. Should be easy to find using your search engine\n"
+        "     of choice.\n"
         "  3. Try to use an official Blender release downloaded from blender.org.\n"
         "  4. It is possible that you have a build for the correct platform\n"
         "     but it still does not work. We experienced this mainly on linux.\n"
