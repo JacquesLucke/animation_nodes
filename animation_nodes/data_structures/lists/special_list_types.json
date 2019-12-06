@@ -79,5 +79,17 @@
             "from ... math.vector cimport Vector2",
             "from ... math.conversion cimport setVector2, toPyVector2"
         ]
+    },
+    "ColorList" : {
+      "Type" : "Color",
+      "Buffer Type" : "float",
+      "Equals" : "not memcmp(&(\\1), &(\\2), sizeof(Color))",
+      "Try Conversion" : "setColor(target, value)",
+      "To PyObject" : "toPyColor(value)",
+      "Additional Methods" : "__color_list_functions.src",
+      "Declarations" : [
+          "from ... math.color cimport Color",
+          "from ... math.conversion cimport setColor, toPyColor, toColor"
+      ]
     }
 }

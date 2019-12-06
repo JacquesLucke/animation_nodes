@@ -13,4 +13,4 @@ class CombineQuaternionNode(bpy.types.Node, AnimationNode):
         self.newOutput("Quaternion", "Quaternion", "quaternion")
 
     def getExecutionCode(self, required):
-        return "quaternion = Quaternion((w, x, y, z))"
+        return "quaternion = Quaternion((w, x, y, z)).normalized()"
