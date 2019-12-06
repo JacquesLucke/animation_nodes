@@ -33,7 +33,7 @@ class VertexColorInputNode(bpy.types.Node, AnimationNode):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
 
         if self.colorLayerIdentifierType == "INDEX":
-            self.newInput("Integer", "Color Index", "colorLayerIndex")
+            self.newInput("Integer", "Vertex Color Index", "vertexColorIndex")
         elif self.colorLayerIdentifierType == "NAME":
             self.newInput("Text", "Name", "colorLayerName")
 
