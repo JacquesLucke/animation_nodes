@@ -8,7 +8,7 @@ from . c_utils import getLoopColorsFromVertexColors, getLoopColorsFromPolygonCol
 colorModeItems = [
     ("LOOP", "Loop", "Set color of every loop vertex", "NONE", 0),
     ("VERTEX", "Vertex", "Set color of every vertex", "NONE", 1),
-    ("POLYGON", "Polygon", "Set color of every polgon", "NONE", 2)    
+    ("POLYGON", "Polygon", "Set color of every polygon", "NONE", 2)    
 ]
 
 colorLayerIdentifierTypeItems = [
@@ -22,7 +22,7 @@ class SetVertexColorNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
 
     colorMode: EnumProperty(name = "Color Mode", default = "LOOP",
-        items = colorModeItems, update = AnimationNode.refresh)
+        items = colorModeItems, update = propertyChanged)
 
     colorLayerIdentifierType: EnumProperty(name = "Color Layer Identifier Type", default = "INDEX",
         items = colorLayerIdentifierTypeItems, update = AnimationNode.refresh)

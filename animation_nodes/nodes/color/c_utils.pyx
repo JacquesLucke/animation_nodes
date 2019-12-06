@@ -1,6 +1,5 @@
 import cython
 from ... math cimport (
-    addColor,
     addColor_Inplace,
     scaleColor_Inplace
 )
@@ -39,7 +38,7 @@ def getVertexColorsFromLoopColors(long vertexCount, PolygonIndicesList polygons,
     cdef ColorList vertexColors = ColorList(length = vertexCount)
     cdef LongList loopCounts = LongList(length = vertexCount)        
     loopCounts.fill(0)
-    vertexColors.fill(0.0)
+    vertexColors.fill(0)
 
     cdef long i, index
     for i in range(len(polygons.indices)):
@@ -55,7 +54,7 @@ def getVertexColorsFromLoopColors(long vertexCount, PolygonIndicesList polygons,
 def getPolygonColorsFromLoopColors(PolygonIndicesList polygons, VirtualColorList colors):
     cdef polygonCount = len(polygons)
     cdef ColorList polygonColors = ColorList(length = polygonCount)
-    polygonColors.fill(0.0)
+    polygonColors.fill(0)
 
     cdef long i, j, index, polyLength
     index = 0 
