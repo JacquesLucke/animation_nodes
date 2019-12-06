@@ -734,3 +734,4 @@ def register():
 
 def unregister():
     bpy.types.NODE_MT_add.remove(drawMenu)
+
