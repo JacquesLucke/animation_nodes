@@ -9,9 +9,9 @@ def prettyTime(seconds):
 def measureTime(function):
     @functools.wraps(function)
     def wrapper(*args, **kwargs):
-        start = time.clock()
+        start = time.process_time()
         output = function(*args, **kwargs)
-        end = time.clock()
+        end = time.process_time()
         duration = end - start
         if debuggingIsEnabled():
             print("Time: {:.5f} - fps : {:.2f} - Function: {}".format(duration, 1 / max(duration, 1e-10), function.__name__))

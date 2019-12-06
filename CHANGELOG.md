@@ -11,11 +11,16 @@
 - Fixed the *Frame Rate* output of the *Time Info* node.
 - Fixed sound evaluation when sound sequences are cut.
 - Fixed *Set Vertex Color* node when alpha value change.
+- Fixed time measurement. `time.clock()` was removed in python 3.8.
+- Fixed the Node Editor's HUD position.
 
 ### Changed
 
 - Allow getting items from virtual lists in Python.
 - Allow choosing alpha in Color socket.
+- Update initialization error messages.
+- Normalize Quaternion in the *Combine Quaternion* node.
+- Normalize Quaternion in the *Convert Rotations* node.
 
 ## 2.1.5
 
