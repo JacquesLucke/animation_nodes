@@ -1,10 +1,10 @@
 ## Unreleased
-- Added Vertex Color Input node.
 
 ### Added
 
 - Added *Set Vertex Weight* node.
 - Added CList and VirtualList for colors.
+- Added Vertex Color Input node.
 
 ### Fixed
 
