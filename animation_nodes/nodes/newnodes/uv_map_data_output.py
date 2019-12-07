@@ -2,8 +2,8 @@ import bpy
 import numpy as np
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import DoubleList
 from ... base_types import AnimationNode
+from ... data_structures import VirtualDoubleList
 
 mapIdentifierTypeItems = [
     ("INDEX", "Index", "Get uv map based on the index", "NONE", 0),
@@ -13,6 +13,7 @@ mapIdentifierTypeItems = [
 class UVMapDataOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_UVMapDataOutputNode"
     bl_label = "UV Map Data Output"
+    errorHandlingType = "EXCEPTION"
 
     mapIdentifierType: EnumProperty(name = "UV Map Identifier Type", default = "INDEX",
         items = mapIdentifierTypeItems, update = AnimationNode.refresh)
@@ -33,22 +34,27 @@ class UVMapDataOutputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "mapIdentifierType", text = "Type")
 
     def execute(self, object, identifier, x, y):
-        if object is None or object.type != "MESH" or object.mode != "OBJECT":
+        if object is None:
             return object
+        
         uvMap = self.getUVMap(object, identifier)
-        if uvMap is None:
-            return object
-        lenX = len(x)
-        lenY = len(y)    
-        if lenX == 0 or lenY == 0:
-            return object
-        coList = np.zeros((lenX + lenY), dtype=float)
-        coList[::2] = np.array(x)
-        coList[1::2] = np.array(y)
+        
+        coLen = len(uvMap.data)    
+        xList = VirtualDoubleList.create(x, 0).materialize(coLen)
+        yList = VirtualDoubleList.create(y, 0).materialize(coLen)
+        
+        coList = np.zeros(2 * coLen, dtype = float)
+        coList[::2] = xList.asNumpyArray()
+        coList[1::2] = yList.asNumpyArray()
+        
         uvMap.data.foreach_set('uv', coList)
         object.update_tag()
         return object
 
     def getUVMap(self, object, identifier):
+        if object.type != "MESH": 
+            self.raiseErrorMessage("No mesh object.")
+
         try: return object.data.uv_layers[identifier]
-        except: return object.data.uv_layers.new(name="UVMap", do_init=True)
+        except: return object.data.uv_layers.new(name = "UVMap", do_init = True)
+

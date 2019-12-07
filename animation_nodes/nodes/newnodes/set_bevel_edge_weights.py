@@ -1,5 +1,5 @@
 import bpy
-import numpy as np
+from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class BevelEdgeWeights(bpy.types.Node, AnimationNode):
@@ -25,9 +25,9 @@ class BevelEdgeWeights(bpy.types.Node, AnimationNode):
         if object is None or object.type != "MESH" or object.mode != "OBJECT": return
         if object.data.use_customdata_edge_bevel is False:
             object.data.use_customdata_edge_bevel = True
-        weights = np.zeros((len(object.data.edges)), dtype=float)     
-        weights[:] = weight
-        object.data.edges.foreach_set('bevel_weight', weights)
+
+        weights = VirtualDoubleList.create(weight, 0).materialize(len(object.data.edges))
+        object.data.edges.foreach_set('bevel_weight', weights.asNumpyArray())
         object.data.update()
         return object
 
@@ -35,10 +35,9 @@ class BevelEdgeWeights(bpy.types.Node, AnimationNode):
         if object is None or object.type != "MESH" or object.mode != "OBJECT": return
         if object.data.use_customdata_edge_bevel is False:
             object.data.use_customdata_edge_bevel = True
-        try:
-            object.data.edges.foreach_set('bevel_weight', weights)
-        except:
-            self.raiseErrorMessage("Input Weights has wrong length")
-            return object
+        
+        weights = VirtualDoubleList.create(weights, 0).materialize(len(object.data.edges))
+        object.data.edges.foreach_set('bevel_weight', weights.asNumpyArray())
         object.data.update()
         return object
+

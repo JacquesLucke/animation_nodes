@@ -1,5 +1,5 @@
 import bpy
-import numpy as np
+from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class EdgeCreases(bpy.types.Node, AnimationNode):
@@ -23,18 +23,18 @@ class EdgeCreases(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, object, crease):
         if object is None or object.type != "MESH" or object.mode != "OBJECT": return
-        creases = np.zeros((len(object.data.edges)), dtype=float)     
-        creases[:] = crease
-        object.data.edges.foreach_set('crease', creases)
+
+        creases = VirtualDoubleList.create(crease, 0).materialize(len(object.data.edges))
+        object.data.edges.foreach_set('crease', creases.asNumpyArray())
         object.data.update()
         return object
 
     def executeList(self, object, creases):
         if object is None or object.type != "MESH" or object.mode != "OBJECT": return
-        try:
-            object.data.edges.foreach_set('crease', creases)
-        except:
-            self.raiseErrorMessage("Input Creases has wrong length")
-            return object
+        
+        creases = VirtualDoubleList.create(creases, 0).materialize(len(object.data.edges))
+        object.data.edges.foreach_set('crease', creases.asNumpyArray())
         object.data.update()
         return object
+
+        
