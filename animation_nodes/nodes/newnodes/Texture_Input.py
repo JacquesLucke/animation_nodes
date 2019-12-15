@@ -1,6 +1,4 @@
 import bpy
-from bpy.props import *
-from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import DoubleList, Color, ColorList
 
@@ -9,7 +7,6 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Texture Input"
 
     useVectorList: VectorizedSocket.newProperty()
-    autoRefreshBool: BoolProperty(name = "Auto Refresh", default = False, update = propertyChanged)    
     
     def create(self):
         self.newInput("Texture", "Texture", "texture", defaultDrawType = "PROPERTY_ONLY")
@@ -32,7 +29,6 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
             socket.hide = socket.name not in visibleOutputs
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "autoRefreshBool")
         box = layout.box()
         col = box.column(align = True)
         col.label(text = "Info", icon = "INFO")
@@ -49,25 +45,21 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
         if texture is None:
             return None, None, None, None, None, None
         
-        if texture.image.source in ['SEQUENCE', 'MOVIE']: 
-            texture.image_user.use_auto_refresh = self.autoRefreshBool
-
         color = Color(texture.evaluate(location))
+        texture.update_tag()
         return color, color.r, color.g, color.b, color.a, texture
         
     def executeList(self, texture, locations):
         if texture is None or len(locations) == 0:
             return ColorList(), DoubleList(), DoubleList(), DoubleList(), DoubleList(), texture
         
-        if texture.image.source in ['SEQUENCE', 'MOVIE']: 
-            texture.image_user.use_auto_refresh = self.autoRefreshBool
-
         locationCount = len(locations)
         reds = DoubleList(length = locationCount)
         greens = DoubleList(length = locationCount)
         blues = DoubleList(length = locationCount)
         alphas = DoubleList(length = locationCount)
         colors = ColorList(length = locationCount)
+
         for i, location in enumerate(locations):
             color = Color(texture.evaluate(location))
             reds[i] = color.r
@@ -75,5 +67,6 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
             blues[i] = color.b
             alphas[i] = color.a 
             colors[i] = color
+        texture.update_tag()
         return colors, reds, greens, blues, alphas, texture
 
