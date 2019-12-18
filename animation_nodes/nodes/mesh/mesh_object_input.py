@@ -14,6 +14,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         self.newInput("Boolean", "Use World Space", "useWorldSpace")
         self.newInput("Boolean", "Use Modifiers", "useModifiers", value = False)
         self.newInput("Boolean", "Load UVs", "loadUVs", value = False)
+        self.newInput("Boolean", "Load Vertex Colors", "loadVertexColors", value = False)
         self.newInput("Scene", "Scene", "scene", hide = True)
 
         self.newOutput("Mesh", "Mesh", "mesh")
@@ -88,6 +89,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             yield "mesh.setPolygonNormals(polygonNormals)"
             yield "mesh.setLoopEdges(sourceMesh.an.getLoopEdges())"
             yield "if loadUVs: self.loadUVs(mesh, sourceMesh, object)"
+            yield "if loadVertexColors: self.loadVertexColors(mesh, sourceMesh, object)"
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
         vertices = mesh.an.getVertices()
@@ -119,3 +121,11 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
                 mesh.insertUVMap(uvMapName, sourceMesh.an.getUVMap(uvMapName))
         else:
             self.setErrorMessage("Object has to be in object mode to load UV maps.")
+    
+    def loadVertexColors(self, mesh, sourceMesh, object):
+        if object.mode != "EDIT":
+            for vertexColorLayerName in sourceMesh.vertex_colors.keys():
+                mesh.insertVertexColorLayer(vertexColorLayerName, sourceMesh.an.getVertexColorLayer(vertexColorLayerName))
+        else:
+            self.setErrorMessage("Object is in edit mode.")
+

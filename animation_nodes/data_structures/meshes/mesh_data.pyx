@@ -3,7 +3,7 @@ import textwrap
 import functools
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
-from .. lists.base_lists cimport UIntegerList, EdgeIndices, Vector3DList, Vector2DList
+from .. lists.base_lists cimport UIntegerList, EdgeIndices, Vector3DList, Vector2DList, ColorList
 from ... math cimport (
     Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
     Matrix4, toMatrix4
@@ -50,6 +50,7 @@ cdef class Mesh:
 
         self.derivedMeshDataCache = {}
         self.uvMaps = OrderedDict()
+        self.vertexColorLayers = OrderedDict()
 
     def verticesTransformed(self):
         self.derivedMeshDataCache.pop("Vertex Normals", None)
@@ -121,6 +122,18 @@ cdef class Mesh:
     def getUVMapNames(self):
         return list(self.uvMaps.keys())
 
+    def insertVertexColorLayer(self, str name, ColorList colors):
+        if len(colors) == len(self.polygons.indices):
+            self.vertexColorLayers[name] = colors
+        else:
+            raise Exception("invalid length")
+
+    def getVertexColorLayers(self):
+        return list(self.vertexColorLayers.items())
+
+    def getVertexColorLayerNames(self):
+        return list(self.vertexColorLayers.keys())    
+
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
         mesh.transferMeshProperties(self,
@@ -141,13 +154,18 @@ cdef class Mesh:
                 Vertices: {}
                 Edges: {}
                 Polygons: {}
-                UV Maps: {}\
-            """.format(len(self.vertices), len(self.edges), len(self.polygons), list(self.uvMaps.keys())))
+                UV Maps: {}
+                Vertex Color Layers: {}\
+            """.format(len(self.vertices), len(self.edges), len(self.polygons), list(self.uvMaps.keys()),
+                       list(self.vertexColorLayers.keys())))
 
     def transferMeshProperties(self, Mesh source, *, calcNewLoopProperty = None):
         if calcNewLoopProperty is not None:
             for name, uvMap in source.uvMaps.items():
                 self.uvMaps[name] = calcNewLoopProperty(uvMap)
+            
+            for name, vertexColorLayer in source.vertexColorLayers.items():
+                self.vertexColorLayers[name] = calcNewLoopProperty(vertexColorLayer)
 
     @classmethod
     def join(cls, *meshes):
@@ -294,3 +312,4 @@ def calculateCrossProducts(Vector3DList a, Vector3DList b):
         crossVec3(_result + i, _a + i, _b + i)
 
     return result
+
