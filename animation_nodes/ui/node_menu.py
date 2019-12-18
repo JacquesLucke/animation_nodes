@@ -373,6 +373,8 @@ class MeshMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
         insertNode(layout, "an_SetVertexWeightNode", "Set Vertex Weight")
+        insertNode(layout, "an_GetMeshVertexColorNode", "Get Mesh Vertex Color")
+        insertNode(layout, "an_AddMeshVertexColorNode", "Add Mesh Vertex Color")
         insertNode(layout, "an_VertexColorInputNode", "Vertex Color Input")
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
         layout.separator()
