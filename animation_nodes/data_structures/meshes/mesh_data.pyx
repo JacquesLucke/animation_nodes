@@ -133,7 +133,10 @@ cdef class Mesh:
 
     def getVertexColorLayerNames(self):
         return list(self.vertexColorLayers.keys())    
-
+    
+    def getVertexColors(self, str colorLayerName):
+        return self.vertexColorLayers.get(colorLayerName, None)
+        
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
         mesh.transferMeshProperties(self,
@@ -149,15 +152,13 @@ cdef class Mesh:
         self.verticesMoved()
 
     def __repr__(self):
-        return textwrap.dedent("""\
-            AN Mesh Object:
-                Vertices: {}
-                Edges: {}
-                Polygons: {}
-                UV Maps: {}
-                Vertex Color Layers: {}\
-            """.format(len(self.vertices), len(self.edges), len(self.polygons), list(self.uvMaps.keys()),
-                       list(self.vertexColorLayers.keys())))
+        return textwrap.dedent(
+        f"""AN Mesh Object:
+        Vertices: {len(self.vertices)}
+        Edges: {len(self.edges)}
+        Polygons: {len(self.polygons)}
+        UV Maps: {list(self.uvMaps.keys())}
+        Vertex Color Layers: {list(self.vertexColorLayers.keys())}""")
 
     def transferMeshProperties(self, Mesh source, *, calcNewLoopProperty = None):
         if calcNewLoopProperty is not None:
@@ -191,13 +192,6 @@ cdef class Mesh:
         for i in range(meshData.polygons.indices.length):
             self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
 
-    def getVertexColorLayer(self, str colorLayerName):
-        cdef long i    
-        for i in range(len(self.getVertexColorLayers())):
-            if self.getVertexColorLayers()[i][0] == colorLayerName:
-                return self.getVertexColorLayers()[i]    
-            else:
-                return None
 
 def calculatePolygonNormals(Vector3DList vertices, PolygonIndicesList polygons):
     cdef Vector3DList normals = Vector3DList(length = polygons.getLength())

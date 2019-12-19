@@ -37,9 +37,8 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
         defaultColor = Color((0, 0, 0, 1))
         colorsList = ColorList(length = len(mesh.polygons.indices))
         
-        vertexColorLayer = mesh.getVertexColorLayer(colorLayerName)
-        if vertexColorLayer is not None:
-            colorsList = vertexColorLayer[1]
+        if mesh.getVertexColors(colorLayerName) is not None:
+            colorsList = mesh.getVertexColors(colorLayerName)
         else:
             self.raiseErrorMessage(f"No Vertex Color Layer of Name '{colorLayerName}'.")    
 
