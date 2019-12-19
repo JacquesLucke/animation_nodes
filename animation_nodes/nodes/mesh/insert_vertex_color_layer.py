@@ -10,10 +10,11 @@ colorModeItems = [
     ("VERTEX", "Vertex", "Get color of every vertex", "NONE", 1),
     ("POLYGON", "Polygon", "Get color of every polygon", "NONE", 2)    
 ]
-
-class AddMeshVertexColorNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_AddMeshVertexColorNode"
-    bl_label = "Add Mesh Vertex Color"
+       
+class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_InsertVertexColorLayerNode"
+    bl_label = "Insert Vertex Color Layer"
+    bl_width_default = 155
     errorHandlingType = "EXCEPTION"
 
     colorMode: EnumProperty(name = "Color Mode", default = "LOOP",
@@ -39,8 +40,9 @@ class AddMeshVertexColorNode(bpy.types.Node, AnimationNode):
             return "execute_SingleColor"
 
     def execute_SingleColor(self, mesh, colorLayerName, color):
-        if mesh is None: return
-        if colorLayerName == "": return mesh
+        if mesh is None: return None
+        if colorLayerName == "": 
+            self.raiseErrorMessage("No Vertex Color Layer Name.")
 
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(color, defaultColor).materialize(len(mesh.polygons.indices))
@@ -50,7 +52,8 @@ class AddMeshVertexColorNode(bpy.types.Node, AnimationNode):
         
     def execute_ColorsList(self, mesh, colorLayerName, colors):
         if mesh is None: return None
-        if colorLayerName == "": return mesh
+        if colorLayerName == "":
+            self.raiseErrorMessage("No Vertex Color Layer Name.")
         
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(colors, defaultColor)

@@ -191,6 +191,13 @@ cdef class Mesh:
         for i in range(meshData.polygons.indices.length):
             self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
 
+    def getVertexColorLayer(self, str colorLayerName):
+        cdef long i    
+        for i in range(len(self.getVertexColorLayers())):
+            if self.getVertexColorLayers()[i][0] == colorLayerName:
+                return self.getVertexColorLayers()[i]    
+            else:
+                return None
 
 def calculatePolygonNormals(Vector3DList vertices, PolygonIndicesList polygons):
     cdef Vector3DList normals = Vector3DList(length = polygons.getLength())

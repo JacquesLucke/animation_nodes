@@ -61,7 +61,7 @@ def getPolygonColorsFromLoopColors(PolygonIndicesList polygons, VirtualColorList
     for i in range(polygonCount):
         polyLength = polygons.polyLengths[i]
         for j in range(polyLength):
-            addColor_Inplace(polygonColors.data + i, colors.get(polygons.indices[index]))
+            addColor_Inplace(polygonColors.data + i, colors.get(index))
             index += 1
         scaleColor_Inplace(polygonColors.data + i, 1.0 / polyLength)
     return polygonColors

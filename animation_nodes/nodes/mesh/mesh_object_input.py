@@ -6,6 +6,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 class MeshObjectInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectInputNode"
     bl_label = "Mesh Object Input"
+    bl_width_default = 145
     errorHandlingType = "MESSAGE"
     searchTags = ["Object Mesh Data", "Mesh from Object"]
 
@@ -124,8 +125,8 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
     
     def loadVertexColors(self, mesh, sourceMesh, object):
         if object.mode != "EDIT":
-            for vertexColorLayerName in sourceMesh.vertex_colors.keys():
-                mesh.insertVertexColorLayer(vertexColorLayerName, sourceMesh.an.getVertexColorLayer(vertexColorLayerName))
+            for colorLayerName in sourceMesh.vertex_colors.keys():
+                mesh.insertVertexColorLayer(colorLayerName, sourceMesh.an.getVertexColorLayer(colorLayerName))
         else:
             self.setErrorMessage("Object is in edit mode.")
 
