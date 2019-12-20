@@ -40,7 +40,8 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
         if mesh.getVertexColors(colorLayerName) is not None:
             colorsList = mesh.getVertexColors(colorLayerName)
         else:
-            self.raiseErrorMessage(f"No Vertex Color Layer of Name '{colorLayerName}'.")    
+            self.raiseErrorMessage(f"No Vertex Color Layer of Name '{colorLayerName}'."
+                                   f" Layers: {', '.join(mesh.getVertexColorLayerNames())}")
 
         if self.colorMode == "LOOP":
             return colorsList

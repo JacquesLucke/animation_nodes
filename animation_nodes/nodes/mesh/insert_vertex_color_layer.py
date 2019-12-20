@@ -43,6 +43,9 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
         if mesh is None: return None
         if colorLayerName == "": 
             self.raiseErrorMessage("No Vertex Color Layer Name.")
+        elif colorLayerName in mesh.getVertexColorLayerNames():
+            self.raiseErrorMessage(f"Mesh has already this Vertex Color Layer."
+                                   f" Layers: {', '.join(mesh.getVertexColorLayerNames())}")
 
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(color, defaultColor).materialize(len(mesh.polygons.indices))
@@ -54,7 +57,10 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
         if mesh is None: return None
         if colorLayerName == "":
             self.raiseErrorMessage("No Vertex Color Layer Name.")
-        
+        elif colorLayerName in mesh.getVertexColorLayerNames():
+            self.raiseErrorMessage(f"Mesh has already this Vertex Color Layer."
+                                   f" Layers: {', '.join(mesh.getVertexColorLayerNames())}")
+
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(colors, defaultColor)
         
