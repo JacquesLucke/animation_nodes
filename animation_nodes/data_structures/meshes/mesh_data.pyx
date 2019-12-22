@@ -157,8 +157,8 @@ cdef class Mesh:
         Vertices: {len(self.vertices)}
         Edges: {len(self.edges)}
         Polygons: {len(self.polygons)}
-        UV Maps: {list(self.uvMaps.keys())}
-        Vertex Color Layers: {list(self.vertexColorLayers.keys())}""")
+        UV Maps: {self.getUVMapNames()}
+        Vertex Colors: {self.getVertexColorLayerNames()}""")
 
     def transferMeshProperties(self, Mesh source, *, calcNewLoopProperty = None):
         if calcNewLoopProperty is not None:

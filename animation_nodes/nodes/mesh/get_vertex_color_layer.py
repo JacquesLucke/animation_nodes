@@ -14,7 +14,6 @@ colorModeItems = [
 class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetVertexColorLayerNode"
     bl_label = "Get Vertex Color Layer"
-    bl_width_default = 155
     errorHandlingType = "EXCEPTION"
 
     colorMode: EnumProperty(name = "Color Mode", default = "LOOP",
@@ -30,18 +29,17 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "colorMode", text = "")
 
     def execute(self, mesh, colorLayerName):
-        if mesh is None: return ColorList()
         if colorLayerName == "":
-            self.raiseErrorMessage("No Vertex Color Layer Name.")
+            self.raiseErrorMessage("Vertex color layer name can't be empty.")
         
         defaultColor = Color((0, 0, 0, 1))
         colorsList = ColorList(length = len(mesh.polygons.indices))
         
-        if mesh.getVertexColors(colorLayerName) is not None:
-            colorsList = mesh.getVertexColors(colorLayerName)
+        getColorList = mesh.getVertexColors(colorLayerName)
+        if getColorList is not None:
+            colorsList = getColorList
         else:
-            self.raiseErrorMessage(f"No Vertex Color Layer of Name '{colorLayerName}'."
-                                   f" Layers: {', '.join(mesh.getVertexColorLayerNames())}")
+            self.raiseErrorMessage(f"Mesh doesn't have a vertex color layer with the name '{colorLayerName}'.")
 
         if self.colorMode == "LOOP":
             return colorsList
@@ -57,4 +55,3 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
             colorsList = VirtualColorList.create(colorsList, defaultColor)
             return getPolygonColorsFromLoopColors(polygonIndices, colorsList)
         
-    

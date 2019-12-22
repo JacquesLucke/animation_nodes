@@ -14,7 +14,6 @@ colorModeItems = [
 class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InsertVertexColorLayerNode"
     bl_label = "Insert Vertex Color Layer"
-    bl_width_default = 155
     errorHandlingType = "EXCEPTION"
 
     colorMode: EnumProperty(name = "Color Mode", default = "LOOP",
@@ -40,12 +39,10 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
             return "execute_SingleColor"
 
     def execute_SingleColor(self, mesh, colorLayerName, color):
-        if mesh is None: return None
         if colorLayerName == "": 
-            self.raiseErrorMessage("No Vertex Color Layer Name.")
+            self.raiseErrorMessage("Vertex color layer name can't be empty.")
         elif colorLayerName in mesh.getVertexColorLayerNames():
-            self.raiseErrorMessage(f"Mesh has already this Vertex Color Layer."
-                                   f" Layers: {', '.join(mesh.getVertexColorLayerNames())}")
+            self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
 
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(color, defaultColor).materialize(len(mesh.polygons.indices))
@@ -54,12 +51,10 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
         return mesh
         
     def execute_ColorsList(self, mesh, colorLayerName, colors):
-        if mesh is None: return None
         if colorLayerName == "":
-            self.raiseErrorMessage("No Vertex Color Layer Name.")
+            self.raiseErrorMessage("Vertex color layer name can't be empty.")
         elif colorLayerName in mesh.getVertexColorLayerNames():
-            self.raiseErrorMessage(f"Mesh has already this Vertex Color Layer."
-                                   f" Layers: {', '.join(mesh.getVertexColorLayerNames())}")
+            self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
 
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(colors, defaultColor)
