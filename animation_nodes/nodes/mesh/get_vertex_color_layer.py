@@ -33,7 +33,6 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Vertex color layer name can't be empty.")
         
         defaultColor = Color((0, 0, 0, 1))
-        colorsList = ColorList(length = len(mesh.polygons.indices))
         
         colorsList = mesh.getVertexColors(colorLayerName)
         if colorsList is None:

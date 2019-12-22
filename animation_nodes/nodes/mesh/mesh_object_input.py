@@ -6,7 +6,6 @@ from ... base_types import AnimationNode, VectorizedSocket
 class MeshObjectInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectInputNode"
     bl_label = "Mesh Object Input"
-    bl_width_default = 145
     errorHandlingType = "MESSAGE"
     searchTags = ["Object Mesh Data", "Mesh from Object"]
 
@@ -14,8 +13,8 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Boolean", "Use World Space", "useWorldSpace")
         self.newInput("Boolean", "Use Modifiers", "useModifiers", value = False)
-        self.newInput("Boolean", "Load UVs", "loadUVs", value = False)
-        self.newInput("Boolean", "Load Vertex Colors", "loadVertexColors", value = False)
+        self.newInput("Boolean", "Load UVs", "loadUVs", value = False, hide = True)
+        self.newInput("Boolean", "Load Vertex Colors", "loadVertexColors", value = False, hide = True)
         self.newInput("Scene", "Scene", "scene", hide = True)
 
         self.newOutput("Mesh", "Mesh", "mesh")
@@ -33,7 +32,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         self.newOutput("Integer List", "Material Indices", "materialIndices")
 
         self.newOutput("Text", "Mesh Name", "meshName")
-
+        
         visibleOutputs = ("Mesh", "Vertex Locations", "Polygon Centers")
         for socket in self.outputs:
             socket.hide = socket.name not in visibleOutputs
