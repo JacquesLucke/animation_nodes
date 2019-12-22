@@ -70,4 +70,3 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
         
         mesh.insertVertexColorLayer(colorLayerName, colorsList)
         return mesh
-        

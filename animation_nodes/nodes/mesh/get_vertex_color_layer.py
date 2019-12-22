@@ -35,10 +35,8 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
         defaultColor = Color((0, 0, 0, 1))
         colorsList = ColorList(length = len(mesh.polygons.indices))
         
-        getColorList = mesh.getVertexColors(colorLayerName)
-        if getColorList is not None:
-            colorsList = getColorList
-        else:
+        colorsList = mesh.getVertexColors(colorLayerName)
+        if colorsList is None:
             self.raiseErrorMessage(f"Mesh doesn't have a vertex color layer with the name '{colorLayerName}'.")
 
         if self.colorMode == "LOOP":
@@ -54,4 +52,3 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
 
             colorsList = VirtualColorList.create(colorsList, defaultColor)
             return getPolygonColorsFromLoopColors(polygonIndices, colorsList)
-        
