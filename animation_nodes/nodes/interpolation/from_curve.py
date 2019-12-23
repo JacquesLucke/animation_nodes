@@ -48,10 +48,10 @@ class CurveInterpolationNode(bpy.types.Node, AnimationNode):
 
         mapping = self.mapping
         curve = mapping.curves[3]
-        try: curve.evaluate(0.5)
+        try: mapping.evaluate(curve, 0.5)
         except: mapping.initialize()
 
-        interpolation = PyInterpolation(curve.evaluate)
+        interpolation = PyInterpolation(lambda x : mapping.evaluate(curve, x))
         if self.cacheInterpolation:
             return CachedInterpolation(interpolation)
         else:
