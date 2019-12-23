@@ -4,7 +4,8 @@
 
 - Added *Set Vertex Weight* node.
 - Added CList and VirtualList for colors.
-- Added Vertex Color Input node.
+- Added Get Vertex Color Layer node.
+- Added Insert Vertex Color Layer node.
 
 ### Fixed
 

@@ -14,6 +14,7 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Polygon Normals", "polygonNormals")
         self.newOutput("Vector List", "Polygon Centers", "polygonCenters")
         self.newOutput("Text List", "UV Map Names", "uvMapNames")
+        self.newOutput("Text List", "Vertex Color Layers", "vertexColorLayerNames")
 
     def getExecutionCode(self, required):
         if "vertices" in required:
@@ -30,3 +31,6 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
             yield "polygonCenters = mesh.getPolygonCenters()"
         if "uvMapNames" in required:
             yield "uvMapNames = mesh.getUVMapNames()"
+        if "vertexColorLayerNames" in required:
+            yield "vertexColorLayerNames = mesh.getVertexColorLayerNames()"
+

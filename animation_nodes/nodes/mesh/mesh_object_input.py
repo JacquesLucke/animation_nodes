@@ -13,7 +13,8 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Boolean", "Use World Space", "useWorldSpace")
         self.newInput("Boolean", "Use Modifiers", "useModifiers", value = False)
-        self.newInput("Boolean", "Load UVs", "loadUVs", value = False)
+        self.newInput("Boolean", "Load UVs", "loadUVs", value = False, hide = True)
+        self.newInput("Boolean", "Load Vertex Colors", "loadVertexColors", value = False, hide = True)
         self.newInput("Scene", "Scene", "scene", hide = True)
 
         self.newOutput("Mesh", "Mesh", "mesh")
@@ -31,7 +32,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         self.newOutput("Integer List", "Material Indices", "materialIndices")
 
         self.newOutput("Text", "Mesh Name", "meshName")
-
+        
         visibleOutputs = ("Mesh", "Vertex Locations", "Polygon Centers")
         for socket in self.outputs:
             socket.hide = socket.name not in visibleOutputs
@@ -88,6 +89,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             yield "mesh.setPolygonNormals(polygonNormals)"
             yield "mesh.setLoopEdges(sourceMesh.an.getLoopEdges())"
             yield "if loadUVs: self.loadUVs(mesh, sourceMesh, object)"
+            yield "if loadVertexColors: self.loadVertexColors(mesh, sourceMesh, object)"
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
         vertices = mesh.an.getVertices()
@@ -119,3 +121,11 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
                 mesh.insertUVMap(uvMapName, sourceMesh.an.getUVMap(uvMapName))
         else:
             self.setErrorMessage("Object has to be in object mode to load UV maps.")
+    
+    def loadVertexColors(self, mesh, sourceMesh, object):
+        if object.mode != "EDIT":
+            for colorLayerName in sourceMesh.vertex_colors.keys():
+                mesh.insertVertexColorLayer(colorLayerName, sourceMesh.an.getVertexColorLayer(colorLayerName))
+        else:
+            self.setErrorMessage("Object is in edit mode.")
+
