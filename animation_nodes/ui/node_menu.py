@@ -232,7 +232,6 @@ class ColorMenu(bpy.types.Menu):
         insertNode(layout, "an_SeparateColorNode", "Separate Color")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Color")})
         layout.separator()
-        insertNode(layout, "an_VertexColorInputNode", "Vertex Color Input")
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
 
 class ListMenu(bpy.types.Menu):

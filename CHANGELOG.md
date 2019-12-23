@@ -4,7 +4,6 @@
 
 - Added *Set Vertex Weight* node.
 - Added CList and VirtualList for colors.
-- Added Vertex Color Input node.
 
 ### Fixed
 
@@ -37,6 +36,8 @@
 - Added missing nodes to the node menu
 - Added *Collection Operations* node.
 - Added *Rotations* output to the *Particles Data* node.
+- Added Get Vertex Color Layer node.
+- Added Insert Vertex Color Layer node.
 
 ### Fixed
 
