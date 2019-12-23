@@ -3,7 +3,8 @@ from bpy.props import *
 from . utils.depsgraph import getEvaluatedID
 from . operators.callbacks import executeCallback
 from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
-                               FloatList, UShortList, UIntegerList, Vector2DList)
+                               FloatList, UShortList, UIntegerList, Vector2DList,
+                               ColorList)
 
 def register():
     bpy.types.Context.getActiveAnimationNodeTree = getActiveAnimationNodeTree
@@ -85,6 +86,12 @@ class MeshProperties(bpy.types.PropertyGroup):
         uvMap = Vector2DList(length = len(self.mesh.loops))
         uvLayer.data.foreach_get("uv", uvMap.asMemoryView())
         return uvMap
+    
+    def getVertexColorLayer(self, name):
+        vertexColorLayer = self.mesh.vertex_colors[name]
+        vertexColors = ColorList(length = len(vertexColorLayer.data))
+        vertexColorLayer.data.foreach_get("color", vertexColors.asNumpyArray())
+        return vertexColors
 
     @property
     def mesh(self):
@@ -109,3 +116,4 @@ class IDProperties(bpy.types.PropertyGroup):
 
     removeOnZeroUsers: BoolProperty(default = False,
         description = "Data block should be removed when it has no users")
+

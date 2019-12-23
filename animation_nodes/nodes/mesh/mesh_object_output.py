@@ -123,6 +123,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             outMesh.uv_layers.new(name = name)
             outMesh.uv_layers[name].data.foreach_set("uv", data.asMemoryView())
 
+        # Vertex Color Layers
+        for name, data in mesh.getVertexColorLayers():
+            outMesh.vertex_colors.new(name = name)
+            outMesh.vertex_colors[name].data.foreach_set("color", data.asMemoryView())
+
         if self.validateMesh:
             outMesh.validate(verbose = self.validateMeshVerbose)
 
@@ -154,3 +159,4 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     def ensureThatMeshHasAnimationData(self, mesh):
         if mesh.animation_data is None:
             mesh.animation_data_create()
+
