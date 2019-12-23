@@ -4,7 +4,8 @@
 
 - Added *Set Vertex Weight* node.
 - Added CList and VirtualList for colors.
-- Added Vertex Color Input node.
+- Added Get Vertex Color Layer node.
+- Added Insert Vertex Color Layer node.
 
 ### Fixed
 
@@ -14,6 +15,8 @@
 - Fixed *Set Vertex Color* node when alpha value change.
 - Fixed time measurement. `time.clock()` was removed in python 3.8.
 - Fixed the Node Editor's HUD position.
+- Fixed Curve Interpolation node.
+- Fixed the name output in the Mesh Object Input node.
 
 ### Changed
 
