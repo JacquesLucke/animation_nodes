@@ -62,7 +62,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
 
     def iterGetMeshDataCodeLines(self, required):
         if "meshName" in required:
-            "meshName = sourceMesh.name"
+            yield "meshName = sourceMesh.name"
 
         meshRequired = "mesh" in required
 

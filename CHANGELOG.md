@@ -15,6 +15,7 @@
 - Fixed time measurement. `time.clock()` was removed in python 3.8.
 - Fixed the Node Editor's HUD position.
 - Fixed Curve Interpolation node.
+- Fixed the name output in the Mesh Object Input node.
 
 ### Changed
 
