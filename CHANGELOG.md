@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Added *Set Vertex Weight* node.
+
 ### Added
 
 - Added *Set Vertex Weight* node.
