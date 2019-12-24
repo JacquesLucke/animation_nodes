@@ -52,10 +52,10 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         return "Color from {}a".format(self.sourceType)
 
     def getExecutionCode(self, required):
-        if self.sourceType == "RGB":    yield "color = [red, green, blue, alpha]"
-        elif self.sourceType == "HSV":  yield "color = [*colorsys.hsv_to_rgb(hue, saturation, value), alpha]"
-        elif self.sourceType == "HSL":  yield "color = [*colorsys.hls_to_rgb(hue, lightness, saturation), alpha]"
-        elif self.sourceType == "YIQ":  yield "color = [*colorsys.yiq_to_rgb(y, i, q), alpha]"
+        if self.sourceType == "RGB":    yield "color = Color((red, green, blue, alpha))"
+        elif self.sourceType == "HSV":  yield "color = Color((*colorsys.hsv_to_rgb(hue, saturation, value), alpha))"
+        elif self.sourceType == "HSL":  yield "color = Color((*colorsys.hls_to_rgb(hue, lightness, saturation), alpha))"
+        elif self.sourceType == "YIQ":  yield "color = Color((*colorsys.yiq_to_rgb(y, i, q), alpha))"
 
     def getUsedModules(self):
         return ["colorsys"]

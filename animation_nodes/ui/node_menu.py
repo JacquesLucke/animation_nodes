@@ -231,6 +231,7 @@ class ColorMenu(bpy.types.Menu):
         insertNode(layout, "an_CombineColorNode", "Combine Color")
         insertNode(layout, "an_SeparateColorNode", "Separate Color")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Color")})
+        layout.separator()
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
 
 class ListMenu(bpy.types.Menu):
@@ -371,6 +372,9 @@ class MeshMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
         insertNode(layout, "an_SetVertexWeightNode", "Set Vertex Weight")
+        insertNode(layout, "an_GetVertexColorLayerNode", "Get Vertex Color Layer")
+        insertNode(layout, "an_InsertVertexColorLayerNode", "Insert Vertex Color Layer")
+        insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
         layout.separator()
         insertNode(layout, "an_OffsetPolygonsNode", "Offset Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
@@ -686,3 +690,4 @@ def register():
 
 def unregister():
     bpy.types.NODE_MT_add.remove(drawMenu)
+

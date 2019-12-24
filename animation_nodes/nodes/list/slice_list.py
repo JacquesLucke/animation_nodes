@@ -67,7 +67,8 @@ class SliceListNode(bpy.types.Node, AnimationNode):
             if self.sliceEndType == "END_INDEX":
                 yield "_end = end"
             elif self.sliceEndType == "OUTPUT_LENGTH":
-                yield "_end = max(0, _start + _step * length)"
+                yield "realStart = _start if _start >= 0 else len(list) + _start"
+                yield "_end = max(0, realStart + _step * length)"
 
         elements = ["_start" if self.useStart else "",
                     "_end" if self.useEnd else "",

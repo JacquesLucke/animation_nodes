@@ -85,7 +85,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     def autoExecute(self):
         self._execute()
-        self.autoExecution.lastExecutionTimestamp = time.clock()
+        self.autoExecution.lastExecutionTimestamp = time.process_time()
 
     def execute(self):
         setupExecutionUnits()
@@ -125,7 +125,7 @@ class AnimationNodeTree(bpy.types.NodeTree):
 
     @property
     def timeSinceLastAutoExecution(self):
-        return abs(time.clock() - self.autoExecution.lastExecutionTimestamp)
+        return abs(time.process_time() - self.autoExecution.lastExecutionTimestamp)
 
     @property
     def networks(self):

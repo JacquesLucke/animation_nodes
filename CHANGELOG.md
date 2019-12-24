@@ -4,15 +4,31 @@
 
 ### Added
 
+- Added *Set Vertex Weight* node.
+- Added CList and VirtualList for colors.
+- Added Get Vertex Color Layer node.
+- Added Insert Vertex Color Layer node.
+
 ### Fixed
 
 - Fixed sound nodes when sounds are packed in the blend file.
 - Fixed the *Frame Rate* output of the *Time Info* node.
 - Fixed sound evaluation when sound sequences are cut.
+- Fixed *Set Vertex Color* node when alpha value change.
+- Fixed time measurement. `time.clock()` was removed in python 3.8.
+- Fixed the Node Editor's HUD position.
+- Fixed Curve Interpolation node.
+- Fixed the name output in the Mesh Object Input node.
+- Fixed Slice List node for negative start index in Length mode.
 
 ### Changed
 
 - Allow getting items from virtual lists in Python.
+- Allow choosing alpha in Color socket.
+- Update initialization error messages.
+- Normalize Quaternion in the *Combine Quaternion* node.
+- Normalize Quaternion in the *Convert Rotations* node.
+- Vectorized Set Vertex Color node and color modes are added.
 
 ## 2.1.5
 
