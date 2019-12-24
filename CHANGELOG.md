@@ -17,6 +17,7 @@
 - Fixed the Node Editor's HUD position.
 - Fixed Curve Interpolation node.
 - Fixed the name output in the Mesh Object Input node.
+- Fixed Slice List node for negative start index in Length mode.
 
 ### Changed
 
