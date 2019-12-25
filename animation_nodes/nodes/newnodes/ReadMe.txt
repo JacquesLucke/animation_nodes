@@ -9,5 +9,6 @@ Manually Installation Guide:
    2) Copy the "__init__.py" file into the "data_structures" folder of animation nodes
    3) Copy the "layer.py, stroke.py, object.py and texture.py" into the "sockets" folder of animation nodes
    4) Copy the "node_menu.py" into the "ui" folder of animation nodes
-   5) Copy the "newnodes" folder into the "nodes" folder of animation noddes
-   6) Copy the "c_utils.cpython-37m-x86_64-linux-gnu.so" into "newnodes" folder from "vector" folder for Linux, and a similar file for Windows, or Mac.
+   5) Copy the "newnodes" folder into the "nodes" folder of animation nodes
+   6) Copy the "blend_data_by_name.py, filter_blend_data_list_by_name.py" into the "generic" folder of animation nodes
+   7) Copy the "c_utils.cpython-37m-x86_64-linux-gnu.so" into "newnodes" folder from "vector" folder for Linux, and a similar file for Windows, or Mac.
