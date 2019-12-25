@@ -8,6 +8,10 @@ container: ubuntu:rolling
 
 steps:
 - script: |
+    whoami
+  displayName: 'Who am I?'
+
+- script: |
     apt-get -y update
     apt-get -y install python3.7
     apt-get -y install cython3
