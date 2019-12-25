@@ -1,10 +1,10 @@
 trigger:
 - master
 stages:
-- stage:
+- stage: build
   displayName: Build
   jobs:
-  - job:
+  - job: linuxBuild
     displayName: Linux Build
     pool:
       vmImage: ubuntu-18.04
@@ -16,7 +16,9 @@ stages:
         apt-get -y install python3.7 cython3 g++;
         python3.7 setup.py build --export"
       displayName: Linux Build
-  - job:
+    - publish: $(Build.SourcesDirectory)/*.zip
+      artifact: linuxBuild
+  - job: macOSBuild
     displayName: MacOS Build
     pool:
       vmImage: macOS-10.14
@@ -33,7 +35,9 @@ stages:
       displayName: 'Install Cython'
     - script: python3.7 setup.py build --export
       displayName: MacOS Build
-  - job:
+    - publish: $(Build.SourcesDirectory)/*.zip
+      artifact: macOSBuild
+  - job: windowsBuild
     displayName: Windows Build
     pool:
       vmImage: windows-2019
@@ -55,39 +59,31 @@ stages:
         DISTUTILS_USE_SDK: 1
         PY_VCRUNTIME_REDIST: No
       displayName: Build Windows
-- stage:
+    - publish: $(Build.SourcesDirectory)/*.zip
+      artifact: windowsBuild
+- stage: deploy
   displayName: Deploy
   jobs:
-    - job: prepareArtifacts
-      displayName: Prepare Artifacts
-      steps:
-      - task: CopyFiles@2
-        inputs:
-          contents: '*.zip'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    - job:
-      displayName: Publish Artifacts
-      dependsOn: prepareArtifacts
-      steps:
-      - task: PublishBuildArtifacts@1
-        inputs:
-          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-          artifactName: build
-    - job:
+    - deployment:
       displayName: Update Github Release
       dependsOn: prepareArtifacts
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-      steps:
-      - task: GitHubRelease@1
-        inputs:
-          gitHubConnection: 'JacquesLucke'
-          repositoryName: 'JacquesLucke/animation_nodes'
-          action: 'edit'
-          target: '$(Build.SourceVersion)'
-          tag: 'daily'
-          releaseNotesSource: 'inline'
-          assets: '$(Build.SourcesDirectory)/*.zip'
-          assetUploadMode: 'replace'
-          isPreRelease: true
-          addChangeLog: false
-        displayName: 'Update Release'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: GitHubRelease@1
+              inputs:
+                gitHubConnection: 'JacquesLucke'
+                repositoryName: 'JacquesLucke/animation_nodes'
+                action: 'edit'
+                tag: 'daily'
+                releaseNotesSource: 'inline'
+                assets: |
+                  $(Pipeline.Workspace)/linuxBuild/animation_nodes*.zip
+                  $(Pipeline.Workspace)/macOSBuild/animation_nodes*.zip
+                  $(Pipeline.Workspace)/windowsBuild/animation_nodes*.zip
+                assetUploadMode: 'replace'
+                isPreRelease: true
+                addChangeLog: false
+              displayName: 'Update Release'
