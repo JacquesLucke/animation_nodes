@@ -18,6 +18,7 @@
 - Fixed Curve Interpolation node.
 - Fixed the name output in the Mesh Object Input node.
 - Fixed Slice List node for negative start index in Length mode.
+- Fixed duplication of the Curve Interpolation node.
 
 ### Changed
 

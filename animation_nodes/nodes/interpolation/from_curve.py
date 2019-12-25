@@ -5,7 +5,6 @@ from ... base_types import AnimationNode
 from .. container_provider import getHelperMaterial
 from ... algorithms.interpolations import PyInterpolation, CachedInterpolation
 
-
 class CurveMapPointCache(bpy.types.PropertyGroup):
     bl_idname = "an_CurveMapPointCache"
     handle_type: StringProperty()
@@ -13,10 +12,8 @@ class CurveMapPointCache(bpy.types.PropertyGroup):
 
 class CurveMapCache(bpy.types.PropertyGroup):
     bl_idname = "an_CurveMapCache"
-    extend: StringProperty()
     points: CollectionProperty(type = CurveMapPointCache)
     dirty: BoolProperty(default = True)
-
 
 class CurveInterpolationNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InterpolationFromCurveNode"
@@ -83,14 +80,13 @@ class CurveInterpolationNode(bpy.types.Node, AnimationNode):
 
     def duplicate(self, sourceNode):
         self.createCurveNode()
-        self.copyOtherCurve(sourceNode.curve)
+        self.copyOtherCurveNode(sourceNode)
 
     def delete(self):
         self.removeCurveNode()
 
     def cacheCurveMap(self):
         curve = self.curve
-        self.curveMapCache.extend = curve.extend
         self.curveMapCache.points.clear()
         for point in curve.points:
             item = self.curveMapCache.points.add()
@@ -103,7 +99,6 @@ class CurveInterpolationNode(bpy.types.Node, AnimationNode):
 
     def copyOtherCurve(self, otherCurve):
         curve = self.curve
-        curve.extend = otherCurve.extend
         curvePoints = curve.points
         for i, point in enumerate(otherCurve.points):
             if len(curvePoints) == i:
@@ -111,6 +106,10 @@ class CurveInterpolationNode(bpy.types.Node, AnimationNode):
             curvePoints[i].location = point.location
             curvePoints[i].handle_type = point.handle_type
         self.mapping.update()
+
+    def copyOtherCurveNode(self, sourceNode):
+        self.mapping.extend = sourceNode.mapping.extend
+        self.copyOtherCurve(sourceNode.curve)
 
     def save(self):
         self.cacheCurveMap()
