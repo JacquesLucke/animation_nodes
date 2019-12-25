@@ -8,9 +8,9 @@ container: ubuntu:rolling
 
 steps:
 - script: |
-    sudo apt-get -y update
-    sudo apt-get -y install python3.7
-    sudo apt-get -y install cython3
+    apt-get -y update
+    apt-get -y install python3.7
+    apt-get -y install cython3
   displayName: 'Install Dependencies'
 
 - script: |
