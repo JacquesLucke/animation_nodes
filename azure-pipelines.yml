@@ -6,6 +6,7 @@ pool:
 
 container: ubuntu:rolling
 
+steps:
 - script: |
     sudo apt-get -y update
     sudo apt-get -y install python3.7
