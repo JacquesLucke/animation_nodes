@@ -1,52 +1,19 @@
 trigger:
 - master
 
-strategy:
-  matrix:
-    linux:
-      imageName: 'ubuntu-18.04'
-    mac:
-      imageName: 'macOS-latest'
-    windows:
-      imageName: 'windows-latest'
-
 pool:
-  vmImage: $(imageName)
+  vmImage: ubuntu-18.04
 
-steps:
-- task: UsePythonVersion@0
-  condition: and(succeeded(), ne(variables['Agent.OS'], 'Linux'))
-  inputs:
-    versionSpec: '3.7'
-    addToPath: true
-    architecture: 'x64'
-  displayName: 'Set Python Version Windows/MacOS'
-
-- script: |
-    python -m pip install --upgrade pip setuptools wheel
-    pip install Cython --install-option="--no-cython-compile"
-  condition: and(succeeded(), ne(variables['Agent.OS'], 'Linux'))
-  displayName: 'Install Cython Windows/MacOS'
+container: ubuntu:rolling
 
 - script: |
     sudo apt-get -y update
     sudo apt-get -y install python3.7
     sudo apt-get -y install cython3
-  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
-  displayName: 'Install Linux Dependencies'
-  
-- script: |
-    call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-    python setup.py build --export
-  condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-  env:
-    DISTUTILS_USE_SDK: 1
-    PY_VCRUNTIME_REDIST: No
-  displayName: 'Build Windows'
+  displayName: 'Install Dependencies'
 
 - script: |
     python3.7 setup.py build --export
-  condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
   displayName: 'Build Linux/MacOS'
 
 - task: CopyFiles@2
