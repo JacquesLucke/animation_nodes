@@ -30,7 +30,7 @@ steps:
 
 - script: |
     sudo apt-get -y update
-    sudo apt-get -y install python3
+    sudo apt-get -y install python3.7
     sudo apt-get -y install cython3
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
   displayName: 'Install Linux Dependencies'
