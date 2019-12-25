@@ -12,9 +12,9 @@ steps:
   displayName: 'Who am I?'
 
 - script: |
-    su -c "apt-get -y update"
-    su -c "apt-get -y install python3.7"
-    su -c "apt-get -y install cython3"
+    su root -c "apt-get -y update"
+    su root -c "apt-get -y install python3.7"
+    su root -c "apt-get -y install cython3"
   displayName: 'Install Dependencies'
 
 - script: |
