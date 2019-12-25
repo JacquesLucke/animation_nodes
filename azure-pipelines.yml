@@ -1,6 +1,6 @@
 trigger:
 - master
-- stages:
+stages:
 - stage:
   displayName: Build
   jobs:
