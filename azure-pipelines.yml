@@ -45,7 +45,7 @@ steps:
   displayName: 'Build Windows'
 
 - script: |
-    ls /usr/bin/ | grep python
+    ls /usr/bin/ | grep python | xargs -I binary bash -c "binary --version"
   condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
   displayName: 'Build Linux/MacOS'
 
