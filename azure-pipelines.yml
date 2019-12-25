@@ -29,9 +29,9 @@ steps:
   displayName: 'Install Cython Windows/MacOS'
 
 - script: |
-    apt-get -y update
-    apt-get -y install python3
-    apt-get -y install cython3
+    sudo apt-get -y update
+    sudo apt-get -y install python3
+    sudo apt-get -y install cython3
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
   displayName: 'Install Linux Dependencies'
   
