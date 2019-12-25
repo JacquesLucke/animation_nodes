@@ -32,6 +32,9 @@ steps:
     sudo apt-get -y update
     sudo apt-get -y install python3.7
     sudo apt-get -y install cython3
+    sudo apt-cache show python3.7
+    sudo apt-cache show python3.7-minimal
+    sudo dpkg -L python3.7-minimal
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
   displayName: 'Install Linux Dependencies'
   
