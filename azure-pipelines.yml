@@ -29,7 +29,7 @@ steps:
   displayName: 'Install Cython Windows/MacOS'
 
 - script: |
-    uname -a
+    lsb_release -a
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
   displayName: 'Install Linux Dependencies'
   
