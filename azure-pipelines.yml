@@ -63,10 +63,10 @@ stages:
       artifact: windowsBuild
 - stage: deploy
   displayName: Deploy
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
     - deployment:
       displayName: Update Github Release
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
       environment: animation-nodes
       strategy:
         runOnce:
