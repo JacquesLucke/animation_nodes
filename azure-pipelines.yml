@@ -45,12 +45,14 @@ steps:
   displayName: 'Build Windows'
 
 - script: |
-    ls /usr/bin/ | grep python | xargs -I binary bash -c "binary --version"
-  condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
-  displayName: 'Build Linux/MacOS'
+    sudo apt-cache show python3.7
+    sudo apt-cache show python3.7-minimal
+    sudo dpkg -L python3.7-minimal
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+  displayName: 'Query Info'
 
 - script: |
-    /usr/bin/python3.7 setup.py build --export
+    python3.7 setup.py build --export
   condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
   displayName: 'Build Linux/MacOS'
 
