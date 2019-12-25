@@ -16,7 +16,11 @@ stages:
         apt-get -y install python3.7 cython3 g++;
         python3.7 setup.py build --export"
       displayName: Linux Build
-    - publish: $(Build.SourcesDirectory)/*.zip
+    - task: CopyFiles@2
+      inputs:
+        contents: 'animation_nodes*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: $(Build.ArtifactStagingDirectory)
       artifact: linuxBuild
   - job: macOSBuild
     displayName: MacOS Build
@@ -35,7 +39,11 @@ stages:
       displayName: 'Install Cython'
     - script: python3.7 setup.py build --export
       displayName: MacOS Build
-    - publish: $(Build.SourcesDirectory)/*.zip
+    - task: CopyFiles@2
+      inputs:
+        contents: 'animation_nodes*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: $(Build.ArtifactStagingDirectory)
       artifact: macOSBuild
   - job: windowsBuild
     displayName: Windows Build
@@ -59,11 +67,14 @@ stages:
         DISTUTILS_USE_SDK: 1
         PY_VCRUNTIME_REDIST: No
       displayName: Build Windows
-    - publish: $(Build.SourcesDirectory)/*.zip
+    - task: CopyFiles@2
+      inputs:
+        contents: 'animation_nodes*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: $(Build.ArtifactStagingDirectory)
       artifact: windowsBuild
 - stage: deploy
   displayName: Deploy
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
     - deployment:
       displayName: Update Github Release
