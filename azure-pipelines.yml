@@ -29,7 +29,9 @@ steps:
   displayName: 'Install Cython Windows/MacOS'
 
 - script: |
-    lsb_release -a
+    sudo apt-get -y update
+    sudo apt-get -y install python3.7
+    sudo apt-get -y install cython3
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
   displayName: 'Install Linux Dependencies'
   
@@ -41,13 +43,6 @@ steps:
     DISTUTILS_USE_SDK: 1
     PY_VCRUNTIME_REDIST: No
   displayName: 'Build Windows'
-
-- script: |
-    sudo apt-cache show python3.7
-    sudo apt-cache show python3.7-minimal
-    sudo dpkg -L python3.7-minimal
-  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
-  displayName: 'Query Info'
 
 - script: |
     python3.7 setup.py build --export
