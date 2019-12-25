@@ -27,8 +27,8 @@ stages:
         addToPath: true
         architecture: 'x64'
       displayName: 'Set Python Version'
-    - script: >-
-        python -m pip install --upgrade pip setuptools wheel;
+    - script: |
+        python -m pip install --upgrade pip setuptools wheel
         pip install Cython --install-option="--no-cython-compile"
       displayName: 'Install Cython'
     - script: python3.7 setup.py build --export
@@ -44,9 +44,9 @@ stages:
         addToPath: true
         architecture: 'x64'
       displayName: 'Set Python Version'
-    - script: >-
-        python -m pip install --upgrade pip setuptools wheel;
-        pip install Cython --install-option="--no-cython-compile";
+    - script: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install Cython --install-option="--no-cython-compile"
       displayName: 'Install Cython'
     - script: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
@@ -76,9 +76,9 @@ stages:
     - job:
       displayName: Update Github Release
       dependsOn: prepareArtifacts
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
       steps:
       - task: GitHubRelease@1
-        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
         inputs:
           gitHubConnection: 'JacquesLucke'
           repositoryName: 'JacquesLucke/animation_nodes'
