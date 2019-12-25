@@ -57,26 +57,37 @@ stages:
       displayName: Build Windows
 - stage:
   displayName: Deploy
-  steps:
-  - task: CopyFiles@2
-    inputs:
-      contents: '*.zip'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: build
-  - task: GitHubRelease@1
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    inputs:
-      gitHubConnection: 'JacquesLucke'
-      repositoryName: 'JacquesLucke/animation_nodes'
-      action: 'edit'
-      target: '$(Build.SourceVersion)'
-      tag: 'daily'
-      releaseNotesSource: 'inline'
-      assets: '$(Build.SourcesDirectory)/*.zip'
-      assetUploadMode: 'replace'
-      isPreRelease: true
-      addChangeLog: false
-    displayName: 'Update Release'
+  jobs:
+    - job: prepareArtifacts
+      displayName: Prepare Artifacts
+      steps:
+      - task: CopyFiles@2
+        inputs:
+          contents: '*.zip'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - job:
+      displayName: Publish Artifacts
+      dependsOn: prepareArtifacts
+      steps:
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: build
+    - job:
+      displayName: Update Github Release
+      dependsOn: prepareArtifacts
+      steps:
+      - task: GitHubRelease@1
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        inputs:
+          gitHubConnection: 'JacquesLucke'
+          repositoryName: 'JacquesLucke/animation_nodes'
+          action: 'edit'
+          target: '$(Build.SourceVersion)'
+          tag: 'daily'
+          releaseNotesSource: 'inline'
+          assets: '$(Build.SourcesDirectory)/*.zip'
+          assetUploadMode: 'replace'
+          isPreRelease: true
+          addChangeLog: false
+        displayName: 'Update Release'
