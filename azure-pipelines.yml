@@ -6,13 +6,13 @@ pool:
 
 steps:
 - script: >-
-  docker run -v $PWD:/build ubuntu:rolling /bin/bash -c
-  "
-  cd /build;
-  apt-get -y update;
-  apt-get -y install python3.7 cython3 g++;
-  python3.7 setup.py build --export
-  "
+    docker run -v $PWD:/build ubuntu:rolling /bin/bash -c
+    "
+    cd /build;
+    apt-get -y update;
+    apt-get -y install python3.7 cython3 g++;
+    python3.7 setup.py build --export
+    "
 
 - task: CopyFiles@2
   inputs:
