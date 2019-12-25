@@ -15,16 +15,25 @@ pool:
 
 steps:
 - task: UsePythonVersion@0
+  condition: and(succeeded(), ne(variables['Agent.OS'], 'Linux'))
   inputs:
     versionSpec: '3.7'
     addToPath: true
     architecture: 'x64'
-  displayName: 'Set Python Version'
+  displayName: 'Set Python Version Windows/MacOS'
 
 - script: |
     python -m pip install --upgrade pip setuptools wheel
     pip install Cython --install-option="--no-cython-compile"
-  displayName: 'Install Cython'
+  condition: and(succeeded(), ne(variables['Agent.OS'], 'Linux'))
+  displayName: 'Install Cython Windows/MacOS'
+
+- script: |
+    apt-get -y update
+    apt-get -y install python3
+    apt-get -y install cython3
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+  displayName: 'Install Linux Dependencies'
   
 - script: |
     call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
@@ -35,13 +44,20 @@ steps:
     PY_VCRUNTIME_REDIST: No
   displayName: 'Build Windows'
 
-- task: PythonScript@0
+- script: |
   condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
-  inputs:
-    scriptSource: 'filePath'
-    scriptPath: 'setup.py'
-    arguments: 'build --export'
+  python3.7 setup.py build --export
   displayName: 'Build Linux/MacOS'
+
+- task: CopyFiles@2
+  inputs:
+    contents: '*.zip'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: drop
 
 - task: GitHubRelease@1
   inputs:
