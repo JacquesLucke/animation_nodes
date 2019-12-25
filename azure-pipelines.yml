@@ -66,8 +66,8 @@ stages:
   jobs:
     - deployment:
       displayName: Update Github Release
-      dependsOn: prepareArtifacts
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      environment: animation-nodes
       strategy:
         runOnce:
           deploy:
