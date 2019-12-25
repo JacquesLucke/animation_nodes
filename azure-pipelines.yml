@@ -45,7 +45,7 @@ steps:
   displayName: 'Build Windows'
 
 - script: |
-    python3.7 setup.py build --export
+    /usr/bin/python3.7 setup.py build --export
   condition: and(succeeded(), ne(variables['Agent.OS'], 'Windows_NT'))
   displayName: 'Build Linux/MacOS'
 
