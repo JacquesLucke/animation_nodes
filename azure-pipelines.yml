@@ -19,6 +19,7 @@ steps:
     artifactName: drop
 
 - task: GitHubRelease@1
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
     gitHubConnection: 'JacquesLucke'
     repositoryName: 'JacquesLucke/animation_nodes'
