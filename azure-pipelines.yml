@@ -75,7 +75,7 @@ stages:
       artifact: windowsBuild
 - stage: deploy
   displayName: Deploy
-  condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
+  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
   jobs:
     - deployment:
       displayName: Update Github Release
