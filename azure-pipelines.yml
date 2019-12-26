@@ -28,11 +28,11 @@ stages:
       vmImage: macOS-10.14
     steps:
     - task: UsePythonVersion@0
+      displayName: 'Set Python Version'
       inputs:
         versionSpec: '3.7'
         addToPath: true
         architecture: 'x64'
-      displayName: 'Set Python Version'
     - script: |
         python -m pip install --upgrade pip setuptools wheel
         pip install Cython --install-option="--no-cython-compile"
@@ -51,11 +51,11 @@ stages:
       vmImage: windows-2019
     steps:
     - task: UsePythonVersion@0
+      displayName: 'Set Python Version'
       inputs:
         versionSpec: '3.7'
         addToPath: true
         architecture: 'x64'
-      displayName: 'Set Python Version'
     - script: |
         python -m pip install --upgrade pip setuptools wheel
         pip install Cython --install-option="--no-cython-compile"
@@ -75,15 +75,17 @@ stages:
       artifact: windowsBuild
 - stage: deploy
   displayName: Deploy
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
     - deployment:
       displayName: Update Github Release
-      environment: animation-nodes
+      environment: animation-nodes-dev
       strategy:
         runOnce:
           deploy:
             steps:
             - task: GitHubRelease@1
+              displayName: 'Update Release'
               inputs:
                 gitHubConnection: 'JacquesLucke'
                 repositoryName: 'JacquesLucke/animation_nodes'
@@ -97,4 +99,3 @@ stages:
                 assetUploadMode: 'replace'
                 isPreRelease: true
                 addChangeLog: false
-              displayName: 'Update Release'
