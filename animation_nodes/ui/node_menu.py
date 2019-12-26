@@ -48,7 +48,7 @@ def drawMenu(self, context):
     layout.menu("AN_MT_geometry_menu", text = "Geometry", icon = "ORIENTATION_NORMAL")
     layout.menu("AN_MT_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
     layout.separator()
-    layout.menu("AN_MT_data_interface_menu", text = "Data Interface", icon = "ARROW_LEFTRIGHT")
+    layout.menu("AN_MT_interface_menu", text = "Interface", icon = "ARROW_LEFTRIGHT")
     layout.separator()
     layout.menu("AN_MT_viewer_menu", text = "Viewer", icon = "INFO")
     layout.menu("AN_MT_subprograms_menu", text = "Subprograms", icon = "FILE_SCRIPT")
@@ -486,7 +486,7 @@ class GPencilMenu(bpy.types.Menu):
         insertNode(layout, "an_GPencilLayerInputNode", "Layer Input")
         insertNode(layout, "an_GPencilStrokeInputNode", "Stroke Input")
         layout.separator()
-        insertNode(layout, "an_GPencilObjectMaterialOutputNode", "Objcet Material Output")
+        insertNode(layout, "an_GPencilObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_GPencilMaterialOutputNode", "Material Output")
         insertNode(layout, "an_GPencilStrokeMaterialIndexNode", "Material Index")
         layout.separator()
@@ -695,12 +695,13 @@ class KDTreeAndBVHTreeMenu(bpy.types.Menu):
         insertNode(layout, "an_FindNearestSurfacePointNode", "Find Nearest")
         insertNode(layout, "an_IsInsideVolumeBVHTreeNode", "Is Inside Volume")
 
-class DataInterfaceMenu(bpy.types.Menu):
-    bl_idname = "AN_MT_data_interface_menu"
-    bl_label = "Data Interface"
+class InterfaceMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_interface_menu"
+    bl_label = "Interface"
 
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "an_ViewportInputNode", "Viewport Input")
         insertNode(layout, "an_DataInterfaceNode", "Data Interface")
         
 class ViewerMenu(bpy.types.Menu):
