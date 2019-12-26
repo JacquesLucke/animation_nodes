@@ -75,7 +75,7 @@ stages:
       artifact: windowsBuild
 - stage: deploy
   displayName: Deploy
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
   jobs:
     - deployment:
       displayName: Update Github Release
