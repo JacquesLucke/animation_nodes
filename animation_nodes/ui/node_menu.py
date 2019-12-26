@@ -32,6 +32,7 @@ def drawMenu(self, context):
     layout.menu("AN_MT_mesh_menu", text = "Mesh", icon = "MESH_DATA")
     layout.menu("AN_MT_spline_menu", text = "Spline", icon = "CURVE_DATA")
     layout.menu("AN_MT_particle_system_menu", text = "Particle System", icon = "PARTICLE_DATA")
+    layout.menu("AN_MT_collection_menu", text = "Collection", icon = "COLLECTION_NEW")
     layout.separator()
     layout.menu("AN_MT_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
     layout.menu("AN_MT_interpolation_menu", text = "Interpolation", icon = "IPO_BEZIER")
@@ -44,6 +45,8 @@ def drawMenu(self, context):
     layout.separator()
     layout.menu("AN_MT_geometry_menu", text = "Geometry", icon = "ORIENTATION_NORMAL")
     layout.menu("AN_MT_kdtree_bvhtree_menu", text = "KD & BVH Tree", icon = "STICKY_UVS_LOC")
+    layout.separator()
+    layout.menu("AN_MT_interface_menu", text = "Interface", icon = "ARROW_LEFTRIGHT")
     layout.separator()
     layout.menu("AN_MT_viewer_menu", text = "Viewer", icon = "INFO")
     layout.menu("AN_MT_subprograms_menu", text = "Subprograms", icon = "FILE_SCRIPT")
@@ -201,6 +204,7 @@ class TextMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
+        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Text Block List", {"dataType" : repr("Text")})
         insertNode(layout, "an_TextFileReaderNode", "File Reader")
         layout.separator()
         insertNode(layout, "an_TextSequenceOutputNode", "Sequence Output")
@@ -319,6 +323,7 @@ class ObjectMenu(bpy.types.Menu):
 
         insertNode(layout, "an_DataInputNode", "Object", {"assignedType" : repr("Object")})
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Object")})
+        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Object List", {"dataType" : repr("Object")})
         insertNode(layout, "an_CollectionInfoNode", "Collection Info")
         layout.separator()
         insertNode(layout, "an_ObjectTransformsInputNode", "Transforms Input")
@@ -420,6 +425,7 @@ class MeshOperatorsMenu(bpy.types.Menu):
         insertNode(layout, "an_EdgesOfPolygonsNode", "Edges of Polygons")
         layout.separator()
         insertNode(layout, "an_EdgeInfoNode", "Edge Info")
+        insertNode(layout, "an_FindLinkedEdgesNode", "Find Linked Edges")
 
 class MeshFinalizingMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_finalizing_menu"
@@ -463,6 +469,20 @@ class SplineMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_LoftSplinesNode", "Loft")
         insertNode(layout, "an_RevolveSplineNode", "Revolve")
+
+class CollectionMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_collection_menu"
+    bl_label = "Collection Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_DataInputNode", "Collection", {"assignedType" : repr("Collection")})
+        insertNode(layout, "an_CollectionInfoNode", "Collection Info")
+        insertNode(layout, "an_CollectionOperationsNode", "Collection Operations")
+        insertNode(layout, "an_BlendDataByNameNode", "Collection By Name", {"dataType" : repr("Collection")})
+        insertNode(layout, "an_CreateListNode", "Create Collection List", {"assignedType" : repr("Collection")})
+        insertNode(layout, "an_CombineListsNode", "Combine Collection Lists", {"assignedType" : repr("Collection")})
+        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Collection List", {"dataType" : repr("Collection")})
 
 class ActionMenu(bpy.types.Menu):
     bl_idname = "AN_MT_action_menu"
@@ -628,6 +648,15 @@ class KDTreeAndBVHTreeMenu(bpy.types.Menu):
         insertNode(layout, "an_RayCastBVHTreeNode", "Ray Cast")
         insertNode(layout, "an_FindNearestSurfacePointNode", "Find Nearest")
         insertNode(layout, "an_IsInsideVolumeBVHTreeNode", "Is Inside Volume")
+
+class InterfaceMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_interface_menu"
+    bl_label = "Interface"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_ViewportInputNode", "Viewport Input")
+        insertNode(layout, "an_DataInterfaceNode", "Data Interface")
 
 class ViewerMenu(bpy.types.Menu):
     bl_idname = "AN_MT_viewer_menu"
