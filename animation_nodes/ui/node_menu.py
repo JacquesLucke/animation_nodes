@@ -201,6 +201,7 @@ class TextMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
+        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Text Block List", {"dataType" : repr("Text Block")})
         insertNode(layout, "an_TextFileReaderNode", "File Reader")
         layout.separator()
         insertNode(layout, "an_TextSequenceOutputNode", "Sequence Output")
@@ -319,7 +320,8 @@ class ObjectMenu(bpy.types.Menu):
 
         insertNode(layout, "an_DataInputNode", "Object", {"assignedType" : repr("Object")})
         insertNode(layout, "an_CreateListNode", "List", {"assignedType" : repr("Object")})
-        insertNode(layout, "an_CollectionInfoNode", "Collection Info")
+        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Object List", {"dataType" : repr("Object")})
+        layout.menu("AN_MT_collection_menu", text = "Collection")
         layout.separator()
         insertNode(layout, "an_ObjectTransformsInputNode", "Transforms Input")
         insertNode(layout, "an_ObjectTransformsOutputNode", "Transforms Output")
@@ -338,7 +340,6 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
-        insertNode(layout, "an_CollectionOperationsNode", "Collection Operations")
         insertNode(layout, "an_ArmatureInfoNode", "Armature Info")
         layout.menu("AN_MT_object_utils_menu", text = "Utils")
         layout.separator()
@@ -357,6 +358,20 @@ class ObjectUtilsMenu(bpy.types.Menu):
         insertNode(layout, "an_CopyTransformsNode", "Copy Transformations")
         insertNode(layout, "an_GetSelectedObjectsNode", "Get Selected Objects")
         insertNode(layout, "an_GetActiveCameraNode", "Get Active Camera")
+
+class CollectionMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_collection_menu"
+    bl_label = "Collection Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_DataInputNode", "Collection", {"assignedType" : repr("Collection")})
+        insertNode(layout, "an_CollectionInfoNode", "Collection Info")
+        insertNode(layout, "an_CollectionOperationsNode", "Collection Operations")
+        insertNode(layout, "an_BlendDataByNameNode", "Collection By Name", {"dataType" : repr("Collection")})
+        insertNode(layout, "an_CreateListNode", "Create Collection List", {"assignedType" : repr("Collection")})
+        insertNode(layout, "an_CombineListsNode", "Combine Collection Lists", {"assignedType" : repr("Collection")})
+        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Collection List", {"dataType" : repr("Collection")})
 
 class MeshMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_menu"
@@ -546,6 +561,7 @@ class MaterialMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "an_DataInputNode", "Material", {"assignedType" : repr("Material")})
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
@@ -660,6 +676,9 @@ class SubprogramsMenu(bpy.types.Menu):
         insertNode(layout, "an_ScriptNode", "Script")
         layout.separator()
         insertNode(layout, "an_ExpressionNode", "Expression")
+        layout.separator()
+        insertNode(layout, "an_ViewportInputNode", "Viewport Input")
+        insertNode(layout, "an_DataInterfaceNode", "Data Interface")
 
 class LayoutMenu(bpy.types.Menu):
     bl_idname = "AN_MT_layout_menu"
