@@ -42,8 +42,9 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
         return getLineMesh(start, end, steps)
 
     def execute_PointsLine(self, points, cyclic):
-        if len(points) < 2:
+        pointAmount = len(points)
+        if pointAmount < 2:
             self.raiseErrorMessage("Points list should have atleast two points.")
-        if len(points) < 3 and cyclic:
+        if pointAmount < 3 and cyclic:
             self.raiseErrorMessage("For cyclic, Points list should have atleast three points.")
         return getLinesMesh(points, cyclic)

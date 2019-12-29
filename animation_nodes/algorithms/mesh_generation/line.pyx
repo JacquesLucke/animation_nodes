@@ -9,7 +9,7 @@ def getLineMesh(start, stop, long steps):
     )
 
 def getLinesMesh(Vector3DList points, bint cyclic):
-    cdef long pointCount = len(points)
+    cdef long pointCount = points.length
     return Mesh(
         vertices = points,
         edges = edges(pointCount, cyclic),
