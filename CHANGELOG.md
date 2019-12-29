@@ -28,6 +28,7 @@
 - Normalize Quaternion in the *Combine Quaternion* node.
 - Normalize Quaternion in the *Convert Rotations* node.
 - Vectorized Set Vertex Color node and color modes are added.
+- Linux and MacOS are now release builds. They were debug builds.
 
 ## 2.1.5
 
