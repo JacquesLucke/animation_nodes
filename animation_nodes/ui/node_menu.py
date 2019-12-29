@@ -201,7 +201,7 @@ class TextMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
-        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Text Block List", {"dataType" : repr("Text")})
+        insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Text Block List", {"dataType" : repr("Text Block")})
         insertNode(layout, "an_TextFileReaderNode", "File Reader")
         layout.separator()
         insertNode(layout, "an_TextSequenceOutputNode", "Sequence Output")
