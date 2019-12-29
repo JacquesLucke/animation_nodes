@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from .... data_structures import Mesh
 from .... base_types import AnimationNode
-from .... algorithms.mesh_generation.line import getLineMesh, edges
+from .... algorithms.mesh_generation.line import getLineMesh, getLinesMesh
 
 lineModeItems = [
     ("STARTEND", "Start-End", "Line from start-end", "NONE", 0),    
@@ -41,12 +41,6 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
         return getLineMesh(start, end, steps)
 
     def execute_PointsLine(self, points, cyclic):
-        if len(points) < 2: return Mesh()
-        pointCount = len(points)
-        edgeIndices = edges(pointCount)
-        if cyclic:
-            edgeIndices.append((pointCount - 1, 0))
-            return Mesh(points, edgeIndices, skipValidation = True)
-        else:    
-            return Mesh(points, edgeIndices, skipValidation = True)
-
+        if len(points) == 0: return Mesh()
+        return getLinesMesh(points, cyclic)
+        
