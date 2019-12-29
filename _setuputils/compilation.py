@@ -70,7 +70,7 @@ def getExtensionFromPath(path, addonDirectory, includeDirs = []):
         "libraries" : [],
         "runtime_library_dirs" : [],
         "extra_objects" : [],
-        "extra_compile_args" : [],
+        "extra_compile_args" : ["-g0"] if not onWindows else [],
         "extra_link_args" : [],
         "export_symbols" : [],
         "depends" : []
