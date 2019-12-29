@@ -42,14 +42,14 @@ def vertices(start, end, long steps):
 ############################################
 
 def edges(long steps, bint cyclic):
-    steps = steps if cyclic and steps > 2 else steps - 1
-    
-    cdef EdgeIndicesList edges = EdgeIndicesList(length = steps)
-    cdef long i 
-    for i in range(steps):
+    cdef long edgeAmount
+    edgeAmount = steps if cyclic else steps - 1
+
+    cdef EdgeIndicesList edges = EdgeIndicesList(length = edgeAmount)
+    cdef long i
+    for i in range(edgeAmount):
         edges.data[i].v1 = i
         edges.data[i].v2 = i + 1
-    if cyclic and steps > 2:
-        edges.data[steps - 1].v2 = 0
+    if cyclic:
+        edges.data[edgeAmount - 1].v2 = 0
     return edges
-

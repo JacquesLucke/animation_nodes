@@ -5,7 +5,7 @@ from .... base_types import AnimationNode
 from .... algorithms.mesh_generation.line import getLineMesh, getLinesMesh
 
 lineModeItems = [
-    ("START_END", "Start-End", "Line from start-end", "NONE", 0),    
+    ("START_END", "Start-End", "Line from start-end", "NONE", 0),
     ("POINTS", "Points", "Line from vector list", "NONE", 1)
 ]
 
@@ -44,6 +44,6 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
     def execute_PointsLine(self, points, cyclic):
         if len(points) < 2:
             self.raiseErrorMessage("Points list should have atleast two points.")
+        if len(points) < 3 and cyclic:
+            self.raiseErrorMessage("For cyclic, Points list should have atleast three points.")
         return getLinesMesh(points, cyclic)
-        
-        
