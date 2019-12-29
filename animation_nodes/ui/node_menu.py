@@ -425,7 +425,6 @@ class MeshOperatorsMenu(bpy.types.Menu):
         insertNode(layout, "an_EdgesOfPolygonsNode", "Edges of Polygons")
         layout.separator()
         insertNode(layout, "an_EdgeInfoNode", "Edge Info")
-        insertNode(layout, "an_FindLinkedEdgesNode", "Find Linked Edges")
 
 class MeshFinalizingMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_finalizing_menu"
@@ -566,6 +565,7 @@ class MaterialMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+        insertNode(layout, "an_DataInputNode", "Material", {"assignedType" : repr("Material")})
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
