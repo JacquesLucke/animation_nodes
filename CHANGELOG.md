@@ -31,7 +31,6 @@
 - Linux and MacOS are now release builds. They were debug builds.
 - Added Points mode to the Line Mesh node.
 
-
 ## 2.1.5
 
 ### Added
