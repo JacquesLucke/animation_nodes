@@ -42,8 +42,7 @@ def vertices(start, end, long steps):
 ############################################
 
 def edges(long steps, bint cyclic):
-    cdef long edgeAmount
-    edgeAmount = steps if cyclic else steps - 1
+    cdef long edgeAmount = steps if cyclic else steps - 1
 
     cdef EdgeIndicesList edges = EdgeIndicesList(length = edgeAmount)
     cdef long i
