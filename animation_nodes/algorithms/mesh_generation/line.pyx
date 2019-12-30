@@ -4,7 +4,15 @@ from ... data_structures cimport Vector3DList, EdgeIndicesList, Mesh
 def getLineMesh(start, stop, long steps):
     return Mesh(
         vertices = vertices(start, stop, steps),
-        edges = edges(steps),
+        edges = edges(steps, False),
+        skipValidation = True
+    )
+
+def getLinesMesh(Vector3DList points, bint cyclic):
+    cdef long pointCount = points.length
+    return Mesh(
+        vertices = points,
+        edges = edges(pointCount, cyclic),
         skipValidation = True
     )
 
@@ -33,10 +41,14 @@ def vertices(start, end, long steps):
 # Edges
 ############################################
 
-def edges(long steps):
-    edges = EdgeIndicesList(length = steps - 1)
+def edges(long steps, bint cyclic):
+    cdef long edgeAmount = steps if cyclic else steps - 1
+
+    cdef EdgeIndicesList edges = EdgeIndicesList(length = edgeAmount)
     cdef long i
-    for i in range(steps - 1):
+    for i in range(edgeAmount):
         edges.data[i].v1 = i
         edges.data[i].v2 = i + 1
+    if cyclic:
+        edges.data[edgeAmount - 1].v2 = 0
     return edges
