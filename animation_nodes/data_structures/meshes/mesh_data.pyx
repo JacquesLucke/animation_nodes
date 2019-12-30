@@ -3,7 +3,8 @@ import textwrap
 import functools
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
-from .. lists.base_lists cimport UIntegerList, EdgeIndices, Vector3DList, Vector2DList, ColorList
+from .. lists.base_lists cimport (
+    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList)
 from ... math cimport (
     Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
     Matrix4, toMatrix4
@@ -62,6 +63,9 @@ cdef class Mesh:
     def verticesMoved(self):
         self.derivedMeshDataCache.pop("Polygon Centers", None)
 
+    def topologyChanged(self):
+        self.derivedMeshDataCache.pop("Linked Edges", None)
+
     def getPolygonOrientationMatrices(self, normalized = True):
         normals = self.getPolygonNormals(normalized)
         tangents = self.getPolygonTangents(normalized)
@@ -91,6 +95,10 @@ cdef class Mesh:
     @derivedMeshDataCacheHelper("Polygon Bitangents", handleNormalization = True)
     def getPolygonBitangents(self):
         return calculatePolygonBitangents(self.getPolygonTangents(), self.getPolygonNormals())
+
+    @derivedMeshDataCacheHelper("Linked Edges")
+    def getVerticesLinkedEdges(self):
+        return findVerticesLinkedEdges(self.vertices, self.edges)
 
     def setLoopEdges(self, UIntegerList loopEdges):
         if len(loopEdges) == len(self.polygons.indices):
@@ -132,11 +140,14 @@ cdef class Mesh:
         return list(self.vertexColorLayers.items())
 
     def getVertexColorLayerNames(self):
-        return list(self.vertexColorLayers.keys())    
-    
+        return list(self.vertexColorLayers.keys())
+
     def getVertexColors(self, str colorLayerName):
         return self.vertexColorLayers.get(colorLayerName, None)
-        
+
+    def getVertexLinkedEdges(self, long vertexIndex):
+        return self.getVerticesLinkedEdges()[vertexIndex]
+
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
         mesh.transferMeshProperties(self,
@@ -146,10 +157,12 @@ cdef class Mesh:
     def transform(self, transformation):
         self.vertices.transform(transformation)
         self.verticesTransformed()
+        self.topologyChanged()
 
     def move(self, translation):
         self.vertices.move(translation)
         self.verticesMoved()
+        self.topologyChanged()
 
     def __repr__(self):
         return textwrap.dedent(
@@ -164,7 +177,7 @@ cdef class Mesh:
         if calcNewLoopProperty is not None:
             for name, uvMap in source.uvMaps.items():
                 self.uvMaps[name] = calcNewLoopProperty(uvMap)
-            
+
             for name, vertexColorLayer in source.vertexColorLayers.items():
                 self.vertexColorLayers[name] = calcNewLoopProperty(vertexColorLayer)
 
@@ -314,3 +327,27 @@ def calculateCrossProducts(Vector3DList a, Vector3DList b):
 
     return result
 
+def findVerticesLinkedEdges(Vector3DList vertices, EdgeIndicesList edges):
+    result = []
+    for i in range(len(vertices)):
+        result.append(findVertexLinkedEdges(i, edges))
+    return result
+
+def findVertexLinkedEdges(long search, EdgeIndicesList edges):
+    cdef LongList vertexIndices = LongList()
+    cdef LongList edgeIndices = LongList()
+    cdef EdgeIndicesList edgeIndicesList = EdgeIndicesList()
+
+    cdef long i, v1, v2
+    for i in range(len(edges)):
+        v1 = edges.data[i].v1
+        v2 = edges.data[i].v2
+        if search == v1:
+            vertexIndices.append(v2)
+            edgeIndices.append(i)
+            edgeIndicesList.append(edges[i])
+        elif search == v2:
+            vertexIndices.append(v1)
+            edgeIndices.append(i)
+            edgeIndicesList.append(edges[i])
+    return vertexIndices, edgeIndices, edgeIndicesList
