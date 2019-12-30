@@ -715,3 +715,22 @@ def getReplicatedLoopEdges(UIntegerList loopEdges, Py_ssize_t amount, Py_ssize_t
             _newLoopEdges[index] = _loopEdges[j] + offset
             index += 1
     return newLoopEdges
+
+def getLinkedEdges(EdgeIndicesList edges, long search):
+    cdef LongList vertexIndices = LongList()
+    cdef LongList edgeIndices = LongList()
+    cdef EdgeIndicesList edgeIndicesList = EdgeIndicesList()
+
+    cdef long i, v1, v2
+    for i in range(len(edges)):
+        v1 = edges.data[i].v1
+        v2 = edges.data[i].v2
+        if search == v1:
+            vertexIndices.append(v2)
+            edgeIndices.append(i)
+            edgeIndicesList.append(edges[i])
+        elif search == v2:
+            vertexIndices.append(v1)
+            edgeIndices.append(i)
+            edgeIndicesList.append(edges[i])
+    return vertexIndices, edgeIndices, edgeIndicesList
