@@ -2,9 +2,9 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures import IntegerList
 
-class FindLinkedEdgesNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_FindLinkedEdgesNode"
-    bl_label = "Find Linked Edges"
+class GetLinkedVerticesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GetLinkedVerticesNode"
+    bl_label = "Get Linked Vertices"
     errorHandlingType = "EXCEPTION"
 
     def create(self):
@@ -20,4 +20,4 @@ class FindLinkedEdgesNode(bpy.types.Node, AnimationNode):
         if vertexIndex < 0 or vertexIndex >= len(mesh.vertices):
             self.raiseErrorMessage("Vertex Index is out of range.")
 
-        return mesh.getVertexLinkedEdges(vertexIndex)
+        return mesh.getVertexLinkedVertices(vertexIndex)

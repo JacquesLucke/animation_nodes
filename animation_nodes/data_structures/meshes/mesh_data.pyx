@@ -64,7 +64,7 @@ cdef class Mesh:
         self.derivedMeshDataCache.pop("Polygon Centers", None)
 
     def topologyChanged(self):
-        self.derivedMeshDataCache.pop("Linked Edges", None)
+        self.derivedMeshDataCache.pop("Linked Vertices", None)
 
     def getPolygonOrientationMatrices(self, normalized = True):
         normals = self.getPolygonNormals(normalized)
@@ -96,9 +96,9 @@ cdef class Mesh:
     def getPolygonBitangents(self):
         return calculatePolygonBitangents(self.getPolygonTangents(), self.getPolygonNormals())
 
-    @derivedMeshDataCacheHelper("Linked Edges")
-    def getVerticesLinkedEdges(self):
-        return findNeighboursEdges(self.vertices, self.edges)
+    @derivedMeshDataCacheHelper("Linked Vertices")
+    def getLinkedVerticesCache(self):
+        return getLinkedVertices(self.vertices.length, self.edges)
 
     def setLoopEdges(self, UIntegerList loopEdges):
         if len(loopEdges) == len(self.polygons.indices):
@@ -145,13 +145,13 @@ cdef class Mesh:
     def getVertexColors(self, str colorLayerName):
         return self.vertexColorLayers.get(colorLayerName, None)
 
-    def getVertexLinkedEdges(self, long vertexIndex):
+    def getVertexLinkedVertices(self, long vertexIndex):
         cdef IntegerList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
-        neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getVerticesLinkedEdges()
+        neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getLinkedVerticesCache()
 
         cdef int start, amount
-        amount = neighboursAmounts[vertexIndex]
-        start = neighboursStarts[vertexIndex]
+        amount = neighboursAmounts.data[vertexIndex]
+        start = neighboursStarts.data[vertexIndex]
 
         cdef IntegerList vertexNeighbours = IntegerList(length = amount)
         cdef IntegerList vertexNeighbourEdges = IntegerList(length = amount)
@@ -340,10 +340,9 @@ def calculateCrossProducts(Vector3DList a, Vector3DList b):
 
     return result
 
-def findNeighboursEdges(Vector3DList vertices, EdgeIndicesList edges):
+def getLinkedVertices(int verticesAmount, EdgeIndicesList edges):
     cdef int i, j
     cdef int edgesAmount = edges.length
-    cdef int verticesAmount = vertices.length
 
     # Compute how many neighbours each vertex have.
     cdef IntegerList neighboursAmounts = IntegerList.fromValue(0, length = verticesAmount)

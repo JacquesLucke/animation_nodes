@@ -435,7 +435,7 @@ class MeshOperatorsMenu(bpy.types.Menu):
         insertNode(layout, "an_EdgesOfPolygonsNode", "Edges of Polygons")
         layout.separator()
         insertNode(layout, "an_EdgeInfoNode", "Edge Info")
-        insertNode(layout, "an_FindLinkedEdgesNode", "Find Linked Edges")
+        insertNode(layout, "an_GetLinkedVerticesNode", "Get Linked Vertices")
 
 class MeshFinalizingMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_finalizing_menu"
