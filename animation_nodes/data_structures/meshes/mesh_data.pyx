@@ -1,6 +1,7 @@
 # cython: profile=True
 import textwrap
 import functools
+from libc.string cimport memcpy
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
 from .. lists.base_lists cimport (
@@ -97,8 +98,8 @@ cdef class Mesh:
         return calculatePolygonBitangents(self.getPolygonTangents(), self.getPolygonNormals())
 
     @derivedMeshDataCacheHelper("Linked Vertices")
-    def getLinkedVerticesCache(self):
-        return getLinkedVertices(self.vertices.length, self.edges)
+    def getLinkedVertices(self):
+        return calculateLinkedVertices(self.vertices.length, self.edges)
 
     def setLoopEdges(self, UIntegerList loopEdges):
         if len(loopEdges) == len(self.polygons.indices):
@@ -147,21 +148,13 @@ cdef class Mesh:
 
     def getVertexLinkedVertices(self, long vertexIndex):
         cdef IntegerList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
-        neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getLinkedVerticesCache()
+        neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getLinkedVertices()
 
-        cdef int start, amount
-        amount = neighboursAmounts.data[vertexIndex]
+        cdef int start, end
         start = neighboursStarts.data[vertexIndex]
+        end = start + neighboursAmounts.data[vertexIndex]
 
-        cdef IntegerList vertexNeighbours = IntegerList(length = amount)
-        cdef IntegerList vertexNeighbourEdges = IntegerList(length = amount)
-
-        cdef int i, index
-        for i in range(amount):
-            index = i + start
-            vertexNeighbours.data[i] = neighbours.data[index]
-            vertexNeighbourEdges.data[i] = neighbourEdges.data[index]
-        return vertexNeighbours, vertexNeighbourEdges
+        return neighbours[start : end], neighbourEdges[start : end]
 
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
@@ -340,7 +333,7 @@ def calculateCrossProducts(Vector3DList a, Vector3DList b):
 
     return result
 
-def getLinkedVertices(int verticesAmount, EdgeIndicesList edges):
+def calculateLinkedVertices(int verticesAmount, EdgeIndicesList edges):
     cdef int i, j
     cdef int edgesAmount = edges.length
 
