@@ -149,18 +149,18 @@ cdef class Mesh:
         cdef IntegerList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
         neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getVerticesLinkedEdges()
 
-        cdef i, start, amount
+        cdef int start, amount
         amount = neighboursAmounts[vertexIndex]
         start = neighboursStarts[vertexIndex]
 
         cdef IntegerList vertexNeighbours = IntegerList(length = amount)
         cdef IntegerList vertexNeighbourEdges = IntegerList(length = amount)
 
-        cdef j = 0, end = start + amount
-        for i in range(start, end):
-            vertexNeighbours.data[j] = neighbours.data[i]
-            vertexNeighbourEdges.data[j] = neighbourEdges.data[i]
-            j += 1
+        cdef int i, index
+        for i in range(amount):
+            index = i + start
+            vertexNeighbours.data[i] = neighbours.data[index]
+            vertexNeighbourEdges.data[i] = neighbourEdges.data[index]
         return vertexNeighbours, vertexNeighbourEdges
 
     def copy(self):
