@@ -4,7 +4,7 @@ import functools
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
 from .. lists.base_lists cimport (
-    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList)
+    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, IntegerList)
 from ... math cimport (
     Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
     Matrix4, toMatrix4
@@ -98,7 +98,7 @@ cdef class Mesh:
 
     @derivedMeshDataCacheHelper("Linked Edges")
     def getVerticesLinkedEdges(self):
-        return findVerticesLinkedEdges(self.vertices, self.edges)
+        return findNeighboursEdges(self.vertices, self.edges)
 
     def setLoopEdges(self, UIntegerList loopEdges):
         if len(loopEdges) == len(self.polygons.indices):
@@ -146,7 +146,22 @@ cdef class Mesh:
         return self.vertexColorLayers.get(colorLayerName, None)
 
     def getVertexLinkedEdges(self, long vertexIndex):
-        return self.getVerticesLinkedEdges()[vertexIndex]
+        cdef IntegerList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
+        neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getVerticesLinkedEdges()
+
+        cdef i, start, amount
+        amount = neighboursAmounts[vertexIndex]
+        start = neighboursStarts[vertexIndex]
+
+        cdef IntegerList vertexNeighbours = IntegerList(length = amount)
+        cdef IntegerList vertexNeighbourEdges = IntegerList(length = amount)
+
+        cdef j = 0, end = start + amount
+        for i in range(start, end):
+            vertexNeighbours.data[j] = neighbours.data[i]
+            vertexNeighbourEdges.data[j] = neighbourEdges.data[i]
+            j += 1
+        return vertexNeighbours, vertexNeighbourEdges
 
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
@@ -157,12 +172,10 @@ cdef class Mesh:
     def transform(self, transformation):
         self.vertices.transform(transformation)
         self.verticesTransformed()
-        self.topologyChanged()
 
     def move(self, translation):
         self.vertices.move(translation)
         self.verticesMoved()
-        self.topologyChanged()
 
     def __repr__(self):
         return textwrap.dedent(
@@ -327,27 +340,38 @@ def calculateCrossProducts(Vector3DList a, Vector3DList b):
 
     return result
 
-def findVerticesLinkedEdges(Vector3DList vertices, EdgeIndicesList edges):
-    result = []
-    for i in range(len(vertices)):
-        result.append(findVertexLinkedEdges(i, edges))
-    return result
+def findNeighboursEdges(Vector3DList vertices, EdgeIndicesList edges):
+    cdef int i, j
+    cdef int edgesAmount = edges.length
+    cdef int verticesAmount = vertices.length
 
-def findVertexLinkedEdges(long search, EdgeIndicesList edges):
-    cdef LongList vertexIndices = LongList()
-    cdef LongList edgeIndices = LongList()
-    cdef EdgeIndicesList edgeIndicesList = EdgeIndicesList()
+    # Compute how many neighbours each vertex have.
+    cdef IntegerList neighboursAmounts = IntegerList.fromValue(0, length = verticesAmount)
+    for i in range(edgesAmount):
+        neighboursAmounts.data[edges.data[i].v1] += 1
+        neighboursAmounts.data[edges.data[i].v2] += 1
 
-    cdef long i, v1, v2
-    for i in range(len(edges)):
-        v1 = edges.data[i].v1
-        v2 = edges.data[i].v2
-        if search == v1:
-            vertexIndices.append(v2)
-            edgeIndices.append(i)
-            edgeIndicesList.append(edges[i])
-        elif search == v2:
-            vertexIndices.append(v1)
-            edgeIndices.append(i)
-            edgeIndicesList.append(edges[i])
-    return vertexIndices, edgeIndices, edgeIndicesList
+    # Compute the start index of each group of neighbours of each vertex.
+    cdef IntegerList neighboursStarts = IntegerList(length = verticesAmount)
+    cdef int start = 0
+    for i in range(verticesAmount):
+        neighboursStarts.data[i] = start
+        start += neighboursAmounts.data[i]
+
+    # Keep track of how many indices are there in each group of neighbours at each iteration.
+    cdef IntegerList usedSlots = IntegerList.fromValue(0, length = verticesAmount)
+
+    # Compute the indices of neighbouring vertices and edges of each vertex.
+    cdef unsigned int v1, v2
+    cdef IntegerList neighbours = IntegerList(length = edgesAmount * 2)
+    cdef IntegerList neighbourEdges = IntegerList(length = edgesAmount * 2)
+    for i in range(edgesAmount):
+        v1, v2 = edges.data[i].v1, edges.data[i].v2
+        neighbours.data[neighboursStarts.data[v1] + usedSlots.data[v1]] = v2
+        neighbours.data[neighboursStarts.data[v2] + usedSlots.data[v2]] = v1
+        neighbourEdges.data[neighboursStarts.data[v1] + usedSlots.data[v1]] = i
+        neighbourEdges.data[neighboursStarts.data[v2] + usedSlots.data[v2]] = i
+        usedSlots.data[v1] += 1
+        usedSlots.data[v2] += 1
+
+    return neighboursAmounts, neighboursStarts, neighbours, neighbourEdges

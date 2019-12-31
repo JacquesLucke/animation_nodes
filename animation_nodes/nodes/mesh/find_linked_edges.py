@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from ... data_structures import LongList, EdgeIndicesList
+from ... data_structures import IntegerList
 
 class FindLinkedEdgesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_FindLinkedEdgesNode"
@@ -13,13 +13,11 @@ class FindLinkedEdgesNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Integer List", "Vertices", "vertexIndices")
         self.newOutput("Integer List", "Edges", "edgeIndices")
-        self.newOutput("Edge Indices List", "Edge Indices", "edgeIndicesListOut", hide = True)
 
     def execute(self, mesh, vertexIndex):
         if mesh is None:
-            return LongList(), LongList(), EdgeIndicesList()
+            return IntegerList(), IntegerList()
         if vertexIndex < 0 or vertexIndex >= len(mesh.vertices):
             self.raiseErrorMessage("Vertex Index is out of range.")
 
-        linkedData = mesh.getVertexLinkedEdges(vertexIndex)
-        return linkedData[0], linkedData[1], linkedData[2]
+        return mesh.getVertexLinkedEdges(vertexIndex)
