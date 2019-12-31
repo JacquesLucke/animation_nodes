@@ -1,7 +1,6 @@
 # cython: profile=True
 import textwrap
 import functools
-from libc.string cimport memcpy
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
 from .. lists.base_lists cimport (
