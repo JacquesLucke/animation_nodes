@@ -4,7 +4,7 @@ import functools
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
 from .. lists.base_lists cimport (
-    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, IntegerList)
+    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList)
 from ... math cimport (
     Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
     Matrix4, toMatrix4
@@ -146,7 +146,7 @@ cdef class Mesh:
         return self.vertexColorLayers.get(colorLayerName, None)
 
     def getVertexLinkedVertices(self, long vertexIndex):
-        cdef IntegerList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
+        cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
         neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getLinkedVertices()
 
         cdef int start, end
@@ -337,25 +337,25 @@ def calculateLinkedVertices(int verticesAmount, EdgeIndicesList edges):
     cdef int edgesAmount = edges.length
 
     # Compute how many neighbours each vertex have.
-    cdef IntegerList neighboursAmounts = IntegerList.fromValue(0, length = verticesAmount)
+    cdef LongList neighboursAmounts = LongList.fromValue(0, length = verticesAmount)
     for i in range(edgesAmount):
         neighboursAmounts.data[edges.data[i].v1] += 1
         neighboursAmounts.data[edges.data[i].v2] += 1
 
     # Compute the start index of each group of neighbours of each vertex.
-    cdef IntegerList neighboursStarts = IntegerList(length = verticesAmount)
+    cdef LongList neighboursStarts = LongList(length = verticesAmount)
     cdef int start = 0
     for i in range(verticesAmount):
         neighboursStarts.data[i] = start
         start += neighboursAmounts.data[i]
 
     # Keep track of how many indices are there in each group of neighbours at each iteration.
-    cdef IntegerList usedSlots = IntegerList.fromValue(0, length = verticesAmount)
+    cdef LongList usedSlots = LongList.fromValue(0, length = verticesAmount)
 
     # Compute the indices of neighbouring vertices and edges of each vertex.
     cdef unsigned int v1, v2
-    cdef IntegerList neighbours = IntegerList(length = edgesAmount * 2)
-    cdef IntegerList neighbourEdges = IntegerList(length = edgesAmount * 2)
+    cdef LongList neighbours = LongList(length = edgesAmount * 2)
+    cdef LongList neighbourEdges = LongList(length = edgesAmount * 2)
     for i in range(edgesAmount):
         v1, v2 = edges.data[i].v1, edges.data[i].v2
         neighbours.data[neighboursStarts.data[v1] + usedSlots.data[v1]] = v2
