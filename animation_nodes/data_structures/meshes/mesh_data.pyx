@@ -3,7 +3,8 @@ import textwrap
 import functools
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
-from .. lists.base_lists cimport UIntegerList, EdgeIndices, Vector3DList, Vector2DList, ColorList
+from .. lists.base_lists cimport (
+    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList)
 from ... math cimport (
     Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
     Matrix4, toMatrix4
@@ -62,6 +63,9 @@ cdef class Mesh:
     def verticesMoved(self):
         self.derivedMeshDataCache.pop("Polygon Centers", None)
 
+    def topologyChanged(self):
+        self.derivedMeshDataCache.pop("Linked Vertices", None)
+
     def getPolygonOrientationMatrices(self, normalized = True):
         normals = self.getPolygonNormals(normalized)
         tangents = self.getPolygonTangents(normalized)
@@ -91,6 +95,10 @@ cdef class Mesh:
     @derivedMeshDataCacheHelper("Polygon Bitangents", handleNormalization = True)
     def getPolygonBitangents(self):
         return calculatePolygonBitangents(self.getPolygonTangents(), self.getPolygonNormals())
+
+    @derivedMeshDataCacheHelper("Linked Vertices")
+    def getLinkedVertices(self):
+        return calculateLinkedVertices(self.vertices.length, self.edges)
 
     def setLoopEdges(self, UIntegerList loopEdges):
         if len(loopEdges) == len(self.polygons.indices):
@@ -132,11 +140,22 @@ cdef class Mesh:
         return list(self.vertexColorLayers.items())
 
     def getVertexColorLayerNames(self):
-        return list(self.vertexColorLayers.keys())    
-    
+        return list(self.vertexColorLayers.keys())
+
     def getVertexColors(self, str colorLayerName):
         return self.vertexColorLayers.get(colorLayerName, None)
-        
+
+    def getVertexLinkedVertices(self, long vertexIndex):
+        cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
+        neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getLinkedVertices()
+
+        cdef int start, end, amount
+        amount = neighboursAmounts.data[vertexIndex]
+        start = neighboursStarts.data[vertexIndex]
+        end = start + amount
+
+        return neighbours[start:end], neighbourEdges[start:end], amount
+
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
         mesh.transferMeshProperties(self,
@@ -164,7 +183,7 @@ cdef class Mesh:
         if calcNewLoopProperty is not None:
             for name, uvMap in source.uvMaps.items():
                 self.uvMaps[name] = calcNewLoopProperty(uvMap)
-            
+
             for name, vertexColorLayer in source.vertexColorLayers.items():
                 self.vertexColorLayers[name] = calcNewLoopProperty(vertexColorLayer)
 
@@ -314,3 +333,37 @@ def calculateCrossProducts(Vector3DList a, Vector3DList b):
 
     return result
 
+def calculateLinkedVertices(int verticesAmount, EdgeIndicesList edges):
+    cdef int i, j
+    cdef int edgesAmount = edges.length
+
+    # Compute how many neighbours each vertex have.
+    cdef LongList neighboursAmounts = LongList.fromValue(0, length = verticesAmount)
+    for i in range(edgesAmount):
+        neighboursAmounts.data[edges.data[i].v1] += 1
+        neighboursAmounts.data[edges.data[i].v2] += 1
+
+    # Compute the start index of each group of neighbours of each vertex.
+    cdef LongList neighboursStarts = LongList(length = verticesAmount)
+    cdef int start = 0
+    for i in range(verticesAmount):
+        neighboursStarts.data[i] = start
+        start += neighboursAmounts.data[i]
+
+    # Keep track of how many indices are there in each group of neighbours at each iteration.
+    cdef LongList usedSlots = LongList.fromValue(0, length = verticesAmount)
+
+    # Compute the indices of neighbouring vertices and edges of each vertex.
+    cdef unsigned int v1, v2
+    cdef LongList neighbours = LongList(length = edgesAmount * 2)
+    cdef LongList neighbourEdges = LongList(length = edgesAmount * 2)
+    for i in range(edgesAmount):
+        v1, v2 = edges.data[i].v1, edges.data[i].v2
+        neighbours.data[neighboursStarts.data[v1] + usedSlots.data[v1]] = v2
+        neighbours.data[neighboursStarts.data[v2] + usedSlots.data[v2]] = v1
+        neighbourEdges.data[neighboursStarts.data[v1] + usedSlots.data[v1]] = i
+        neighbourEdges.data[neighboursStarts.data[v2] + usedSlots.data[v2]] = i
+        usedSlots.data[v1] += 1
+        usedSlots.data[v2] += 1
+
+    return neighboursAmounts, neighboursStarts, neighbours, neighbourEdges

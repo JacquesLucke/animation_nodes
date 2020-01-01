@@ -6,6 +6,7 @@
 - Added CList and VirtualList for colors.
 - Added Get Vertex Color Layer node.
 - Added Insert Vertex Color Layer node.
+- Added Get Linked Vertices node.
 
 ### Fixed
 
