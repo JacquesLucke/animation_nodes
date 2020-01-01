@@ -149,11 +149,12 @@ cdef class Mesh:
         cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
         neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getLinkedVertices()
 
-        cdef int start, end
+        cdef int start, end, amount
+        amount = neighboursAmounts.data[vertexIndex]
         start = neighboursStarts.data[vertexIndex]
-        end = start + neighboursAmounts.data[vertexIndex]
+        end = start + amount
 
-        return neighbours[start : end], neighbourEdges[start : end]
+        return neighbours[start:end], neighbourEdges[start:end], amount
 
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())

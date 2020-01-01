@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from ... data_structures import IntegerList
+from ... data_structures import LongList
 
 class GetLinkedVerticesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetLinkedVerticesNode"
@@ -13,10 +13,11 @@ class GetLinkedVerticesNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Integer List", "Vertices", "vertexIndices")
         self.newOutput("Integer List", "Edges", "edgeIndices")
+        self.newOutput("Integer", "Amount", "amount")
 
     def execute(self, mesh, vertexIndex):
         if mesh is None:
-            return IntegerList(), IntegerList()
+            return LongList(), LongList(), 0
         if vertexIndex < 0 or vertexIndex >= len(mesh.vertices):
             self.raiseErrorMessage("Vertex Index is out of range.")
 
