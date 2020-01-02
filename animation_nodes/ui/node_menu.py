@@ -390,6 +390,8 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_GetVertexColorLayerNode", "Get Vertex Color Layer")
         insertNode(layout, "an_InsertVertexColorLayerNode", "Insert Vertex Color Layer")
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
+        insertNode(layout, "an_SetBevelVertexWeight", "Set Bevel Vertex Weight")
+        insertNode(layout, "an_SetBevelEdgeWeight", "Set Bevel Edge Weight")
         layout.separator()
         insertNode(layout, "an_OffsetPolygonsNode", "Offset Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
