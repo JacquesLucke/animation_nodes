@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from itertools import chain
 from ... events import propertyChanged
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
@@ -10,6 +9,7 @@ class ParticlesOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ParticlesOutputNode"
     bl_label = "Particles Output"
     bl_width_default = 180
+    errorHandlingType = "EXCEPTION"
 
     def checkedPropertiesChanged(self, context):
         self.updateSocketVisibility()
@@ -36,7 +36,7 @@ class ParticlesOutputNode(bpy.types.Node, AnimationNode):
         self.newInput("Vector List", "Velocities", "velocities")
         self.newInput("Quaternion List", "Rotations", "rotations")
         self.newInput("Float List", "Die Times", "dietimes")
-        
+
         self.updateSocketVisibility()
 
     def updateSocketVisibility(self):
@@ -47,21 +47,30 @@ class ParticlesOutputNode(bpy.types.Node, AnimationNode):
 
     def execute(self, particleSystem, locations, velocities, rotations, dietimes):
         if object is None or particleSystem is None:
-            return   
+            return
 
         particles = particleSystem.particles
         particleCount = len(particles)
 
-        defaultVector = [0, 0, 0]
-        locationsList = VirtualVector3DList.create(locations, defaultVector).materialize(particleCount)
-        velocitiesList = VirtualVector3DList.create(velocities, defaultVector).materialize(particleCount)
-        dietimesList = VirtualDoubleList.create(dietimes, 0).materialize(particleCount)
+        if self.locBool:
+            if len(locations) < particleCount or len(locations) > particleCount:
+                self.raiseErrorMessage("Length of Locations list should be equal to the total number of particles.")
 
-        if self.locBool: particles.foreach_set('location', locationsList.asNumpyArray())
-        if self.velBool: particles.foreach_set('velocity', velocitiesList.asNumpyArray())
-        if len(rotations) != 0 and self.rotBool: particles.foreach_set('rotation', self.flatList(rotations))
-        if self.dieBool: particles.foreach_set('die_time', dietimesList.asNumpyArray())
-            
-    def flatList(self, vectors):
-        return list(chain.from_iterable(vectors))
+            particles.foreach_set('location', locations.asNumpyArray())
 
+        if self.velBool:
+            if len(velocities) < particleCount or len(velocities) > particleCount:
+                self.raiseErrorMessage("Length of Velocities list should be equal to the total number of particles.")
+
+            particles.foreach_set('velocity', velocities.asNumpyArray())
+
+        if self.rotBool:
+            if len(rotations) < particleCount or len(rotations) > particleCount:
+                self.raiseErrorMessage("Length of Rotations list should be equal to the total number of particles.")
+
+            particles.foreach_set('rotation', rotations.asNumpyArray())
+        if self.dieBool:
+            if len(dietimes) < particleCount or len(dietimes) > particleCount:
+                self.raiseErrorMessage("Length of Die Times list should be equal to the total number of particles.")
+
+            particles.foreach_set('die_time', dietimes.asNumpyArray())
