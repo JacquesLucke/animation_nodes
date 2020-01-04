@@ -20,7 +20,7 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
         items = colorModeItems, update = propertyChanged)
 
     def create(self):
-        self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
+        self.newInput("Mesh", "Mesh", "mesh")
         self.newInput("Text", "Name", "colorLayerName")
 
         self.newOutput("Color List", "Colors", "colors")        
