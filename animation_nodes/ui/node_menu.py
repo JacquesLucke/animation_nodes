@@ -385,7 +385,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_CombineMeshNode", "Combine Mesh")
         insertNode(layout, "an_MeshFromSplineNode", "Mesh From Spline")
         layout.separator()
-        layout.menu("AN_MT_mesh_getters_setters_menu", text = "Getters - Setters")
+        layout.menu("AN_MT_mesh_data_menu", text = "Mesh Data")
         layout.separator()
         insertNode(layout, "an_OffsetPolygonsNode", "Offset Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
@@ -404,9 +404,9 @@ class MeshMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_MeshObjectOutputNode", "Object Output")
 
-class MeshGettersSettersMenu(bpy.types.Menu):
-    bl_idname = "AN_MT_mesh_getters_setters_menu"
-    bl_label = "Mesh Getters - Setters Menu"
+class MeshDataMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_mesh_data_menu"
+    bl_label = "Mesh Data Menu"
 
     def draw(self, context):
         layout = self.layout
