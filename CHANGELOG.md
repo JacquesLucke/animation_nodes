@@ -7,6 +7,8 @@
 - Added Get Vertex Color Layer node.
 - Added Insert Vertex Color Layer node.
 - Added Get Linked Vertices node.
+- Added Set Bevel Vertex Weight node.
+- Added Set Bevel Edge Weight node.
 
 ### Fixed
 
