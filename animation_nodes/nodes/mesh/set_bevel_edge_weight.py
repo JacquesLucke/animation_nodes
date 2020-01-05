@@ -19,8 +19,11 @@ class BevelEdgeWeight(bpy.types.Node, AnimationNode):
     def execute(self, object, weights):
         if object is None: return None
 
-        if object.type != "MESH" or object.mode != "OBJECT":
-            self.raiseErrorMessage("Object is not in object mode or is no mesh object.")
+        if object.type != "MESH":
+            self.raiseErrorMessage("Object is no mesh object.")
+
+        if object.mode != "OBJECT":
+            self.raiseErrorMessage("Object is not in object mode.")
 
         if not object.data.use_customdata_edge_bevel:
             object.data.use_customdata_edge_bevel = True
