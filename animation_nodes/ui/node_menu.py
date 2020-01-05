@@ -385,13 +385,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_CombineMeshNode", "Combine Mesh")
         insertNode(layout, "an_MeshFromSplineNode", "Mesh From Spline")
         layout.separator()
-        insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
-        insertNode(layout, "an_SetVertexWeightNode", "Set Vertex Weight")
-        insertNode(layout, "an_GetVertexColorLayerNode", "Get Vertex Color Layer")
-        insertNode(layout, "an_InsertVertexColorLayerNode", "Insert Vertex Color Layer")
-        insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
-        insertNode(layout, "an_SetBevelVertexWeight", "Set Bevel Vertex Weight")
-        insertNode(layout, "an_SetBevelEdgeWeight", "Set Bevel Edge Weight")
+        layout.menu("AN_MT_mesh_getters_setters_menu", text = "Getters - Setters")
         layout.separator()
         insertNode(layout, "an_OffsetPolygonsNode", "Offset Polygons")
         insertNode(layout, "an_SeparatePolygonsNode", "Separate Polygons")
@@ -409,6 +403,20 @@ class MeshMenu(bpy.types.Menu):
         layout.menu("AN_MT_mesh_finalizing_menu", text = "Tools")
         layout.separator()
         insertNode(layout, "an_MeshObjectOutputNode", "Object Output")
+
+class MeshGettersSettersMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_mesh_getters_setters_menu"
+    bl_label = "Mesh Getters - Setters Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
+        insertNode(layout, "an_SetVertexWeightNode", "Set Vertex Weight")
+        insertNode(layout, "an_GetVertexColorLayerNode", "Get Vertex Color Layer")
+        insertNode(layout, "an_InsertVertexColorLayerNode", "Insert Vertex Color Layer")
+        insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
+        insertNode(layout, "an_SetBevelVertexWeight", "Set Bevel Vertex Weight")
+        insertNode(layout, "an_SetBevelEdgeWeight", "Set Bevel Edge Weight")
 
 class MeshGeneratorsMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_generators_menu"

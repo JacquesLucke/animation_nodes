@@ -12,7 +12,7 @@ class BevelEdgeWeight(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Float", "useWeightList",
-            ("Weight", "weights"), ("Weights", "weights")))
+            ("Weight", "weight"), ("Weights", "weights")))
 
         self.newOutput("Object", "Object", "object")
 
