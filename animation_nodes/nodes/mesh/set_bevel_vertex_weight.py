@@ -22,7 +22,7 @@ class BevelVertexWeights(bpy.types.Node, AnimationNode):
         if object.type != "MESH" or object.mode != "OBJECT":
             self.raiseErrorMessage("Object is not in object mode or is no mesh object.")
 
-        if object.data.use_customdata_vertex_bevel is False:
+        if not object.data.use_customdata_vertex_bevel:
             object.data.use_customdata_vertex_bevel = True
 
         weights = VirtualDoubleList.create(weights, 0).materialize(len(object.data.vertices))
