@@ -412,7 +412,6 @@ class MeshDataMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-
         insertNode(layout, "an_VertexGroupInputNode", "Vertex Group Input")
         insertNode(layout, "an_SetVertexWeightNode", "Set Vertex Weight")
         insertNode(layout, "an_GetVertexColorLayerNode", "Get Vertex Color Layer")
