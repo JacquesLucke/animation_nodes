@@ -7,9 +7,9 @@ from ... data_structures import UShortList
 from ... events import propertyChanged, executionCodeChanged
 
 meshDataTypeItems = [
-    ("MESH_DATA", "Mesh", "Mesh object that contains only vertex locations, edge indices and polygon indices.", "", 0),
-    ("BMESH", "BMesh", "BMesh object.", "", 1),
-    ("VERTICES", "Vertices", "A list of vertex locations; The length of this list has to be equal to the amount of vertices the mesh already has.", "", 2) ]
+    ("MESH_DATA", "Mesh", "Mesh object that contains only vertex locations, edge indices and polygon indices", "", 0),
+    ("BMESH", "BMesh", "BMesh object", "", 1),
+    ("VERTICES", "Vertices", "A list of vertex locations; The length of this list has to be equal to the amount of vertices the mesh already has", "", 2) ]
 
 class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectOutputNode"
