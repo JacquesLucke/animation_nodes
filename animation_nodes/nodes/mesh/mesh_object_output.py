@@ -7,9 +7,9 @@ from ... data_structures import UShortList
 from ... events import propertyChanged, executionCodeChanged
 
 meshDataTypeItems = [
-    ("MESH_DATA", "Mesh", "Mesh object that contains only vertex locations, edge indices and polygon indices", "", 0),
-    ("BMESH", "BMesh", "BMesh object", "", 1),
-    ("VERTICES", "Vertices", "A list of vertex locations; The length of this list has to be equal to the amount of vertices the mesh already has", "", 2) ]
+    ("MESH_DATA", "Mesh", "Mesh object that contains only vertex locations, edge indices and polygon indices.", "", 0),
+    ("BMESH", "BMesh", "BMesh object.", "", 1),
+    ("VERTICES", "Vertices", "A list of vertex locations; The length of this list has to be equal to the amount of vertices the mesh already has.", "", 2) ]
 
 class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectOutputNode"
@@ -24,11 +24,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         description = "", update = propertyChanged)
 
     validateMeshVerbose: BoolProperty(name = "Validate Mesh Verbose", default = False,
-        description = "Print results from validation in the console", update = propertyChanged)
+        description = "Print results from validation in the console.", update = propertyChanged)
 
     ensureAnimationData: BoolProperty(name = "Ensure Animation Data", default = True,
         description = ("Make sure that the mesh has animation data so that "
-                       "it will be exported as animation by exporters (mainly Alembic)"),
+                       "it will be exported as animation by exporters (mainly Alembic)."),
         update = propertyChanged)
 
     def create(self):
@@ -90,8 +90,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def isValidObject(self, object):
         if object is None: return False
-        if object.type != "MESH" or object.mode != "OBJECT":
-            self.setErrorMessage("Object is not in object mode or is no mesh object")
+        if object.type != "MESH":
+            self.setErrorMessage("Object is not a mesh object.")
+            return False
+        if object.mode != "OBJECT":
+            self.setErrorMessage("Object is not in object mode.")
             return False
         return True
 
@@ -136,7 +139,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def setVertices(self, mesh, vertices):
         if len(mesh.vertices) != len(vertices):
-            self.setErrorMessage("The vertex amounts are not equal")
+            self.setErrorMessage("The vertex amounts are not equal.")
             return object
 
         mesh.vertices.foreach_set("co", vertices.asMemoryView())
@@ -146,7 +149,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         if len(materialIndices) == 0: return
         if len(mesh.polygons) == 0: return
         if materialIndices.containsValueLowerThan(0):
-            self.setErrorMessage("Material indices have to be greater or equal to zero")
+            self.setErrorMessage("Material indices have to be greater or equal to zero.")
             return
 
         allMaterialIndices = UShortList.fromValues(materialIndices)
@@ -159,4 +162,3 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     def ensureThatMeshHasAnimationData(self, mesh):
         if mesh.animation_data is None:
             mesh.animation_data_create()
-
