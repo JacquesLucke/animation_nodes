@@ -24,11 +24,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         description = "", update = propertyChanged)
 
     validateMeshVerbose: BoolProperty(name = "Validate Mesh Verbose", default = False,
-        description = "Print results from validation in the console.", update = propertyChanged)
+        description = "Print results from validation in the console", update = propertyChanged)
 
     ensureAnimationData: BoolProperty(name = "Ensure Animation Data", default = True,
         description = ("Make sure that the mesh has animation data so that "
-                       "it will be exported as animation by exporters (mainly Alembic)."),
+                       "it will be exported as animation by exporters (mainly Alembic)"),
         update = propertyChanged)
 
     def create(self):
