@@ -417,6 +417,8 @@ class MeshDataMenu(bpy.types.Menu):
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
         insertNode(layout, "an_SetBevelVertexWeight", "Set Bevel Vertex Weight")
         insertNode(layout, "an_SetBevelEdgeWeight", "Set Bevel Edge Weight")
+        insertNode(layout, "an_UVMapDataInputNode", "UV Map Data Input")
+        insertNode(layout, "an_UVMapDataOutputNode", "UV Map Data Output")
 
 class MeshGeneratorsMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_generators_menu"
