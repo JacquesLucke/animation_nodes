@@ -90,8 +90,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def isValidObject(self, object):
         if object is None: return False
-        if object.type != "MESH" or object.mode != "OBJECT":
-            self.setErrorMessage("Object is not in object mode or is no mesh object")
+        if object.type != "MESH":
+            self.setErrorMessage("Object is not a mesh object.")
+            return False
+        if object.mode != "OBJECT":
+            self.setErrorMessage("Object is not in object mode.")
             return False
         return True
 
@@ -136,7 +139,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def setVertices(self, mesh, vertices):
         if len(mesh.vertices) != len(vertices):
-            self.setErrorMessage("The vertex amounts are not equal")
+            self.setErrorMessage("The vertex amounts are not equal.")
             return object
 
         mesh.vertices.foreach_set("co", vertices.asMemoryView())
@@ -146,7 +149,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         if len(materialIndices) == 0: return
         if len(mesh.polygons) == 0: return
         if materialIndices.containsValueLowerThan(0):
-            self.setErrorMessage("Material indices have to be greater or equal to zero")
+            self.setErrorMessage("Material indices have to be greater or equal to zero.")
             return
 
         allMaterialIndices = UShortList.fromValues(materialIndices)
@@ -159,4 +162,3 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
     def ensureThatMeshHasAnimationData(self, mesh):
         if mesh.animation_data is None:
             mesh.animation_data_create()
-
