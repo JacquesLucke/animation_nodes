@@ -2,18 +2,18 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... data_structures import Stroke
-from . c_utils import combineVectorList
-from ... data_structures import DoubleList, VirtualDoubleList
 from ... base_types import AnimationNode
+from .. vector.c_utils import combineVectorList
+from ... data_structures import DoubleList, VirtualDoubleList
 
 gframeTypeItems = [
     ("ACTIVE", "Active GFrame", "Active GFrame strokes", "NONE", 0),
-    ("INDEX", "Index GFrame", "Specific GFrame strokes", "NONE", 1) 
+    ("INDEX", "Index GFrame", "Specific GFrame strokes", "NONE", 1)
 ]
 
 layerTypeItems = [
     ("ALL", "All Strokes", "Get all strokes data", "NONE", 0),
-    ("INDEX", "Index Stroke ", "Get a specific strokes data", "NONE", 1) 
+    ("INDEX", "Index Stroke ", "Get a specific strokes data", "NONE", 1)
 ]
 
 class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
@@ -31,7 +31,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
 
         if self.gframeType == "INDEX":
             self.newInput("Integer", "GFrame Index", "gframeIndex")
-        
+
         if self.strokeType == "INDEX":
             self.newInput("Integer", "Stroke Index", "strokeIndex")
             self.newOutput("Stroke", "Stroke", "stroke")
@@ -39,7 +39,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
         elif self.strokeType == "ALL":
             self.newOutput("Stroke List", "Strokes", "strokes")
             self.newOutput("Integer", "Frame number", "frameNumber")
-        
+
         visibleOutputs = ("Stroke", "Strokes")
         for socket in self.outputs:
             socket.hide = socket.name not in visibleOutputs
@@ -51,20 +51,20 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
     def getExecutionFunctionName(self):
         if self.gframeType == "INDEX":
             if self.strokeType == "INDEX":
-                return "execute_IndexIndex"    
+                return "execute_IndexIndex"
             elif self.strokeType == "ALL":
                 return "execute_AllIndex"
-                
+
         elif self.gframeType == "ACTIVE":
             if self.strokeType == "INDEX":
-                return "execute_IndexActive"    
+                return "execute_IndexActive"
             elif self.strokeType == "ALL":
                 return "execute_AllActive"
-        
+
     def execute_IndexIndex(self, gpencilLayer, gframeIndex, strokeIndex):
         if gpencilLayer.layer is None: return None, None
         matrixWorld = gpencilLayer.matrix_world
-        
+
         frame = self.getFrame(gpencilLayer, gframeIndex)
         if frame is None: return None, None
         frameNumber = frame.frame_number
@@ -130,7 +130,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
 
         gpStrokePoints = gpStroke.points
         totalPoints = len(gpStrokePoints)
-        
+
         flatVectors = [0., 0., 0.]*totalPoints
         gpStrokePoints.foreach_get('co', flatVectors)
         xVectors = flatVectors[0::3]
@@ -138,7 +138,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
         zVectors = flatVectors[2::3]
         vectors = self.createVectorList(DoubleList.fromValues(xVectors), DoubleList.fromValues(yVectors), DoubleList.fromValues(zVectors))
         if matrixWorld is not None: vectors.transform(matrixWorld)
-        
+
         strengths = [0.]*totalPoints
         gpStrokePoints.foreach_get('strength', strengths)
         pressures = [0.]*totalPoints

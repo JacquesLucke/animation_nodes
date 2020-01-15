@@ -1,16 +1,16 @@
 import bpy
-from . c_utils import combineVectorList
-from ... data_structures import DoubleList, VirtualDoubleList
 from ... base_types import AnimationNode
+from .. vector.c_utils import combineVectorList
+from ... data_structures import DoubleList, VirtualDoubleList
 
 class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPencilStrokeInputNode"
     bl_label = "GPencil Stroke Input"
-    
+
     def create(self):
         self.newInput("Stroke", "Stroke", "stroke")
 
-        self.newOutput("Integer", "Total Points", "totalPoints") 
+        self.newOutput("Integer", "Total Points", "totalPoints")
         self.newOutput("Vector List", "Points", "vectors")
         self.newOutput("Float List", "Strengths", "strengths")
         self.newOutput("Float List", "Pressures", "pressures")
@@ -19,7 +19,7 @@ class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "Cyclic", "drawCyclic")
         self.newOutput("Boolean", "Start Cap", "startCapMode")
         self.newOutput("Boolean", "End Cap", "endCapMode")
-        self.newOutput("Integer", "Material Index", "materialIndex") 
+        self.newOutput("Integer", "Material Index", "materialIndex")
 
         visibleOutputs = ("Total Points", "Points")
         for socket in self.outputs:
@@ -47,7 +47,7 @@ class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
             endCapMode = False
         else:
             endCapMode = True
-        return totalPoints, stroke.vectors, DoubleList.fromValues(stroke.strength), DoubleList.fromValues(stroke.pressure), DoubleList.fromValues(stroke.uv_rotation), stroke.line_width, stroke.draw_cyclic, startCapMode, endCapMode, stroke.material_index 
+        return totalPoints, stroke.vectors, DoubleList.fromValues(stroke.strength), DoubleList.fromValues(stroke.pressure), DoubleList.fromValues(stroke.uv_rotation), stroke.line_width, stroke.draw_cyclic, startCapMode, endCapMode, stroke.material_index
 
     def createVectorList(self, x, y, z):
         x, y, z = VirtualDoubleList.createMultiple((x, 0), (y, 0), (z, 0))

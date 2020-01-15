@@ -419,7 +419,7 @@ class MeshDataMenu(bpy.types.Menu):
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
         insertNode(layout, "an_SetBevelVertexWeight", "Set Bevel Vertex Weight")
         insertNode(layout, "an_SetBevelEdgeWeight", "Set Bevel Edge Weight")
-        insertNode(layout, "an_SetEdgeCreases", "Set Edge Creases")
+        insertNode(layout, "an_SetEdgeCrease", "Set Edge Crease")
         insertNode(layout, "an_UVMapDataInputNode", "UV Map Data Input")
         insertNode(layout, "an_UVMapDataOutputNode", "UV Map Data Output")
         insertNode(layout, "an_SetPolygonMaterialIndexNode", "Set Polygon Material Index")

@@ -1,6 +1,6 @@
 from itertools import chain
 import bpy
-from . c_utils import combineVectorList
+from .. vector.c_utils import combineVectorList
 from ... data_structures import DoubleList, VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
@@ -55,7 +55,7 @@ class GPencilStrokeTransformNode(bpy.types.Node, AnimationNode):
         flatVectors = self.flatList(vectors)
         xVectors = flatVectors[0::3]
         yVectors = flatVectors[1::3]
-        zVectors = flatVectors[2::3] 
+        zVectors = flatVectors[2::3]
         newVectors = self.createVectorList(DoubleList.fromValues(xVectors), DoubleList.fromValues(yVectors), DoubleList.fromValues(zVectors))
         newVectors.transform(matrix)
         outStroke.vectors = newVectors
