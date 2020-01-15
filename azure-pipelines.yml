@@ -1,5 +1,5 @@
 trigger:
-- master
+- extranodes
 stages:
 - stage: build
   displayName: Build
@@ -87,8 +87,8 @@ stages:
             - task: GitHubRelease@1
               displayName: 'Update Release'
               inputs:
-                gitHubConnection: 'JacquesLucke'
-                repositoryName: 'JacquesLucke/animation_nodes'
+                gitHubConnection: '3DSinghVFX'
+                repositoryName: '3DSinghVFX/animation_nodes'
                 action: 'edit'
                 tag: 'daily'
                 releaseNotesSource: 'inline'
