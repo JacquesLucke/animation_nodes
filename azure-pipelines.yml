@@ -1,0 +1,101 @@
+trigger:
+- master
+stages:
+- stage: build
+  displayName: Build
+  jobs:
+  - job: linuxBuild
+    displayName: Linux Build
+    pool:
+      vmImage: ubuntu-18.04
+    steps:
+    - script: >-
+        docker run -v $PWD:/build ubuntu:rolling /bin/bash -c "
+        cd /build;
+        apt-get -y update;
+        apt-get -y install python3.7 cython3 g++;
+        python3.7 setup.py build --export"
+      displayName: Linux Build
+    - task: CopyFiles@2
+      inputs:
+        contents: 'animation_nodes*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: linuxBuild
+  - job: macOSBuild
+    displayName: MacOS Build
+    pool:
+      vmImage: macOS-10.14
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Set Python Version'
+      inputs:
+        versionSpec: '3.7'
+        addToPath: true
+        architecture: 'x64'
+    - script: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install Cython --install-option="--no-cython-compile"
+      displayName: 'Install Cython'
+    - script: python3.7 setup.py build --export
+      displayName: MacOS Build
+    - task: CopyFiles@2
+      inputs:
+        contents: 'animation_nodes*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: macOSBuild
+  - job: windowsBuild
+    displayName: Windows Build
+    pool:
+      vmImage: windows-2019
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Set Python Version'
+      inputs:
+        versionSpec: '3.7'
+        addToPath: true
+        architecture: 'x64'
+    - script: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install Cython --install-option="--no-cython-compile"
+      displayName: 'Install Cython'
+    - script: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+        python setup.py build --export
+      env:
+        DISTUTILS_USE_SDK: 1
+        PY_VCRUNTIME_REDIST: No
+      displayName: Build Windows
+    - task: CopyFiles@2
+      inputs:
+        contents: 'animation_nodes*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: windowsBuild
+- stage: deploy
+  displayName: Deploy
+  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
+  jobs:
+    - deployment:
+      displayName: Update Github Release
+      environment: animation-nodes-dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: GitHubRelease@1
+              displayName: 'Update Release'
+              inputs:
+                gitHubConnection: 'JacquesLucke'
+                repositoryName: 'JacquesLucke/animation_nodes'
+                action: 'edit'
+                tag: 'daily'
+                releaseNotesSource: 'inline'
+                assets: |
+                  $(Pipeline.Workspace)/linuxBuild/animation_nodes*.zip
+                  $(Pipeline.Workspace)/macOSBuild/animation_nodes*.zip
+                  $(Pipeline.Workspace)/windowsBuild/animation_nodes*.zip
+                assetUploadMode: 'replace'
+                isPreRelease: true
+                addChangeLog: false
