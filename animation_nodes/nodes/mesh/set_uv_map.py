@@ -3,7 +3,6 @@ import numpy as np
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures import VirtualDoubleList
 
 mapIdentifierTypeItems = [
     ("INDEX", "Index", "Get uv map based on the index", "NONE", 0),
@@ -25,29 +24,24 @@ class SetUVMapNode(bpy.types.Node, AnimationNode):
         elif self.mapIdentifierType == "NAME":
             self.newInput("Text", "Name", "uvMapName")
 
-        self.newInput("Float List", "X", "x")
-        self.newInput("Float List", "Y", "y")
+        self.newInput("Vector 2D List", "Vectors2D", "vectors2D")
 
         self.newOutput("Object", "Object", "object")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "mapIdentifierType", text = "Type")
 
-    def execute(self, object, identifier, x, y):
+    def execute(self, object, identifier, vectors2D):
         if object is None:
             return object
 
         uvMap = self.getUVMap(object, identifier)
 
         coLength = len(uvMap.data)
-        xList = VirtualDoubleList.create(x, 0).materialize(coLength)
-        yList = VirtualDoubleList.create(y, 0).materialize(coLength)
+        if len(vectors2D) != coLength:
+            self.raiseErrorMessage("Invaild input vectors 2D list.")
 
-        coList = np.zeros(2 * coLength, dtype = float)
-        coList[::2] = xList.asNumpyArray()
-        coList[1::2] = yList.asNumpyArray()
-
-        uvMap.data.foreach_set('uv', coList)
+        uvMap.data.foreach_set('uv', vectors2D.asNumpyArray())
         object.update_tag()
         return object
 

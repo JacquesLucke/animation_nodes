@@ -1,6 +1,5 @@
 import bpy
 from ... base_types import AnimationNode
-from ... data_structures import DoubleList
 
 class GetUVMapNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetUVMapNode"
@@ -11,8 +10,7 @@ class GetUVMapNode(bpy.types.Node, AnimationNode):
         self.newInput("Mesh", "Mesh", "mesh")
         self.newInput("Text", "Name", "uvMapName")
 
-        self.newOutput("Float List", "X", "x")
-        self.newOutput("Float List", "Y", "y")
+        self.newOutput("Vector 2D List", "Vectors2D", "vectors2D")
 
     def execute(self, mesh, uvMapName):
         if uvMapName == "":
@@ -23,5 +21,4 @@ class GetUVMapNode(bpy.types.Node, AnimationNode):
         if uvMapCos is None:
             self.raiseErrorMessage(f"Mesh doesn't have a uv map with the name '{uvMapName}'.")
 
-        coList = uvMapCos.asNumpyArray()
-        return DoubleList.fromValues(coList[::2]), DoubleList.fromValues(coList[1::2])
+        return uvMapCos
