@@ -1,6 +1,6 @@
 from ... math cimport Vector3, distanceVec3, lengthVec3
 from ... data_structures cimport (
-    DoubleList, Vector3DList, CDefaultList,
+    DoubleList, Vector3DList, CDefaultList, Vector2DList,
     VirtualDoubleList, VirtualVector3DList)
 
 def combineVectorList(Py_ssize_t amount,
@@ -76,3 +76,20 @@ def calculateVectorCenters(Vector3DList vectors1, Vector3DList vectors2):
         centers.data[i].z = (vectors1.data[i].z + vectors2.data[i].z) * <float>0.5
 
     return centers
+
+def convert_Vector3DList_to_Vector2DList(Vector3DList vectors):
+    cdef Py_ssize_t i
+    cdef Vector2DList vectors2D = Vector2DList(length = len(vectors))
+    for i in range(len(vectors)):
+        vectors2D.data[i].x = vectors.data[i].x
+        vectors2D.data[i].y = vectors.data[i].y
+    return vectors2D
+
+def convert_Vector2DList_to_Vector3DList(Vector2DList vectors):
+    cdef Py_ssize_t i
+    cdef Vector3DList vectors3D = Vector3DList(length = len(vectors))
+    for i in range(len(vectors)):
+        vectors3D.data[i].x = vectors.data[i].x
+        vectors3D.data[i].y = vectors.data[i].y
+        vectors3D.data[i].z = <float>0.0
+    return vectors3D
