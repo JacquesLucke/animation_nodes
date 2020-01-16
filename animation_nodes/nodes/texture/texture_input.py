@@ -1,4 +1,5 @@
 import bpy
+from . c_utils import getTextureColors
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import DoubleList, Color, ColorList
 
@@ -7,7 +8,7 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Texture Input"
 
     useVectorList: VectorizedSocket.newProperty()
-    
+
     def create(self):
         self.newInput("Texture", "Texture", "texture", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Vector", "useVectorList",
@@ -22,7 +23,6 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
             ("Blue", "blue"), ("Blues", "blues")))
         self.newOutput(VectorizedSocket("Float", "useVectorList",
             ("Alpha / Luminance", "alpha"), ("Alphas / Luminances", "alphas")))
-        self.newOutput("Generic", "Extra Settings", "texture")
 
         visibleOutputs = ("Color", "Colors")
         for socket in self.outputs:
@@ -44,29 +44,12 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
     def executeSingle(self, texture, location):
         if texture is None:
             return None, None, None, None, None, None
-        
+
         color = Color(texture.evaluate(location))
-        texture.update_tag()
-        return color, color.r, color.g, color.b, color.a, texture
-        
+        return color, color.r, color.g, color.b, color.a
+
     def executeList(self, texture, locations):
         if texture is None or len(locations) == 0:
-            return ColorList(), DoubleList(), DoubleList(), DoubleList(), DoubleList(), texture
-        
-        locationCount = len(locations)
-        reds = DoubleList(length = locationCount)
-        greens = DoubleList(length = locationCount)
-        blues = DoubleList(length = locationCount)
-        alphas = DoubleList(length = locationCount)
-        colors = ColorList(length = locationCount)
+            return ColorList(), DoubleList(), DoubleList(), DoubleList(), DoubleList()
 
-        for i, location in enumerate(locations):
-            color = Color(texture.evaluate(location))
-            reds[i] = color.r
-            greens[i] = color.g
-            blues[i] = color.b
-            alphas[i] = color.a 
-            colors[i] = color
-        texture.update_tag()
-        return colors, reds, greens, blues, alphas, texture
-
+        return getTextureColors(texture, locations)
