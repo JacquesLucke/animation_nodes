@@ -9,19 +9,19 @@ class InsertUVMapNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
         self.newInput("Text", "Name", "uvMapName", value = "AN-UV Map")
-        self.newInput("Vector 2D List", "Vectors2D", "vectors2D")
+        self.newInput("Vector 2D List", "Vectors", "vectors")
 
         self.newOutput("Mesh", "Mesh", "mesh")
 
-    def execute(self, mesh, uvMapName, vectors2D):
+    def execute(self, mesh, uvMapName, vectors):
         if uvMapName == "":
             self.raiseErrorMessage("UV map name can't be empty.")
         elif uvMapName in mesh.getVertexColorLayerNames():
             self.raiseErrorMessage(f"Mesh has already a uv map with the name '{uvMapName}'.")
 
         coLength = len(mesh.polygons.indices)
-        if len(vectors2D) != coLength:
+        if len(vectors) != coLength:
             self.raiseErrorMessage("Invaild input vectors 2D list.")
 
-        mesh.insertUVMap(uvMapName, vectors2D)
+        mesh.insertUVMap(uvMapName, vectors)
         return mesh

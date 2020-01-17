@@ -130,7 +130,7 @@ cdef class Mesh:
     def getUVMapNames(self):
         return list(self.uvMaps.keys())
 
-    def getUVMapCos(self, str uvMapName):
+    def getUVMapPositions(self, str uvMapName):
         return self.uvMaps.get(uvMapName, None)
 
     def insertVertexColorLayer(self, str name, ColorList colors):
