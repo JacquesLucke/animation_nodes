@@ -14,7 +14,8 @@ def importDataStructures():
     from . virtual_list.virtual_list import VirtualList, VirtualPyList
     from . virtual_list.virtual_clists import (
         VirtualVector3DList, VirtualMatrix4x4List, VirtualEulerList, VirtualBooleanList,
-        VirtualFloatList, VirtualDoubleList, VirtualLongList, VirtualColorList
+        VirtualFloatList, VirtualDoubleList, VirtualLongList, VirtualColorList,
+        VirtualVector2DList
     )
 
     from . splines.base_spline import Spline
