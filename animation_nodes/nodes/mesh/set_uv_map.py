@@ -1,8 +1,9 @@
 import bpy
 from bpy.props import *
+from ... math import Vector
 from ... events import propertyChanged
-from ... base_types import AnimationNode
 from ... data_structures import VirtualVector2DList
+from ... base_types import AnimationNode, VectorizedSocket
 
 mapIdentifierTypeItems = [
     ("INDEX", "Index", "Get uv map based on the index", "NONE", 0),
@@ -17,6 +18,8 @@ class SetUVMapNode(bpy.types.Node, AnimationNode):
     mapIdentifierType: EnumProperty(name = "UV Map Identifier Type", default = "INDEX",
         items = mapIdentifierTypeItems, update = AnimationNode.refresh)
 
+    useVector2DList: VectorizedSocket.newProperty()
+
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         if self.mapIdentifierType == "INDEX":
@@ -24,7 +27,8 @@ class SetUVMapNode(bpy.types.Node, AnimationNode):
         elif self.mapIdentifierType == "NAME":
             self.newInput("Text", "Name", "uvMapName")
 
-        self.newInput("Vector 2D List", "Vectors", "vectors")
+        self.newInput(VectorizedSocket("Vector 2D", "useVector2DList",
+            ("Vector", "vector"), ("Vectors", "vectors")))
 
         self.newOutput("Object", "Object", "object")
 
@@ -36,7 +40,7 @@ class SetUVMapNode(bpy.types.Node, AnimationNode):
             return object
 
         uvMap = self.getUVMap(object, identifier)
-        VirtualVector2DList.create(vectors, [0, 0]).materialize(len(uvMap.data))
+        vectors = VirtualVector2DList.create(vectors, Vector((0, 0))).materialize(len(uvMap.data))
 
         uvMap.data.foreach_set('uv', vectors.asNumpyArray())
         object.update_tag()
