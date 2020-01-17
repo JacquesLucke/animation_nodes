@@ -1,7 +1,4 @@
-from itertools import chain
 import bpy
-from .. vector.c_utils import combineVectorList
-from ... data_structures import DoubleList, VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPencilStrokeTransformNode(bpy.types.Node, AnimationNode):
@@ -51,20 +48,4 @@ class GPencilStrokeTransformNode(bpy.types.Node, AnimationNode):
         return strokes
 
     def strokeTransfom(self, outStroke, matrix):
-        vectors = outStroke.vectors
-        flatVectors = self.flatList(vectors)
-        xVectors = flatVectors[0::3]
-        yVectors = flatVectors[1::3]
-        zVectors = flatVectors[2::3]
-        newVectors = self.createVectorList(DoubleList.fromValues(xVectors), DoubleList.fromValues(yVectors), DoubleList.fromValues(zVectors))
-        newVectors.transform(matrix)
-        outStroke.vectors = newVectors
-        return outStroke
-
-    def createVectorList(self, x, y, z):
-        x, y, z = VirtualDoubleList.createMultiple((x, 0), (y, 0), (z, 0))
-        amount = VirtualDoubleList.getMaxRealLength(x, y, z)
-        return combineVectorList(amount, x, y, z)
-
-    def flatList(self, vectors):
-        return list(chain.from_iterable(vectors))
+        return outStroke.vectors.transform(matrix)

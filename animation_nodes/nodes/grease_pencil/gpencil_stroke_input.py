@@ -1,7 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from .. vector.c_utils import combineVectorList
-from ... data_structures import DoubleList, VirtualDoubleList
+from ... data_structures import DoubleList, Vector3DList
 
 class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPencilStrokeInputNode"
@@ -26,18 +25,11 @@ class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
             socket.hide = socket.name not in visibleOutputs
 
     def execute(self, stroke):
-        xVectors = []
-        yVectors = []
-        zVectors = []
-        totalPoints = 0
-        strengths = []
-        pressures = []
-        uvRotations = []
-        vectors = self.createVectorList(DoubleList.fromValues(xVectors), DoubleList.fromValues(yVectors), DoubleList.fromValues(zVectors))
-        if stroke is None: return totalPoints, vectors, DoubleList.fromValues(strengths), DoubleList.fromValues(pressures), DoubleList.fromValues(uvRotations), 0, False, False, False, 0
+        if stroke is None:
+            return 0, Vector3DList(), DoubleList(), DoubleList(), DoubleList(), 0, False, False, False, 0
 
-        totalPoints = len(stroke.vectors)
-        if totalPoints == 0: return totalPoints, vectors, DoubleList.fromValues(strengths), DoubleList.fromValues(pressures), DoubleList.fromValues(uvRotations), 0, False, False, False, 0
+        vectors = stroke.vectors
+
         if stroke.start_cap_mode == "ROUND":
             startCapMode = False
         else:
@@ -47,9 +39,5 @@ class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
             endCapMode = False
         else:
             endCapMode = True
-        return totalPoints, stroke.vectors, DoubleList.fromValues(stroke.strength), DoubleList.fromValues(stroke.pressure), DoubleList.fromValues(stroke.uv_rotation), stroke.line_width, stroke.draw_cyclic, startCapMode, endCapMode, stroke.material_index
-
-    def createVectorList(self, x, y, z):
-        x, y, z = VirtualDoubleList.createMultiple((x, 0), (y, 0), (z, 0))
-        amount = VirtualDoubleList.getMaxRealLength(x, y, z)
-        return combineVectorList(amount, x, y, z)
+        return len(vectors), vectors, stroke.strength, stroke.pressure, stroke.uv_rotation,\
+            stroke.line_width, stroke.draw_cyclic, startCapMode, endCapMode, stroke.material_index

@@ -3,8 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... data_structures import Stroke
 from ... base_types import AnimationNode
-from .. vector.c_utils import combineVectorList
-from ... data_structures import DoubleList, VirtualDoubleList
+from ... data_structures import DoubleList, Vector3DList
 
 gframeTypeItems = [
     ("ACTIVE", "Active GFrame", "Active GFrame strokes", "NONE", 0),
@@ -124,32 +123,20 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
         except: return None
 
     def getStrokeData(self, gpStroke, matrixWorld):
-        xVectors = []
-        yVectors = []
-        zVectors = []
-
         gpStrokePoints = gpStroke.points
-        totalPoints = len(gpStrokePoints)
+        amount = len(gpStrokePoints)
 
-        flatVectors = [0., 0., 0.]*totalPoints
-        gpStrokePoints.foreach_get('co', flatVectors)
-        xVectors = flatVectors[0::3]
-        yVectors = flatVectors[1::3]
-        zVectors = flatVectors[2::3]
-        vectors = self.createVectorList(DoubleList.fromValues(xVectors), DoubleList.fromValues(yVectors), DoubleList.fromValues(zVectors))
+        vectors = Vector3DList(length = amount)
+        strengths = DoubleList(length = amount)
+        pressures = DoubleList(length = amount)
+        uvRotations = DoubleList(length = amount)
+
+        gpStrokePoints.foreach_get('co', vectors.asNumpyArray())
         if matrixWorld is not None: vectors.transform(matrixWorld)
 
-        strengths = [0.]*totalPoints
-        gpStrokePoints.foreach_get('strength', strengths)
-        pressures = [0.]*totalPoints
-        gpStrokePoints.foreach_get('pressure', pressures)
-        uvRotations = [0.]*totalPoints
-        gpStrokePoints.foreach_get('uv_rotation', uvRotations)
-        return Stroke(vectors, DoubleList.fromValues(strengths), DoubleList.fromValues(pressures), DoubleList.fromValues(uvRotations), gpStroke.line_width,
-        gpStroke.draw_cyclic, gpStroke.start_cap_mode, gpStroke.end_cap_mode, gpStroke.material_index,
-        gpStroke.display_mode)
+        gpStrokePoints.foreach_get('strength', strengths.asNumpyArray())
+        gpStrokePoints.foreach_get('pressure', pressures.asNumpyArray())
+        gpStrokePoints.foreach_get('uv_rotation', uvRotations.asNumpyArray())
 
-    def createVectorList(self, x, y, z):
-        x, y, z = VirtualDoubleList.createMultiple((x, 0), (y, 0), (z, 0))
-        amount = VirtualDoubleList.getMaxRealLength(x, y, z)
-        return combineVectorList(amount, x, y, z)
+        return Stroke(vectors, strengths, pressures, uvRotations, gpStroke.line_width, gpStroke.draw_cyclic,
+        gpStroke.start_cap_mode, gpStroke.end_cap_mode, gpStroke.material_index, gpStroke.display_mode)

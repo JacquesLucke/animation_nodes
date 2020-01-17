@@ -1,11 +1,10 @@
-from itertools import chain
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 
 strokeTypeItems = [
     ("STROKE", "Stroke", "One Stroke", "NONE", 0),
-    ("STROKES", "Stroke List", "Stroke List", "NONE", 1) 
+    ("STROKES", "Stroke List", "Stroke List", "NONE", 1)
 ]
 
 class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
@@ -24,7 +23,7 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
             ("Stroke", "stroke"), ("Strokes", "strokes")))
         self.newInput("Integer", "GP-Layer Index", "gpLayerIndex", value = 0)
         self.newOutput("Object", "Object", "object")
-        
+
     def getExecutionFunctionName(self):
         if self.useStrokeList:
             return "executeStrokeList"
@@ -33,39 +32,39 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def executeStroke(self, object, stroke, gpLayerIndex):
         if self.isValidObject(object) is False or stroke is None: return object
-        
+
         gpencil = object.data
         if gpencil is None: return object
 
         gpencilLayer = self.getLayer(gpencil, gpLayerIndex)
         if gpencilLayer is None: return object
-        
+
         gpencilFrame = self.getFrame(gpencilLayer, 0, 1)
         if gpencilFrame is None:
             self.setErrorMessage("Current GPencil Frame has same the frame-number. Each GPencil Frame must have unique frame-number!")
             return object
         gpencilFrame = self.setFrameStrokes(gpencilFrame, [stroke])
         gpencilStroke = self.setStrokeProperties(self.getStroke(0, gpencilFrame), stroke)
-        
+
         gpencilPoints = self.setStrokePoints(gpencilStroke, stroke)
         if gpencilPoints is not None:
-            gpencilPoints.foreach_set('co', self.flatList(stroke.vectors))
+            gpencilPoints.foreach_set('co', stroke.vectors.asNumpyArray())
             gpencilPoints.foreach_set('strength', stroke.strength)
             gpencilPoints.foreach_set('pressure', stroke.pressure)
             gpencilPoints.foreach_set('uv_rotation', stroke.uv_rotation)
-        
+
         gpencilFrame.strokes.update()
         gpencil.layers.active.frames.update()
         return object
 
     def executeStrokeList(self, object, strokes, gpLayerIndex):
-        if self.isValidObject(object) is False: return object
+        if not self.isValidObject(object): return object
         gpencil = object.data
         if gpencil is None: return object
 
         gpencilLayer = self.getLayer(gpencil, gpLayerIndex)
         if gpencilLayer is None: return object
-        
+
         gpencilFrame = self.getFrame(gpencilLayer, 0, 1)
         if gpencilFrame is None:
             self.setErrorMessage("Current GPencil Frame has same the frame-number. Each GPencil Frame must have unique frame-number!")
@@ -76,7 +75,7 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
             gpencilStroke = self.setStrokeProperties(self.getStroke(i, gpencilFrame), stroke)
             gpencilPoints = self.setStrokePoints(gpencilStroke, stroke)
             if gpencilPoints is not None:
-                gpencilPoints.foreach_set('co', self.flatList(stroke.vectors))
+                gpencilPoints.foreach_set('co', stroke.vectors.asNumpyArray())
                 gpencilPoints.foreach_set('strength', stroke.strength)
                 gpencilPoints.foreach_set('pressure', stroke.pressure)
                 gpencilPoints.foreach_set('uv_rotation', stroke.uv_rotation)
@@ -127,7 +126,7 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
         gpencilStroke.display_mode = "3DSPACE"
         if stroke.draw_cyclic: gpencilStroke.draw_cyclic = True
         else: gpencilStroke.draw_cyclic = False
-        
+
         if stroke.start_cap_mode == 'FLAT':
             gpencilStroke.start_cap_mode = 'FLAT'
         else:
@@ -141,10 +140,10 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def isValidObject(self, object):
         if object is None: return False
-        if object.type != "GPENCIL" or object.mode != "OBJECT":
-            self.setErrorMessage("Object is not in object mode or is no gpencil object")
+        if object.type != "GPENCIL":
+            self.setErrorMessage("Object is not a grease pencil object.")
+            return False
+        if object.mode != "OBJECT":
+            self.setErrorMessage("Object is not in object mode.")
             return False
         return True
-
-    def flatList(self, vectors):
-        return list(chain.from_iterable(vectors))
