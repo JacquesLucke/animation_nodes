@@ -10,6 +10,10 @@
 - Added Set Bevel Vertex Weight node.
 - Added Set Bevel Edge Weight node.
 - Added Vector 2D and Vector 2D List sockets.
+- Added VirtualVector2DList structure.
+- Added Get UV Map node.
+- Added Insert UV Map node.
+- Added Set UV Map node.
 
 ### Fixed
 
