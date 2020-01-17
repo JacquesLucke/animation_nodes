@@ -1,7 +1,8 @@
 import bpy
 from bpy.props import *
+from mathutils import Vector
 from .. events import propertyChanged
-from .. data_structures import Vector2D, Vector2DList
+from .. data_structures import Vector2DList
 from .. base_types import AnimationNodeSocket, CListSocket
 from . implicit_conversion import registerImplicitConversion
 
@@ -22,7 +23,7 @@ class Vector2DSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         col.prop(self, "value", index = 1, text = "Y")
 
     def getValue(self):
-        return Vector2D(self.value)
+        return Vector(self.value)
 
     def setProperty(self, data):
         self.value = data
@@ -32,7 +33,7 @@ class Vector2DSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def getDefaultValue(cls):
-        return Vector2D((0, 0))
+        return Vector((0, 0))
 
     @classmethod
     def getCopyExpression(cls):
@@ -40,15 +41,15 @@ class Vector2DSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, Vector2D) and len(value) == 2:
+        if isinstance(value, Vector) and len(value) == 2:
             return value, 0
         try:
-            if len(value) == 2: return Vector2D(value), 1
+            if len(value) == 2: return Vector(value), 1
         except:
             pass
         return cls.getDefaultValue(), 2
 
-registerImplicitConversion("Vector", "Vector 2D", "Vector2D((value.x, value.y))")
+registerImplicitConversion("Vector", "Vector 2D", "Vector((value.x, value.y))")
 registerImplicitConversion("Vector 2D", "Vector", "Vector((value.x, value.y, 0))")
 
 class Vector2DListSocket(bpy.types.NodeSocket, CListSocket):
