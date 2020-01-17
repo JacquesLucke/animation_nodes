@@ -1,7 +1,6 @@
 def importDataStructures():
     from . color import Color
     from . struct import ANStruct
-    from . vector2d import Vector2D
 
     from . meshes.mesh_data import Mesh
     from . gpencils.gpencils import Stroke
@@ -17,7 +16,8 @@ def importDataStructures():
     from . virtual_list.virtual_list import VirtualList, VirtualPyList
     from . virtual_list.virtual_clists import (
         VirtualVector3DList, VirtualMatrix4x4List, VirtualEulerList, VirtualBooleanList,
-        VirtualFloatList, VirtualDoubleList, VirtualLongList, VirtualColorList
+        VirtualFloatList, VirtualDoubleList, VirtualLongList, VirtualColorList,
+        VirtualVector2DList
     )
 
     from . splines.base_spline import Spline
