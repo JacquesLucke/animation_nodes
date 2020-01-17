@@ -28,21 +28,21 @@ class SetUVMapNode(bpy.types.Node, AnimationNode):
             self.newInput("Text", "Name", "uvMapName")
 
         self.newInput(VectorizedSocket("Vector 2D", "useVector2DList",
-            ("Vector", "vector"), ("Vectors", "vectors")))
+            ("Position", "position"), ("Positions", "positions")))
 
         self.newOutput("Object", "Object", "object")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "mapIdentifierType", text = "Type")
 
-    def execute(self, object, identifier, vectors):
+    def execute(self, object, identifier, positions):
         if object is None:
             return object
 
         uvMap = self.getUVMap(object, identifier)
-        vectors = VirtualVector2DList.create(vectors, Vector((0, 0))).materialize(len(uvMap.data))
+        positions = VirtualVector2DList.create(positions, Vector((0, 0))).materialize(len(uvMap.data))
 
-        uvMap.data.foreach_set('uv', vectors.asNumpyArray())
+        uvMap.data.foreach_set('uv', positions.asNumpyArray())
         object.update_tag()
         return object
 

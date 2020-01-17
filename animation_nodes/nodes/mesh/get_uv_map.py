@@ -10,7 +10,7 @@ class GetUVMapNode(bpy.types.Node, AnimationNode):
         self.newInput("Mesh", "Mesh", "mesh")
         self.newInput("Text", "Name", "uvMapName")
 
-        self.newOutput("Vector 2D List", "Vectors", "vectors")
+        self.newOutput("Vector 2D List", "Positions", "positions")
 
     def execute(self, mesh, uvMapName):
         if uvMapName == "":
