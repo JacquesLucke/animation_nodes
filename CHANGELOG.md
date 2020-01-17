@@ -9,6 +9,7 @@
 - Added Get Linked Vertices node.
 - Added Set Bevel Vertex Weight node.
 - Added Set Bevel Edge Weight node.
+- Added Vector 2D and Vector 2D List sockets.
 
 ### Fixed
 
