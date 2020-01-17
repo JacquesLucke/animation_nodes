@@ -1,4 +1,5 @@
 import bpy
+from ... data_structures import VirtualVector2DList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class InsertUVMapNode(bpy.types.Node, AnimationNode):
@@ -19,9 +20,6 @@ class InsertUVMapNode(bpy.types.Node, AnimationNode):
         elif uvMapName in mesh.getVertexColorLayerNames():
             self.raiseErrorMessage(f"Mesh has already a uv map with the name '{uvMapName}'.")
 
-        coLength = len(mesh.polygons.indices)
-        if len(vectors) != coLength:
-            self.raiseErrorMessage("Invaild input vectors 2D list.")
-
+        vectors = VirtualVector2DList.create(vectors, [0, 0]).materialize(len(mesh.polygons.indices))
         mesh.insertUVMap(uvMapName, vectors)
         return mesh

@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
+from ... data_structures import VirtualVector2DList
 
 mapIdentifierTypeItems = [
     ("INDEX", "Index", "Get uv map based on the index", "NONE", 0),
@@ -35,10 +36,7 @@ class SetUVMapNode(bpy.types.Node, AnimationNode):
             return object
 
         uvMap = self.getUVMap(object, identifier)
-
-        coLength = len(uvMap.data)
-        if len(vectors) != coLength:
-            self.raiseErrorMessage("Invaild input vectors 2D list.")
+        VirtualVector2DList.create(vectors, [0, 0]).materialize(len(uvMap.data))
 
         uvMap.data.foreach_set('uv', vectors.asNumpyArray())
         object.update_tag()
