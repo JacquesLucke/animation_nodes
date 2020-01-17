@@ -1,7 +1,6 @@
 def importDataStructures():
     from . color import Color
     from . struct import ANStruct
-    from . vector2d import Vector2D
 
     from . meshes.mesh_data import Mesh
     from . lists.clist import CList
