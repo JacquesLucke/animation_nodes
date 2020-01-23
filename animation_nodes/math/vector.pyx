@@ -118,10 +118,13 @@ cdef float distanceSquaredVec3(Vector3* a, Vector3* b):
 cdef float dotVec3(Vector3* a, Vector3* b):
     return a.x * b.x + a.y * b.y + a.z * b.z
 
+@cython.cdivision(True)
 cdef float angleVec3(Vector3 *a, Vector3 *b):
+    cdef float denominator = lengthVec3(a) * lengthVec3(b)
+    if denominator == 0: return 0
+
     cdef float dot = dotVec3(a, b)
-    cdef float val
-    val = dot / (lengthVec3(a) * lengthVec3(b))
+    cdef float val = dot / denominator
     if val > 1: val = 1
     elif val < -1: val = -1
     return acos(val)
