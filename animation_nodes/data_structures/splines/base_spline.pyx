@@ -1,7 +1,7 @@
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (
     distanceSquaredVec3, crossVec3, projectOnCenterPlaneVec3,
-    almostZeroVec3, lengthVec3, angleVec3, dotVec3, normalizeVec3_InPlace,
+    almostZeroVec3, angleVec3, dotVec3, normalizeVec3_InPlace,
     toPyVector3, toVector3,
     findNearestLineParameter,
     distanceSumOfVector3DList,
@@ -491,13 +491,7 @@ cdef void setInitialNormal(Vector3 *tangent, Vector3 *target):
 cdef void calcNextNormal(Vector3 *target, Vector3 *lastNormal, Vector3 *lastTangent, Vector3 *currentTangent):
     cdef Vector3 axis
     crossVec3(&axis, lastTangent, currentTangent)
-
-    cdef float angle
-    if lengthVec3(lastTangent) == 0 or lengthVec3(currentTangent) == 0:
-        angle = 0
-    else:
-        angle = angleVec3(lastTangent, currentTangent)
-
+    cdef float angle = angleVec3(lastTangent, currentTangent)
     cdef Vector3 newNormal
     rotateAroundAxisVec3(&newNormal, lastNormal, &axis, angle)
     projectOnCenterPlaneVec3(target, &newNormal, currentTangent)

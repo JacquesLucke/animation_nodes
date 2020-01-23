@@ -121,8 +121,13 @@ cdef float dotVec3(Vector3* a, Vector3* b):
 @cython.cdivision(True)
 cdef float angleVec3(Vector3 *a, Vector3 *b):
     cdef float dot = dotVec3(a, b)
-    cdef float val
-    val = dot / (lengthVec3(a) * lengthVec3(b))
+    cdef float val, lengthVecA, lengthVecB
+    lengthVecA = lengthVec3(a)
+    lengthVecB = lengthVec3(b)
+    if lengthVecA == 0 or lengthVecB == 0:
+        val = 0
+    else:
+        val = dot / (lengthVecA * lengthVecB)
     if val > 1: val = 1
     elif val < -1: val = -1
     return acos(val)
