@@ -3,6 +3,7 @@ import bmesh
 from bpy.props import *
 from ... utils.layout import writeText
 from ... base_types import AnimationNode
+from ... utils.animation import isAnimated
 from ... data_structures import UShortList
 from ... events import propertyChanged, executionCodeChanged
 
@@ -160,5 +161,6 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         mesh.polygons[0].material_index = materialIndices[0]
 
     def ensureThatMeshHasAnimationData(self, mesh):
-        if mesh.animation_data is None:
-            mesh.animation_data_create()
+        if not isAnimated(mesh):
+            mesh['an_helper_property'] = 0
+            mesh.keyframe_insert(data_path = '["an_helper_property"]')
