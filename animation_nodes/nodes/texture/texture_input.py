@@ -43,7 +43,7 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, texture, location):
         if texture is None:
-            return None, None, None, None, None, None
+            return Color((0, 0, 0, 0)), 0, 0, 0, 0
 
         color = Color(texture.evaluate(location))
         return color, color.r, color.g, color.b, color.a
