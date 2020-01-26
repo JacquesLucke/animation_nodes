@@ -32,6 +32,7 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
             return
 
         yield "try:"
+        yield "    evaluatedObject = AN.utils.depsgraph.getEvaluatedID(object)"
         yield "    " + code
         yield "except:"
         yield "    if object: self.setErrorMessage('Attribute not found')"
@@ -39,8 +40,10 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
 
     @property
     def evaluationExpression(self):
-        if self.attribute.startswith("["): return "value = object" + self.attribute
-        else: return "value = object." + self.attribute
+        if self.attribute.startswith("["):
+            return "value = evaluatedObject" + self.attribute
+        else:
+            return "value = evaluatedObject." + self.attribute
 
     def createAutoExecutionTrigger(self):
         item = self.nodeTree.autoExecution.customTriggers.new("MONITOR_PROPERTY")

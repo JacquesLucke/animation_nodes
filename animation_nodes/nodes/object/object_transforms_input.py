@@ -35,10 +35,11 @@ class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
             return
 
         yield "if object is not None:"
-        if "location" in required:   yield "    location = object.location"
-        if "rotation" in required:   yield "    rotation = object.rotation_euler"
-        if "scale" in required:      yield "    scale = object.scale"
-        if "quaternion" in required: yield "    quaternion = object.rotation_quaternion"
+        yield "    evaluatedObject = AN.utils.depsgraph.getEvaluatedID(object)"
+        if "location" in required:   yield "    location = evaluatedObject.location"
+        if "rotation" in required:   yield "    rotation = evaluatedObject.rotation_euler"
+        if "scale" in required:      yield "    scale = evaluatedObject.scale"
+        if "quaternion" in required: yield "    quaternion = evaluatedObject.rotation_quaternion"
         yield "else:"
         yield "    location = Vector((0, 0, 0))"
         yield "    rotation = Euler((0, 0, 0))"

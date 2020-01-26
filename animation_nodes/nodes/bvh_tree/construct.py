@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from mathutils.bvhtree import BVHTree
 from ... base_types import AnimationNode
+from ... utils.depsgraph import getEvaluatedID
 
 sourceTypeItems = [
     ("MESH_DATA", "Mesh", "", "NONE", 0),
@@ -55,9 +56,10 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
         if object.type != "MESH":
             return self.getFallbackBVHTree()
 
-        mesh = object.data
+        evaluatedObject = getEvaluatedID(object)
+        mesh = evaluatedObject.data
         vertices = mesh.an.getVertices()
-        vertices.transform(object.matrix_world)
+        vertices.transform(evaluatedObject.matrix_world)
         polygons = mesh.an.getPolygonIndices()
         return self.execute_Mesh(vertices, polygons, epsilon)
 

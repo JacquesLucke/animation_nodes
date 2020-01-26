@@ -12,8 +12,6 @@ class EventState:
     def reset(self):
         self.treeChanged = False
         self.fileChanged = False
-        self.sceneChanged = False
-        self.frameChanged = False
         self.addonChanged = False
         self.propertyChanged = False
 
@@ -22,36 +20,23 @@ class EventState:
         if self.treeChanged: events.add("Tree")
         if self.fileChanged: events.add("File")
         if self.addonChanged: events.add("Addon")
-        if self.sceneChanged: events.add("Scene")
-        if self.frameChanged: events.add("Frame")
         if self.propertyChanged: events.add("Property")
         return events
 
 event = EventState()
 
-
 @eventHandler("ALWAYS")
-def sceneUpdated():
-    event.sceneChanged = True
-    evaluateRaisedEvents()
-
-@eventHandler("RENDER_PRE")
-def renderFramePre():
-    event.frameChanged = True
-    evaluateRaisedEvents()
-
 def evaluateRaisedEvents():
     event_handler.update(event.getActives())
     event.reset()
 
-
-lastFrame = 0
+evaluatedDepsgraph = None
 @eventHandler("FRAME_CHANGE_POST")
-def frameChanged(scene):
-    global lastFrame
-    if scene.frame_current != lastFrame:
-        lastFrame = scene.frame_current
-        event.frameChanged = True
+def frameChanged(scene, depsgraph):
+    global evaluatedDepsgraph
+    evaluatedDepsgraph = depsgraph
+    event_handler.update({"Frame"})
+    evaluatedDepsgraph = None
 
 def propertyChanged(self = None, context = None):
     event.propertyChanged = True
