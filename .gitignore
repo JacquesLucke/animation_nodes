@@ -18,3 +18,4 @@ venv/
 conf.json
 animation_nodes/compilation_info.json
 setup_summary.json
+tags

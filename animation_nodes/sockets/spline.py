@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. events import propertyChanged
+from .. utils.depsgraph import getEvaluatedID
 from .. data_structures import BezierSpline, PolySpline
 from .. base_types import AnimationNodeSocket, PythonListSocket
 from .. data_structures.splines.from_blender import (createSplinesFromBlenderObject,
@@ -37,10 +38,11 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         bSplines = self.object.data.splines
         if len(bSplines) > 0:
             spline = createSplineFromBlenderSpline(bSplines[0])
-            # is None when the spline type is not supported
+            # Is None when the spline type is not supported.
             if spline is not None:
                 if self.useWorldSpace:
-                    spline.transform(self.object.matrix_world)
+                    evaluatedObject = getEvaluatedID(self.object)
+                    spline.transform(evaluatedObject.matrix_world)
                 return spline
 
         return BezierSpline()
@@ -102,10 +104,12 @@ class SplineListSocket(bpy.types.NodeSocket, PythonListSocket):
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
     def getValue(self):
+        if self.object is None: return []
         splines = createSplinesFromBlenderObject(self.object)
         if self.useWorldSpace:
+            evaluatedObject = getEvaluatedID(self.object)
             for spline in splines:
-                spline.transform(self.object.matrix_world)
+                spline.transform(evaluatedObject.matrix_world)
         return splines
 
     def setProperty(self, data):
