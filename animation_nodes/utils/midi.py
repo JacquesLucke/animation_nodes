@@ -9,11 +9,13 @@ class Tempo_Class:
         timeInTicksCumul = 0
         ticksPrevious = 0
         tempoPrevious = 0
+        tempoCount = 0
         secCumul = 0
         for msg in self.track:
             timeInTicksCumul += msg.time
             if msg.type == 'set_tempo':
                 if msg.tempo != 0:
+                    tempoCount += 1
                     row = []
                     tempo = msg.tempo
                     bpm = int(60000/(tempo/1000))
@@ -31,6 +33,16 @@ class Tempo_Class:
                     self.tempoMap.append(row)
                     ticksPrevious = timeInTicksCumul
                     tempoPrevious = tempo
+        if tempoCount == 0:
+            row = []
+            row.append(0)
+            row.append(500000)
+            row.append(120)
+            row.append(0)
+            row.append(0)
+            row.append(0)
+            row.append(0)
+            self.tempoMap.append(row)
 
     def getRealtime(self, ticksCumul, ppq):
         if ticksCumul == 0:
@@ -70,6 +82,7 @@ def MIDI_ParseFile(filemid):
             if msgType == 'note_on':
                 lastNoteOn[msg.note] = [msg.channel, currentTime, msg.velocity / 127]
             if msgType == 'note_off':
-                track.add_note(msg.channel, msg.note, lastNoteOn[msg.note][1], currentTime, lastNoteOn[msg.note][2])
+                track.addNote(MIDINote(msg.channel, msg.note, lastNoteOn[msg.note][1],
+                    currentTime, lastNoteOn[msg.note][2]))
         tracks.append(track)
     return tracks

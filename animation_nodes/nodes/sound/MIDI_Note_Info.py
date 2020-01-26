@@ -1,5 +1,6 @@
 import bpy
 from ... base_types import AnimationNode, ListTypeSelectorSocket, VectorizedSocket
+from ... data_structures import DoubleList
 
 class MidiNoteNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MidiNoteInfoNode"
@@ -24,9 +25,14 @@ class MidiNoteNode(bpy.types.Node, AnimationNode):
 
     def execute(self, note):
         if self.useNotesList:
-            return [note.channel for note in note], [note.noteNumber for note in note], [note.timeOn for note in note], [note.timeOff for note in note], [note.velocity for note in note]
+            return (DoubleList.fromValues([note.channel for note in note]),
+             DoubleList.fromValues([note.noteNumber for note in note]),
+             DoubleList.fromValues([note.timeOn for note in note]),
+             DoubleList.fromValues([note.timeOff for note in note]),
+             DoubleList.fromValues([note.velocity for note in note]))
         else:
             if note is None:
-                return 0,0,0.0,0.0,0.0
+                return(0,0,0.0,0.0,0.0)
             else:
-                return note.channel, note.noteNumber, note.timeOn, note.timeOff, note.velocity
+                return(note.channel, note.noteNumber, note.timeOn,
+                    note.timeOff, note.velocity)

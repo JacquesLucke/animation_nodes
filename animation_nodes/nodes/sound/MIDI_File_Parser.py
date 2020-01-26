@@ -29,20 +29,23 @@ class MIDIFileParserNode(bpy.types.Node, AnimationNode):
         cache.clear()
 
     def execute(self, path):
+        loadFile = False
+        print(loadFile)
+        print(cache)
+
         if not os.path.exists(path):
             self.raiseErrorMessage("Path does not exist")
-
-        key = path
-        lastModification = os.stat(path).st_mtime
-
-        loadFile = False
-        if key not in cache:
-            loadFile = True
         else:
-            oldLastModification = cache[key][0]
-            if lastModification > oldLastModification:
+            key = path
+            lastModification = os.stat(path).st_mtime
+            if key not in cache:
                 loadFile = True
+            else:
+                oldLastModification = cache[key][0]
+                if lastModification > oldLastModification:
+                    loadFile = True
 
+        print(loadFile)
         if loadFile:
             try:
                 tracks = MIDI_ParseFile(path)

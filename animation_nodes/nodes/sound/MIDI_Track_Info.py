@@ -8,8 +8,12 @@ class MidiTrackNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("MIDITrack", "Track", "track")
+        self.newOutput("Integer", "Index", "index")
+        self.newOutput("Text", "Name", "name")
         self.newOutput("MIDINoteList", "Notes", "notes")
 
     def execute(self, track):
-        if track is None: return None
-        return track.notes
+        if track is None:
+            return 0, "", None
+        else:
+            return track.index, track.name, track.notes
