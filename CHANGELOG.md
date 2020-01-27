@@ -28,6 +28,8 @@
 - Fixed Slice List node for negative start index in Length mode.
 - Fixed duplication of the Curve Interpolation node.
 - Fixed the Ensure Animation Data option in the Mesh Object Output node.
+- Fixed crashes during rendering and exporting.
+- Fixed inconsistency between viewport, renders, and exports.
 
 ### Changed
 

@@ -2,6 +2,7 @@ import bpy
 import bpy_extras
 from bpy.props import *
 from ... base_types import AnimationNode
+from ... utils.depsgraph import getEvaluatedID
 
 class PointInCameraFrustrumNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_PointInCameraFrustrumNode"
@@ -21,8 +22,9 @@ class PointInCameraFrustrumNode(bpy.types.Node, AnimationNode):
     def execute(self, camera, point, threshold, scene):
         if getattr(camera, "type", "") != 'CAMERA':
             return 0, 0, 0, False
-        co = bpy_extras.object_utils.world_to_camera_view(scene, camera, point)
-        clipStart, clipEnd = camera.data.clip_start, camera.data.clip_end
+        evaluatedCamera = getEvaluatedID(camera)
+        co = bpy_extras.object_utils.world_to_camera_view(scene, evaluatedCamera, point)
+        clipStart, clipEnd = evaluatedCamera.data.clip_start, evaluatedCamera.data.clip_end
         threshold = min(0.5, threshold)
         u, v, z = co.xyz
         visible = (0.0 + threshold < u < 1.0 - threshold and

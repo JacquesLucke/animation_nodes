@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
+from ... utils.depsgraph import getEvaluatedID
 from ... data_structures.splines.bezier_spline import BezierSpline
 from ... data_structures.splines.from_blender import (
     createSplinesFromBlenderObject,
@@ -48,7 +49,8 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
             if bSpline.type in ("POLY", "BEZIER"):
                 spline = createSplineFromBlenderSpline(bSpline)
                 if useWorldSpace:
-                    spline.transform(object.matrix_world)
+                    evaluatedObject = getEvaluatedID(object)
+                    spline.transform(evaluatedObject.matrix_world)
                 return spline
             else:
                 self.raiseErrorMessage("Spline type not supported: " + bSpline.type)
@@ -56,8 +58,13 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Index out of range")
 
     def getAllSplines(self, object, useWorldSpace):
+        if object is None: return []
+        if object.type != "CURVE":
+            self.raiseErrorMessage("Not a curve object.")
+
         splines = createSplinesFromBlenderObject(object)
         if useWorldSpace:
+            evaluatedObject = getEvaluatedID(object)
             for spline in splines:
-                spline.transform(object.matrix_world)
+                spline.transform(evaluatedObject.matrix_world)
         return splines

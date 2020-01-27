@@ -41,12 +41,13 @@ class ArmatureInfoNode(bpy.types.Node, AnimationNode):
         loadHeads = "heads" in required or headsAndTailsRequired
         loadTails = "tails" in required or headsAndTailsRequired
 
-        yield "if getattr(armature, 'type', '') == 'ARMATURE':"
+        yield "evaluatedArmature = AN.utils.depsgraph.getEvaluatedID(armature)"
+        yield "if getattr(evaluatedArmature, 'type', '') == 'ARMATURE':"
         if self.state == "REST":
-            yield "    bones = armature.data.bones"
+            yield "    bones = evaluatedArmature.data.bones"
             matrixName = "matrix_local"
         else:
-            yield "    bones = armature.pose.bones"
+            yield "    bones = evaluatedArmature.pose.bones"
             matrixName = "matrix"
 
         if loadMatrices:
@@ -61,7 +62,7 @@ class ArmatureInfoNode(bpy.types.Node, AnimationNode):
             yield "    bones.foreach_get('tail', tails.asMemoryView())"
 
         yield "    if useWorldSpace:"
-        yield "        worldMatrix = armature.matrix_world"
+        yield "        worldMatrix = evaluatedArmature.matrix_world"
         if loadMatrices: yield "        matrices.transform(worldMatrix)"
         if loadHeads:    yield "        heads.transform(worldMatrix)"
         if loadTails:    yield "        tails.transform(worldMatrix)"

@@ -63,21 +63,22 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
     def iterGetMeshDataCodeLines(self, required):
         if "meshName" in required:
             yield "meshName = sourceMesh.name"
-
+        
+        yield "evaluatedObject = AN.utils.depsgraph.getEvaluatedID(object)"
         meshRequired = "mesh" in required
-
+        
         if "vertexLocations" in required or meshRequired:
-            yield "vertexLocations = self.getVertexLocations(sourceMesh, object, useWorldSpace)"
+            yield "vertexLocations = self.getVertexLocations(sourceMesh, evaluatedObject, useWorldSpace)"
         if "edgeIndices" in required or meshRequired:
             yield "edgeIndices = sourceMesh.an.getEdgeIndices()"
         if "polygonIndices" in required or meshRequired:
             yield "polygonIndices = sourceMesh.an.getPolygonIndices()"
         if "vertexNormals" in required or meshRequired:
-            yield "vertexNormals = self.getVertexNormals(sourceMesh, object, useWorldSpace)"
+            yield "vertexNormals = self.getVertexNormals(sourceMesh, evaluatedObject, useWorldSpace)"
         if "polygonNormals" in required or meshRequired:
-            yield "polygonNormals = self.getPolygonNormals(sourceMesh, object, useWorldSpace)"
+            yield "polygonNormals = self.getPolygonNormals(sourceMesh, evaluatedObject, useWorldSpace)"
         if "polygonCenters" in required:
-            yield "polygonCenters = self.getPolygonCenters(sourceMesh, object, useWorldSpace)"
+            yield "polygonCenters = self.getPolygonCenters(sourceMesh, evaluatedObject, useWorldSpace)"
         if "localPolygonAreas" in required:
             yield "localPolygonAreas = DoubleList.fromValues(sourceMesh.an.getPolygonAreas())"
         if "materialIndices" in required:

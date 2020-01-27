@@ -1,5 +1,6 @@
 import bpy
 from .... base_types import AnimationNode
+from .... utils.depsgraph import getEvaluatedID
 
 class MoveObjectNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MoveObjectNode"
@@ -11,4 +12,4 @@ class MoveObjectNode(bpy.types.Node, AnimationNode):
         self.newOutput("Object", "Object", "object")
 
     def getExecutionCode(self, required):
-        return "if object: object.location += translation"
+        return "if object: object.location = AN.utils.depsgraph.getEvaluatedID(object).location + translation"

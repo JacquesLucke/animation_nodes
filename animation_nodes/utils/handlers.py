@@ -66,9 +66,9 @@ def renderPre(scene):
         handler()
 
 @persistent
-def frameChangedPost(scene):
+def frameChangedPost(scene, depsgraph):
     for handler in frameChangePostHandlers:
-        handler(scene)
+        handler(scene, depsgraph)
 
 @persistent
 def renderInitialized(scene):
