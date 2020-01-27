@@ -45,7 +45,7 @@ cdef class BezierSpline(Spline):
     def __repr__(self):
         return textwrap.dedent(
         f"""AN Spline Object:
-        Total Points: {self.points.length}
+        Points: {self.points.length}
         Type: {self.type}
         Cyclic: {self.cyclic}""")
 

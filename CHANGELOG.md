@@ -39,6 +39,7 @@
 - Vectorized Set Vertex Color node and color modes are added.
 - Linux and MacOS are now release builds. They were debug builds.
 - Added Points mode to the Line Mesh node.
+- Added the `__repr__` function for spline.
 
 ## 2.1.5
 
