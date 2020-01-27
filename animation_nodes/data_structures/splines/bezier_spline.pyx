@@ -1,4 +1,5 @@
 cimport cython
+import textwrap
 from libc.string cimport memcpy
 from numpy.polynomial import Polynomial
 from ... utils.lists cimport findListSegment_LowLevel
@@ -40,6 +41,13 @@ cdef class BezierSpline(Spline):
         self.cyclic = cyclic
         self.type = "BEZIER"
         self.markChanged()
+
+    def __repr__(self):
+        return textwrap.dedent(
+        f"""AN Spline Object:
+        Points: {self.points.length}
+        Type: {self.type}
+        Cyclic: {self.cyclic}""")
 
     cpdef void markChanged(self):
         Spline.markChanged(self)
