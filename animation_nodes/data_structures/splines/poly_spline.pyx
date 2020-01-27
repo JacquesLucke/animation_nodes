@@ -1,4 +1,5 @@
 cimport cython
+import textwrap
 from libc.math cimport floor
 from libc.string cimport memcpy
 from . base_spline import calculateNormalsForTangents
@@ -28,6 +29,13 @@ cdef class PolySpline(Spline):
         self.tilts = tilts
         self.cyclic = cyclic
         self.markChanged()
+
+    def __repr__(self):
+        return textwrap.dedent(
+        f"""AN Spline Object:
+        Points: {self.points.length}
+        Type: {self.type}
+        Cyclic: {self.cyclic}""")
 
     cpdef void markChanged(self):
         Spline.markChanged(self)
