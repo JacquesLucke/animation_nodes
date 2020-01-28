@@ -11,4 +11,5 @@ class UpdateObjectMatricesNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         yield "if object:"
-        yield "    object.matrix_world = animation_nodes.utils.math.composeMatrix(object.location, object.rotation_euler, object.scale)"
+        yield "    evaluatedObject = AN.utils.depsgraph.getEvaluatedID(object)"
+        yield "    object.matrix_world = AN.utils.math.composeMatrix(evaluatedObject.location, evaluatedObject.rotation_euler, evaluatedObject.scale)"

@@ -43,9 +43,10 @@ class CopyTransformsNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self, required):
         yield "if fromObject and toObject:"
         if self.useCurrentTransforms:
-            yield "    toObject.location = fromObject.location"
-            yield "    toObject.rotation_euler = fromObject.rotation_euler"
-            yield "    toObject.scale = fromObject.scale"
+            yield "    evaluatedFromObject = AN.utils.depsgraph.getEvaluatedID(fromObject)"
+            yield "    toObject.location = evaluatedFromObject.location"
+            yield "    toObject.rotation_euler = evaluatedFromObject.rotation_euler"
+            yield "    toObject.scale = evaluatedFromObject.scale"
         else:
             if self.frameType == "OFFSET": yield "    evaluationFrame = frame + self.nodeTree.scene.frame_current_final"
             else: yield "    evaluationFrame = frame"

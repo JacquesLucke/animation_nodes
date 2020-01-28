@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
+from ... utils.depsgraph import getEvaluatedID
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import PolySpline, BezierSpline, Vector3DList
 
@@ -45,7 +46,8 @@ class ParticleSystemHairDataNode(bpy.types.Node, AnimationNode):
         if particleSystem.settings.type != "HAIR":
             return []
 
-        worldMatrix = particleSystem.id_data.matrix_world
+        evaluatedObject = getEvaluatedID(particleSystem.id_data)
+        worldMatrix = evaluatedObject.matrix_world
         newSpline = self.getSplineType()
 
         splines = []

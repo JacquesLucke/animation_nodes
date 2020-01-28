@@ -4,9 +4,10 @@ from .. import bl_info
 from bpy.props import * 
 from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
+from .. utils.animation import isAnimationPlaying
+from .. utils.blender_ui import isViewportRendering
 from . tree_auto_execution import AutoExecutionProperties
 from .. events import treeChanged, isRendering, propertyChanged
-from .. utils.blender_ui import iterActiveScreens, isViewportRendering
 from .. preferences import getBlenderVersion, getAnimationNodesVersion
 from .. tree_info import getNetworksByNodeTree, getSubprogramNetworksByNodeTree
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
@@ -54,32 +55,26 @@ class AnimationNodeTree(bpy.types.NodeTree):
         treeChanged()
 
     def canAutoExecute(self, events):
-        def isAnimationPlaying():
-            return any([screen.is_animation_playing for screen in iterActiveScreens()])
-
         a = self.autoExecution
 
-        # always update the triggers for better visual feedback
+        # Always update the triggers for better visual feedback.
         customTriggerHasBeenActivated = a.customTriggers.update()
 
         if not a.enabled: return False
         if not self.hasMainExecutionUnits: return False
 
-        if isRendering():
-            if events.intersection({"Scene", "Frame"}) and (a.sceneUpdate or a.frameChanged):
-                return True
-        else:
+        if "Frame" in events and (a.sceneUpdate or a.frameChanged): return True
+        # TODO: We should also check if we are not exporting.
+        if not isRendering():
             if self.timeSinceLastAutoExecution < a.minTimeDifference: return False
 
-            if isAnimationPlaying():
-                if (a.sceneUpdate or a.frameChanged) and "Frame" in events: return True
-            elif not isViewportRendering():
-                if "Scene" in events and a.sceneUpdate: return True
-            if "Frame" in events and a.frameChanged: return True
             if "Property" in events and a.propertyChanged: return True
             if "Tree" in events and a.treeChanged: return True
-            if events.intersection({"File", "Addon"}) and \
-                (a.sceneUpdate or a.frameChanged or a.propertyChanged or a.treeChanged): return True
+            if events.intersection({"File", "Addon"}) and any(
+                (a.sceneUpdate, a.frameChanged, a.propertyChanged, a.treeChanged)): return True
+
+            if not isViewportRendering() or isAnimationPlaying():
+                if a.sceneUpdate: return True
 
         return customTriggerHasBeenActivated
 
