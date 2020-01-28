@@ -444,6 +444,7 @@ class MeshOperatorsMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_FindClosePointsNode", "Find Close Points")
+        insertNode(layout, "an_FindShortestPathNode", "Find Shortest Path")
         insertNode(layout, "an_EdgeToTubeNode", "Edge to Tube")
         layout.separator()
         insertNode(layout, "an_CreateEdgesNode", "Create Edges")
