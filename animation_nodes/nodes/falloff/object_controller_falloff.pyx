@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
+from ... utils.depsgraph import getEvaluatedID
 from ... algorithms.rotations import eulerToDirection
 from ... base_types import AnimationNode, VectorizedSocket
 
@@ -91,8 +92,9 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
     def getSphereFalloff(self, object, offset, falloffWidth):
         if object is None:
             return ConstantFalloff(0)
-
-        matrix = object.matrix_world
+        
+        evaluatedObject = getEvaluatedID(object)
+        matrix = evaluatedObject.matrix_world
         center = matrix.to_translation()
         size = abs(matrix.to_scale().x) + offset
         return PointDistanceFalloff(center, size-1, falloffWidth)
@@ -115,7 +117,8 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
         if object is None:
             return ConstantFalloff(0)
 
-        matrix = object.matrix_world
+        evaluatedObject = getEvaluatedID(object)
+        matrix = evaluatedObject.matrix_world
         location = matrix.to_translation()
         size = max(matrix.to_scale().x, 0.0001)
         direction = eulerToDirection(matrix.to_euler(), self.axisDirection)

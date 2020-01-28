@@ -1,3 +1,8 @@
+from . blender_ui import iterActiveScreens
+
+def isAnimationPlaying():
+    return any([screen.is_animation_playing for screen in iterActiveScreens()])
+
 def isAnimated(idObject):
     if not idObject:
         return False
