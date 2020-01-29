@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import Stroke
+from ... data_structures import GPStroke
 from ... base_types import AnimationNode, VectorizedSocket
 
 strokeTypeItems = [
@@ -20,15 +20,15 @@ class GPencilFrameInputNode(bpy.types.Node, AnimationNode):
     useIntegerList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Frame", "Frame", "frame", dataIsModified = True)
+        self.newInput("GPFrame", "Frame", "frame", dataIsModified = True)
 
         if self.strokeType == "ALL":
-            self.newOutput("Stroke List", "Strokes", "strokes")
+            self.newOutput("GPStroke List", "Strokes", "strokes")
         elif self.strokeType == "INDEX":
             self.newInput(VectorizedSocket("Integer", "useIntegerList",
             ("Stroke Index", "strokeIndex"), ("Stroke Indices", "strokeIndices")))
 
-            self.newOutput(VectorizedSocket("Stroke", "useIntegerList",
+            self.newOutput(VectorizedSocket("GPStroke", "useIntegerList",
             ("Stroke", "stroke"), ("Strokes", "strokes")))
         self.newOutput("Float", "Frame Number", "frameNumber")
 
@@ -50,7 +50,7 @@ class GPencilFrameInputNode(bpy.types.Node, AnimationNode):
     def execute_StrokeIndex(self, frame, strokeIndex):
         strokes = frame.strokes
         if len(frame.strokes) == 0:
-            return Stroke(), frame.frameNumber
+            return GPStroke(), frame.frameNumber
         return self.getStroke(strokes, strokeIndex), frame.frameNumber
 
     def execute_StrokeIndices(self, frame, strokeIndices):

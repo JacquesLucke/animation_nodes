@@ -7,7 +7,7 @@ class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
     bl_label = "GPencil Stroke Input"
 
     def create(self):
-        self.newInput("Stroke", "Stroke", "stroke")
+        self.newInput("GPStroke", "Stroke", "stroke")
 
         self.newOutput("Vector List", "Points", "vertices")
         self.newOutput("Float List", "Strengths", "strengths")

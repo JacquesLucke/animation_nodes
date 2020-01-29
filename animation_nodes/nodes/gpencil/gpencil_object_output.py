@@ -13,7 +13,7 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
         socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.objectCreationType = "GPENCIL"
-        self.newInput(VectorizedSocket("Layer", "useLayerList",
+        self.newInput(VectorizedSocket("GPLayer", "useLayerList",
             ("Layer", "layer"), ("Layers", "layers")))
         self.newOutput("Object", "Object", "object")
 

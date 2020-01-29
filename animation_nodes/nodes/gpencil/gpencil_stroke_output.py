@@ -1,6 +1,6 @@
 import bpy
-from ... data_structures import Stroke, VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import GPStroke, VirtualDoubleList
 
 class GPencilStrokeOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPencilStrokeOutputNode"
@@ -23,7 +23,7 @@ class GPencilStrokeOutputNode(bpy.types.Node, AnimationNode):
         self.newInput("Boolean", "Start Cap", "startCapMode", value = False)
         self.newInput("Boolean", "End Cap", "endCapMode", value = False)
         self.newInput("Integer", "Material Index", "materialIndex", value = 0)
-        self.newOutput("Stroke", "Stroke", "stroke")
+        self.newOutput("GPStroke", "Stroke", "stroke")
 
         visibleInputs = ("Points", "Strength", "Strengths", "Pressure", "Pressures", "Line Width", "Material Index")
         for socket in self.inputs:
@@ -31,7 +31,7 @@ class GPencilStrokeOutputNode(bpy.types.Node, AnimationNode):
 
     def execute(self, vertices, strengths, pressures, uvRotations, lineWidth, drawCyclic, startCapMode, endCapMode, materialIndex):
         amount = len(vertices)
-        stroke = Stroke()
+        stroke = GPStroke()
 
         strengths = VirtualDoubleList.create(strengths, 1).materialize(amount)
         pressures = VirtualDoubleList.create(pressures, 1).materialize(amount)

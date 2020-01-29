@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import Frame, LongList
+from ... data_structures import GPFrame, LongList
 from ... base_types import AnimationNode, VectorizedSocket
 
 frameTypeItems = [
@@ -22,19 +22,19 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
     useFrameList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Layer", "GPencil Layer", "layer", dataIsModified = True)
+        self.newInput("GPLayer", "GPencil Layer", "layer", dataIsModified = True)
 
         if self.frameType == "ACTIVE":
             self.newInput("Scene", "Scene", "scene", hide = True)
 
-            self.newOutput("Frame", "Frame", "frame")
+            self.newOutput("GPFrame", "Frame", "frame")
             self.newOutput("Integer", "Frame Index", "frameIndex")
             self.newOutput("Float", "Frame Number", "frameNumber")
         elif self.frameType == "INDEX":
             self.newInput(VectorizedSocket("Integer", "useFrameList",
             ("Frame Index", "frameIndex"), ("Frame Indices", "frameIndices")))
 
-            self.newOutput(VectorizedSocket("Frame", "useFrameList",
+            self.newOutput(VectorizedSocket("GPFrame", "useFrameList",
             ("Frame", "frame"), ("Frames", "frames")))
             self.newOutput(VectorizedSocket("Float", "useFrameList",
             ("Frame Number", "frameNumber"), ("Frame Numbers", "outframeNumbers")))
@@ -42,12 +42,12 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
             self.newInput(VectorizedSocket("Float", "useFrameList",
             ("Frame Number", "frameNumber"), ("Frame Numbers", "inframeNumbers")))
 
-            self.newOutput(VectorizedSocket("Frame", "useFrameList",
+            self.newOutput(VectorizedSocket("GPFrame", "useFrameList",
             ("Frame", "frame"), ("Frames", "frames")))
             self.newOutput(VectorizedSocket("Integer", "useFrameList",
             ("Frame Index", "frameIndex"), ("Frame Indices", "outframeIndices")))
         elif self.frameType == "ALL":
-            self.newOutput("Frame List", "Frames", "frames")
+            self.newOutput("GPFrame List", "Frames", "frames")
             self.newOutput("Float List", "Frame Numbers", "outframeNumbers")
         self.newOutput("Text", "Layer Name", "layerName", hide = True)
         self.newOutput("Text", "Layer Blend Mode", "blendMode", hide = True)
@@ -76,7 +76,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
     def execute_ActiveFrame(self, layer, scene):
         frames = layer.frames
         if len(layer.frames) == 0:
-            return Frame(), 0, 0, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+            return GPFrame(), 0, 0, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
         frameNumbers = layer.frameNumbers
         activeIndex = self.getActiveFrameIndex(scene.frame_current, frameNumbers)
         return frames[activeIndex], activeIndex, frameNumbers[activeIndex], layer.layerName,\
@@ -85,7 +85,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
     def execute_FrameIndex(self, layer, frameIndex):
         frames = layer.frames
         if len(layer.frames) == 0:
-            return Frame(), 0, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+            return GPFrame(), 0, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
         frame = self.getFrame(frames, frameIndex)
         frameNumbers = layer.frameNumbers
         return frame, frameNumbers[frameIndex], layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
@@ -105,7 +105,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
     def execute_FrameNumber(self, layer, frameNumber):
         frames = layer.frames
         if len(layer.frames) == 0:
-            return Frame(), 0, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+            return GPFrame(), 0, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
         frameNumbers = layer.frameNumbers
         index = self.getFrameNumberIndex(frameNumbers, frameNumber)
         return frames[index], index, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex

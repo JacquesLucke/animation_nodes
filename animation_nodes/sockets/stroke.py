@@ -1,18 +1,18 @@
 import bpy
-from .. data_structures import Stroke
+from .. data_structures import GPStroke
 from .. base_types import AnimationNodeSocket, PythonListSocket
 
-class StrokeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
-    bl_idname = "an_StrokeSocket"
-    bl_label = "Stroke Socket"
-    dataType = "Stroke"
+class GPStrokeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
+    bl_idname = "an_GPStrokeSocket"
+    bl_label = "GPStroke Socket"
+    dataType = "GPStroke"
     drawColor = (0.85, 0.35, 0.0, 1)
     storable = True
     comparable = False
 
     @classmethod
     def getDefaultValue(cls):
-        return Stroke()
+        return GPStroke()
 
     @classmethod
     def getCopyExpression(cls):
@@ -20,16 +20,16 @@ class StrokeSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        if isinstance(value, Stroke):
+        if isinstance(value, GPStroke):
             return value, 0
         return cls.getDefaultValue(), 2
 
 
-class StrokeListSocket(bpy.types.NodeSocket, PythonListSocket):
-    bl_idname = "an_StrokeListSocket"
-    bl_label = "Stroke List Socket"
-    dataType = "Stroke List"
-    baseType = StrokeSocket
+class GPStrokeListSocket(bpy.types.NodeSocket, PythonListSocket):
+    bl_idname = "an_GPStrokeListSocket"
+    bl_label = "GPStroke List Socket"
+    dataType = "GPStroke List"
+    baseType = GPStrokeSocket
     drawColor = (0.85, 0.35, 0.0, 0.5)
     storable = True
     comparable = False
@@ -41,6 +41,6 @@ class StrokeListSocket(bpy.types.NodeSocket, PythonListSocket):
     @classmethod
     def correctValue(cls, value):
         if isinstance(value, list):
-            if all(isinstance(element, Stroke) for element in value):
+            if all(isinstance(element, GPStroke) for element in value):
                 return value, 0
         return cls.getDefaultValue(), 2

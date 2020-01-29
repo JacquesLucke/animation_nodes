@@ -1,8 +1,8 @@
 import bpy
 import numpy as np
 from bpy.props import *
-from ... data_structures import Frame
 from ... events import propertyChanged
+from ... data_structures import GPFrame
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPencilFrameOutputNode(bpy.types.Node, AnimationNode):
@@ -14,11 +14,11 @@ class GPencilFrameOutputNode(bpy.types.Node, AnimationNode):
     useNumberList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("Stroke", "useStrokeList",
+        self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Float", "useNumberList",
             ("Frame Number", "frameNumber"), ("Frame Numbers", "frameNumbers")), dataIsModified = True)
-        self.newOutput(VectorizedSocket("Frame", "useNumberList",
+        self.newOutput(VectorizedSocket("GPFrame", "useNumberList",
             ("Frame", "frame"), ("Frames", "frames")))
 
     def getExecutionFunctionName(self):
@@ -31,7 +31,7 @@ class GPencilFrameOutputNode(bpy.types.Node, AnimationNode):
         if not self.useStrokeList:
             strokes = [strokes]
 
-        return Frame(strokes, 0, frameNumber)
+        return GPFrame(strokes, 0, frameNumber)
 
     def execute_StrokesFrameNumbers(self, strokes, frameNumbers):
         frames = []
@@ -45,5 +45,5 @@ class GPencilFrameOutputNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Some Frame Numbers are repeated.")
 
         for i, stroke in enumerate(strokes):
-            frames.append(Frame([stroke], i, frameNumbers[i]))
+            frames.append(GPFrame([stroke], i, frameNumbers[i]))
         return frames

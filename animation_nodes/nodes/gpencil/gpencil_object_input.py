@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import Layer, Frame, Stroke, DoubleList, Vector3DList
+from ... data_structures import GPLayer, GPFrame, GPStroke, DoubleList, Vector3DList
 
 layerTypeItems = [
     ("ALL", "All", "Get all grease pencil layers", "NONE", 0),
@@ -23,9 +23,9 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
 
         if self.layerType == "SINGLE":
             self.newInput("Text", "Layer Name", "layerName")
-            self.newOutput("Layer", "GPencil Layer", "gpencilLayer")
+            self.newOutput("GPLayer", "GPencil Layer", "gpencilLayer")
         elif self.layerType == "ALL":
-            self.newOutput("Layer List", "GPencil Layers", "gpencilLayers")
+            self.newOutput("GPLayer List", "GPencil Layers", "gpencilLayers")
 
     def draw(self, layout):
         layout.prop(self, "layerType", text = "")
@@ -38,7 +38,7 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
 
     def executeSingle(self, object, useWorldSpace, layerName):
         if object is None:
-            return Layer()
+            return GPLayer()
 
         if useWorldSpace:
             worldMatrix = object.matrix_world
@@ -47,7 +47,7 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
 
         layer = self.getLayer(object, layerName)
         frames, frameNumbers = self.getFrames(layer, worldMatrix)
-        return Layer(layer.info, frames, frameNumbers, layer.blend_mode, layer.opacity, layer.pass_index)
+        return GPLayer(layer.info, frames, frameNumbers, layer.blend_mode, layer.opacity, layer.pass_index)
 
     def executeList(self, object, useWorldSpace):
         if object is None:
@@ -61,7 +61,7 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
         gpencilLayers = []
         for layer in self.getLayers(object):
             frames, frameNumbers = self.getFrames(layer, worldMatrix)
-            gpencilLayers.append(Layer(layer.info, frames, frameNumbers, layer.blend_mode, layer.opacity, layer.pass_index))
+            gpencilLayers.append(GPLayer(layer.info, frames, frameNumbers, layer.blend_mode, layer.opacity, layer.pass_index))
         return gpencilLayers
 
     def getLayer(self, object, layerName):
@@ -82,7 +82,7 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
         for i, frame in enumerate(layerFrames):
             frameNumber = frame.frame_number
             frameNumbers[i] = frameNumber
-            frames.append(Frame(self.getStrokes(frame.strokes, matrixWorld), i, frameNumber))
+            frames.append(GPFrame(self.getStrokes(frame.strokes, matrixWorld), i, frameNumber))
         return frames, frameNumbers
 
     def getStrokes(self, strokes, matrixWorld):
@@ -107,5 +107,5 @@ class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
         strokePoints.foreach_get("pressure", pressures.asNumpyArray())
         strokePoints.foreach_get("uv_rotation", uvRotations.asNumpyArray())
 
-        return Stroke(vertices, strengths, pressures, uvRotations, stroke.line_width, stroke.draw_cyclic,
+        return GPStroke(vertices, strengths, pressures, uvRotations, stroke.line_width, stroke.draw_cyclic,
         stroke.start_cap_mode, stroke.end_cap_mode, stroke.material_index, stroke.display_mode)
