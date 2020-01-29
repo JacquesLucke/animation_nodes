@@ -31,6 +31,7 @@ def drawMenu(self, context):
     layout.menu("AN_MT_object_menu", text = "Object", icon = "OBJECT_DATAMODE")
     layout.menu("AN_MT_mesh_menu", text = "Mesh", icon = "MESH_DATA")
     layout.menu("AN_MT_spline_menu", text = "Spline", icon = "CURVE_DATA")
+    layout.menu("AN_MT_gpencil_menu", text = "Grease Pencil", icon = "OUTLINER_OB_GREASEPENCIL")
     layout.menu("AN_MT_particle_system_menu", text = "Particle System", icon = "PARTICLE_DATA")
     layout.separator()
     layout.menu("AN_MT_animation_menu", text = "Animation", icon = "RENDER_ANIMATION")
@@ -492,6 +493,22 @@ class SplineMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_LoftSplinesNode", "Loft")
         insertNode(layout, "an_RevolveSplineNode", "Revolve")
+
+class GPencilMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_gpencil_menu"
+    bl_label = "GPencil Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        insertNode(layout, "an_GPencilObjectInputNode", "Object Input")
+        insertNode(layout, "an_GPencilLayerInputNode", "Layer Input")
+        insertNode(layout, "an_GPencilFrameInputNode", "Frame Input")
+        insertNode(layout, "an_GPencilStrokeInputNode", "Stroke Input")
+        layout.separator()
+        insertNode(layout, "an_GPencilStrokeOutputNode", "Stroke Output")
+        insertNode(layout, "an_GPencilFrameOutputNode", "Frame Output")
+        insertNode(layout, "an_GPencilLayerOutputNode", "Layer Output")
+        insertNode(layout, "an_GPencilObjectOutputNode", "Object Output")
 
 class ActionMenu(bpy.types.Menu):
     bl_idname = "AN_MT_action_menu"
