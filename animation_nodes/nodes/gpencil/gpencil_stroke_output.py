@@ -38,21 +38,21 @@ class GPencilStrokeOutputNode(bpy.types.Node, AnimationNode):
         uvRotations = VirtualDoubleList.create(uvRotations, 0).materialize(amount)
 
         stroke.vertices = vertices
-        stroke.strength = strengths
-        stroke.pressure = pressures
-        stroke.uv_rotation = uvRotations
-        stroke.line_width = lineWidth
-        stroke.draw_cyclic = drawCyclic
+        stroke.strengths = strengths
+        stroke.pressures = pressures
+        stroke.uvRotations = uvRotations
+        stroke.lineWidth = lineWidth
+        stroke.drawCyclic = drawCyclic
 
         if startCapMode:
-            stroke.start_cap_mode = "FLAT"
+            stroke.startCapMode = "FLAT"
         else:
-            stroke.start_cap_mode = "ROUND"
+            stroke.startCapMode = "ROUND"
 
         if endCapMode:
-            stroke.end_cap_mode = "FLAT"
+            stroke.endCapMode = "FLAT"
         else:
-            stroke.end_cap_mode = "ROUND"
+            stroke.endCapMode = "ROUND"
 
-        stroke.material_index = materialIndex
+        stroke.materialIndex = materialIndex
         return stroke

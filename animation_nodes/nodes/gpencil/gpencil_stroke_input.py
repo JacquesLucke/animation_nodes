@@ -27,14 +27,14 @@ class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
         if stroke is None:
             return Vector3DList(), DoubleList(), DoubleList(), DoubleList(), 0, False, False, False, 0
 
-        if stroke.start_cap_mode == "ROUND":
+        if stroke.startCapMode == "ROUND":
             startCapMode = False
         else:
             startCapMode = True
 
-        if stroke.end_cap_mode == "ROUND":
+        if stroke.endCapMode == "ROUND":
             endCapMode = False
         else:
             endCapMode = True
-        return stroke.vertices, stroke.strength, stroke.pressure, stroke.uv_rotation,\
-        stroke.line_width, stroke.draw_cyclic, startCapMode, endCapMode, stroke.material_index
+        return stroke.vertices, stroke.strengths, stroke.pressures, stroke.uvRotations,\
+        stroke.lineWidth, stroke.drawCyclic, startCapMode, endCapMode, stroke.materialIndex

@@ -3,40 +3,42 @@ import textwrap
 from .. lists.base_lists cimport DoubleList, Vector3DList
 
 class GPStroke:
-    def __init__(self, vertices = None, strength = None, pressure = None,
-        uv_rotation = None, line_width = None, draw_cyclic = None, start_cap_mode = None,
-        end_cap_mode = None, material_index = None, display_mode = None):
+    def __init__(self, vertices = None, strengths = None, pressures = None,
+                 uvRotations = None, lineWidth = None, drawCyclic = None,
+                 startCapMode = None, endCapMode = None, materialIndex = None,
+                 displayMode = None):
 
         if vertices is None: vertices = Vector3DList()
-        if strength is None: strength = DoubleList()
-        if pressure is None: pressure = DoubleList()
-        if uv_rotation is None: uv_rotation = DoubleList()
-        if line_width is None: line_width = 250
-        if draw_cyclic is None: draw_cyclic = False
-        if start_cap_mode is None: start_cap_mode = "ROUND"
-        if end_cap_mode is None: end_cap_mode = "ROUND"
-        if material_index is None: material_index = 0
-        if display_mode is None: display_mode = "SCREEN"
+        if strengths is None: strengths = DoubleList()
+        if pressures is None: pressures = DoubleList()
+        if uvRotations is None: uvRotations = DoubleList()
+        if lineWidth is None: lineWidth = 250
+        if drawCyclic is None: drawCyclic = False
+        if startCapMode is None: startCapMode = "ROUND"
+        if endCapMode is None: endCapMode = "ROUND"
+        if materialIndex is None: materialIndex = 0
+        if displayMode is None: displayMode = "SCREEN"
 
         self.vertices = vertices
-        self.strength = strength
-        self.pressure = pressure
-        self.uv_rotation = uv_rotation
-        self.line_width = line_width
-        self.draw_cyclic = draw_cyclic
-        self.start_cap_mode = start_cap_mode
-        self.end_cap_mode = end_cap_mode
-        self.material_index = material_index
-        self.display_mode = display_mode
+        self.strengths = strengths
+        self.pressures = pressures
+        self.uvRotations = uvRotations
+        self.lineWidth = lineWidth
+        self.drawCyclic = drawCyclic
+        self.startCapMode = startCapMode
+        self.endCapMode = endCapMode
+        self.materialIndex = materialIndex
+        self.displayMode = displayMode
 
     def __repr__(self):
         return textwrap.dedent(
             f"""AN Stroke Object:
             Points: {len(self.vertices)}
-            Material Index: {self.material_index}
-            Display Mode: {self.display_mode}""")
+            Material Index: {self.materialIndex}
+            Display Mode: {self.displayMode}""")
 
     def copy(self):
-        return GPStroke(self.vertices, self.strength, self.pressure, self.uv_rotation,
-        self.line_width, self.draw_cyclic, self.start_cap_mode, self.end_cap_mode,
-        self.material_index, self.display_mode)
+        return GPStroke(self.vertices.copy(), self.strengths.copy(), self.pressures.copy(),
+                        self.uvRotations.copy(), self.lineWidth, self.drawCyclic,
+                        self.startCapMode, self.endCapMode, self.materialIndex,
+                        self.displayMode)

@@ -35,4 +35,5 @@ class GPLayer:
         Pass Index: {self.passIndex}""")
 
     def copy(self):
-        return GPLayer(self.layerName, self.frames, self.frameNumbers, self.blendMode, self.opacity, self.passIndex)
+        return GPLayer(self.layerName, self.frames.copy(), self.frameNumbers.copy(),
+                       self.blendMode, self.opacity, self.passIndex)

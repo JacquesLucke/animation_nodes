@@ -43,9 +43,9 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
                 vertices = stroke.vertices
                 gpPoints.add(len(vertices), strength = 0.75, pressure = 1)
                 gpPoints.foreach_set("co", vertices.asNumpyArray())
-                gpPoints.foreach_set("strength", stroke.strength)
-                gpPoints.foreach_set("pressure", stroke.pressure)
-                gpPoints.foreach_set("uv_rotation", stroke.uv_rotation)
+                gpPoints.foreach_set("strength", stroke.strengths)
+                gpPoints.foreach_set("pressure", stroke.pressures)
+                gpPoints.foreach_set("uv_rotation", stroke.uvRotations)
             gpFrame.strokes.update()
         gpencil.layers.active.frames.update()
         return object
@@ -72,9 +72,9 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
                     vertices = stroke.vertices
                     gpPoints.add(len(vertices), strength = 0.75, pressure = 1)
                     gpPoints.foreach_set("co", vertices.asNumpyArray())
-                    gpPoints.foreach_set("strength", stroke.strength)
-                    gpPoints.foreach_set("pressure", stroke.pressure)
-                    gpPoints.foreach_set("uv_rotation", stroke.uv_rotation)
+                    gpPoints.foreach_set("strength", stroke.strengths)
+                    gpPoints.foreach_set("pressure", stroke.pressures)
+                    gpPoints.foreach_set("uv_rotation", stroke.uvRotations)
                 gpFrame.strokes.update()
         gpencil.layers.active.frames.update()
         return object
@@ -98,21 +98,12 @@ class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
         return frameNumbers.index(frameNumber)
 
     def setStrokeProperties(self, gpencilStroke, stroke):
-        gpencilStroke.line_width = stroke.line_width
-        gpencilStroke.material_index = stroke.material_index
-        gpencilStroke.display_mode = stroke.display_mode
-        if stroke.draw_cyclic: gpencilStroke.draw_cyclic = True
-        else: gpencilStroke.draw_cyclic = False
-
-        if stroke.start_cap_mode == "FLAT":
-            gpencilStroke.start_cap_mode = "FLAT"
-        else:
-            gpencilStroke.start_cap_mode = "ROUND"
-
-        if stroke.end_cap_mode == "FLAT":
-            gpencilStroke.end_cap_mode = "FLAT"
-        else:
-            gpencilStroke.end_cap_mode = "ROUND"
+        gpencilStroke.line_width = stroke.lineWidth
+        gpencilStroke.material_index = stroke.materialIndex
+        gpencilStroke.display_mode = stroke.displayMode
+        gpencilStroke.draw_cyclic = stroke.drawCyclic
+        gpencilStroke.start_cap_mode = stroke.startCapMode
+        gpencilStroke.end_cap_mode = stroke.endCapMode
         return gpencilStroke
 
     def getObjectData(self, object):
