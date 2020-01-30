@@ -22,7 +22,7 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
     useFrameList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("GPLayer", "GP Layer", "layer", dataIsModified = True)
+        self.newInput("GPLayer", "Layer", "layer", dataIsModified = True)
 
         if self.frameType == "ACTIVE":
             self.newInput("Scene", "Scene", "scene", hide = True)

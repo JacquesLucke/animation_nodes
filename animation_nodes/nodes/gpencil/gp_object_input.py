@@ -23,9 +23,9 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
 
         if self.layerType == "SINGLE":
             self.newInput("Text", "Layer Name", "layerName")
-            self.newOutput("GPLayer", "GPencil Layer", "gpencilLayer")
+            self.newOutput("GPLayer", "Layer", "layer")
         elif self.layerType == "ALL":
-            self.newOutput("GPLayer List", "GPencil Layers", "gpencilLayers")
+            self.newOutput("GPLayer List", "Layers", "layers")
 
     def draw(self, layout):
         layout.prop(self, "layerType", text = "")

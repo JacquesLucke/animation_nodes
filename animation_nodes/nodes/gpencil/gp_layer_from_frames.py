@@ -20,7 +20,7 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Blend Mode", "blendMode", value = 'REGULAR', hide = True)
         self.newInput("Float", "Opacity", "opacity", value = 1, hide = True)
         self.newInput("Integer", "Pass Index", "passIndex", value = 0, hide = True)
-        self.newOutput("GPLayer", "GPencil Layer", "gpencilLayer")
+        self.newOutput("GPLayer", "Layer", "layer")
 
     def execute(self, frames, layerName, blendMode, opacity, passIndex):
         if not self.useFrameList:
