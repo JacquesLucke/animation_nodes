@@ -500,15 +500,15 @@ class GPencilMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_GPencilObjectInputNode", "Object Input")
-        insertNode(layout, "an_GPencilLayerInputNode", "Layer Input")
-        insertNode(layout, "an_GPencilFrameInputNode", "Frame Input")
-        insertNode(layout, "an_GPencilStrokeInputNode", "Stroke Input")
+        insertNode(layout, "an_GPObjectInputNode", "Object Input")
+        insertNode(layout, "an_GPLayerInfoNode", "Layer Info")
+        insertNode(layout, "an_GPFrameInfoNode", "Frame Info")
+        insertNode(layout, "an_GPStrokeInfoNode", "Stroke Info")
         layout.separator()
-        insertNode(layout, "an_GPencilStrokeOutputNode", "Stroke Output")
-        insertNode(layout, "an_GPencilFrameOutputNode", "Frame Output")
-        insertNode(layout, "an_GPencilLayerOutputNode", "Layer Output")
-        insertNode(layout, "an_GPencilObjectOutputNode", "Object Output")
+        insertNode(layout, "an_GPStrokeFromPointsNode", "Stroke From Points")
+        insertNode(layout, "an_GPFrameFromStrokesNode", "Frame From Strokes")
+        insertNode(layout, "an_GPLayerFromFramesNode", "Layer From Frames")
+        insertNode(layout, "an_GPObjectOutputNode", "Object Output")
 
 class ActionMenu(bpy.types.Menu):
     bl_idname = "AN_MT_action_menu"

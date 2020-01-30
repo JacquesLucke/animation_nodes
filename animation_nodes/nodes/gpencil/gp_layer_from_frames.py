@@ -5,9 +5,9 @@ from ... events import propertyChanged
 from ... data_structures import GPLayer, LongList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPencilLayerOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilLayerOutputNode"
-    bl_label = "GPencil Layer Output"
+class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPLayerFromFramesNode"
+    bl_label = "GP Layer From Frames"
     errorHandlingType = "EXCEPTION"
 
     useFrameList: VectorizedSocket.newProperty()

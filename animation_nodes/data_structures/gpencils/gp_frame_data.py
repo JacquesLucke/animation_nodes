@@ -20,4 +20,4 @@ class GPFrame:
         Frame Number: {self.frameNumber}""")
 
     def copy(self):
-        return GPFrame(self.strokes.copy(), self.frameIndex, self.frameNumber)
+        return GPFrame([stroke.copy() for stroke in self.strokes], self.frameIndex, self.frameNumber)

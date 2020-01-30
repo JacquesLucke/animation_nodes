@@ -5,9 +5,9 @@ from ... events import propertyChanged
 from ... data_structures import GPFrame
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPencilFrameOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilFrameOutputNode"
-    bl_label = "GPencil Frame Output"
+class GPFrameFromStrokesNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPFrameFromStrokesNode"
+    bl_label = "GP Frame From Strokes"
     errorHandlingType = "EXCEPTION"
 
     useStrokeList: VectorizedSocket.newProperty()

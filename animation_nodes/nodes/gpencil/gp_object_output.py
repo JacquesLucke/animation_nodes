@@ -2,9 +2,9 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPencilObjectOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilObjectOutputNode"
-    bl_label = "GPencil Object Output"
+class GPObjectOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPObjectOutputNode"
+    bl_label = "GP Object Output"
     errorHandlingType = "EXCEPTION"
 
     useLayerList: VectorizedSocket.newProperty()

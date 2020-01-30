@@ -9,9 +9,9 @@ layerTypeItems = [
     ("SINGLE", "Single", "Get a specific grease pencil layer", "NONE", 1)
 ]
 
-class GPencilObjectInputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilObjectInputNode"
-    bl_label = "GPencil Object Input"
+class GPObjectInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPObjectInputNode"
+    bl_label = "GP Object Input"
     errorHandlingType = "EXCEPTION"
 
     layerType: EnumProperty(name = "Layer Type", default = "SINGLE",

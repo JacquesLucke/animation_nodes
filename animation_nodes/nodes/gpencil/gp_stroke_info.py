@@ -2,9 +2,9 @@ import bpy
 from ... data_structures import DoubleList, Vector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPencilStrokeInputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilStrokeInputNode"
-    bl_label = "GPencil Stroke Input"
+class GPStrokeInfoNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPStrokeInfoNode"
+    bl_label = "GP Stroke Info"
 
     def create(self):
         self.newInput("GPStroke", "Stroke", "stroke")

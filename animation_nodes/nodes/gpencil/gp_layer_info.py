@@ -11,9 +11,9 @@ frameTypeItems = [
     ("ALL", "All Frames", "Get all frames", "NONE", 3)
 ]
 
-class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilLayerInputNode"
-    bl_label = "GPencil Layer Input"
+class GPLayerInfoNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPLayerInfoNode"
+    bl_label = "GP Layer Info"
     errorHandlingType = "EXCEPTION"
 
     frameType: EnumProperty(name = "Frame Type", default = "ACTIVE",
@@ -22,7 +22,7 @@ class GPencilLayerInputNode(bpy.types.Node, AnimationNode):
     useFrameList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("GPLayer", "GPencil Layer", "layer", dataIsModified = True)
+        self.newInput("GPLayer", "GP Layer", "layer", dataIsModified = True)
 
         if self.frameType == "ACTIVE":
             self.newInput("Scene", "Scene", "scene", hide = True)

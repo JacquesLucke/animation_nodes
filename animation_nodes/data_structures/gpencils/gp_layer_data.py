@@ -1,6 +1,6 @@
 # cython: profile=True
 import textwrap
-from .. lists.base_lists cimport DoubleList
+from .. lists.base_lists import DoubleList
 
 class GPLayer:
     def __init__(self, layerName = None,
@@ -35,5 +35,5 @@ class GPLayer:
         Pass Index: {self.passIndex}""")
 
     def copy(self):
-        return GPLayer(self.layerName, self.frames.copy(), self.frameNumbers.copy(),
+        return GPLayer(self.layerName, [frame.copy() for frame in self.frames], self.frameNumbers.copy(),
                        self.blendMode, self.opacity, self.passIndex)

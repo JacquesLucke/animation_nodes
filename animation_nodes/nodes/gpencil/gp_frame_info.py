@@ -9,9 +9,9 @@ strokeTypeItems = [
     ("INDEX", "Index Stroke ", "Get a specific stroke", "NONE", 1)
 ]
 
-class GPencilFrameInputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilFrameInputNode"
-    bl_label = "GPencil Frame Input"
+class GPFrameInfoNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPFrameInfoNode"
+    bl_label = "GP Frame Info"
     errorHandlingType = "EXCEPTION"
 
     strokeType: EnumProperty(name = "Stroke Type", default = "ALL",

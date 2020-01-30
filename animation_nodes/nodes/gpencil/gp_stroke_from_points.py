@@ -2,9 +2,9 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import GPStroke, VirtualDoubleList
 
-class GPencilStrokeOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilStrokeOutputNode"
-    bl_label = "GPencil Stroke Output"
+class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPStrokeFromPointsNode"
+    bl_label = "GP Stroke From Points"
 
     useStrengthsList: VectorizedSocket.newProperty()
     usePressuresList: VectorizedSocket.newProperty()

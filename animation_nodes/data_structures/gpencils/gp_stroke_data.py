@@ -1,6 +1,6 @@
 # cython: profile=True
 import textwrap
-from .. lists.base_lists cimport DoubleList, Vector3DList
+from .. lists.base_lists import DoubleList, Vector3DList
 
 class GPStroke:
     def __init__(self, vertices = None, strengths = None, pressures = None,
