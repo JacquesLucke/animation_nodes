@@ -2,6 +2,20 @@
 
 ### Added
 
+
+
+### Fixed
+
+
+
+### Changed
+
+- Optimized the *Object Instancer* node.
+
+## 2.1.6
+
+### Added
+
 - Added *Set Vertex Weight* node.
 - Added CList and VirtualList for colors.
 - Added Get Vertex Color Layer node.
