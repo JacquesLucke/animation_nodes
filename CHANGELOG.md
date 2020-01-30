@@ -10,7 +10,7 @@
 
 ### Changed
 
-
+- Optimized the *Object Instancer* node.
 
 ## 2.1.6
 

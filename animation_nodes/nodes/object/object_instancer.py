@@ -27,10 +27,9 @@ emptyDisplayTypeItems = []
 for item in bpy.types.Object.bl_rna.properties["empty_display_type"].enum_items:
     emptyDisplayTypeItems.append((item.identifier, item.name, ""))
 
-class ObjectNamePropertyGroup(bpy.types.PropertyGroup):
-    bl_idname = "an_ObjectNamePropertyGroup"
-    objectName: StringProperty(name = "Object Name", default = "", update = propertyChanged)
-    objectIndex: IntProperty(name = "Object Index", default = 0, update = propertyChanged)
+class ObjectPropertyGroup(bpy.types.PropertyGroup):
+    bl_idname = "an_ObjectPropertyGroup"
+    object: PointerProperty(type = bpy.types.Object, name = "Object")
 
 class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectInstancerNode"
@@ -46,7 +45,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.resetInstances = True
         propertyChanged()
 
-    linkedObjects: CollectionProperty(type = ObjectNamePropertyGroup)
+    linkedObjects: CollectionProperty(type = ObjectPropertyGroup)
     resetInstances: BoolProperty(default = False, update = propertyChanged)
 
     copyFromSource: BoolProperty(name = "Copy from Source",
@@ -151,8 +150,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             self.removeAllObjects()
             self.resetInstances = False
 
-        while instancesAmount < len(self.linkedObjects):
-            self.removeLastObject()
+        self.removeObjectsInRange(instancesAmount, len(self.linkedObjects))
 
         return self.getOutputObjects(instancesAmount, sourceObject, scenes)
 
@@ -160,72 +158,42 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     def getOutputObjects(self, instancesAmount, sourceObject, scenes):
         objects = []
 
-        self.updateFastListAccess()
-
-        indicesToRemove = []
-        for i, item in enumerate(self.linkedObjectsList):
-            object = self.getObjectFromItem(item)
-            if object is None: indicesToRemove.append(i)
-            else: objects.append(object)
-
-        self.removeObjectFromItemIndices(indicesToRemove)
+        for i, objectGroup in enumerate(self.linkedObjects):
+            object = objectGroup.object
+            if object is None:
+                self.linkedObjects.remove(i)
+            else:
+                objects.append(object)
 
         missingAmount = instancesAmount - len(objects)
+        if missingAmount == 0:
+            return objects
+
         newObjects = self.createNewObjects(missingAmount, sourceObject, scenes)
         objects.extend(newObjects)
 
         return objects
 
-    def updateFastListAccess(self):
-        self.linkedObjectsList = list(self.linkedObjects)
-        self.objectList = list(bpy.data.objects)
-        self.objectNameList = None
-
-    # at first try to get the object by index, because it's faster and then search by name
-    def getObjectFromItem(self, item):
-        if item.objectIndex < len(self.objectList):
-            object = self.objectList[item.objectIndex]
-            if object.name == item.objectName:
-                return object
-
-        try:
-            if self.objectNameList is None:
-                self.objectNameList = list(bpy.data.objects.keys())
-            index = self.objectNameList.index(item.objectName)
-            item.objectIndex = index
-            return self.objectList[index]
-        except:
-            return None
-
     def removeAllObjects(self):
-        objectNames = []
-        for item in self.linkedObjects:
-            objectNames.append(item.objectName)
-
-        for name in objectNames:
-            object = bpy.data.objects.get(name)
+        for objectGroup in self.linkedObjects:
+            object = objectGroup.object
             if object is not None:
                 self.removeObject(object)
 
         self.linkedObjects.clear()
 
-    def removeLastObject(self):
-        self.removeObjectFromItemIndex(len(self.linkedObjects)-1)
+    def removeObjectsInRange(self, start, end):
+        for i in reversed(range(start, end)):
+            self.removeObjectAtIndex(i)
 
-    def removeObjectFromItemIndices(self, indices):
-        for offset, index in enumerate(indices):
-            self.removeObjectFromItemIndex(index - offset)
-
-    def removeObjectFromItemIndex(self, itemIndex):
-        item = self.linkedObjects[itemIndex]
-        objectName = item.objectName
-        self.linkedObjects.remove(itemIndex)
-        object = bpy.data.objects.get(objectName)
+    def removeObjectAtIndex(self, index):
+        object = self.linkedObjects[index].object
         if object is not None:
             self.removeObject(object)
+        self.linkedObjects.remove(index)
 
     def removeObject(self, object):
-        if object.users < 2:
+        if object.users < 3:
             data = object.data
             type = object.type
             self.removeShapeKeys(object)
@@ -247,7 +215,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         while object.active_shape_key is not None:
             object.shape_key_remove(object.active_shape_key)
 
-
     def createNewObjects(self, amount, sourceObject, scenes):
         objects = []
         nameSuffix = "instance_{}_".format(getRandomString(5))
@@ -259,6 +226,11 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def appendNewObject(self, name, sourceObject, scenes):
         object = self.newInstance(name, sourceObject, scenes)
+        self.linkObject(object, scenes)
+        self.linkedObjects.add().object = object
+        return object
+
+    def linkObject(self, object, scenes):
         if self.addToMainContainer:
             for scene in scenes:
                 if scene is not None:
@@ -269,21 +241,14 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                 if scene is not None:
                     scene.collection.objects.link(object)
                     break
-        linkedItem = self.linkedObjects.add()
-        linkedItem.objectName = object.name
-        linkedItem.objectIndex = bpy.data.objects.find(object.name)
-        return object
 
     def newInstance(self, name, sourceObject, scenes):
         instanceData = self.getSourceObjectData(sourceObject)
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
-            # The following check is due to https://developer.blender.org/T67857
-            # The bug is fixed. This should be removed when 2.81 is released.
-            if instanceData:
-                newObject.data = instanceData
+            newObject.data = instanceData
         else:
-            newObject = self.createObject(name, instanceData)
+            newObject = bpy.data.objects.new(name, instanceData)
 
         if self.removeAnimationData and newObject.animation_data is not None:
             newObject.animation_data.action = None
@@ -293,9 +258,6 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if not self.copyFromSource and self.objectType == "Empty":
             newObject.empty_display_type = self.emptyDisplayType
         return newObject
-
-    def createObject(self, name, instanceData):
-        return bpy.data.objects.new(name, instanceData)
 
     def getSourceObjectData(self, sourceObject):
         data = None
