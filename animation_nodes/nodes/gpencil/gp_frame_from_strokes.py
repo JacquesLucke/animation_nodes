@@ -16,8 +16,8 @@ class GPFrameFromStrokesNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Float", "useNumberList",
-            ("Frame Number", "frameNumber"), ("Frame Numbers", "frameNumbers")), dataIsModified = True)
+        self.newInput(VectorizedSocket("Float", ["useStrokeList", "useNumberList"],
+            ("Frame Number", "frameNumber"), ("Frame Numbers", "frameNumbers")))
         self.newOutput(VectorizedSocket("GPFrame", "useNumberList",
             ("Frame", "frame"), ("Frames", "frames")))
 
@@ -31,12 +31,11 @@ class GPFrameFromStrokesNode(bpy.types.Node, AnimationNode):
         if not self.useStrokeList:
             strokes = [strokes]
 
-        return GPFrame(strokes, 0, frameNumber)
+        return GPFrame(strokes, frameNumber)
 
     def execute_StrokesFrameNumbers(self, strokes, frameNumbers):
-        frames = []
-        if not self.useStrokeList:
-            return frames
+        if len(strokes) < len(frameNumbers):
+            self.raiseErrorMessage("Invalid Stroke list.")
 
         if len(strokes) > len(frameNumbers):
             self.raiseErrorMessage("Invalid Frame Numbers list.")
@@ -44,6 +43,7 @@ class GPFrameFromStrokesNode(bpy.types.Node, AnimationNode):
         if len(np.unique(frameNumbers)) != len(frameNumbers):
             self.raiseErrorMessage("Some Frame Numbers are repeated.")
 
+        frames = []
         for i, stroke in enumerate(strokes):
-            frames.append(GPFrame([stroke], i, frameNumbers[i]))
+            frames.append(GPFrame([stroke], frameNumbers[i]))
         return frames

@@ -33,4 +33,4 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Some Frame Numbers are repeated.")
         if blendMode not in ['REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE']:
             self.raiseErrorMessage("The blend mode is invalid. \n\nPossible values for 'Blend Mode' are: 'REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE'")
-        return GPLayer(layerName, frames, frameNumbers, blendMode, opacity, passIndex)
+        return GPLayer(layerName, frames, blendMode, opacity, passIndex)

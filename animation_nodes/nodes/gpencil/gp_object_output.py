@@ -28,14 +28,27 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         gpencil = self.getObjectData(object)
 
         if layer is None: return object
+        self.setLayerData(gpencil, layer)
+        gpencil.layers.active.frames.update()
+        return object
+
+    def execute_LayerList(self, object, layers):
+        if object is None: None
+        gpencil = self.getObjectData(object)
+
+        if len(layers) == 0: return object
+        for layer in layers:
+            if layer is None: return
+            self.setLayerData(gpencil, layer)
+        gpencil.layers.active.frames.update()
+        return object
+
+    def setLayerData(self, gpencil, layer):
         gpencilLayer = self.getLayer(gpencil, layer)
         gpencilLayer.clear()
-        gpFrameNumbers = self.getFrameNumbers(gpencilLayer, layer)
-        gpFrames = gpencilLayer.frames
 
         for frame in layer.frames:
-            index = self.getFrameNumberIndex(gpFrameNumbers, frame.frameNumber)
-            gpFrame = gpFrames[index]
+            gpFrame = gpencilLayer.frames.new(frame.frameNumber, active = True)
             gpFrame.clear()
             for stroke in frame.strokes:
                 gpStroke = self.setStrokeProperties(gpFrame.strokes.new(), stroke)
@@ -47,55 +60,6 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
                 gpPoints.foreach_set("pressure", stroke.pressures)
                 gpPoints.foreach_set("uv_rotation", stroke.uvRotations)
             gpFrame.strokes.update()
-        gpencil.layers.active.frames.update()
-        return object
-
-    def execute_LayerList(self, object, layers):
-        if object is None: None
-        gpencil = self.getObjectData(object)
-
-        if len(layers) == 0: return object
-        for layer in layers:
-            if layer is None: return
-            gpencilLayer = self.getLayer(gpencil, layer)
-            gpencilLayer.clear()
-            gpFrameNumbers = self.getFrameNumbers(gpencilLayer, layer)
-            gpFrames = gpencilLayer.frames
-
-            for frame in layer.frames:
-                index = self.getFrameNumberIndex(gpFrameNumbers, frame.frameNumber)
-                gpFrame = gpFrames[index]
-                gpFrame.clear()
-                for stroke in frame.strokes:
-                    gpStroke = self.setStrokeProperties(gpFrame.strokes.new(), stroke)
-                    gpPoints = gpStroke.points
-                    vertices = stroke.vertices
-                    gpPoints.add(len(vertices), strength = 0.75, pressure = 1)
-                    gpPoints.foreach_set("co", vertices.asNumpyArray())
-                    gpPoints.foreach_set("strength", stroke.strengths)
-                    gpPoints.foreach_set("pressure", stroke.pressures)
-                    gpPoints.foreach_set("uv_rotation", stroke.uvRotations)
-                gpFrame.strokes.update()
-        gpencil.layers.active.frames.update()
-        return object
-
-    def getLayer(self, gpencil, layer):
-        layerName = layer.layerName
-        try: gpencilLayer = gpencil.layers[layerName]
-        except: gpencilLayer = gpencil.layers.new(layerName, set_active=True)
-        gpencilLayer.blend_mode = layer.blendMode
-        gpencilLayer.opacity = layer.opacity
-        gpencilLayer.pass_index = layer.passIndex
-        return gpencilLayer
-
-    def getFrameNumbers(self, gpencilLayer, layer):
-        frameNumbers = layer.frameNumbers
-        for frameNumber in frameNumbers:
-            gpencilLayer.frames.new(frameNumber, active = True)
-        return frameNumbers
-
-    def getFrameNumberIndex(self, frameNumbers, frameNumber):
-        return frameNumbers.index(frameNumber)
 
     def setStrokeProperties(self, gpencilStroke, stroke):
         gpencilStroke.line_width = stroke.lineWidth
@@ -105,6 +69,15 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         gpencilStroke.start_cap_mode = stroke.startCapMode
         gpencilStroke.end_cap_mode = stroke.endCapMode
         return gpencilStroke
+
+    def getLayer(self, gpencil, layer):
+        layerName = layer.layerName
+        try: gpencilLayer = gpencil.layers[layerName]
+        except: gpencilLayer = gpencil.layers.new(layerName, set_active = True)
+        gpencilLayer.blend_mode = layer.blendMode
+        gpencilLayer.opacity = layer.opacity
+        gpencilLayer.pass_index = layer.passIndex
+        return gpencilLayer
 
     def getObjectData(self, object):
         if object.type != "GPENCIL":

@@ -1,4 +1,3 @@
-# cython: profile=True
 import textwrap
 from .. lists.base_lists import DoubleList, Vector3DList
 

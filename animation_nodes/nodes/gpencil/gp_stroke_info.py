@@ -12,29 +12,14 @@ class GPStrokeInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Points", "vertices")
         self.newOutput("Float List", "Strengths", "strengths")
         self.newOutput("Float List", "Pressures", "pressures")
-        self.newOutput("Float List", "UV-Rotations", "uvRotations")
+        self.newOutput("Float List", "UV-Rotations", "uvRotations", hide = True)
         self.newOutput("Float", "Line Width", "lineWidth")
-        self.newOutput("Boolean", "Cyclic", "drawCyclic")
-        self.newOutput("Boolean", "Start Cap", "startCapMode")
-        self.newOutput("Boolean", "End Cap", "endCapMode")
+        self.newOutput("Boolean", "Cyclic", "drawCyclic", hide = True)
+        self.newOutput("Text", "Start Cap", "startCapMode", hide = True)
+        self.newOutput("Text", "End Cap", "endCapMode", hide = True)
         self.newOutput("Integer", "Material Index", "materialIndex")
-
-        visibleOutputs = ("Points", "Strengths", "Pressures", "Line Width", "Material Index")
-        for socket in self.outputs:
-            socket.hide = socket.name not in visibleOutputs
+        self.newOutput("Text", "Display Mode", "displayMode", hide = True)
 
     def execute(self, stroke):
-        if stroke is None:
-            return Vector3DList(), DoubleList(), DoubleList(), DoubleList(), 0, False, False, False, 0
-
-        if stroke.startCapMode == "ROUND":
-            startCapMode = False
-        else:
-            startCapMode = True
-
-        if stroke.endCapMode == "ROUND":
-            endCapMode = False
-        else:
-            endCapMode = True
-        return stroke.vertices, stroke.strengths, stroke.pressures, stroke.uvRotations,\
-        stroke.lineWidth, stroke.drawCyclic, startCapMode, endCapMode, stroke.materialIndex
+        return (stroke.vertices, stroke.strengths, stroke.pressures, stroke.uvRotations, stroke.lineWidth,
+                stroke.drawCyclic, stroke.startCapMode, stroke.endCapMode, stroke.materialIndex, stroke.displayMode)

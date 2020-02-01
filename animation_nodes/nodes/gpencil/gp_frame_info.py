@@ -64,5 +64,6 @@ class GPFrameInfoNode(bpy.types.Node, AnimationNode):
         return outStrokes, frame.frameNumber
 
     def getStroke(self, strokes, strokeIndex):
-        try: return strokes[strokeIndex]
-        except: self.raiseErrorMessage(f"There is no stroke for index '{strokeIndex}'.")
+        if strokeIndex < 0 or strokeIndex >= len(strokes):
+            self.raiseErrorMessage(f"There is no stroke for index '{strokeIndex}'.")
+        return strokes[strokeIndex]
