@@ -6,7 +6,7 @@
 
 ### Fixed
 
-
+- Fixed the Splines From Branches algorithm for closed loops.
 
 ### Changed
 

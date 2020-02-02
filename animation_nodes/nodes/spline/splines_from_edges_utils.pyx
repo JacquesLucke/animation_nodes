@@ -36,6 +36,7 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
 
     # Generate Splines.
     cdef list splines = []
+    cdef PolySpline spline
     cdef FloatList splineRadii
     cdef Vector3DList splineVertices
     cdef IntegerList unusedEdges = usedSlots
@@ -88,6 +89,42 @@ def splinesFromBranches(Vector3DList vertices, EdgeIndicesList edges, VirtualDou
                 nextVertex = n1 if lastVertex != n1 else n2
 
             splines.append(PolySpline.__new__(PolySpline, splineVertices, splineRadii))
+
+    # The rest of the vertices are part of cyclic loops.
+    for startVertex in range(verticesAmount):
+        # All unused vertices should have 2 neighbours.
+        if unusedEdges.data[startVertex] != 2:
+            continue
+        
+        currentVertex = startVertex
+        nextVertex = neighbours.data[neighboursStarts.data[currentVertex]]
+
+        splineVertices = Vector3DList.__new__(Vector3DList)
+        splineRadii = FloatList.__new__(FloatList)
+
+        splineVertices.append_LowLevel(vertices.data[currentVertex])
+        splineRadii.append_LowLevel(radii.get(currentVertex))
+
+        # Follow the loop until we reach the start vertex again.
+        while nextVertex != startVertex:
+            lastVertex = currentVertex
+            currentVertex = nextVertex
+
+            splineVertices.append_LowLevel(vertices.data[currentVertex])
+            splineRadii.append_LowLevel(radii.get(currentVertex))
+            unusedEdges.data[currentVertex] -= 1
+            unusedEdges.data[lastVertex] -= 1
+
+            # Choose next vertex to be the one we are not coming from.
+            offset = neighboursStarts.data[currentVertex]
+            n1 = neighbours.data[offset + 0]
+            n2 = neighbours.data[offset + 1]
+            nextVertex = n1 if lastVertex != n1 else n2
+        
+        spline = PolySpline.__new__(PolySpline, splineVertices, splineRadii)
+        spline.cyclic = True
+        splines.append(spline)
+
     return splines
 
 def splinesFromEdges(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList radii,
