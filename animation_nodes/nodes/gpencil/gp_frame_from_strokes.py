@@ -34,16 +34,10 @@ class GPFrameFromStrokesNode(bpy.types.Node, AnimationNode):
         return GPFrame(strokes, frameNumber)
 
     def execute_StrokesFrameNumbers(self, strokes, frameNumbers):
-        if len(strokes) < len(frameNumbers):
-            self.raiseErrorMessage("Invalid Stroke list.")
-
-        if len(strokes) > len(frameNumbers):
-            self.raiseErrorMessage("Invalid Frame Numbers list.")
-
-        if len(np.unique(frameNumbers)) != len(frameNumbers):
+        if len(strokes) != len(frameNumbers):
+            self.raiseErrorMessage("Strokes and Frame Numbers have different lengths.")
+        if len(np.unique(frameNumbers.asNumpyArray())) != len(frameNumbers):
             self.raiseErrorMessage("Some Frame Numbers are repeated.")
 
-        frames = []
-        for i, stroke in enumerate(strokes):
-            frames.append(GPFrame([stroke], frameNumbers[i]))
+        frames = [GPFrame([stroke], number) for stroke, number in zip(strokes, frameNumbers)]
         return frames
