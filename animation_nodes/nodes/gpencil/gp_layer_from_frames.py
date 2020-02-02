@@ -2,7 +2,7 @@ import bpy
 import numpy as np
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import GPLayer, LongList
+from ... data_structures import GPLayer
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
@@ -26,9 +26,7 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         if not self.useFrameList:
             frames = [frames]
 
-        frameNumbers = LongList(length = len(frames))
-        for i, frame in enumerate(frames):
-            frameNumbers[i] = frame.frameNumber
+        frameNumbers = [frame.frameNumber for frame in frames]
         if len(np.unique(frameNumbers)) != len(frameNumbers):
             self.raiseErrorMessage("Some Frame Numbers are repeated.")
         if blendMode not in ['REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE']:

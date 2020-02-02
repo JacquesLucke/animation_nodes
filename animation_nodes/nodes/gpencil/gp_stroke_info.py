@@ -15,8 +15,8 @@ class GPStrokeInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float List", "UV-Rotations", "uvRotations", hide = True)
         self.newOutput("Float", "Line Width", "lineWidth")
         self.newOutput("Boolean", "Cyclic", "drawCyclic", hide = True)
-        self.newOutput("Text", "Start Cap", "startCapMode", hide = True)
-        self.newOutput("Text", "End Cap", "endCapMode", hide = True)
+        self.newOutput("Text", "Start Cap Mode", "startCapMode", hide = True)
+        self.newOutput("Text", "End Cap Mode", "endCapMode", hide = True)
         self.newOutput("Integer", "Material Index", "materialIndex")
         self.newOutput("Text", "Display Mode", "displayMode", hide = True)
 

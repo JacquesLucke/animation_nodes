@@ -49,18 +49,17 @@ class GPFrameInfoNode(bpy.types.Node, AnimationNode):
 
     def execute_StrokeIndex(self, frame, strokeIndex):
         strokes = frame.strokes
-        if len(frame.strokes) == 0:
+        if len(strokes) == 0:
             return GPStroke(), frame.frameNumber
         return self.getStroke(strokes, strokeIndex), frame.frameNumber
 
     def execute_StrokeIndices(self, frame, strokeIndices):
         strokes = frame.strokes
         outStrokes = []
-        if len(frame.strokes) == 0:
+        if len(strokes) == 0:
             return outStrokes, frame.frameNumber
 
-        for index in strokeIndices:
-            outStrokes.append(self.getStroke(strokes, index))
+        outStrokes = [self.getStroke(strokes, index) for index in strokeIndices]
         return outStrokes, frame.frameNumber
 
     def getStroke(self, strokes, strokeIndex):

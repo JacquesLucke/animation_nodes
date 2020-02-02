@@ -70,25 +70,22 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
     def getLayer(self, object, layerName):
         if object.type != "GPENCIL":
             self.raiseErrorMessage("Object is not a grease pencil object.")
-        if object.mode != "OBJECT":
+        if object.mode == "EDIT":
             self.raiseErrorMessage("Object is not in object mode.")
-        try: return object.data.layers[layerName]
-        except: self.raiseErrorMessage(f"Object doesn't have a layer with the name '{layerName}'.")
+        if layerName in object.data.layers:
+            return object.data.layers[layerName]
+        else:
+            self.raiseErrorMessage(f"Object doesn't have a layer with the name '{layerName}'.")
 
     def getLayers(self, object):
         return object.data.layers
 
     def getFrames(self, layer, matrixWorld):
-        layerFrames = layer.frames
-        frames = []
-        for frame in layerFrames:
-            frames.append(GPFrame(self.getStrokes(frame.strokes, matrixWorld), frame.frame_number))
+        frames = [GPFrame(self.getStrokes(frame.strokes, matrixWorld), frame.frame_number) for frame in layer.frames]
         return frames
 
     def getStrokes(self, strokes, matrixWorld):
-        newStrokes = []
-        for stroke in strokes:
-            newStrokes.append(self.getStroke(stroke, matrixWorld))
+        newStrokes = [self.getStroke(stroke, matrixWorld) for stroke in strokes]
         return newStrokes
 
     def getStroke(self, stroke, matrixWorld):

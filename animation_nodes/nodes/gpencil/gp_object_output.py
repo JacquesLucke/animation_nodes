@@ -61,19 +61,21 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
                 gpPoints.foreach_set("uv_rotation", stroke.uvRotations)
             gpFrame.strokes.update()
 
-    def setStrokeProperties(self, gpencilStroke, stroke):
-        gpencilStroke.line_width = stroke.lineWidth
-        gpencilStroke.material_index = stroke.materialIndex
-        gpencilStroke.display_mode = stroke.displayMode
-        gpencilStroke.draw_cyclic = stroke.drawCyclic
-        gpencilStroke.start_cap_mode = stroke.startCapMode
-        gpencilStroke.end_cap_mode = stroke.endCapMode
-        return gpencilStroke
+    def setStrokeProperties(self, gpStroke, stroke):
+        gpStroke.line_width = stroke.lineWidth
+        gpStroke.material_index = stroke.materialIndex
+        gpStroke.display_mode = stroke.displayMode
+        gpStroke.draw_cyclic = stroke.drawCyclic
+        gpStroke.start_cap_mode = stroke.startCapMode
+        gpStroke.end_cap_mode = stroke.endCapMode
+        return gpStroke
 
     def getLayer(self, gpencil, layer):
         layerName = layer.layerName
-        try: gpencilLayer = gpencil.layers[layerName]
-        except: gpencilLayer = gpencil.layers.new(layerName, set_active = True)
+        if layerName in gpencil.layers:
+            gpencilLayer = gpencil.layers[layerName]
+        else:
+            gpencilLayer = gpencil.layers.new(layerName, set_active = True)
         gpencilLayer.blend_mode = layer.blendMode
         gpencilLayer.opacity = layer.opacity
         gpencilLayer.pass_index = layer.passIndex
@@ -82,6 +84,6 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
     def getObjectData(self, object):
         if object.type != "GPENCIL":
             self.raiseErrorMessage("Object is not a grease pencil object.")
-        if object.mode != "OBJECT":
+        if object.mode == "EDIT":
             self.raiseErrorMessage("Object is not in object mode.")
         return object.data
