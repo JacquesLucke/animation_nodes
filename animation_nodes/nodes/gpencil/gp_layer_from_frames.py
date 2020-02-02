@@ -10,7 +10,6 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
 
     useFrameList: VectorizedSocket.newProperty()
-    useGPFrameList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("GPFrame", "useFrameList",

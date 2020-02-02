@@ -69,7 +69,7 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
 
     def execute_ActiveFrame(self, layer, scene):
         frames = layer.frames
-        if len(layer.frames) == 0:
+        if len(frames) == 0:
             return GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
 
         return (self.getActiveFrame(scene.frame_current, frames), layer.layerName, layer.blendMode,
@@ -77,7 +77,7 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
 
     def execute_FrameIndex(self, layer, frameIndex):
         frames = layer.frames
-        if len(layer.frames) == 0:
+        if len(frames) == 0:
             return GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
 
         frame = self.getFrame(frames, frameIndex)
@@ -85,7 +85,7 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
 
     def execute_FrameIndices(self, layer, frameIndices):
         frames = layer.frames
-        if len(layer.frames) == 0:
+        if len(frames) == 0:
             return [], layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
 
         outFrames = [self.getFrame(frames, index) for index in frameIndices]
@@ -93,20 +93,18 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
 
     def execute_FrameNumber(self, layer, frameNumber):
         frames = layer.frames
-        if len(layer.frames) == 0:
+        if len(frames) == 0:
             return GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
 
-        frameNumbers = self.getFrameNumbers(frames)
-        index = self.getFrameNumberIndex(frameNumbers, frameNumber)
-        return frames[index], layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+        return (self.getFrameFromNumber(frames, frameNumber), layer.layerName, layer.blendMode,
+                layer.opacity, layer.passIndex)
 
     def execute_FrameNumbers(self, layer, inFrameNumbers):
         frames = layer.frames
         if len(frames) == 0:
             return [], layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
 
-        frameNumbers = self.getFrameNumbers(frames)
-        outFrames = [frames[self.getFrameNumberIndex(frameNumbers, frameNumber)] for frameNumber in inFrameNumbers]
+        outFrames = [self.getFrameFromNumber(frames, frameNumber) for frameNumber in inFrameNumbers]
         return outFrames, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
 
     def execute_AllFrames(self, layer):
@@ -114,21 +112,14 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
         return frames, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
 
     def getActiveFrame(self, currentFrame, frames):
-        frameNumbers = self.getFrameNumbers(frames)
-        if currentFrame <= frameNumbers.getMinValue(): return frames[0]
-        allFrames = list(filter(lambda x: x <= currentFrame, frameNumbers))
-        return frames[frameNumbers.index(allFrames[-1])]
+        return max((frame for frame in frames if frame.frameNumber <= currentFrame),
+                    key = lambda frame : frame.frameNumber, default = frames[0])
 
-    def getFrameNumbers(self, frames):
-        frameNumbers = LongList(length = len(frames))
-        for i, frame in enumerate(frames):
-            frameNumbers[i] = frame.frameNumber
-        return frameNumbers
-
-    def getFrameNumberIndex(self, frameNumbers, frameNumber):
-        if frameNumber not in set(frameNumbers):
+    def getFrameFromNumber(self, frames, frameNumber):
+        filteredFrame = list(filter(lambda f: f.frameNumber == frameNumber, frames))
+        if len(filteredFrame) == 0:
             self.raiseErrorMessage(f"There is no frame for frame-number '{frameNumber}'.")
-        return frameNumbers.index(frameNumber)
+        return filteredFrame[0]
 
     def getFrame(self, frames, frameIndex):
         if frameIndex < 0 or frameIndex >= len(frames):

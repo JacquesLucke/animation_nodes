@@ -42,29 +42,19 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
             return GPLayer()
 
         evaluatedObject = getEvaluatedID(object)
-        if useWorldSpace:
-            worldMatrix = evaluatedObject.matrix_world
-        else:
-            worldMatrix = None
-
         layer = self.getLayer(evaluatedObject, layerName)
-        return GPLayer(layer.info, self.getFrames(layer, worldMatrix), layer.blend_mode, layer.opacity,
-                       layer.pass_index)
+        return GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace), layer.blend_mode,
+                       layer.opacity, layer.pass_index)
 
     def executeList(self, object, useWorldSpace):
         if object is None:
             return []
 
         evaluatedObject = getEvaluatedID(object)
-        if useWorldSpace:
-            worldMatrix = evaluatedObject.matrix_world
-        else:
-            worldMatrix = None
-
         gpencilLayers = []
         for layer in self.getLayers(evaluatedObject):
-            gpencilLayers.append(GPLayer(layer.info, self.getFrames(layer, worldMatrix), layer.blend_mode,
-                                         layer.opacity, layer.pass_index))
+            gpencilLayers.append(GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
+                                         layer.blend_mode, layer.opacity, layer.pass_index))
         return gpencilLayers
 
     def getLayer(self, object, layerName):
@@ -80,15 +70,16 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
     def getLayers(self, object):
         return object.data.layers
 
-    def getFrames(self, layer, matrixWorld):
-        frames = [GPFrame(self.getStrokes(frame.strokes, matrixWorld), frame.frame_number) for frame in layer.frames]
+    def getFrames(self, layer, object, useWorldSpace):
+        frames = [GPFrame(self.getStrokes(frame.strokes, object, useWorldSpace), frame.frame_number)
+                  for frame in layer.frames]
         return frames
 
-    def getStrokes(self, strokes, matrixWorld):
-        newStrokes = [self.getStroke(stroke, matrixWorld) for stroke in strokes]
+    def getStrokes(self, strokes, object, useWorldSpace):
+        newStrokes = [self.getStroke(stroke, object, useWorldSpace) for stroke in strokes]
         return newStrokes
 
-    def getStroke(self, stroke, matrixWorld):
+    def getStroke(self, stroke, object, useWorldSpace):
         strokePoints = stroke.points
         amount = len(strokePoints)
 
@@ -98,7 +89,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         uvRotations = DoubleList(length = amount)
 
         strokePoints.foreach_get("co", vertices.asNumpyArray())
-        if matrixWorld is not None: vertices.transform(matrixWorld)
+        if useWorldSpace: vertices.transform(object.matrix_world)
 
         strokePoints.foreach_get("strength", strengths.asNumpyArray())
         strokePoints.foreach_get("pressure", pressures.asNumpyArray())
