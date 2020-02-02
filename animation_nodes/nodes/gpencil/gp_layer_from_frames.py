@@ -1,5 +1,4 @@
 import bpy
-import numpy as np
 from bpy.props import *
 from ... events import propertyChanged
 from ... data_structures import GPLayer
@@ -27,7 +26,7 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
             frames = [frames]
 
         frameNumbers = [frame.frameNumber for frame in frames]
-        if len(np.unique(frameNumbers)) != len(frameNumbers):
+        if len(frameNumbers) != len(set(frameNumbers)):
             self.raiseErrorMessage("Some Frame Numbers are repeated.")
         if blendMode not in ['REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE']:
             self.raiseErrorMessage("The blend mode is invalid. \n\nPossible values for 'Blend Mode' are: 'REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE'")
