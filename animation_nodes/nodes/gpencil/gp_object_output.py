@@ -7,7 +7,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "GP Object Output"
     errorHandlingType = "EXCEPTION"
 
-    appendCustomLayers: BoolProperty(name = "Append Custom Layers", default = False,
+    appendLayers: BoolProperty(name = "Append Layers", default = False,
         description = "This option allow to add custom layers",
         update = AnimationNode.refresh)
 
@@ -23,7 +23,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         row = layout.row(align = True)
-        row.prop(self, "appendCustomLayers")
+        row.prop(self, "appendLayers")
 
     def getExecutionFunctionName(self):
         if self.useLayerList:
@@ -77,7 +77,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def getLayer(self, gpencil, layer):
         layerName = layer.layerName
-        if layerName in gpencil.layers:
+        if layerName in gpencil.layers and self.appendLayers:
             gpencilLayer = gpencil.layers[layerName]
             gpencilLayer.clear()
         else:
@@ -93,5 +93,5 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         if object.mode == "EDIT":
             self.raiseErrorMessage("Object is not in object mode.")
         gpencil = object.data
-        if not self.appendCustomLayers: gpencil.clear()
+        if not self.appendLayers: gpencil.clear()
         return gpencil
