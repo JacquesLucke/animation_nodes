@@ -33,6 +33,10 @@ class GPStroke:
         return textwrap.dedent(
             f"""AN Stroke Object:
             Points: {len(self.vertices)}
+            Line Width: {self.lineWidth}
+            Cyclic: {self.drawCyclic}
+            Start Cap Mode: {self.startCapMode}
+            End Cap Mode: {self.endCapMode}
             Material Index: {self.materialIndex}
             Display Mode: {self.displayMode}""")
 

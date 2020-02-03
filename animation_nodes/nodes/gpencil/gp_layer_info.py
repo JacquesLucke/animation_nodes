@@ -30,13 +30,13 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
 
         elif self.frameType == "INDEX":
             self.newInput(VectorizedSocket("Integer", "useFrameList",
-            ("Frame Index", "frameIndex"), ("Frame Indices", "frameIndices")))
+            ("Frame Index", "frameIndex"), ("Frame Indices", "frameIndices")), value = 0)
             self.newOutput(VectorizedSocket("GPFrame", "useFrameList",
             ("Frame", "frame"), ("Frames", "frames")))
 
         elif self.frameType == "FRAME":
             self.newInput(VectorizedSocket("Float", "useFrameList",
-            ("Frame Number", "frameNumber"), ("Frame Numbers", "inFrameNumbers")))
+            ("Frame Number", "frameNumber"), ("Frame Numbers", "inFrameNumbers")), value = 1)
             self.newOutput(VectorizedSocket("GPFrame", "useFrameList",
             ("Frame", "frame"), ("Frames", "frames")))
 

@@ -5,7 +5,7 @@ from ... utils.depsgraph import getEvaluatedID
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import GPLayer, GPFrame, GPStroke, DoubleList, Vector3DList
 
-layerTypeItems = [
+importTypeItems = [
     ("ALL", "All", "Get all grease pencil layers", "NONE", 0),
     ("SINGLE", "Single", "Get a specific grease pencil layer", "NONE", 1)
 ]
@@ -15,26 +15,26 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
     bl_label = "GP Object Input"
     errorHandlingType = "EXCEPTION"
 
-    layerType: EnumProperty(name = "Layer Type", default = "SINGLE",
-        items = layerTypeItems, update = AnimationNode.refresh)
+    importType: EnumProperty(name = "Import Type", default = "ALL",
+        items = importTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Boolean", "Use World Space", "useWorldSpace", value = True)
 
-        if self.layerType == "SINGLE":
+        if self.importType == "SINGLE":
             self.newInput("Text", "Layer Name", "layerName")
             self.newOutput("GPLayer", "Layer", "layer")
-        elif self.layerType == "ALL":
+        elif self.importType == "ALL":
             self.newOutput("GPLayer List", "Layers", "layers")
 
-    def draw(self, layout):
-        layout.prop(self, "layerType", text = "")
+    def drawAdvanced(self, layout):
+        layout.prop(self, "importType")
 
     def getExecutionFunctionName(self):
-        if self.layerType == "SINGLE":
+        if self.importType == "SINGLE":
             return "executeSingle"
-        elif self.layerType == "ALL":
+        elif self.importType == "ALL":
             return "executeList"
 
     def executeSingle(self, object, useWorldSpace, layerName):
