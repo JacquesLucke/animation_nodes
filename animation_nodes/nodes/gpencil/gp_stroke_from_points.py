@@ -24,7 +24,7 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Start Cap Mode", "startCapMode", value = 'ROUND', hide = True)
         self.newInput("Text", "End Cap Mode", "endCapMode", value = 'ROUND', hide = True)
         self.newInput("Integer", "Material Index", "materialIndex", value = 0)
-        self.newInput("Text", "Display Mode", "displayMode", value = 'SCREEN', hide = True)
+        self.newInput("Text", "Display Mode", "displayMode", value = '3DSPACE', hide = True)
         self.newOutput("GPStroke", "Stroke", "stroke")
 
     def execute(self, vertices, strengths, pressures, uvRotations, lineWidth, drawCyclic,

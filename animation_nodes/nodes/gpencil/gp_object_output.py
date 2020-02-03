@@ -33,7 +33,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         return object
 
     def execute_LayerList(self, object, layers):
-        if object is None: None
+        if object is None: return None
         gpencil = self.getObjectData(object)
 
         if len(layers) == 0: return object
@@ -44,7 +44,6 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def setLayerData(self, gpencil, layer):
         gpencilLayer = self.getLayer(gpencil, layer)
-        gpencilLayer.clear()
 
         for frame in layer.frames:
             gpFrame = gpencilLayer.frames.new(frame.frameNumber, active = True)
@@ -72,6 +71,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         layerName = layer.layerName
         if layerName in gpencil.layers:
             gpencilLayer = gpencil.layers[layerName]
+            gpencilLayer.clear()
         else:
             gpencilLayer = gpencil.layers.new(layerName, set_active = True)
         gpencilLayer.blend_mode = layer.blendMode

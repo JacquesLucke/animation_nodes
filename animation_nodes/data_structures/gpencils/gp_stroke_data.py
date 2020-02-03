@@ -16,7 +16,7 @@ class GPStroke:
         if startCapMode is None: startCapMode = "ROUND"
         if endCapMode is None: endCapMode = "ROUND"
         if materialIndex is None: materialIndex = 0
-        if displayMode is None: displayMode = "SCREEN"
+        if displayMode is None: displayMode = "3DSPACE"
 
         self.vertices = vertices
         self.strengths = strengths
