@@ -10,6 +10,14 @@ class Color:
     def __getitem__(self, key):
         return self.color[key]
     
+    def __eq__(self, other):
+        if not isinstance(other, Color):
+            return False
+        return all(a == b for a, b in zip(self.color, other.color))
+
+    def __hash__(self):
+        return hash(tuple(self.color))
+
     def __repr__(self):
         return f"Color(R: {self.r:.2f}, G: {self.g:.2f}, B: {self.b:.2f}, A: {self.a:.2f})"
 
