@@ -65,7 +65,7 @@ class SceneListSocket(bpy.types.NodeSocket, PythonListSocket):
             if text != "": text += ": "
             row.label(text = text + "[{}]".format(repr(self.nodeTree.scene.name)))
         else:
-            if text is "": text = self.text
+            if not text: text = self.text
             row.label(text = text)
         row.prop(self, "useGlobalScene", icon = "WORLD", text = "")
 

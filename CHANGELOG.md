@@ -11,6 +11,7 @@
 ### Changed
 
 - Optimized the *Object Instancer* node.
+- Make all numeric types comparable.
 
 ## 2.1.6
 
