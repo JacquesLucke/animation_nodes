@@ -61,14 +61,6 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             data.fill_mode = "FULL"
         if type == "GPENCIL":
             data = bpy.data.grease_pencils.new("ANGPencil")
-            layer = data.layers.new("AN-Layer", set_active = True)
-            frame = layer.frames.new(1)
-            stroke = frame.strokes.new()
-            stroke.display_mode = "3DSPACE"
-            stroke.material_index = 0
-            material = bpy.data.materials.new('AN-Material')
-            bpy.data.materials.create_gpencil_data(material)
-            data.materials.append(material)
         object = bpy.data.objects.new("Target", data)
         bpy.context.collection.objects.link(object)
         self.object = object
