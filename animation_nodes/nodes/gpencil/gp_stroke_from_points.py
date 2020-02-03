@@ -31,26 +31,16 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
                 startCapMode, endCapMode, materialIndex, displayMode):
 
         amount = len(vertices)
-        stroke = GPStroke()
-
         strengths = VirtualDoubleList.create(strengths, 1).materialize(amount)
         pressures = VirtualDoubleList.create(pressures, 1).materialize(amount)
         uvRotations = VirtualDoubleList.create(uvRotations, 0).materialize(amount)
 
-        stroke.vertices = vertices
-        stroke.strengths = strengths
-        stroke.pressures = pressures
-        stroke.uvRotations = uvRotations
-        stroke.lineWidth = lineWidth
-        stroke.drawCyclic = drawCyclic
-
         if startCapMode not in ['ROUND', 'FLAT']:
-            self.raiseErrorMessage("The Start Cap mode is invalid. \n\nPossible values for 'Start Cap Mode' are: 'REGULAR', 'FLAT'")
-        stroke.startCapMode = startCapMode
+            self.raiseErrorMessage("The Start Cap Mode is invalid. \n\nPossible values for 'Start Cap Mode' are: 'REGULAR', 'FLAT'")
         if endCapMode not in ['ROUND', 'FLAT']:
-            self.raiseErrorMessage("The End Cap mode is invalid. \n\nPossible values for 'End Cap Mode' are: 'REGULAR', 'FLAT'")
-        stroke.endCapMode = endCapMode
+            self.raiseErrorMessage("The End Cap Mode is invalid. \n\nPossible values for 'End Cap Mode' are: 'REGULAR', 'FLAT'")
+        if displayMode not in ['SCREEN', '3DSPACE', '2DSPACE', '2DIMAGE']:
+            self.raiseErrorMessage("The Display Mode is invalid. \n\nPossible values for 'Display Mode' are: 'SCREEN', '3DSPACE', '2DSPACE', '2DIMAGE'")
 
-        stroke.materialIndex = materialIndex
-        stroke.displayMode = displayMode
-        return stroke
+        return GPStroke(vertices, strengths, pressures, uvRotations, lineWidth, drawCyclic,
+                        startCapMode, endCapMode, materialIndex, displayMode)

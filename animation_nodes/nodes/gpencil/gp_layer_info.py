@@ -116,10 +116,10 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
                     key = lambda frame : frame.frameNumber, default = frames[0])
 
     def getFrameFromNumber(self, frames, frameNumber):
-        filteredFrame = list(filter(lambda f: f.frameNumber == frameNumber, frames))
-        if len(filteredFrame) == 0:
+        frame = next(filter(lambda f: f.frameNumber == frameNumber, frames), None)
+        if frame is None:
             self.raiseErrorMessage(f"There is no frame for frame-number '{frameNumber}'.")
-        return filteredFrame[0]
+        return frame
 
     def getFrame(self, frames, frameIndex):
         if frameIndex < 0 or frameIndex >= len(frames):

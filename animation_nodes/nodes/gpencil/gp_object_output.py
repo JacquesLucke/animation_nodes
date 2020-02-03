@@ -38,7 +38,6 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
 
         if len(layers) == 0: return object
         for layer in layers:
-            if layer is None: return
             self.setLayerData(gpencil, layer)
         gpencil.layers.active.frames.update()
         return object
@@ -49,9 +48,9 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
 
         for frame in layer.frames:
             gpFrame = gpencilLayer.frames.new(frame.frameNumber, active = True)
-            gpFrame.clear()
             for stroke in frame.strokes:
-                gpStroke = self.setStrokeProperties(gpFrame.strokes.new(), stroke)
+                gpStroke = gpFrame.strokes.new()
+                self.setStrokeProperties(gpStroke, stroke)
                 gpPoints = gpStroke.points
                 vertices = stroke.vertices
                 gpPoints.add(len(vertices), strength = 0.75, pressure = 1)
@@ -68,7 +67,6 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         gpStroke.draw_cyclic = stroke.drawCyclic
         gpStroke.start_cap_mode = stroke.startCapMode
         gpStroke.end_cap_mode = stroke.endCapMode
-        return gpStroke
 
     def getLayer(self, gpencil, layer):
         layerName = layer.layerName
