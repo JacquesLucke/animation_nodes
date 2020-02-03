@@ -7,6 +7,10 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "GP Object Output"
     errorHandlingType = "EXCEPTION"
 
+    appendCustomLayers: BoolProperty(name = "Append Custom Layers", default = False,
+        description = "This option allow to add custom layers",
+        update = AnimationNode.refresh)
+
     useLayerList: VectorizedSocket.newProperty()
 
     def create(self):
@@ -16,6 +20,10 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("GPLayer", "useLayerList",
             ("Layer", "layer"), ("Layers", "layers")))
         self.newOutput("Object", "Object", "object")
+
+    def drawAdvanced(self, layout):
+        row = layout.row(align = True)
+        row.prop(self, "appendCustomLayers")
 
     def getExecutionFunctionName(self):
         if self.useLayerList:
@@ -84,4 +92,6 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Object is not a grease pencil object.")
         if object.mode == "EDIT":
             self.raiseErrorMessage("Object is not in object mode.")
-        return object.data
+        gpencil = object.data
+        if not self.appendCustomLayers: gpencil.clear()
+        return gpencil
