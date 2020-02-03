@@ -59,6 +59,8 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             data = bpy.data.curves.new("Curve", "CURVE")
             data.dimensions = "3D"
             data.fill_mode = "FULL"
+        if type == "GPENCIL":
+            data = bpy.data.grease_pencils.new("ANGPencil")
         object = bpy.data.objects.new("Target", data)
         bpy.context.collection.objects.link(object)
         self.object = object

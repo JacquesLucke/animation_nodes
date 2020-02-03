@@ -100,8 +100,8 @@ class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
             if self.subprogramIdentifier not in inputBasedCache: inputBasedCache[self.subprogramIdentifier] = {}
             inputBasedCache[self.subprogramIdentifier][self.getArgsHash(args)] = data
 
-    def getArgsHash(self, *args):
-        return tuple(hash(arg) for arg in args)
+    def getArgsHash(self, args):
+        return tuple(hash(arg.freeze() if hasattr(arg, "freeze") else arg) for arg in args)
 
 
     def draw(self, layout):

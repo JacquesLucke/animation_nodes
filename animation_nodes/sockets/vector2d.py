@@ -12,7 +12,7 @@ class Vector2DSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Vector 2D"
     drawColor = (0.15, 0.45, 0.7, 1.0)
     storable = True
-    comparable = False
+    comparable = True
 
     value: FloatVectorProperty(default = [0, 0], size = 2, update = propertyChanged, subtype = "XYZ")
 

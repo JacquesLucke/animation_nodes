@@ -11,7 +11,7 @@ class EulerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     dataType = "Euler"
     drawColor = (0.1, 0.0, 0.4, 1.0)
     storable = True
-    comparable = False
+    comparable = True
 
     value: FloatVectorProperty(default = [0, 0, 0], update = propertyChanged, subtype = "EULER")
 
