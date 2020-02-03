@@ -21,7 +21,7 @@ class FloatSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     value: FloatProperty(default = 0.0,
         set = setValue, get = getValue,
-        update = propertyChanged)
+        precision = 6, update = propertyChanged)
 
     minValue: FloatProperty(default = -1e10)
     maxValue: FloatProperty(default = sys.float_info.max)
