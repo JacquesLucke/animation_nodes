@@ -6,24 +6,24 @@ displayModeTypeItems = [
     ("SCREEN", "Screen", "", "NONE", 0),
     ("3DSPACE", "3D Space", "", "NONE", 1),
     ("2DSPACE", "2D Space", "", "NONE", 2),
-    ("2DIMAGE", "2D Image", "", "NONE", 3)    
+    ("2DIMAGE", "2D Image", "", "NONE", 3)
 ]
 
-class GPencilStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilStrokeDisplayModeNode"
-    bl_label = "GPencil Stroke Display Mode"
+class GPStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPStrokeDisplayModeNode"
+    bl_label = "GP Stroke Display Mode"
     bl_width_default = 165
 
     displayModeType: EnumProperty(name = "Display Mode", default = "SCREEN",
         items = displayModeTypeItems, update = AnimationNode.refresh)
-    
+
     useStrokeList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("Stroke", "useStrokeList",
+        self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newOutput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "outStroke"), ("Strokes", "outStrokes")), dataIsModified = True)
+        self.newOutput(VectorizedSocket("GPStroke", "useStrokeList",
+            ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
     def draw(self, layout):
         layout.prop(self, "displayModeType", text = "")
@@ -45,13 +45,13 @@ class GPencilStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
                 self.strokeDisplayMode(stroke)
         return strokes
 
-    def strokeDisplayMode(self, outStroke):
+    def strokeDisplayMode(self, stroke):
         if self.displayModeType == "SCREEN":
-            outStroke.display_mode = 'SCREEN'
+            stroke.displayMode = "SCREEN"
         elif self.displayModeType == "3DSPACE":
-            outStroke.display_mode = '3DSPACE'
+            stroke.displayMode = "3DSPACE"
         elif self.displayModeType == "2DSPACE":
-            outStroke.display_mode = '2DSPACE'
+            stroke.displayMode = "2DSPACE"
         elif self.displayModeType == "2DIMAGE":
-            outStroke.display_mode = '2DIMAGE' 
-        return outStroke
+            stroke.displayMode = "2DIMAGE"
+        return stroke

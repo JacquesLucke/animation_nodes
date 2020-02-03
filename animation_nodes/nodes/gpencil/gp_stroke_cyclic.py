@@ -1,22 +1,22 @@
 import bpy
-from bpy.props import *
+from ... data_structures import VirtualBooleanList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPencilStrokeCyclicNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilStrokeCyclicNode"
-    bl_label = "GPencil Stroke Cyclic"
+class GPStrokeCyclicNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPStrokeCyclicNode"
+    bl_label = "GP Stroke Cyclic"
 
     useStrokeList: VectorizedSocket.newProperty()
     useBooleanList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("Stroke", "useStrokeList",
+        self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Boolean", "useBooleanList",
+        self.newInput(VectorizedSocket("Boolean", ["useStrokeList", "useBooleanList"],
             ("Cyclic", "cyclic"), ("Cyclics", "cyclics")))
-        self.newOutput(VectorizedSocket("Stroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-    
+        self.newOutput(VectorizedSocket("GPStroke", "useStrokeList",
+            ("Stroke", "stroke"), ("Strokes", "strokes")))
+
     def getExecutionFunctionName(self):
         if self.useStrokeList and self.useBooleanList:
             return "executeListList"
@@ -26,18 +26,18 @@ class GPencilStrokeCyclicNode(bpy.types.Node, AnimationNode):
             return "executeSingle"
 
     def executeSingle(self, stroke, cyclic):
-        if stroke is None: return None
-        stroke.draw_cyclic = cyclic
+        stroke.drawCyclic = cyclic
         return stroke
 
     def executeList(self, strokes, cyclic):
         if len(strokes) == 0: return strokes
         for stroke in strokes:
-            if stroke is not None: stroke.draw_cyclic = cyclic
+            stroke.drawCyclic = cyclic
         return strokes
 
     def executeListList(self, strokes, cyclics):
-        if len(strokes) == 0 or len(cyclics) == 0 or len(strokes) != len(cyclics): return strokes
+        if len(strokes) == 0 or len(cyclics) == 0: return strokes
+        cyclics = VirtualBooleanList.create(cyclics, False)
         for i, stroke in enumerate(strokes):
-            if stroke is not None: stroke.draw_cyclic = cyclics[i]
+            stroke.drawCyclic = cyclics[i]
         return strokes

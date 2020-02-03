@@ -9,11 +9,11 @@ modeTypeItems = [
     ("BOX", "Boxes", "", "NONE", 2)
 ]
 
-class GPencilMaterialOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilMaterialOutputNode"
-    bl_label = "GPencil Material Output"
-    bl_width_default = 165
-
+class GPMaterialOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPMaterialOutputNode"
+    bl_label = "GP Material Output"
+    errorHandlingType = "EXCEPTION"
+    
     modeType: EnumProperty(name = "Mode Type", default = "LINE",
         items = modeTypeItems, update = AnimationNode.refresh)
 
@@ -46,5 +46,5 @@ class GPencilMaterialOutputNode(bpy.types.Node, AnimationNode):
         if self.strokeBool and  gmaterial.stroke_style == "SOLID":
             gmaterial.color = color
         if self.fillBool and gmaterial.fill_style in ["SOLID", "GRADIENT", "CHECKER_BOARD"]:
-            gmaterial.fill_color = fillColor    
+            gmaterial.fill_color = fillColor
         return material

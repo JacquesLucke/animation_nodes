@@ -27,7 +27,7 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             if self.object is not None:
                 icon = "RESTRICT_VIEW_ON" if self.object.hide_viewport else "RESTRICT_VIEW_OFF"
                 self.invokeFunction(row, node, "toggleObjectVisibilty", icon = icon,
-                    description = "Toggle viewport and render visibility.")
+                    description = "Toggle viewport and render visibility")
 
         self.invokeFunction(row, node, "handleEyedropperButton", icon = "EYEDROPPER", passEvent = True,
             description = "Assign active object to this socket (hold CTRL to open a rename object dialog)")
@@ -59,19 +59,8 @@ class ObjectSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             data = bpy.data.curves.new("Curve", "CURVE")
             data.dimensions = "3D"
             data.fill_mode = "FULL"
-
         if type == "GPENCIL":
-            data=bpy.data.grease_pencils.new("ANGPencil")
-            scene=bpy.context.scene
-            scene.grease_pencil=data
-            layer=data.layers.new("ANGPencil_Layer", set_active=True)
-            frame=layer.frames.new(1)
-            stroke=frame.strokes.new()
-            stroke.display_mode="SCREEN"
-            material = bpy.data.materials.new('ANMaterial')
-            bpy.data.materials.create_gpencil_data(material)
-            data.materials.append(material)
-            
+            data = bpy.data.grease_pencils.new("ANGPencil")
         object = bpy.data.objects.new("Target", data)
         bpy.context.collection.objects.link(object)
         self.object = object

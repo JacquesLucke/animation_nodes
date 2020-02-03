@@ -3,10 +3,10 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPencilObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPencilObjectMaterialOutputNode"
-    bl_label = "GPencil Object Material Output"
-    bl_width_default = 175
+class GPObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPObjectMaterialOutputNode"
+    bl_label = "GP Object Material Output"
+    errorHandlingType = "EXCEPTION"
 
     useMaterialList: VectorizedSocket.newProperty()
     removeMaterialBool: BoolProperty(name="Remove Old Materials",
@@ -16,8 +16,7 @@ class GPencilObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Material", "useMaterialList",
-            ("Material", "material"),
-            ("Materials", "materials")), defaultDrawType = "PROPERTY_ONLY")
+            ("Material", "material"), ("Materials", "materials")), defaultDrawType = "PROPERTY_ONLY")
 
         self.newOutput("Object", "Object", "object")
 
