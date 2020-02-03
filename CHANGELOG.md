@@ -2,7 +2,14 @@
 
 ### Added
 
-
+- Added GP Object Input node.
+- Added GP Layer Info node.
+- Added GP Frame Info node.
+- Added GP Stroke Info node.
+- Added GP Stroke From Points node.
+- Added GP Frame From Strokes node.
+- Added GP Layer From Frames node.
+- Added GP Object Output node.
 
 ### Fixed
 
