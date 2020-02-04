@@ -19,6 +19,7 @@
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
+- Increase precision of float sockets.
 
 ## 2.1.6
 
