@@ -5,8 +5,8 @@ from ... base_types import AnimationNode, VectorizedSocket
 class ChangeSplineDirectionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ChangeSplineDirectionNode"
     bl_label = "Change Spline Direction"
-    bl_width_default = 160
 
+    codeEffects = [VectorizedSocket.CodeEffect]
     useSplineList: VectorizedSocket.newProperty()
 
     def create(self):
@@ -16,23 +16,11 @@ class ChangeSplineDirectionNode(bpy.types.Node, AnimationNode):
         socket.dataIsModified = True
 
         self.newOutput(VectorizedSocket("Spline", "useSplineList",
-            ("Spline", "spline"),
+            ("Spline", "newSpline"),
             ("Splines", "newSplines")))
 
-    def getExecutionFunctionName(self):
-        if self.useSplineList:
-            return "execute_MultipleSplines"
-        else:
-            return "execute_SingleSpline"
-
-    def execute_SingleSpline(self, spline):
-        return self.changeSplineDirection(spline)
-
-    def execute_MultipleSplines(self, splines):
-        newSplines = []
-        for spline in splines:
-            newSplines.append(self.changeSplineDirection(spline))
-        return newSplines
+    def getExecutionCode(self, required):
+        return "newSpline = self.changeSplineDirection(spline)"
 
     def changeSplineDirection(self, spline):
         if spline.type == "POLY":
@@ -42,6 +30,8 @@ class ChangeSplineDirectionNode(bpy.types.Node, AnimationNode):
                               cyclic = spline.cyclic)
         elif spline.type == "BEZIER":
             return BezierSpline(points = spline.points.reversed(),
+                                leftHandles = spline.rightHandles.reversed(),
+                                rightHandles = spline.leftHandles.reversed(),
                                 radii = spline.radii.reversed(),
                                 tilts = spline.tilts.reversed(),
                                 cyclic = spline.cyclic)
