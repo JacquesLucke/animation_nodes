@@ -518,6 +518,7 @@ class GPencilMenu(bpy.types.Menu):
         insertNode(layout, "an_GPStrokeStartCapModeNode", "Stroke Start Cap")
         insertNode(layout, "an_GPStrokeEndCapModeNode", "Stroke End Cap")
         insertNode(layout, "an_GPStrokeMaterialIndexNode", "Stroke Material Index")
+        insertNode(layout, "an_GPReplicateStrokeNode", "Replicate Stroke")
         insertNode(layout, "an_GPStrokeTransformNode", "Stroke Transform")
         insertNode(layout, "an_GPStrokeDisplayModeNode", "Stroke Display Mode")
         layout.separator()
