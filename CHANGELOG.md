@@ -10,6 +10,7 @@
 - Added GP Frame From Strokes node.
 - Added GP Layer From Frames node.
 - Added GP Object Output node.
+- Added Change Spline Direction node.
 
 ### Fixed
 
