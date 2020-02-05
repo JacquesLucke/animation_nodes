@@ -33,18 +33,18 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def execute_Layer(self, object, layer):
         if object is None: return None
-        gpencil = self.getObjectData(object)
-
         if layer is None: return object
+
+        gpencil = self.getObjectData(object)
         self.setLayerData(gpencil, layer)
         gpencil.layers.active.frames.update()
         return object
 
     def execute_LayerList(self, object, layers):
         if object is None: return None
-        gpencil = self.getObjectData(object)
-
         if len(layers) == 0: return object
+
+        gpencil = self.getObjectData(object)
         for layer in layers:
             self.setLayerData(gpencil, layer)
         gpencil.layers.active.frames.update()
