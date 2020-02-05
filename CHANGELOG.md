@@ -10,6 +10,7 @@
 - Added GP Frame From Strokes node.
 - Added GP Layer From Frames node.
 - Added GP Object Output node.
+- Added Change Spline Direction node.
 
 ### Fixed
 
@@ -19,6 +20,7 @@
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
+- Increase precision of float sockets.
 
 ## 2.1.6
 
