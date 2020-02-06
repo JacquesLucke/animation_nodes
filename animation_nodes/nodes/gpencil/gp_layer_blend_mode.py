@@ -1,46 +1,51 @@
 import bpy
-from bpy.props import *
-from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
-
-blendModeItems = [
-    ("REGULAR", "Regular", "Layer blend mode", "NONE", 0),
-    ("OVERLAY", "Overlay", "Layer blend mode", "NONE", 1),
-    ("ADD", "Add", "Layer blend mode", "NONE", 2),
-    ("SUBTRACT", "Subtract", "Layer blend mode", "NONE", 3),
-    ("MULTIPLY", "Multiply", "Layer blend mode", "NONE", 4),
-    ("DIVIDE", "Divide", "Layer blend mode", "NONE", 5)
-]
 
 class GPLayerBlendModeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPLayerBlendModeNode"
     bl_label = "GP Layer Blend Mode"
-
-    blendMode: EnumProperty(name = "Layer blend mode", default = "REGULAR",
-        items = blendModeItems, update = AnimationNode.refresh)
+    errorHandlingType = "EXCEPTION"
 
     useLayerList: VectorizedSocket.newProperty()
+    useModeTextList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("GPLayer", "useLayerList",
             ("Layer", "layer"), ("Layers", "layers")), dataIsModified = True)
+        self.newInput(VectorizedSocket("Text", ["useLayerList", "useModeTextList"],
+            ("Blend Mode", "blendMode"), ("Blend Modes", "blendModes")), value = "REGULAR")
         self.newOutput(VectorizedSocket("GPLayer", "useLayerList",
             ("Layer", "layer"), ("Layers", "layers")))
 
-    def draw(self, layout):
-        layout.prop(self, "blendMode", text = "")
-
     def getExecutionFunctionName(self):
-        if self.useLayerList:
-            return "execute_LayerList"
+        if self.useLayerList and self.useModeTextList:
+            return "execute_LayerList_BlendModeList"
+        elif self.useLayerList:
+            return "execute_LayerList_BlendMode"
         else:
-            return "execute_Layer"
+            return "execute_Layer_BlendMode"
 
-    def execute_Layer(self, layer):
-        layer.blendMode = self.blendMode
-        return layer
+    def execute_Layer_BlendMode(self, layer, blendMode):
+        return self.setLayerBlendMode(layer, blendMode)
 
-    def execute_LayerList(self, layers):
+    def execute_LayerList_BlendMode(self, layers, blendMode):
+        if len(layers) == 0: return layers
         for layer in layers:
-            layer.blendMode = self.blendMode
+            self.setLayerBlendMode(layer, blendMode)
         return layers
+
+    def execute_LayerList_BlendModeList(self, layers, blendModes):
+        if len(layers) == 0 or len(blendModes) == 0: return layers
+        if len(layers) != len(blendModes):
+            self.raiseErrorMessage("Layers and Blend Modes have different lengths.")
+        for i, layer in enumerate(layers):
+            blendMode = blendModes[i]
+            self.setLayerBlendMode(layer, blendMode)
+        return layers
+
+    def setLayerBlendMode(self, layer, blendMode):
+        if blendMode not in ['REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE']:
+            self.raiseErrorMessage("The Blend Mode is invalid. \n\nPossible values for 'Blend Mode' are: 'REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE'")
+
+        layer.blendMode = blendMode
+        return layer
