@@ -1,4 +1,5 @@
 import bpy
+from ... data_structures import VirtualPyList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPStrokeStartCapModeNode(bpy.types.Node, AnimationNode):
@@ -36,11 +37,9 @@ class GPStrokeStartCapModeNode(bpy.types.Node, AnimationNode):
         return strokes
 
     def execute_StrokeList_StartCapModeList(self, strokes, startCapModes):
-        if len(strokes) == 0 or len(startCapModes) == 0: return strokes
-        if len(strokes) != len(startCapModes):
-            self.raiseErrorMessage("Strokes and Start Cap Modes have different lengths.")
+        startCapModes = VirtualPyList.create(startCapModes, "ROUND")
         for i, stroke in enumerate(strokes):
-            self.strokeStartCapMode(stroke, startCapModes[i])
+            self.setStrokeStartCapMode(stroke, startCapModes[i])
         return strokes
 
     def setStrokeStartCapMode(self, stroke, startCapMode):

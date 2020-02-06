@@ -1,4 +1,5 @@
 import bpy
+from ... data_structures import VirtualPyList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
@@ -36,9 +37,7 @@ class GPStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
         return strokes
 
     def execute_StrokeList_EndCapModeList(self, strokes, endCapModes):
-        if len(strokes) == 0 or len(endCapModes) == 0: return strokes
-        if len(strokes) != len(endCapModes):
-            self.raiseErrorMessage("Strokes and End Cap Modes have different lengths.")
+        endCapModes = VirtualPyList.create(endCapModes, "ROUND")
         for i, stroke in enumerate(strokes):
             self.setStrokeEndCapMode(stroke, endCapModes[i])
         return strokes
