@@ -15,6 +15,7 @@
 ### Fixed
 
 - Fixed the Splines From Branches algorithm for closed loops.
+- Fixed auto execution when the node tree is refreshed during animation.
 
 ### Changed
 
