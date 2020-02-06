@@ -1,4 +1,5 @@
 import bpy
+from ... data_structures import VirtualPyList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPLayerBlendModeNode(bpy.types.Node, AnimationNode):
@@ -35,9 +36,7 @@ class GPLayerBlendModeNode(bpy.types.Node, AnimationNode):
         return layers
 
     def execute_LayerList_BlendModeList(self, layers, blendModes):
-        if len(layers) == 0 or len(blendModes) == 0: return layers
-        if len(layers) != len(blendModes):
-            self.raiseErrorMessage("Layers and Blend Modes have different lengths.")
+        blendModes = VirtualPyList.create(blendModes, "REGULAR")
         for i, layer in enumerate(layers):
             blendMode = blendModes[i]
             self.setLayerBlendMode(layer, blendMode)

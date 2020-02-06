@@ -1,4 +1,5 @@
 import bpy
+from ... data_structures import VirtualPyList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
@@ -35,9 +36,7 @@ class GPStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
         return strokes
 
     def execute_StrokeList_DisplayModeList(self, strokes, displayModes):
-        if len(strokes) == 0 or len(displayModes) == 0: return strokes
-        if len(strokes) != len(displayModes):
-            self.raiseErrorMessage("Strokes and Display Modes have different lengths.")
+        displayModes = VirtualPyList.create(displayModes, "3DSPACE")
         for i, stroke in enumerate(strokes):
             displayMode = displayModes[i]
             self.setStrokeDisplayMode(stroke, displayMode)
