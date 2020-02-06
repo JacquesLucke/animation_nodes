@@ -35,7 +35,7 @@ evaluatedDepsgraph = None
 def frameChanged(scene, depsgraph):
     global evaluatedDepsgraph
     evaluatedDepsgraph = depsgraph
-    event_handler.update({"Frame"})
+    event_handler.update(event.getActives().union({"Frame"}))
     evaluatedDepsgraph = None
 
 def propertyChanged(self = None, context = None):
