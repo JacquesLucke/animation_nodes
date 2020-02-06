@@ -26,28 +26,26 @@ class GPStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
             return "execute_Stroke_EndCapMode"
 
     def execute_Stroke_EndCapMode(self, stroke, endCapMode):
-        self.strokeEndCapMode(stroke, endCapMode)
+        self.setStrokeEndCapMode(stroke, endCapMode)
         return stroke
 
     def execute_StrokeList_EndCapMode(self, strokes, endCapMode):
         if len(strokes) == 0: return strokes
         for stroke in strokes:
-            self.strokeEndCapMode(stroke, endCapMode)
+            self.setStrokeEndCapMode(stroke, endCapMode)
         return strokes
 
     def execute_StrokeList_EndCapModeList(self, strokes, endCapModes):
         if len(strokes) == 0 or len(endCapModes) == 0: return strokes
-        if len(strokes) < len(endCapModes):
-            self.raiseErrorMessage("Invalid stroke list.")
-        if len(strokes) > len(endCapModes):
-            self.raiseErrorMessage("Invalid end cap mode list.")
+        if len(strokes) != len(endCapModes):
+            self.raiseErrorMessage("Strokes and End Cap Modes have different lengths.")
         for i, stroke in enumerate(strokes):
-            self.strokeEndCapMode(stroke, endCapModes[i])
+            self.setStrokeEndCapMode(stroke, endCapModes[i])
         return strokes
 
-    def strokeEndCapMode(self, stroke, endCapMode):
+    def setStrokeEndCapMode(self, stroke, endCapMode):
         if endCapMode not in ['ROUND', 'FLAT']:
-            self.raiseErrorMessage("The End Cap mode is invalid. \n\nPossible values for 'End Cap Mode' are: 'REGULAR', 'FLAT'")
+            self.raiseErrorMessage("The End Cap Mode is invalid. \n\nPossible values for 'End Cap Mode' are: 'ROUND', 'FLAT'")
 
         stroke.endCapMode = endCapMode
         return stroke

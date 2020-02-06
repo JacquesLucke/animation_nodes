@@ -26,28 +26,26 @@ class GPStrokeStartCapModeNode(bpy.types.Node, AnimationNode):
             return "execute_Stroke_StartCapMode"
 
     def execute_Stroke_StartCapMode(self, stroke, startCapMode):
-        self.strokeStartCapMode(stroke, startCapMode)
+        self.setStrokeStartCapMode(stroke, startCapMode)
         return stroke
 
     def execute_StrokeList_StartCapMode(self, strokes, startCapMode):
         if len(strokes) == 0: return strokes
         for stroke in strokes:
-            self.strokeStartCapMode(stroke, startCapMode)
+            self.setStrokeStartCapMode(stroke, startCapMode)
         return strokes
 
     def execute_StrokeList_StartCapModeList(self, strokes, startCapModes):
         if len(strokes) == 0 or len(startCapModes) == 0: return strokes
-        if len(strokes) < len(startCapModes):
-            self.raiseErrorMessage("Invalid stroke list.")
-        if len(strokes) > len(startCapModes):
-            self.raiseErrorMessage("Invalid start cap mode list.")
+        if len(strokes) != len(startCapModes):
+            self.raiseErrorMessage("Strokes and Start Cap Modes have different lengths.")
         for i, stroke in enumerate(strokes):
             self.strokeStartCapMode(stroke, startCapModes[i])
         return strokes
 
-    def strokeStartCapMode(self, stroke, startCapMode):
+    def setStrokeStartCapMode(self, stroke, startCapMode):
         if startCapMode not in ['ROUND', 'FLAT']:
-            self.raiseErrorMessage("The Start Cap mode is invalid. \n\nPossible values for 'Start Cap Mode' are: 'REGULAR', 'FLAT'")
+            self.raiseErrorMessage("The Start Cap Mode is invalid. \n\nPossible values for 'Start Cap Mode' are: 'ROUND', 'FLAT'")
 
         stroke.startCapMode = startCapMode
         return stroke
