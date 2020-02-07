@@ -2,9 +2,9 @@ import bpy
 from ... data_structures import VirtualPyList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPLayerBlendModeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPLayerBlendModeNode"
-    bl_label = "GP Layer Blend Mode"
+class GPSetLayerBlendModeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPSetLayerBlendModeNode"
+    bl_label = "GP Set Layer Blend Mode"
     errorHandlingType = "EXCEPTION"
 
     useLayerList: VectorizedSocket.newProperty()
@@ -13,9 +13,9 @@ class GPLayerBlendModeNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("GPLayer", "useLayerList",
             ("Layer", "layer"), ("Layers", "layers")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Text", ["useLayerList", "useModeTextList"],
+        self.newInput(VectorizedSocket("Text", "useModeTextList",
             ("Blend Mode", "blendMode"), ("Blend Modes", "blendModes")), value = "REGULAR")
-        self.newOutput(VectorizedSocket("GPLayer", "useLayerList",
+        self.newOutput(VectorizedSocket("GPLayer", ["useLayerList", "useModeTextList"],
             ("Layer", "layer"), ("Layers", "layers")))
 
     def getExecutionFunctionName(self):
@@ -23,11 +23,23 @@ class GPLayerBlendModeNode(bpy.types.Node, AnimationNode):
             return "execute_LayerList_BlendModeList"
         elif self.useLayerList:
             return "execute_LayerList_BlendMode"
+        elif self.useModeTextList:
+            return "execute_Layer_BlendModeList"
         else:
             return "execute_Layer_BlendMode"
 
     def execute_Layer_BlendMode(self, layer, blendMode):
         return self.setLayerBlendMode(layer, blendMode)
+
+    def execute_Layer_BlendModeList(self, layer, blendModes):
+        if len(blendModes) == 0: return [layer]
+
+        layers = []
+        for blendMode in blendModes:
+            layerNew = layer.copy()
+            self.setLayerBlendMode(layerNew, blendMode)
+            layers.append(layerNew)
+        return layers
 
     def execute_LayerList_BlendMode(self, layers, blendMode):
         if len(layers) == 0: return layers

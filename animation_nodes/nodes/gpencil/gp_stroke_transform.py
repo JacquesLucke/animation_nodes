@@ -15,30 +15,42 @@ class GPStrokeTransformNode(bpy.types.Node, AnimationNode):
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Matrix", "useMatrixList",
             ("Matrix", "matrix"), ("Matices", "matrices")))
-        self.newOutput(VectorizedSocket("GPStroke", "useStrokeList",
+        self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useMatrixList"],
             ("Stroke", "stroke"), ("Strokes", "strokes")))
 
     def getExecutionFunctionName(self):
         if self.useStrokeList and self.useMatrixList:
-            return "executeListList"
+            return "execute_StrokeList_MatrixList"
         elif self.useStrokeList:
-            return "executeList"
+            return "execute_StrokeList_Matrix"
+        elif self.useMatrixList:
+            return "execute_Stroke_MatrixList"
         else:
-            return "executeSingle"
+            return "execute_Stroke_Matrix"
 
-    def executeSingle(self, stroke, matrix):
+    def execute_Stroke_Matrix(self, stroke, matrix):
         if matrix is not None:
             self.strokeTransfom(stroke, matrix)
         return stroke
 
-    def executeList(self, strokes, matrix):
+    def execute_Stroke_MatrixList(self, stroke, matrices):
+        if len(matrices) == 0: return [stroke]
+        strokes = []
+        for matrix in matrices:
+            if matrix is not None:
+                strokeNew = stroke.copy()
+                self.strokeTransfom(strokeNew, matrix)
+                strokes.append(strokeNew)
+        return strokes
+
+    def execute_StrokeList_Matrix(self, strokes, matrix):
         if len(strokes) == 0: return strokes
         for stroke in strokes:
             if matrix is not None:
                 self.strokeTransfom(stroke, matrix)
         return strokes
 
-    def executeListList(self, strokes, matrices):
+    def execute_StrokeList_MatrixList(self, strokes, matrices):
         if len(strokes) == 0 or len(matrices) == 0: return strokes
         matrices = VirtualMatrix4x4List.create(matrices, Matrix())
         for i, stroke in enumerate(strokes):

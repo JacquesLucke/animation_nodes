@@ -2,9 +2,9 @@ import bpy
 from ... data_structures import VirtualLongList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPStrokeMaterialIndexNode"
-    bl_label = "GP Stroke Material Index"
+class GPSetStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPSetStrokeMaterialIndexNode"
+    bl_label = "GP Set Stroke Material Index"
 
     useStrokeList: VectorizedSocket.newProperty()
     useIntegerList: VectorizedSocket.newProperty()
@@ -14,28 +14,39 @@ class GPStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Integer", "useIntegerList",
             ("Material Index", "materialIndex"), ("Material Indices", "materialIndices")))
-        self.newOutput(VectorizedSocket("GPStroke", "useStrokeList",
+        self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useIntegerList"],
             ("Stroke", "stroke"), ("Strokes", "strokes")))
 
     def getExecutionFunctionName(self):
         if self.useStrokeList and self.useIntegerList:
-            return "executeListList"
+            return "execute_StrokeList_MaterialIndexList"
         elif self.useStrokeList:
-            return "executeList"
+            return "execute_StrokeList_MaterialIndex"
+        elif self.useIntegerList:
+            return "execute_Stroke_MaterialIndexList"
         else:
-            return "executeSingle"
+            return "execute_Stroke_MaterialIndex"
 
-    def executeSingle(self, stroke, materialIndex):
+    def execute_Stroke_MaterialIndex(self, stroke, materialIndex):
         stroke.materialIndex = materialIndex
         return stroke
 
-    def executeList(self, strokes, materialIndex):
+    def execute_Stroke_MaterialIndexList(self, stroke, materialIndices):
+        if len(materialIndices) == 0: return [stroke]
+        strokes = []
+        for materialIndex in materialIndices:
+            strokeNew = stroke.copy()
+            strokeNew.materialIndex = materialIndex
+            strokes.append(strokeNew)
+        return strokes
+
+    def execute_StrokeList_MaterialIndex(self, strokes, materialIndex):
         if len(strokes) == 0: return strokes
         for stroke in strokes:
             stroke.materialIndex = materialIndex
         return strokes
 
-    def executeListList(self, strokes, materialIndices):
+    def execute_StrokeList_MaterialIndexList(self, strokes, materialIndices):
         if len(strokes) == 0 or len(materialIndices) == 0: return strokes
         materialIndices = VirtualLongList.create(materialIndices, 0)
         for i, stroke in enumerate(strokes):

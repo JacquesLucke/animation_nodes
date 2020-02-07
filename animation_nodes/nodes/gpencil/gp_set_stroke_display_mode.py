@@ -2,9 +2,9 @@ import bpy
 from ... data_structures import VirtualPyList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPStrokeDisplayModeNode"
-    bl_label = "GP Stroke Display Mode"
+class GPSetStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPSetStrokeDisplayModeNode"
+    bl_label = "GP Set Stroke Display Mode"
     errorHandlingType = "EXCEPTION"
 
     useStrokeList: VectorizedSocket.newProperty()
@@ -13,9 +13,9 @@ class GPStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Text", ["useStrokeList", "useModeTextList"],
+        self.newInput(VectorizedSocket("Text", "useModeTextList",
             ("Display Mode", "displayMode"), ("Display Modes", "displayModes")), value = "3DSPACE")
-        self.newOutput(VectorizedSocket("GPStroke", "useStrokeList",
+        self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useModeTextList"],
             ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
     def getExecutionFunctionName(self):
@@ -23,11 +23,23 @@ class GPStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
             return "execute_StrokeList_DisplayModeList"
         elif self.useStrokeList:
             return "execute_StrokeList_DisplayMode"
+        elif self.useModeTextList:
+            return "execute_Stroke_DisplayModeList"
         else:
             return "execute_Stroke_DisplayMode"
 
     def execute_Stroke_DisplayMode(self, stroke, displayMode):
         return self.setStrokeDisplayMode(stroke, displayMode)
+
+    def execute_Stroke_DisplayModeList(self, stroke, displayModes):
+        if len(displayModes) == 0: return [stroke]
+
+        strokes = []
+        for displayMode in displayModes:
+            strokeNew = stroke.copy()
+            self.setStrokeDisplayMode(strokeNew, displayMode)
+            strokes.append(strokeNew)
+        return strokes
 
     def execute_StrokeList_DisplayMode(self, strokes, displayMode):
         if len(strokes) == 0: return strokes

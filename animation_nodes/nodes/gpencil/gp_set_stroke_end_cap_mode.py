@@ -2,9 +2,9 @@ import bpy
 from ... data_structures import VirtualPyList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPStrokeEndCapModeNode"
-    bl_label = "GP Stroke End Cap Mode"
+class GPSetStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPSetStrokeEndCapModeNode"
+    bl_label = "GP Set Stroke End Cap Mode"
     errorHandlingType = "EXCEPTION"
 
     useStrokeList: VectorizedSocket.newProperty()
@@ -13,9 +13,9 @@ class GPStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Text", ["useStrokeList", "useModeTextList"],
+        self.newInput(VectorizedSocket("Text", "useModeTextList",
             ("End Cap Mode", "endCapMode"), ("End Cap Modes", "endCapModes")), value = "ROUND")
-        self.newOutput(VectorizedSocket("GPStroke", "useStrokeList",
+        self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useModeTextList"],
             ("Stroke", "stroke"), ("Strokes", "strokes")))
 
     def getExecutionFunctionName(self):
@@ -23,12 +23,24 @@ class GPStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
             return "execute_StrokeList_EndCapModeList"
         elif self.useStrokeList:
             return "execute_StrokeList_EndCapMode"
+        elif self.useModeTextList:
+            return "execute_Stroke_EndCapModeList"
         else:
             return "execute_Stroke_EndCapMode"
 
     def execute_Stroke_EndCapMode(self, stroke, endCapMode):
         self.setStrokeEndCapMode(stroke, endCapMode)
         return stroke
+
+    def execute_Stroke_EndCapModeList(self, stroke, endCapModes):
+        if len(endCapModes) == 0: return [stroke]
+
+        strokes = []
+        for endCapMode in endCapModes:
+            strokeNew = stroke.copy()
+            self.setStrokeEndCapMode(strokeNew, endCapMode)
+            strokes.append(strokeNew)
+        return strokes
 
     def execute_StrokeList_EndCapMode(self, strokes, endCapMode):
         if len(strokes) == 0: return strokes
