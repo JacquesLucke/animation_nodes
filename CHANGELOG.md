@@ -17,6 +17,7 @@
 - Fixed the Splines From Branches algorithm for closed loops.
 - Fixed auto execution when the node tree is refreshed during animation.
 - Fixed the Distribute Matrices node for the Spiral option.
+- Fixed VirtualPyList for singleton lists.
 
 ### Changed
 
