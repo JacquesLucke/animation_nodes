@@ -26,7 +26,7 @@ class TransformGPStrokeNode(bpy.types.Node, AnimationNode):
 
     def execute_Stroke_Matrix(self, stroke, matrix):
         if matrix is not None:
-            self.strokeTransfom(stroke, matrix)
+            self.transfomStroke(stroke, matrix)
         return stroke
 
     def execute_StrokeList_MatrixList(self, strokes, matrices):
@@ -37,9 +37,9 @@ class TransformGPStrokeNode(bpy.types.Node, AnimationNode):
         outStrokes = []
         for i in range(amount):
             strokeNew = _strokes[i].copy()
-            self.strokeTransfom(strokeNew, _matrices[i])
+            self.transfomStroke(strokeNew, _matrices[i])
             outStrokes.append(strokeNew)
         return outStrokes
 
-    def strokeTransfom(self, stroke, matrix):
+    def transfomStroke(self, stroke, matrix):
         return stroke.vertices.transform(matrix)
