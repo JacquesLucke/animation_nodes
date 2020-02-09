@@ -1,6 +1,6 @@
 import bpy
-from ... data_structures import VirtualLongList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualLongList, VirtualPyList, GPLayer
 
 class GPSetLayerPassIndexNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPSetLayerPassIndexNode"
@@ -15,13 +15,11 @@ class GPSetLayerPassIndexNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Integer", "usePassIndexList",
             ("Pass Index", "passIndex"), ("Pass Indices", "passIndices")), value = 0)
         self.newOutput(VectorizedSocket("GPLayer", ["useLayerList", "usePassIndexList"],
-            ("Layer", "layer"), ("Layers", "layers")))
+            ("Layer", "outLayer"), ("Layers", "outLayers")))
 
     def getExecutionFunctionName(self):
-        if self.useLayerList:
+        if self.useLayerList or self.usePassIndexList:
             return "execute_LayerList_PassIndexList"
-        elif self.usePassIndexList:
-            return "execute_Layer_PassIndexList"
         else:
             return "execute_Layer_PassIndex"
 
@@ -29,18 +27,14 @@ class GPSetLayerPassIndexNode(bpy.types.Node, AnimationNode):
         layer.passIndex = passIndex
         return layer
 
-    def execute_Layer_PassIndexList(self, layer, passIndices):
-        if len(passIndices) == 0: return [layer]
-
-        layers = []
-        for passIndex in passIndices:
-            layerNew = layer.copy()
-            layerNew.passIndex = passIndex
-            layers.append(layerNew)
-        return layers
-
     def execute_LayerList_PassIndexList(self, layers, passIndices):
-        passIndices = VirtualLongList.create(passIndices, 0)
-        for i, layer in enumerate(layers):
-            layer.passIndex = passIndices[i]
-        return layers
+        _layers = VirtualPyList.create(layers, GPLayer())
+        _passIndices = VirtualLongList.create(passIndices, 0)
+        amount = VirtualPyList.getMaxRealLength(_layers, _passIndices)
+
+        outLayers = []
+        for i in range(amount):
+            layerNew = _layers[i].copy()
+            layerNew.passIndex = _passIndices[i]
+            outLayers.append(layerNew)
+        return outLayers

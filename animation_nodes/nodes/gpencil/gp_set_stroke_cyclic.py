@@ -1,6 +1,6 @@
 import bpy
-from ... data_structures import VirtualBooleanList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualBooleanList, VirtualPyList, GPStroke
 
 class GPSetStrokeCyclicNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPSetStrokeCyclicNode"
@@ -15,15 +15,11 @@ class GPSetStrokeCyclicNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Boolean", "useBooleanList",
             ("Cyclic", "cyclic"), ("Cyclics", "cyclics")))
         self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useBooleanList"],
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
     def getExecutionFunctionName(self):
-        if self.useStrokeList and self.useBooleanList:
+        if self.useStrokeList or self.useBooleanList:
             return "execute_StrokeList_CyclicList"
-        elif self.useStrokeList:
-            return "execute_StrokeList_Cyclic"
-        elif self.useBooleanList:
-            return "execute_Stroke_CyclicList"
         else:
             return "execute_Stroke_Cyclic"
 
@@ -31,25 +27,14 @@ class GPSetStrokeCyclicNode(bpy.types.Node, AnimationNode):
         stroke.drawCyclic = cyclic
         return stroke
 
-    def execute_Stroke_CyclicList(self, stroke, cyclics):
-        if len(cyclics) == 0: return [stroke]
-
-        strokes = []
-        for cyclic in cyclics:
-            strokeNew = stroke.copy()
-            strokeNew.drawCyclic = cyclic
-            strokes.append(strokeNew)
-        return strokes
-
-    def execute_StrokeList_Cyclic(self, strokes, cyclic):
-        if len(strokes) == 0: return strokes
-        for stroke in strokes:
-            stroke.drawCyclic = cyclic
-        return strokes
-
     def execute_StrokeList_CyclicList(self, strokes, cyclics):
-        if len(strokes) == 0 or len(cyclics) == 0: return strokes
-        cyclics = VirtualBooleanList.create(cyclics, False)
-        for i, stroke in enumerate(strokes):
-            stroke.drawCyclic = cyclics[i]
-        return strokes
+        _strokes = VirtualPyList.create(strokes, GPStroke())
+        _cyclics = VirtualBooleanList.create(cyclics, False)
+        amount = VirtualPyList.getMaxRealLength(_strokes, _cyclics)
+
+        outStrokes = []
+        for i in range(amount):
+            strokeNew = _strokes[i].copy()
+            strokeNew.drawCyclic = _cyclics[i]
+            outStrokes.append(strokeNew)
+        return outStrokes

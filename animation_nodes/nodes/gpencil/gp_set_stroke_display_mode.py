@@ -1,5 +1,5 @@
 import bpy
-from ... data_structures import VirtualPyList
+from ... data_structures import VirtualPyList, GPStroke
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPSetStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
@@ -19,40 +19,25 @@ class GPSetStrokeDisplayModeNode(bpy.types.Node, AnimationNode):
             ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
     def getExecutionFunctionName(self):
-        if self.useStrokeList and self.useModeTextList:
+        if self.useStrokeList or self.useModeTextList:
             return "execute_StrokeList_DisplayModeList"
-        elif self.useStrokeList:
-            return "execute_StrokeList_DisplayMode"
-        elif self.useModeTextList:
-            return "execute_Stroke_DisplayModeList"
         else:
             return "execute_Stroke_DisplayMode"
 
     def execute_Stroke_DisplayMode(self, stroke, displayMode):
         return self.setStrokeDisplayMode(stroke, displayMode)
 
-    def execute_Stroke_DisplayModeList(self, stroke, displayModes):
-        if len(displayModes) == 0: return [stroke]
-
-        strokes = []
-        for displayMode in displayModes:
-            strokeNew = stroke.copy()
-            self.setStrokeDisplayMode(strokeNew, displayMode)
-            strokes.append(strokeNew)
-        return strokes
-
-    def execute_StrokeList_DisplayMode(self, strokes, displayMode):
-        if len(strokes) == 0: return strokes
-        for stroke in strokes:
-            self.setStrokeDisplayMode(stroke, displayMode)
-        return strokes
-
     def execute_StrokeList_DisplayModeList(self, strokes, displayModes):
-        displayModes = VirtualPyList.create(displayModes, "3DSPACE")
-        for i, stroke in enumerate(strokes):
-            displayMode = displayModes[i]
-            self.setStrokeDisplayMode(stroke, displayMode)
-        return strokes
+        _strokes = VirtualPyList.create(strokes, GPStroke())
+        _displayModes = VirtualPyList.create(displayModes, "3DSPACE")
+        amount = VirtualPyList.getMaxRealLength(_strokes, _displayModes)
+
+        outStrokes = []
+        for i in range(amount):
+            strokeNew = _strokes[i].copy()
+            self.setStrokeDisplayMode(strokeNew, _displayModes[i])
+            outStrokes.append(strokeNew)
+        return outStrokes
 
     def setStrokeDisplayMode(self, stroke, displayMode):
         if displayMode not in ['SCREEN', '3DSPACE', '2DSPACE', '2DIMAGE']:

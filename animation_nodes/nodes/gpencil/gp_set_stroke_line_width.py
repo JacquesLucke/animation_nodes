@@ -1,6 +1,6 @@
 import bpy
-from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualDoubleList, VirtualPyList, GPStroke
 
 class GPSetStrokeLineWidthNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPSetStrokeLineWidthNode"
@@ -18,12 +18,8 @@ class GPSetStrokeLineWidthNode(bpy.types.Node, AnimationNode):
             ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
     def getExecutionFunctionName(self):
-        if self.useStrokeList and self.useFloatList:
+        if self.useStrokeList or self.useFloatList:
             return "execute_StrokeList_LineWidthList"
-        elif self.useStrokeList:
-            return "execute_StrokeList_LineWidth"
-        elif self.useFloatList:
-            return "execute_Stroke_LineWidthList"
         else:
             return "execute_Stroke_LineWidth"
 
@@ -31,24 +27,14 @@ class GPSetStrokeLineWidthNode(bpy.types.Node, AnimationNode):
         stroke.lineWidth = lineWidth
         return stroke
 
-    def execute_Stroke_LineWidthList(self, stroke, lineWidths):
-        if len(lineWidths) == 0: return [stroke]
-        strokes = []
-        for lineWidth in lineWidths:
-            strokeNew = stroke.copy()
-            strokeNew.lineWidth = lineWidth
-            strokes.append(strokeNew)
-        return strokes
-
-    def execute_StrokeList_LineWidth(self, strokes, lineWidth):
-        if len(strokes) == 0: return strokes
-        for stroke in strokes:
-            stroke.lineWidth = lineWidth
-        return strokes
-
     def execute_StrokeList_LineWidthList(self, strokes, lineWidths):
-        if len(strokes) == 0 or len(lineWidths) == 0: return strokes
-        lineWidths = VirtualDoubleList.create(lineWidths, 0)
-        for i, stroke in enumerate(strokes):
-            stroke.lineWidth = lineWidths[i]
-        return strokes
+        _strokes = VirtualPyList.create(strokes, GPStroke())
+        _lineWidths = VirtualDoubleList.create(lineWidths, 0)
+        amount = VirtualPyList.getMaxRealLength(_strokes, _lineWidths)
+
+        outStrokes = []
+        for i in range(amount):
+            strokeNew = _strokes[i].copy()
+            strokeNew.lineWidth = _lineWidths[i]
+            outStrokes.append(strokeNew)
+        return outStrokes

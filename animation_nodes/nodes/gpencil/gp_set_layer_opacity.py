@@ -1,6 +1,6 @@
 import bpy
-from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualDoubleList, VirtualPyList, GPLayer
 
 class GPSetLayerOpacityNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPSetLayerOpacityNode"
@@ -15,13 +15,11 @@ class GPSetLayerOpacityNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Float", "useOpacityList",
             ("Opacity", "opacity"), ("Opacities", "opacities")), value = 1)
         self.newOutput(VectorizedSocket("GPLayer", ["useLayerList", "useOpacityList"],
-            ("Layer", "layer"), ("Layers", "layers")))
+            ("Layer", "outLayer"), ("Layers", "outLayers")))
 
     def getExecutionFunctionName(self):
-        if self.useLayerList and self.useOpacityList:
+        if self.useLayerList or self.useOpacityList:
             return "execute_LayerList_OpacityList"
-        elif self.useOpacityList:
-            return "execute_Layer_OpacityList"
         else:
             return "execute_Layer"
 
@@ -29,18 +27,14 @@ class GPSetLayerOpacityNode(bpy.types.Node, AnimationNode):
         layer.opacity = opacity
         return layer
 
-    def execute_Layer_OpacityList(self, layer, opacities):
-        if len(opacities) == 0: return [layer]
-
-        layers = []
-        for opacity in opacities:
-            layerNew = layer.copy()
-            layerNew.opacity = opacity
-            layers.append(layerNew)
-        return layers
-
     def execute_LayerList_OpacityList(self, layers, opacities):
-        opacities = VirtualDoubleList.create(opacities, 1)
-        for i, layer in enumerate(layers):
-            layer.opacity = opacities[i]
-        return layers
+        _layers = VirtualPyList.create(layers, GPLayer())
+        _opacities = VirtualDoubleList.create(opacities, 1)
+        amount = VirtualPyList.getMaxRealLength(_layers, _opacities)
+
+        outLayers = []
+        for i in range(amount):
+            layerNew =_layers[i].copy()
+            layerNew.opacity = _opacities[i]
+            outLayers.append(layerNew)
+        return outLayers

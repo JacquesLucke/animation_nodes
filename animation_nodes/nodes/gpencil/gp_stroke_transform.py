@@ -1,7 +1,7 @@
 import bpy
 from ... math import Matrix
-from ... data_structures import VirtualMatrix4x4List
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualMatrix4x4List, VirtualPyList, GPStroke
 
 class GPStrokeTransformNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPStrokeTransformNode"
@@ -19,12 +19,8 @@ class GPStrokeTransformNode(bpy.types.Node, AnimationNode):
             ("Stroke", "stroke"), ("Strokes", "strokes")))
 
     def getExecutionFunctionName(self):
-        if self.useStrokeList and self.useMatrixList:
+        if self.useStrokeList or self.useMatrixList:
             return "execute_StrokeList_MatrixList"
-        elif self.useStrokeList:
-            return "execute_StrokeList_Matrix"
-        elif self.useMatrixList:
-            return "execute_Stroke_MatrixList"
         else:
             return "execute_Stroke_Matrix"
 
@@ -33,30 +29,17 @@ class GPStrokeTransformNode(bpy.types.Node, AnimationNode):
             self.strokeTransfom(stroke, matrix)
         return stroke
 
-    def execute_Stroke_MatrixList(self, stroke, matrices):
-        if len(matrices) == 0: return [stroke]
-        strokes = []
-        for matrix in matrices:
-            if matrix is not None:
-                strokeNew = stroke.copy()
-                self.strokeTransfom(strokeNew, matrix)
-                strokes.append(strokeNew)
-        return strokes
-
-    def execute_StrokeList_Matrix(self, strokes, matrix):
-        if len(strokes) == 0: return strokes
-        for stroke in strokes:
-            if matrix is not None:
-                self.strokeTransfom(stroke, matrix)
-        return strokes
-
     def execute_StrokeList_MatrixList(self, strokes, matrices):
-        if len(strokes) == 0 or len(matrices) == 0: return strokes
-        matrices = VirtualMatrix4x4List.create(matrices, Matrix())
-        for i, stroke in enumerate(strokes):
-            if matrices[i] is not None:
-                self.strokeTransfom(stroke, matrices[i])
-        return strokes
+        _strokes = VirtualPyList.create(strokes, GPStroke())
+        _matrices = VirtualMatrix4x4List.create(matrices, Matrix())
+        amount = VirtualPyList.getMaxRealLength(_strokes, _matrices)
+
+        outStrokes = []
+        for i in range(amount):
+            strokeNew = _strokes[i].copy()
+            self.strokeTransfom(strokeNew, _matrices[i])
+            outStrokes.append(strokeNew)
+        return outStrokes
 
     def strokeTransfom(self, stroke, matrix):
         return stroke.vertices.transform(matrix)

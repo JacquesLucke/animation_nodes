@@ -1,6 +1,6 @@
 import bpy
-from ... data_structures import VirtualLongList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualLongList, VirtualPyList, GPStroke
 
 class GPSetStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPSetStrokeMaterialIndexNode"
@@ -15,15 +15,11 @@ class GPSetStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Integer", "useIntegerList",
             ("Material Index", "materialIndex"), ("Material Indices", "materialIndices")))
         self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useIntegerList"],
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
     def getExecutionFunctionName(self):
-        if self.useStrokeList and self.useIntegerList:
+        if self.useStrokeList or self.useIntegerList:
             return "execute_StrokeList_MaterialIndexList"
-        elif self.useStrokeList:
-            return "execute_StrokeList_MaterialIndex"
-        elif self.useIntegerList:
-            return "execute_Stroke_MaterialIndexList"
         else:
             return "execute_Stroke_MaterialIndex"
 
@@ -31,24 +27,14 @@ class GPSetStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
         stroke.materialIndex = materialIndex
         return stroke
 
-    def execute_Stroke_MaterialIndexList(self, stroke, materialIndices):
-        if len(materialIndices) == 0: return [stroke]
-        strokes = []
-        for materialIndex in materialIndices:
-            strokeNew = stroke.copy()
-            strokeNew.materialIndex = materialIndex
-            strokes.append(strokeNew)
-        return strokes
-
-    def execute_StrokeList_MaterialIndex(self, strokes, materialIndex):
-        if len(strokes) == 0: return strokes
-        for stroke in strokes:
-            stroke.materialIndex = materialIndex
-        return strokes
-
     def execute_StrokeList_MaterialIndexList(self, strokes, materialIndices):
-        if len(strokes) == 0 or len(materialIndices) == 0: return strokes
-        materialIndices = VirtualLongList.create(materialIndices, 0)
-        for i, stroke in enumerate(strokes):
-            stroke.materialIndex = materialIndices[i]
-        return strokes
+        _strokes = VirtualPyList.create(strokes, GPStroke())
+        _materialIndices = VirtualLongList.create(materialIndices, 0)
+        amount = VirtualPyList.getMaxRealLength(_strokes, _materialIndices)
+
+        outStrokes = []
+        for i in range(amount):
+            strokeNew = _strokes[i].copy()
+            strokeNew.materialIndex = _materialIndices[i]
+            outStrokes.append(strokeNew)
+        return outStrokes

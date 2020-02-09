@@ -1,5 +1,5 @@
 import bpy
-from ... data_structures import VirtualPyList
+from ... data_structures import VirtualPyList, GPLayer
 from ... base_types import AnimationNode, VectorizedSocket
 
 class GPSetLayerBlendModeNode(bpy.types.Node, AnimationNode):
@@ -16,43 +16,28 @@ class GPSetLayerBlendModeNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Text", "useModeTextList",
             ("Blend Mode", "blendMode"), ("Blend Modes", "blendModes")), value = "REGULAR")
         self.newOutput(VectorizedSocket("GPLayer", ["useLayerList", "useModeTextList"],
-            ("Layer", "layer"), ("Layers", "layers")))
+            ("Layer", "outLayer"), ("Layers", "outLayers")))
 
     def getExecutionFunctionName(self):
-        if self.useLayerList and self.useModeTextList:
+        if self.useLayerList or self.useModeTextList:
             return "execute_LayerList_BlendModeList"
-        elif self.useLayerList:
-            return "execute_LayerList_BlendMode"
-        elif self.useModeTextList:
-            return "execute_Layer_BlendModeList"
         else:
             return "execute_Layer_BlendMode"
 
     def execute_Layer_BlendMode(self, layer, blendMode):
         return self.setLayerBlendMode(layer, blendMode)
 
-    def execute_Layer_BlendModeList(self, layer, blendModes):
-        if len(blendModes) == 0: return [layer]
-
-        layers = []
-        for blendMode in blendModes:
-            layerNew = layer.copy()
-            self.setLayerBlendMode(layerNew, blendMode)
-            layers.append(layerNew)
-        return layers
-
-    def execute_LayerList_BlendMode(self, layers, blendMode):
-        if len(layers) == 0: return layers
-        for layer in layers:
-            self.setLayerBlendMode(layer, blendMode)
-        return layers
-
     def execute_LayerList_BlendModeList(self, layers, blendModes):
-        blendModes = VirtualPyList.create(blendModes, "REGULAR")
-        for i, layer in enumerate(layers):
-            blendMode = blendModes[i]
-            self.setLayerBlendMode(layer, blendMode)
-        return layers
+        _layers = VirtualPyList.create(layers, GPLayer())
+        _blendModes = VirtualPyList.create(blendModes, "REGULAR")
+        amount = VirtualPyList.getMaxRealLength(_layers, _blendModes)
+
+        outLayers = []
+        for i in range(amount):
+            layerNew =_layers[i].copy()
+            self.setLayerBlendMode(layerNew, _blendModes[i])
+            outLayers.append(layerNew)
+        return outLayers
 
     def setLayerBlendMode(self, layer, blendMode):
         if blendMode not in ['REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE']:
