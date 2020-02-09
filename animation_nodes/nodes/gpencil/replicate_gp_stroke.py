@@ -9,9 +9,9 @@ transformationTypeItems = [
     ("Vector List", "Vectors", "", "NONE", 1)
 ]
 
-class GPReplicateStrokeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPReplicateStrokeNode"
-    bl_label = "GP Replicate Stroke"
+class ReplicateGPStrokeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ReplicateGPStrokeNode"
+    bl_label = "Replicate GP Stroke"
 
     useStrokeList: VectorizedSocket.newProperty()
 

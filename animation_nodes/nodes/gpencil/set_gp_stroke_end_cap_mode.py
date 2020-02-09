@@ -2,9 +2,9 @@ import bpy
 from ... data_structures import VirtualPyList, GPStroke
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPSetStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPSetStrokeEndCapModeNode"
-    bl_label = "GP Set Stroke End Cap Mode"
+class SetGPStrokeEndCapModeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetGPStrokeEndCapModeNode"
+    bl_label = "Set GP Stroke End Cap Mode"
     errorHandlingType = "EXCEPTION"
 
     useStrokeList: VectorizedSocket.newProperty()

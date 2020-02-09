@@ -2,9 +2,9 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualLongList, VirtualPyList, GPStroke
 
-class GPSetStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPSetStrokeMaterialIndexNode"
-    bl_label = "GP Set Stroke Material Index"
+class SetGPStrokeMaterialIndexNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetGPStrokeMaterialIndexNode"
+    bl_label = "Set GP Stroke Material Index"
 
     useStrokeList: VectorizedSocket.newProperty()
     useIntegerList: VectorizedSocket.newProperty()

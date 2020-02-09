@@ -2,9 +2,9 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualLongList, VirtualPyList, GPLayer
 
-class GPSetLayerPassIndexNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPSetLayerPassIndexNode"
-    bl_label = "GP Set Layer Pass Index"
+class SetGPLayerPassIndexNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetGPLayerPassIndexNode"
+    bl_label = "Set GP Layer Pass Index"
 
     useLayerList: VectorizedSocket.newProperty()
     usePassIndexList: VectorizedSocket.newProperty()

@@ -2,9 +2,9 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualDoubleList, VirtualPyList, GPStroke
 
-class GPSetStrokeLineWidthNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPSetStrokeLineWidthNode"
-    bl_label = "GP Set Stroke Line Width"
+class SetGPStrokeLineWidthNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetGPStrokeLineWidthNode"
+    bl_label = "Set GP Stroke Line Width"
 
     useStrokeList: VectorizedSocket.newProperty()
     useFloatList: VectorizedSocket.newProperty()

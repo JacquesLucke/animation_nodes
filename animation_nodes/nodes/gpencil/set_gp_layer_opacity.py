@@ -2,9 +2,9 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualDoubleList, VirtualPyList, GPLayer
 
-class GPSetLayerOpacityNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPSetLayerOpacityNode"
-    bl_label = "GP Set Layer Opacity"
+class SetGPLayerOpacityNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetGPLayerOpacityNode"
+    bl_label = "Set GP Layer Opacity"
 
     useLayerList: VectorizedSocket.newProperty()
     useOpacityList: VectorizedSocket.newProperty()

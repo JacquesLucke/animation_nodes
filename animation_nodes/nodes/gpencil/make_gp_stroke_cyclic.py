@@ -2,9 +2,9 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualBooleanList, VirtualPyList, GPStroke
 
-class GPSetStrokeCyclicNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPSetStrokeCyclicNode"
-    bl_label = "GP Set Stroke Cyclic"
+class MakeGPStrokeCyclicNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_MakeGPStrokeCyclicNode"
+    bl_label = "Make GP Stroke Cyclic"
 
     useStrokeList: VectorizedSocket.newProperty()
     useBooleanList: VectorizedSocket.newProperty()

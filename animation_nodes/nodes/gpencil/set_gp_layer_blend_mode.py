@@ -2,9 +2,9 @@ import bpy
 from ... data_structures import VirtualPyList, GPLayer
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPSetLayerBlendModeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPSetLayerBlendModeNode"
-    bl_label = "GP Set Layer Blend Mode"
+class SetGPLayerBlendModeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetGPLayerBlendModeNode"
+    bl_label = "Set GP Layer Blend Mode"
     errorHandlingType = "EXCEPTION"
 
     useLayerList: VectorizedSocket.newProperty()

@@ -3,9 +3,9 @@ from ... math import Matrix
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualMatrix4x4List, VirtualPyList, GPStroke
 
-class GPStrokeTransformNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPStrokeTransformNode"
-    bl_label = "GP Stroke Transform"
+class TransformGPStrokeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TransformGPStrokeNode"
+    bl_label = "Transform GP Stroke"
 
     useStrokeList: VectorizedSocket.newProperty()
     useMatrixList: VectorizedSocket.newProperty()

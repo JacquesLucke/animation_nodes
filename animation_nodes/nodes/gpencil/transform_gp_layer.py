@@ -9,9 +9,9 @@ transformationTypeItems = [
     ("VECTOR", "Vector", "", "NONE", 1)
 ]
 
-class GPTransformLayerNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPTransformLayerNode"
-    bl_label = "GP Transform Layer"
+class TransformGPLayerNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_TransformGPLayerNode"
+    bl_label = "Transform GP Layer"
 
     transformationType: EnumProperty(name = "Transformation Type", default = "MATRIX",
         items = transformationTypeItems, update = AnimationNode.refresh)
