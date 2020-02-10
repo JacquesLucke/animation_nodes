@@ -11,11 +11,25 @@
 - Added GP Layer From Frames node.
 - Added GP Object Output node.
 - Added Change Spline Direction node.
+- Added Set GP Layer Blend Mode node.
+- Added Set GP Layer Opacity node.
+- Added Set GP Layer Pass Index node.
+- Added Transfrom GP Layer node.
+- Added Make GP Stroke Cyclic node.
+- Added Set GP Stroke Line Width node.
+- Added Set GP Stroke Start Cap Mode node.
+- Added Set GP Stroke End Cap Mode node.
+- Added Set GP Stroke Material Index node.
+- Added Set GP Stroke Display Mode node.
+- Added Replicate GP Stroke node.
+- Added Transform GP Stoke node.
 
 ### Fixed
 
 - Fixed the Splines From Branches algorithm for closed loops.
 - Fixed auto execution when the node tree is refreshed during animation.
+- Fixed the Distribute Matrices node for the Spiral option.
+- Fixed VirtualPyList for singleton lists.
 
 ### Changed
 

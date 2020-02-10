@@ -53,7 +53,7 @@ cdef class VirtualPyList_Element_NoCopy(VirtualPyList):
 
     def __cinit__(self, object element, Py_ssize_t realLength = 0):
         self.element = element
-        self.realLength = 0
+        self.realLength = realLength
 
     def __getitem__(self, index):
         return self.element
