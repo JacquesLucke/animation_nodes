@@ -224,7 +224,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         cdef float iCos, iSin, stepCos, stepSin, f, size
         cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
         cdef float factor = 1 / <float>(amount - 1) if amount > 1 else 0
-        cdef float angleStep = (endAngle - startAngle) / (amount - 1)
+        cdef float angleStep = (endAngle - startAngle) / (amount - 1) if amount > 1 else 0
 
         iCos = cos(startAngle)
         iSin = sin(startAngle)
