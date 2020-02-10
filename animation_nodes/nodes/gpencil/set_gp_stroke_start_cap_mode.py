@@ -1,10 +1,10 @@
 import bpy
-from ... data_structures import VirtualPyList
+from ... data_structures import VirtualPyList, GPStroke
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPStrokeStartCapModeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPStrokeStartCapModeNode"
-    bl_label = "GP Stroke Start Cap Mode"
+class SetGPStrokeStartCapModeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetGPStrokeStartCapModeNode"
+    bl_label = "Set GP Stroke Start Cap Mode"
     errorHandlingType = "EXCEPTION"
 
     useStrokeList: VectorizedSocket.newProperty()
@@ -13,16 +13,14 @@ class GPStrokeStartCapModeNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Text", ["useStrokeList", "useModeTextList"],
+        self.newInput(VectorizedSocket("Text", "useModeTextList",
             ("Start Cap Mode", "startCapMode"), ("Start Cap Modes", "startCapModes")), value = "ROUND")
-        self.newOutput(VectorizedSocket("GPStroke", "useStrokeList",
+        self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useModeTextList"],
             ("Stroke", "stroke"), ("Strokes", "strokes")))
 
     def getExecutionFunctionName(self):
-        if self.useStrokeList and self.useModeTextList:
+        if self.useStrokeList or self.useModeTextList:
             return "execute_StrokeList_StartCapModeList"
-        elif self.useStrokeList:
-            return "execute_StrokeList_StartCapMode"
         else:
             return "execute_Stroke_StartCapMode"
 
@@ -30,17 +28,17 @@ class GPStrokeStartCapModeNode(bpy.types.Node, AnimationNode):
         self.setStrokeStartCapMode(stroke, startCapMode)
         return stroke
 
-    def execute_StrokeList_StartCapMode(self, strokes, startCapMode):
-        if len(strokes) == 0: return strokes
-        for stroke in strokes:
-            self.setStrokeStartCapMode(stroke, startCapMode)
-        return strokes
-
     def execute_StrokeList_StartCapModeList(self, strokes, startCapModes):
-        startCapModes = VirtualPyList.create(startCapModes, "ROUND")
-        for i, stroke in enumerate(strokes):
-            self.setStrokeStartCapMode(stroke, startCapModes[i])
-        return strokes
+        _strokes = VirtualPyList.create(strokes, GPStroke())
+        _startCapModes = VirtualPyList.create(startCapModes, "ROUND")
+        amount = VirtualPyList.getMaxRealLength(_strokes, _startCapModes)
+
+        outStrokes = []
+        for i in range(amount):
+            strokeNew = _strokes[i].copy()
+            self.setStrokeStartCapMode(strokeNew, _startCapModes[i])
+            outStrokes.append(strokeNew)
+        return outStrokes
 
     def setStrokeStartCapMode(self, stroke, startCapMode):
         if startCapMode not in ['ROUND', 'FLAT']:
