@@ -22,9 +22,9 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Text", "useBlendModeList",
             ("Blend Mode", "blendModes"), ("Blend Modes", "blendModes")), value = 'REGULAR', hide = True)
         self.newInput(VectorizedSocket("Float", "useOpacityList",
-            ("Opacity", "opacities"), ("Opacities", "opacities")), value = 1)
+            ("Opacity", "opacities"), ("Opacities", "opacities")), value = 1, minValue = 0)
         self.newInput(VectorizedSocket("Integer", "usePassIndexList",
-            ("Pass Index", "passIndices"), ("Pass Indices", "passIndices")), value = 0)
+            ("Pass Index", "passIndices"), ("Pass Indices", "passIndices")), value = 0, minValue = 0)
 
         self.newOutput(VectorizedSocket("GPLayer",
             ["useLayerList", "useNameList", "useBlendModeList", "useOpacityList", "usePassIndexList"],

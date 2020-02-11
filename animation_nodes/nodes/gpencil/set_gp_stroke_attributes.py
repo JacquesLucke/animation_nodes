@@ -20,7 +20,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "strokes"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Float", "useLineWidthList",
-            ("Line Width", "lineWidths"), ("Line Widths", "lineWidths")), value = 250)
+            ("Line Width", "lineWidths"), ("Line Widths", "lineWidths")), value = 250, minValue = 0)
         self.newInput(VectorizedSocket("Boolean", "useCyclicList",
             ("Cyclic", "cyclics"), ("Cyclics", "cyclics")), value = False, hide = True)
         self.newInput(VectorizedSocket("Text", "useStartCapModeList",
@@ -28,7 +28,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Text", "useEndCapModeList",
             ("End Cap Mode", "endCapModes"), ("End Cap Modes", "endCapModes")), value = 'ROUND', hide = True)
         self.newInput(VectorizedSocket("Integer", "useMaterialIndexList",
-            ("Material Index", "materialIndices"), ("Material Indices", "materialIndices")), value = 0)
+            ("Material Index", "materialIndices"), ("Material Indices", "materialIndices")), value = 0, minValue = 0)
         self.newInput(VectorizedSocket("Text", "useDisplayModeList",
             ("Display Mode", "displayModes"), ("Display Modes", "displayModes")), value = '3DSPACE', hide = True)
 
