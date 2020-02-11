@@ -10,24 +10,31 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
 
     useStrokeList: VectorizedSocket.newProperty()
+    useLineWidthList: VectorizedSocket.newProperty()
+    useCyclicList: VectorizedSocket.newProperty()
+    useStartCapModeList: VectorizedSocket.newProperty()
+    useEndCapModeList: VectorizedSocket.newProperty()
+    useMaterialIndexList: VectorizedSocket.newProperty()
+    useDisplayModeList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Float", "useStrokeList",
-            ("Line Width", "lineWidth"), ("Line Widths", "lineWidths")), value = 250)
-        self.newInput(VectorizedSocket("Boolean", "useStrokeList",
-            ("Cyclic", "drawCyclic"), ("Cyclics", "drawCyclics")), value = False)
-        self.newInput(VectorizedSocket("Text", "useStrokeList",
-            ("Start Cap Mode", "startCapMode"), ("Start Cap Modes", "startCapModes")), value = 'ROUND', hide = True)
-        self.newInput(VectorizedSocket("Text", "useStrokeList",
-            ("End Cap Mode", "endCapMode"), ("End Cap Modes", "endCapModes")), value = 'ROUND', hide = True)
-        self.newInput(VectorizedSocket("Integer", "useStrokeList",
-            ("Material Index", "materialIndex"), ("Material Indices", "materialIndices")), value = 0, hide = True)
-        self.newInput(VectorizedSocket("Text", "useStrokeList",
-            ("Display Mode", "displayMode"), ("Display Modes", "displayModes")), value = '3DSPACE', hide = True)
-        self.newOutput(VectorizedSocket("GPStroke", "useStrokeList",
-            ("Stroke", "stroke"), ("Strokes", "strokes")))
+            ("Stroke", "strokes"), ("Strokes", "strokes")), dataIsModified = True)
+        self.newInput(VectorizedSocket("Float", "useLineWidthList",
+            ("Line Width", "lineWidths"), ("Line Widths", "lineWidths")), value = 250)
+        self.newInput(VectorizedSocket("Boolean", "useCyclicList",
+            ("Cyclic", "cyclics"), ("Cyclics", "cyclics")), value = False)
+        self.newInput(VectorizedSocket("Text", "useStartCapModeList",
+            ("Start Cap Mode", "startCapModes"), ("Start Cap Modes", "startCapModes")), value = 'ROUND', hide = True)
+        self.newInput(VectorizedSocket("Text", "useEndCapModeList",
+            ("End Cap Mode", "endCapModes"), ("End Cap Modes", "endCapModes")), value = 'ROUND', hide = True)
+        self.newInput(VectorizedSocket("Integer", "useMaterialIndexList",
+            ("Material Index", "materialIndices"), ("Material Indices", "materialIndices")), value = 0, hide = True)
+        self.newInput(VectorizedSocket("Text", "useDisplayModeList",
+            ("Display Mode", "displayModes"), ("Display Modes", "displayModes")), value = '3DSPACE', hide = True)
+        self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useLineWidthList", "useCyclicList",
+            "useStartCapModeList", "useEndCapModeList", "useMaterialIndexList", "useDisplayModeList"],
+            ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -35,29 +42,53 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         s = self.inputs
-        if self.useStrokeList:
-            pass
-            yield "lineWidths = VirtualDoubleList.create(lineWidths, 250)"
-            yield "drawCyclics = VirtualBooleanList.create(drawCyclics, False)"
-            yield "startCapModes = VirtualPyList.create(startCapModes, 'ROUND')"
-            yield "endCapModes = VirtualPyList.create(endCapModes, 'ROUND')"
-            yield "materialIndices = VirtualLongList.create(materialIndices, 0)"
-            yield "displayModes = VirtualPyList.create(displayModes, '3DSPACE')"
-            yield "for i, stroke in enumerate(strokes):"
-            if s["Line Widths"].isUsed:     yield "    stroke.lineWidth = lineWidths[i]"
-            if s["Cyclics"].isUsed:         yield "    stroke.drawCyclic = drawCyclics[i]"
-            if s["Start Cap Modes"].isUsed: yield "    self.setStartCapMode(stroke, startCapModes[i])"
-            if s["End Cap Modes"].isUsed:   yield "    self.setEndCapMode(stroke, endCapModes[i])"
-            if s["Material Indices"].isUsed: yield "    stroke.materialIndex = materialIndices[i]"
-            if s["Display Modes"].isUsed:   yield "    self.setDisplayMode(stroke, displayModes[i])"
-            yield "    pass"
+        isLineWidth = s[1].isUsed
+        isCylic = s[2].isUsed
+        isStartCapMode = s[3].isUsed
+        isEndCapMode = s[4].isUsed
+        isMaterialIndex = s[5].isUsed
+        isDisplayMode = s[6].isUsed
+        if (self.useStrokeList or self.useLineWidthList or self.useCyclicList or self.useStartCapModeList or
+            self.useEndCapModeList or self.useMaterialIndexList or self.useDisplayModeList):
+            if isLineWidth or isCylic or isStartCapMode or isEndCapMode or isMaterialIndex or isDisplayMode:
+                if isLineWidth:     yield "_lineWidths = VirtualDoubleList.create(lineWidths, 0)"
+                if isCylic:         yield "_cyclics = VirtualBooleanList.create(cyclics, False)"
+                if isStartCapMode:  yield "_startCapModes = VirtualPyList.create(startCapModes, 'ROUND')"
+                if isEndCapMode:    yield "_endCapModes = VirtualPyList.create(endCapModes, 'ROUND')"
+                if isMaterialIndex: yield "_materialIndices = VirtualLongList.create(materialIndices, 0)"
+                if isDisplayMode:   yield "_displayModes = VirtualPyList.create(displayModes, '3DSPACE')"
+
+                yield                     "_strokes = VirtualPyList.create(strokes, GPStroke())"
+                yield                     "amount = VirtualPyList.getMaxRealLength(_strokes"
+                if isLineWidth:     yield "         , _lineWidths"
+                if isCylic:         yield "         , _cyclics"
+                if isStartCapMode:  yield "         , _startCapModes"
+                if isEndCapMode:    yield "         , _endCapModes"
+                if isMaterialIndex: yield "         , _materialIndices"
+                if isDisplayMode:   yield "         , _displayModes"
+                yield                     "         )"
+
+                yield                     "outStrokes = []"
+                yield                     "for i in range(amount):"
+                yield                     "    strokeNew = _strokes[i].copy()"
+                if isLineWidth:     yield "    strokeNew.lineWidth = _lineWidths[i]"
+                if isCylic:         yield "    strokeNew.drawCyclic = _cyclics[i]"
+                if isStartCapMode:  yield "    self.setStartCapMode(strokeNew, _startCapModes[i])"
+                if isEndCapMode:    yield "    self.setEndCapMode(strokeNew, _endCapModes[i])"
+                if isMaterialIndex: yield "    strokeNew.materialIndex = _materialIndices[i]"
+                if isDisplayMode:   yield "    self.setDisplayMode(strokeNew, _displayModes[i])"
+                yield                     "    outStrokes.append(strokeNew)"
+            else:
+                yield                     "outStrokes = strokes"
+
         else:
-            if s["Line Width"].isUsed:     yield "stroke.lineWidth = lineWidth"
-            if s["Cyclic"].isUsed:         yield "stroke.drawCyclic = drawCyclic"
-            if s["Start Cap Mode"].isUsed: yield "self.setStartCapMode(stroke, startCapMode)"
-            if s["End Cap Mode"].isUsed:   yield "self.setEndCapMode(stroke, endCapMode)"
-            if s["Material Index"].isUsed: yield "stroke.materialIndex = materialIndex"
-            if s["Display Mode"].isUsed:   yield "self.setDisplayMode(stroke, displayMode)"
+            yield                     "outStroke = strokes"
+            if isLineWidth:     yield "outStroke.lineWidth = lineWidths"
+            if isCylic:         yield "outStroke.drawCyclic = cyclics"
+            if isStartCapMode:  yield "self.setStartCapMode(outStroke, startCapModes)"
+            if isEndCapMode:    yield "self.setEndCapMode(outStroke, endCapModes)"
+            if isMaterialIndex: yield "outStroke.materialIndex = materialIndices"
+            if isDisplayMode:   yield "self.setDisplayMode(outStroke, displayModes)"
 
     def setStartCapMode(self, stroke, startCapMode):
         if startCapMode not in ['ROUND', 'FLAT']:
