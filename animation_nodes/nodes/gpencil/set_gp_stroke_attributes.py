@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import GPStroke, VirtualPyList, VirtualDoubleList, VirtualLongList, VirtualBooleanList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
@@ -32,7 +31,9 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
             ("Material Index", "materialIndices"), ("Material Indices", "materialIndices")), value = 0, hide = True)
         self.newInput(VectorizedSocket("Text", "useDisplayModeList",
             ("Display Mode", "displayModes"), ("Display Modes", "displayModes")), value = '3DSPACE', hide = True)
-        self.newOutput(VectorizedSocket("GPStroke", ["useStrokeList", "useLineWidthList", "useCyclicList",
+
+        self.newOutput(VectorizedSocket("GPStroke",
+            ["useStrokeList", "useLineWidthList", "useCyclicList",
             "useStartCapModeList", "useEndCapModeList", "useMaterialIndexList", "useDisplayModeList"],
             ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
@@ -48,9 +49,9 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
         isEndCapMode = s[4].isUsed
         isMaterialIndex = s[5].isUsed
         isDisplayMode = s[6].isUsed
-        if (self.useStrokeList or self.useLineWidthList or self.useCyclicList or self.useStartCapModeList or
-            self.useEndCapModeList or self.useMaterialIndexList or self.useDisplayModeList):
-            if isLineWidth or isCylic or isStartCapMode or isEndCapMode or isMaterialIndex or isDisplayMode:
+        if any([self.useStrokeList, self.useLineWidthList, self.useCyclicList, self.useStartCapModeList,
+                self.useEndCapModeList, self.useMaterialIndexList, self.useDisplayModeList]):
+            if any([isLineWidth, isCylic, isStartCapMode, isEndCapMode, isMaterialIndex, isDisplayMode]):
                 if isLineWidth:     yield "_lineWidths = VirtualDoubleList.create(lineWidths, 0)"
                 if isCylic:         yield "_cyclics = VirtualBooleanList.create(cyclics, False)"
                 if isStartCapMode:  yield "_startCapModes = VirtualPyList.create(startCapModes, 'ROUND')"

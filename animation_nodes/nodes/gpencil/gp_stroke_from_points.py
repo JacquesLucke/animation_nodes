@@ -36,9 +36,9 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
         uvRotations = VirtualDoubleList.create(uvRotations, 0).materialize(amount)
 
         if startCapMode not in ['ROUND', 'FLAT']:
-            self.raiseErrorMessage("The Start Cap Mode is invalid. \n\nPossible values for 'Start Cap Mode' are: 'REGULAR', 'FLAT'")
+            self.raiseErrorMessage("The Start Cap Mode is invalid. \n\nPossible values for 'Start Cap Mode' are: 'ROUND', 'FLAT'")
         if endCapMode not in ['ROUND', 'FLAT']:
-            self.raiseErrorMessage("The End Cap Mode is invalid. \n\nPossible values for 'End Cap Mode' are: 'REGULAR', 'FLAT'")
+            self.raiseErrorMessage("The End Cap Mode is invalid. \n\nPossible values for 'End Cap Mode' are: 'ROUND', 'FLAT'")
         if displayMode not in ['SCREEN', '3DSPACE', '2DSPACE', '2DIMAGE']:
             self.raiseErrorMessage("The Display Mode is invalid. \n\nPossible values for 'Display Mode' are: 'SCREEN', '3DSPACE', '2DSPACE', '2DIMAGE'")
 

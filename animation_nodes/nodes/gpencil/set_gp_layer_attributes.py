@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import GPLayer, VirtualPyList, VirtualDoubleList, VirtualLongList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
@@ -26,8 +25,10 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             ("Opacity", "opacities"), ("Opacities", "opacities")), value = 1, hide = True)
         self.newInput(VectorizedSocket("Integer", "usePassIndexList",
             ("Pass Index", "passIndices"), ("Pass Indices", "passIndices")), value = 0, hide = True)
-        self.newOutput(VectorizedSocket("GPLayer", ["useLayerList", "useNameList", "useBlendModeList",
-            "useOpacityList", "usePassIndexList"], ("Layer", "outLayer"), ("Layers", "outLayers")))
+
+        self.newOutput(VectorizedSocket("GPLayer",
+            ["useLayerList", "useNameList", "useBlendModeList", "useOpacityList", "usePassIndexList"],
+            ("Layer", "outLayer"), ("Layers", "outLayers")))
 
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
@@ -39,8 +40,8 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         isBlendMode = s[2].isUsed
         isOpacity = s[3].isUsed
         isPassIndex = s[4].isUsed
-        if self.useLayerList or self.useNameList or self.useBlendModeList or self.useOpacityList or self.usePassIndexList:
-            if isName or isBlendMode or isOpacity or isPassIndex:
+        if any([self.useLayerList, self.useNameList, self.useBlendModeList, self.useOpacityList, self.usePassIndexList]):
+            if any([isName, isBlendMode, isOpacity, isPassIndex]):
                 if isName:      yield "_layerNames = VirtualPyList.create(layerNames, 'AN-Layer')"
                 if isBlendMode: yield "_blendModes = VirtualPyList.create(blendModes, 'REGULAR')"
                 if isOpacity:   yield "_opacities = VirtualDoubleList.create(opacities, 1)"
