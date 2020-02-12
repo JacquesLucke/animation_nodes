@@ -16,6 +16,8 @@
 - Added Transform GP Stoke node.
 - Added Set GP Layer Attributes node.
 - Added Set GP Stroke Attributes node.
+- Added GP Material Output node.
+- Added GP Object Material Output node.
 
 ### Fixed
 
