@@ -44,7 +44,8 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         isOpacity = s[3].isUsed
         isPassIndex = s[4].isUsed
         isMaskLayer = s[5].isUsed
-        if any([self.useLayerList, self.useNameList, self.useBlendModeList, self.useOpacityList, self.usePassIndexList, self.useMaskLayerList]):
+        if any([self.useLayerList, self.useNameList, self.useBlendModeList, self.useOpacityList, 
+                self.usePassIndexList, self.useMaskLayerList]):
             if any([isName, isBlendMode, isOpacity, isPassIndex, isMaskLayer]):
                 if isName:      yield "_layerNames = VirtualPyList.create(layerNames, 'AN-Layer')"
                 if isBlendMode: yield "_blendModes = VirtualPyList.create(blendModes, 'REGULAR')"
