@@ -44,8 +44,6 @@ class GPMaterialOutputNode(bpy.types.Node, AnimationNode):
             if isShowFill:       yield "    gpMaterial.show_fill = showFill"
             if isFillColor:      yield "    gpMaterial.fill_color = fillColor"
             if isPassIndex:      yield "    gpMaterial.pass_index = passIndex"
-        else:
-            yield "material"
 
     def setStrokeDrawMode(self, gpMaterial, strokeDrawMode):
         if strokeDrawMode not in ["LINE", "DOTS", "BOX"]:

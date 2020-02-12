@@ -7,8 +7,7 @@ class ObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Material Output"
 
     appendMaterials: BoolProperty(name = "Append Materials", default = False,
-        description = "Append input material(s) to the object's materials instead of overwriting them",
-        update = AnimationNode.refresh)
+        description = "Append input material(s) to the object's materials instead of overwriting them")
 
     useMaterialList: VectorizedSocket.newProperty()
 
@@ -36,7 +35,7 @@ class ObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
         objectMaterials = object.data.materials
         if not self.appendMaterials: objectMaterials.clear()
 
-        self.setObjectMaterial(objectMaterials, material)
+        self.appendMaterial(objectMaterials, material)
         return object
 
     def executeList(self, object, materials):
@@ -46,10 +45,10 @@ class ObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
         if not self.appendMaterials: objectMaterials.clear()
 
         for material in materials:
-            self.setObjectMaterial(objectMaterials, material)
+            self.appendMaterial(objectMaterials, material)
         return object
 
-    def setObjectMaterial(self, objectMaterials, material):
+    def appendMaterial(self, objectMaterials, material):
         if self.appendMaterials:
             if material.name not in objectMaterials: objectMaterials.append(material)
         else:
