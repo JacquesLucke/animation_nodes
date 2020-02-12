@@ -28,7 +28,7 @@
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
-- Added Mask Layer to the Set GP Layer Attributes node, GP Object Input node, GP Layer Info node, GP Layer From Frames node, Object Output node
+- Added Mask Layer to the Set GP Layer Attributes node, GP Object Input node, GP Layer Info node, GP Layer From Frames node, GP Object Output node
 
 ## 2.1.6
 
