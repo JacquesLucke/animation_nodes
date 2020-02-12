@@ -13,6 +13,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
     useBlendModeList: VectorizedSocket.newProperty()
     useOpacityList: VectorizedSocket.newProperty()
     usePassIndexList: VectorizedSocket.newProperty()
+    useMaskLayerList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("GPLayer", "useLayerList",
