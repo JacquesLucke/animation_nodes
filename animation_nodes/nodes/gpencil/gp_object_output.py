@@ -85,6 +85,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         gpencilLayer.blend_mode = layer.blendMode
         gpencilLayer.opacity = layer.opacity
         gpencilLayer.pass_index = layer.passIndex
+        gpencilLayer.mask_layer = layer.maskLayer
         return gpencilLayer
 
     def getObjectData(self, object):
