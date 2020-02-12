@@ -11,17 +11,23 @@
 - Added GP Layer From Frames node.
 - Added GP Object Output node.
 - Added Change Spline Direction node.
+- Added Transfrom GP Layer node.
+- Added Replicate GP Stroke node.
+- Added Transform GP Stoke node.
+- Added Set GP Layer Attributes node.
+- Added Set GP Stroke Attributes node.
 
 ### Fixed
 
 - Fixed the Splines From Branches algorithm for closed loops.
 - Fixed auto execution when the node tree is refreshed during animation.
+- Fixed the Distribute Matrices node for the Spiral option.
+- Fixed VirtualPyList for singleton lists.
 
 ### Changed
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
-- Increase precision of float sockets.
 
 ## 2.1.6
 
