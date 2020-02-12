@@ -18,6 +18,8 @@
 - Added Set GP Stroke Attributes node.
 - Added GP Material Output node.
 - Added GP Object Material Output node.
+- Added Replicate GP Layer node.
+- Added Offset GP Layer Frame Number node.
 
 ### Fixed
 
