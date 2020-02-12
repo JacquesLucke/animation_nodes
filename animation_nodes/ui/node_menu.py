@@ -522,8 +522,8 @@ class GPencilMenu(bpy.types.Menu):
         insertNode(layout, "an_GPLayerFromFramesNode", "Layer From Frames")
         insertNode(layout, "an_GPObjectOutputNode", "Object Output")
         layout.separator()
-        insertNode(layout, "an_GPObjectMaterialOutputNode", "Object Material Output")
-        insertNode(layout, "an_GPMaterialOutputNode", "Material Output")
+        insertNode(layout, "an_GPMaterialOutputNode", "GP Material Output")
+        insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
 
 class ActionMenu(bpy.types.Menu):
     bl_idname = "AN_MT_action_menu"
@@ -612,6 +612,7 @@ class MaterialMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
+        insertNode(layout, "an_GPMaterialOutputNode", "GP Material Output")
         insertNode(layout, "an_SetPolygonMaterialIndexNode", "Set Polygon Material Index")
         insertNode(layout, "an_MaterialAttributeInputNode", "Material Attribute Input")
         insertNode(layout, "an_MaterialAttributeOutputNode", "Material Attribute Output")
