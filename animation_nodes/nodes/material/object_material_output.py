@@ -7,7 +7,7 @@ class ObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
     bl_label = "Object Material Output"
 
     appendMaterials: BoolProperty(name = "Append Materials", default = False,
-        description = "This option allow to add custom materials",
+        description = "Append input material(s) to the object's materials instead of overwriting them",
         update = AnimationNode.refresh)
 
     useMaterialList: VectorizedSocket.newProperty()
@@ -36,13 +36,6 @@ class ObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
         objectMaterials = object.data.materials
         if not self.appendMaterials: objectMaterials.clear()
 
-        if object.type == "GPENCIL":
-            if material is not None:
-                if not material.is_grease_pencil:
-                    bpy.data.materials.create_gpencil_data(material)
-                self.setObjectMaterial(objectMaterials, material)
-            return object
-
         self.setObjectMaterial(objectMaterials, material)
         return object
 
@@ -51,14 +44,6 @@ class ObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
 
         objectMaterials = object.data.materials
         if not self.appendMaterials: objectMaterials.clear()
-
-        if object.type == "GPENCIL":
-            for material in materials:
-                if material is not None:
-                    if not material.is_grease_pencil:
-                        bpy.data.materials.create_gpencil_data(material)
-                    self.setObjectMaterial(objectMaterials, material)
-            return object
 
         for material in materials:
             self.setObjectMaterial(objectMaterials, material)
