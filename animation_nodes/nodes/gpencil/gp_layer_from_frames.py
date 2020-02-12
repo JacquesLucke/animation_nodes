@@ -18,9 +18,10 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Blend Mode", "blendMode", value = 'REGULAR', hide = True)
         self.newInput("Float", "Opacity", "opacity", value = 1, hide = True)
         self.newInput("Integer", "Pass Index", "passIndex", value = 0, hide = True)
+        self.newInput("Boolean", "Mask Layer", "maskLayer", value = False, hide = True)
         self.newOutput("GPLayer", "Layer", "layer")
 
-    def execute(self, frames, layerName, blendMode, opacity, passIndex):
+    def execute(self, frames, layerName, blendMode, opacity, passIndex, maskLayer):
         if not self.useFrameList:
             frames = [frames]
 
@@ -29,4 +30,4 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Some Frame Numbers are repeated.")
         if blendMode not in ['REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE']:
             self.raiseErrorMessage("The blend mode is invalid. \n\nPossible values for 'Blend Mode' are: 'REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE'")
-        return GPLayer(layerName, frames, blendMode, opacity, passIndex)
+        return GPLayer(layerName, frames, blendMode, opacity, passIndex, maskLayer)
