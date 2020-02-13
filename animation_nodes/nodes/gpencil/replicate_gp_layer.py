@@ -24,6 +24,7 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
             ("Layers", "layers")))
         self.newInput(self.transformationType, "Transformations", "transformations")
         self.newInput("Float List", "Offset Frame Numbers", "offsets", value = 0, hide = True)
+        self.newInput("Boolean", "Name Suffix", "nameSuffix", value = False, hide = True)
 
         self.newOutput("GPLayer List", "Layers", "outLayers")
 
@@ -36,7 +37,7 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
         elif self.transformationType == "Vector List":
             return "execute_VectorList"
 
-    def execute_MatrixList(self, layers, matrices, offsets):
+    def execute_MatrixList(self, layers, matrices, offsets, nameSuffix):
         if isinstance(layers, GPLayer):
             layers = [layers]
 
@@ -46,11 +47,12 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
         for i, matrix in enumerate(matrices):
             for layer in layers:
                 newLayer = layer.copy()
+                if nameSuffix: newLayer.layerName = layer.layerName + "-" + str(i)
                 self.transformLayerByMatrix(newLayer, _offsets[i], matrix)
                 outLayers.append(newLayer)
         return outLayers
 
-    def execute_VectorList(self, layers, vectors, offsets):
+    def execute_VectorList(self, layers, vectors, offsets, nameSuffix):
         if isinstance(layers, GPLayer):
             layers = [layers]
 
@@ -60,6 +62,7 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
         for i, vector in enumerate(vectors):
             for layer in layers:
                 newLayer = layer.copy()
+                if nameSuffix: newLayer.layerName = layer.layerName + "-" + str(i)
                 self.transformLayerByVector(newLayer, _offsets[i], vector)
                 outLayers.append(newLayer)
         return outLayers
