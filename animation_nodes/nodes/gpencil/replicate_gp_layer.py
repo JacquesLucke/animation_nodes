@@ -60,7 +60,7 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
         for i, vector in enumerate(vectors):
             for layer in layers:
                 newLayer = layer.copy()
-                self.transformLayerByMatrix(newLayer, _offsets[i], vector)
+                self.transformLayerByMatrix(newLayer, _offsets[i], Matrix.Translation(vector))
                 outLayers.append(newLayer)
         return outLayers
 
@@ -69,9 +69,3 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
             frame.frameNumber += offset
             for stroke in frame.strokes:
                 stroke.vertices.transform(matrix)
-
-    def transformLayerByVector(self, layer, offset, vector):
-        for frame in layer.frames:
-            frame.frameNumber += offset
-            for stroke in frame.strokes:
-                stroke.vertices.transform(Matrix.Translation(vector))

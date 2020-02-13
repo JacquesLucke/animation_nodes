@@ -509,7 +509,7 @@ class GPencilMenu(bpy.types.Menu):
         insertNode(layout, "an_SetGPLayerAttributesNode", "Set Layer Attributes")
         insertNode(layout, "an_ReplicateGPLayerNode", "Replicate Layer")
         insertNode(layout, "an_TransformGPLayerNode", "Transform Layer")
-        insertNode(layout, "an_OffsetGPLayerFrameNumberNode", "Offset Layer FrameNumber")
+        insertNode(layout, "an_OffsetGPLayerFramesNode", "Offset Layer Frames")
         layout.separator()
         insertNode(layout, "an_SetGPStrokeAttributesNode", "Set Stroke Attributes")
         insertNode(layout, "an_ReplicateGPStrokeNode", "Replicate Stroke")
