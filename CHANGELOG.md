@@ -33,6 +33,7 @@
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
+- Vectorize *Combine Color* node.
 
 ## 2.1.6
 
