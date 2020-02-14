@@ -18,7 +18,7 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Blend Mode", "blendMode", value = 'REGULAR', hide = True)
         self.newInput("Float", "Opacity", "opacity", value = 1, minValue = 0, maxValue = 1, hide = True)
         self.newInput("Color", "Tint Color", "tintColor", hide = True)
-        self.newInput("Float", "Factor", "tintFactor", value = 0, minValue = 0, maxValue = 1, hide = True)
+        self.newInput("Float", "Tint Factor", "tintFactor", value = 0, minValue = 0, maxValue = 1, hide = True)
         self.newInput("Float", "Stroke Thickness", "lineChange", hide = True)
         self.newInput("Integer", "Pass Index", "passIndex", value = 0, minValue = 0, hide = True)
         self.newInput("Boolean", "Mask Layer", "maskLayer", value = False, hide = True)
