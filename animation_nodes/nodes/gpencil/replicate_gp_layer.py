@@ -32,7 +32,7 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Color", "useTintColorList",
             ("Tint Color", "tintColors"), ("Tint Colors", "tintColors")), hide = True)
         self.newInput(VectorizedSocket("Float", "useTintFactorList",
-            ("Factor", "tintFactors"), ("Factors", "tintFactors")), value = 0, hide = True)
+            ("Tint Factor", "tintFactors"), ("Tint Factors", "tintFactors")), value = 0, hide = True)
         self.newInput(VectorizedSocket("Float", "useLineChangeList",
             ("Stroke Thickness", "lineChanges"), ("Stroke Thicknesses", "lineChanges")), value = 0, hide = True)
 
