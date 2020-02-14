@@ -33,6 +33,8 @@
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
+- Vectorize *Combine Color* node.
+- Replace the Font socket pick operator with a *Load Font* operator.
 
 ## 2.1.6
 

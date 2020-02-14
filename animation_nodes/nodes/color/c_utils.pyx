@@ -1,15 +1,58 @@
 import cython
 from ... math cimport (
     addColor_Inplace,
-    scaleColor_Inplace
+    scaleColor_Inplace,
+    hsva_to_rgba,
+    hsla_to_rgba,
+    yiqa_to_rgba,
 )
 from ... data_structures cimport (
     Color,
     LongList,
     ColorList,
     VirtualColorList,
+    VirtualDoubleList,
     PolygonIndicesList
 )
+
+
+def colorListFromRGBA(Py_ssize_t amount, VirtualDoubleList r, VirtualDoubleList g,
+                      VirtualDoubleList b, VirtualDoubleList a):
+    cdef ColorList output = ColorList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        output.data[i].r = <float>r.get(i)
+        output.data[i].g = <float>g.get(i)
+        output.data[i].b = <float>b.get(i)
+        output.data[i].a = <float>a.get(i)
+    return output
+
+def colorListFromHSVA(Py_ssize_t amount, VirtualDoubleList h, VirtualDoubleList s,
+                      VirtualDoubleList v, VirtualDoubleList a):
+    cdef ColorList output = ColorList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        hsva_to_rgba(output.data + i, <float>h.get(i), <float>s.get(i),
+                                      <float>v.get(i), <float>a.get(i))
+    return output
+
+def colorListFromHSLA(Py_ssize_t amount, VirtualDoubleList h, VirtualDoubleList s,
+                      VirtualDoubleList l, VirtualDoubleList a):
+    cdef ColorList output = ColorList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        hsla_to_rgba(output.data + i, <float>h.get(i), <float>s.get(i),
+                                      <float>l.get(i), <float>a.get(i))
+    return output
+
+def colorListFromYIQA(Py_ssize_t amount, VirtualDoubleList y, VirtualDoubleList i,
+                      VirtualDoubleList q, VirtualDoubleList a):
+    cdef ColorList output = ColorList(length = amount)
+    cdef Py_ssize_t j
+    for j in range(amount):
+        yiqa_to_rgba(output.data + j, <float>y.get(j), <float>i.get(j),
+                                      <float>q.get(j), <float>a.get(j))
+    return output
 
 def getLoopColorsFromVertexColors(PolygonIndicesList polygons, VirtualColorList colors):
     cdef long loopsCount = polygons.indices.length

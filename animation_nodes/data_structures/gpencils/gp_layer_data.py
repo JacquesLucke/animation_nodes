@@ -40,7 +40,7 @@ class GPLayer:
         Blend Mode: {self.blendMode}
         Opacity: {self.opacity}
         Tint Color: {self.tintColor}
-        Factor: {self.tintFactor}
+        Tint Factor: {self.tintFactor}
         Stroke Thickness: {self.lineChange}
         Pass Index: {self.passIndex}
         Mask Layer: {self.maskLayer}""")

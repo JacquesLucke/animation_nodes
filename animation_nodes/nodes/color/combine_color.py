@@ -1,6 +1,14 @@
 import bpy, colorsys
 from bpy.props import *
-from ... base_types import AnimationNode
+from ... data_structures import VirtualDoubleList
+from ... base_types import AnimationNode, VectorizedSocket
+from . c_utils import (
+    colorListFromRGBA,
+    colorListFromHSVA,
+    colorListFromHSLA,
+    colorListFromYIQA,
+)
+
 
 # using linear conversion here, unlike BL colorpicker hsv/hex
 # BL Color() funcion does this also and has only rgb+hsv, so we'l use colorsys
@@ -18,29 +26,37 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
     bl_label = "Combine Color"
     dynamicLabelType = "HIDDEN_ONLY"
 
+    useListR: VectorizedSocket.newProperty()
+    useListG: VectorizedSocket.newProperty()
+    useListB: VectorizedSocket.newProperty()
+    useListA: VectorizedSocket.newProperty()
+
     sourceType: EnumProperty(name = "Source Type", default = "RGB",
         items = sourceTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         if self.sourceType == "RGB":
-            self.newInput("Float", "Red", "red")
-            self.newInput("Float", "Green", "green")
-            self.newInput("Float", "Blue", "blue")
+            self.newInput(VectorizedSocket("Float", "useListR", ("R", "r"), ("R", "r")))
+            self.newInput(VectorizedSocket("Float", "useListG", ("G", "g"), ("G", "g")))
+            self.newInput(VectorizedSocket("Float", "useListB", ("B", "b"), ("B", "b")))
         elif self.sourceType == "HSV":
-            self.newInput("Float", "Hue", "hue")
-            self.newInput("Float", "Saturation", "saturation")
-            self.newInput("Float", "Value", "value")
+            self.newInput(VectorizedSocket("Float", "useListR", ("H", "h"), ("H", "h")))
+            self.newInput(VectorizedSocket("Float", "useListG", ("S", "s"), ("S", "s")))
+            self.newInput(VectorizedSocket("Float", "useListB", ("V", "v"), ("V", "v")))
         elif self.sourceType == "HSL":
-            self.newInput("Float", "Hue", "hue")
-            self.newInput("Float", "Saturation", "saturation")
-            self.newInput("Float", "Lightness", "lightness")
+            self.newInput(VectorizedSocket("Float", "useListR", ("H", "h"), ("H", "h")))
+            self.newInput(VectorizedSocket("Float", "useListG", ("S", "s"), ("S", "s")))
+            self.newInput(VectorizedSocket("Float", "useListB", ("L", "l"), ("L", "l")))
         elif self.sourceType == "YIQ":
-            self.newInput("Float", "Y Luma", "y")
-            self.newInput("Float", "I In phase", "i")
-            self.newInput("Float", "Q Quadrature", "q")
+            self.newInput(VectorizedSocket("Float", "useListR", ("Y", "y"), ("Y", "y")))
+            self.newInput(VectorizedSocket("Float", "useListG", ("I", "i"), ("I", "i")))
+            self.newInput(VectorizedSocket("Float", "useListB", ("Q", "q"), ("Q", "q")))
 
-        self.newInput("Float", "Alpha", "alpha", value = 1)
-        self.newOutput("Color", "Color", "color")
+        self.newInput(VectorizedSocket("Float", "useListA", ("A", "a"), ("A", "a")))
+
+        self.newOutput(VectorizedSocket("Color",
+            ["useListR", "useListG", "useListB", "useListA"],
+            ("Color", "color"), ("Colors", "colors")))
 
     def draw(self, layout):
         layout.prop(self, "sourceType", expand = True)
@@ -49,13 +65,31 @@ class CombineColorNode(bpy.types.Node, AnimationNode):
         layout.label(text = "Uses linear color space", icon = "INFO")
 
     def drawLabel(self):
-        return "Color from {}a".format(self.sourceType)
+        return "Color from {}A".format(self.sourceType)
 
     def getExecutionCode(self, required):
-        if self.sourceType == "RGB":    yield "color = Color((red, green, blue, alpha))"
-        elif self.sourceType == "HSV":  yield "color = Color((*colorsys.hsv_to_rgb(hue, saturation, value), alpha))"
-        elif self.sourceType == "HSL":  yield "color = Color((*colorsys.hls_to_rgb(hue, lightness, saturation), alpha))"
-        elif self.sourceType == "YIQ":  yield "color = Color((*colorsys.yiq_to_rgb(y, i, q), alpha))"
+        if any((self.useListR, self.useListG, self.useListB, self.useListA)):
+            if self.sourceType == "RGB": yield "colors = self.createColorList(r, g, b, a)"
+            elif self.sourceType == "HSV": yield "colors = self.createColorList(h, s, v, a)"
+            elif self.sourceType == "HSL": yield "colors = self.createColorList(h, s, l, a)"
+            elif self.sourceType == "YIQ": yield "colors = self.createColorList(y, i, q, a)"
+        else:
+            if self.sourceType == "RGB":    yield "color = Color((r, g, b, a))"
+            elif self.sourceType == "HSV":  yield "color = Color((*colorsys.hsv_to_rgb(h, s, v), a))"
+            elif self.sourceType == "HSL":  yield "color = Color((*colorsys.hls_to_rgb(h, l, s), a))"
+            elif self.sourceType == "YIQ":  yield "color = Color((*colorsys.yiq_to_rgb(y, i, q), a))"
+
+    def createColorList(self, r, g, b, a):
+        r, g, b, a = VirtualDoubleList.createMultiple((r, 0), (g, 0), (b, 0), (a, 0))
+        amount = VirtualDoubleList.getMaxRealLength(r, g, b, a)
+        if self.sourceType == "RGB":
+            return colorListFromRGBA(amount, r, g, b, a)
+        if self.sourceType == "HSV":
+            return colorListFromHSVA(amount, r, g, b, a)
+        if self.sourceType == "HSL":
+            return colorListFromHSLA(amount, r, g, b, a)
+        if self.sourceType == "YIQ":
+            return colorListFromYIQA(amount, r, g, b, a)
 
     def getUsedModules(self):
         return ["colorsys"]
