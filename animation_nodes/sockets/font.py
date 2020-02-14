@@ -17,7 +17,7 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def drawProperty(self, layout, text, node):
         row = layout.row(align = True)
         row.prop(self, "font", text = text)
-        self.invokeFunction(row, node, "assignFontOfActiveObject", icon = "EYEDROPPER")
+        self.invokeSelector(row, "PATH", node, "loadFont", icon = "PLUS")
 
     def getValue(self):
         return self.font
@@ -28,10 +28,11 @@ class FontSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getProperty(self):
         return self.font
 
-    def assignFontOfActiveObject(self):
-        object = bpy.context.active_object
-        if getattr(object, "type", "") == "FONT":
-            self.font = object.data.font
+    def loadFont(self, path):
+        try:
+            self.font = bpy.data.fonts.load(path)
+        except:
+            pass
 
     @classmethod
     def getDefaultValue(cls):
