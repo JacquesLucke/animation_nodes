@@ -688,6 +688,8 @@ class NonPersistentNodeData:
         for (k, v) in self.outputs.items():
             newData.outputs[k] = v
 
+        newData.codeEffects = self.codeEffects
+
         return newData
 
 infoByNode = defaultdict(NonPersistentNodeData)

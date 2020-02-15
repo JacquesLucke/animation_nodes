@@ -46,7 +46,11 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Text", "Name", "layerName", hide = True)
         self.newOutput("Text", "Blend Mode", "blendMode", hide = True)
         self.newOutput("Float", "Opacity", "opacity", hide = True)
+        self.newOutput("Color", "Tint Color", "tintColor", hide = True)
+        self.newOutput("Float", "Tint Factor", "tintFactor", hide = True)
+        self.newOutput("Float", "Stroke Thickness", "lineChange", hide = True)
         self.newOutput("Integer", "Pass Index", "passIndex", hide = True)
+        self.newOutput("Boolean", "Mask Layer", "maskLayer", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "frameType", text = "")
@@ -70,46 +74,57 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
     def execute_ActiveFrame(self, layer, scene):
         frames = layer.frames
         if len(frames) == 0:
-            return GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+            return (GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                    layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
         return (self.getActiveFrame(scene.frame_current, frames), layer.layerName, layer.blendMode,
-                layer.opacity, layer.passIndex)
+                layer.opacity, layer.tintColor, layer.tintFactor, layer.lineChange, layer.passIndex,
+                layer.maskLayer)
 
     def execute_FrameIndex(self, layer, frameIndex):
         frames = layer.frames
         if len(frames) == 0:
-            return GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+            return (GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                    layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
         frame = self.getFrame(frames, frameIndex)
-        return frame, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+        return (frame, layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
     def execute_FrameIndices(self, layer, frameIndices):
         frames = layer.frames
         if len(frames) == 0:
-            return [], layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+            return ([], layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                    layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
         outFrames = [self.getFrame(frames, index) for index in frameIndices]
-        return outFrames, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+        return (outFrames, layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
     def execute_FrameNumber(self, layer, frameNumber):
         frames = layer.frames
         if len(frames) == 0:
-            return GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+            return (GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                    layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
         return (self.getFrameFromNumber(frames, frameNumber), layer.layerName, layer.blendMode,
-                layer.opacity, layer.passIndex)
+                layer.opacity, layer.tintColor, layer.tintFactor, layer.lineChange, layer.passIndex,
+                layer.maskLayer)
 
     def execute_FrameNumbers(self, layer, inFrameNumbers):
         frames = layer.frames
         if len(frames) == 0:
-            return [], layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+            return ([], layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                    layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
         outFrames = [self.getFrameFromNumber(frames, frameNumber) for frameNumber in inFrameNumbers]
-        return outFrames, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+        return (outFrames, layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
     def execute_AllFrames(self, layer):
         frames = layer.frames
-        return frames, layer.layerName, layer.blendMode, layer.opacity, layer.passIndex
+        return (frames, layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
+                layer.tintFactor, layer.lineChange, layer.passIndex, layer.maskLayer)
 
     def getActiveFrame(self, currentFrame, frames):
         return max((frame for frame in frames if frame.frameNumber <= currentFrame),

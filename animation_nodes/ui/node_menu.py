@@ -507,7 +507,9 @@ class GPencilMenu(bpy.types.Menu):
         insertNode(layout, "an_GPStrokeInfoNode", "Stroke Info")
         layout.separator()
         insertNode(layout, "an_SetGPLayerAttributesNode", "Set Layer Attributes")
+        insertNode(layout, "an_ReplicateGPLayerNode", "Replicate Layer")
         insertNode(layout, "an_TransformGPLayerNode", "Transform Layer")
+        insertNode(layout, "an_OffsetGPLayerFramesNode", "Offset Layer Frames")
         layout.separator()
         insertNode(layout, "an_SetGPStrokeAttributesNode", "Set Stroke Attributes")
         insertNode(layout, "an_ReplicateGPStrokeNode", "Replicate Stroke")
@@ -517,6 +519,9 @@ class GPencilMenu(bpy.types.Menu):
         insertNode(layout, "an_GPFrameFromStrokesNode", "Frame From Strokes")
         insertNode(layout, "an_GPLayerFromFramesNode", "Layer From Frames")
         insertNode(layout, "an_GPObjectOutputNode", "Object Output")
+        layout.separator()
+        insertNode(layout, "an_GPMaterialOutputNode", "GP Material Output")
+        insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
 
 class ActionMenu(bpy.types.Menu):
     bl_idname = "AN_MT_action_menu"
@@ -604,6 +609,7 @@ class MaterialMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
+        insertNode(layout, "an_GPMaterialOutputNode", "GP Material Output")
 
 class ParticleSystemMenu(bpy.types.Menu):
     bl_idname = "AN_MT_particle_system_menu"

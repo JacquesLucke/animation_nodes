@@ -16,6 +16,10 @@
 - Added Transform GP Stoke node.
 - Added Set GP Layer Attributes node.
 - Added Set GP Stroke Attributes node.
+- Added GP Material Output node.
+- Added GP Object Material Output node.
+- Added Replicate GP Layer node.
+- Added Offset GP Layer Frames node.
 
 ### Fixed
 
@@ -23,11 +27,14 @@
 - Fixed auto execution when the node tree is refreshed during animation.
 - Fixed the Distribute Matrices node for the Spiral option.
 - Fixed VirtualPyList for singleton lists.
+- Fixed error due to duplication of nodes with code effects.
 
 ### Changed
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
+- Vectorize *Combine Color* node.
+- Replace the Font socket pick operator with a *Load Font* operator.
 
 ## 2.1.6
 
