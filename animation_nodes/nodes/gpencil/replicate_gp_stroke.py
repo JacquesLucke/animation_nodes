@@ -20,8 +20,7 @@ class ReplicateGPStrokeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
-            ("Stroke", "stroke", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Strokes", "strokes")))
+            ("Stroke", "strokes"), ("Strokes", "strokes")), dataIsModified = True)
 
         self.newInput(self.transformationType, "Transformations", "transformations")
 
