@@ -2,8 +2,8 @@ import bpy
 from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class EdgeCrease(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SetEdgeCrease"
+class SetEdgeCreaseNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetEdgeCreaseNode"
     bl_label = "Set Edge Crease"
     errorHandlingType = "EXCEPTION"
 
@@ -15,24 +15,19 @@ class EdgeCrease(bpy.types.Node, AnimationNode):
             ("Crease", "crease"), ("Creases", "creases")))
         self.newOutput("Object", "Object", "object")
 
-    def getExecutionFunctionName(self):
-        if self.useFloatList:
-            return "executeList"
-        else:
-            return "executeSingle"
+    def execute(self, object, creases):
+        if object is None: return None
 
-    def executeSingle(self, object, crease):
-        if object is None or object.type != "MESH" or object.mode != "OBJECT": return
+        if object.type != "MESH":
+            self.raiseErrorMessage("Object is not a mesh object.")
 
-        creases = VirtualDoubleList.create(crease, 0).materialize(len(object.data.edges))
-        object.data.edges.foreach_set('crease', creases.asNumpyArray())
-        object.data.update()
-        return object
+        if object.mode != "OBJECT":
+            self.raiseErrorMessage("Object is not in object mode.")
 
-    def executeList(self, object, creases):
-        if object is None or object.type != "MESH" or object.mode != "OBJECT": return
+        if not object.data.use_customdata_edge_crease:
+            object.data.use_customdata_edge_crease = True
 
         creases = VirtualDoubleList.create(creases, 0).materialize(len(object.data.edges))
-        object.data.edges.foreach_set('crease', creases.asNumpyArray())
+        object.data.edges.foreach_set('crease', creases)
         object.data.update()
         return object
