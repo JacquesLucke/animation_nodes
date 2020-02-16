@@ -2,8 +2,8 @@ import bpy
 from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class BevelEdgeWeight(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SetBevelEdgeWeight"
+class SetBevelEdgeWeightNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetBevelEdgeWeightNode"
     bl_label = "Set Bevel Edge Weight"
     errorHandlingType = "EXCEPTION"
 

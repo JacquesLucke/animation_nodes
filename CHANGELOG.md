@@ -20,6 +20,7 @@
 - Added GP Object Material Output node.
 - Added Replicate GP Layer node.
 - Added Offset GP Layer Frames node.
+- Added Set Edge Crease node.
 
 ### Fixed
 
