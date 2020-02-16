@@ -24,6 +24,9 @@ class SetEdgeCreaseNode(bpy.types.Node, AnimationNode):
         if object.mode != "OBJECT":
             self.raiseErrorMessage("Object is not in object mode.")
 
+        if not object.data.use_customdata_edge_crease:
+            object.data.use_customdata_edge_crease = True
+
         creases = VirtualDoubleList.create(creases, 0).materialize(len(object.data.edges))
         object.data.edges.foreach_set('crease', creases)
         object.data.update()
