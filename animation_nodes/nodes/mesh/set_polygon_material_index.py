@@ -26,7 +26,7 @@ class SetPolygonMaterialIndexNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Object is not in object mode.")
 
         if self.useMaterialIndexList:
-            if min(materialIndices) < 0:
+            if materialIndices.containsValueLowerThan(0):
                 self.raiseErrorMessage("Material index can't be negative.")
         else:
             if materialIndices < 0:
