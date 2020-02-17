@@ -5,13 +5,15 @@ from mathutils import Matrix
 from string import whitespace
 from functools import lru_cache
 from ... events import propertyChanged
-from ... data_structures import Matrix4x4List
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import Matrix4x4List, VirtualDoubleList
 
 class DecomposeTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DecomposeTextNode"
     bl_label = "Decompose Text"
     errorHandlingType = "EXCEPTION"
+
+    useScaleList : VectorizedSocket.newProperty()
 
     includeWhiteSpaces : BoolProperty(name = "Include White Spaces", default = True,
         update = propertyChanged)
@@ -19,6 +21,9 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Text", "Text", "text")
         self.newInput("Font", "Font", "font")
+        self.newInput(VectorizedSocket("Float", "useScaleList",
+            ("Size", "size", dict(value = 1, hide = True)),
+            ("Sizes", "sizes")))
         self.newInput("Float", "Character Spacing", "charSpacing", value = 1, hide = True)
         self.newInput("Float", "Word Spacing", "wordSpacing", value = 1, hide = True)
         self.newInput("Float", "Line Spacing", "lineSpacing", value = 1, hide = True)
@@ -31,26 +36,28 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "includeWhiteSpaces")
 
-    def execute(self, text, font, charSpacing, wordSpacing, lineSpacing, align):
+    def execute(self, text, font, sizes, charSpacing, wordSpacing, lineSpacing, align):
         self.validateAlignment(align)
         fontID = self.getFontID(font)
-        fontRatio = self.getFontRatio(font, fontID)
+        fontRatio = getFontRatio(font, fontID)
 
-        return self.getCharTransforms(text, fontID, fontRatio, charSpacing, wordSpacing, lineSpacing, align)
+        return self.getCharTransforms(text, fontID, fontRatio, sizes, charSpacing, wordSpacing, lineSpacing, align)
 
-    def getCharTransforms(self, text, fontID, fontRatio, charSpacing, wordSpacing, lineSpacing, align):
+    def getCharTransforms(self, text, fontID, fontRatio, sizes, charSpacing, wordSpacing, lineSpacing, align):
+        _sizes = VirtualDoubleList.create(sizes, 1)
+
         allChars = []
         allTransforms = Matrix4x4List()
         for i, line in enumerate(text.splitlines()):
             chars = []
             transforms = []
             comulativeWidth = 0
-            for char in line:
+            for j, char in enumerate(line):
                 if self.includeWhiteSpaces or char not in whitespace:
                     transforms.append(Matrix.Translation((comulativeWidth, -i * lineSpacing, 0)))
                     chars.append(char)
 
-                comulativeWidth += self.getCharWidth(fontID, char, fontRatio, charSpacing, wordSpacing)
+                comulativeWidth += getCharWidth(fontID, char, fontRatio, charSpacing, wordSpacing) * _sizes[j]
 
             transforms = Matrix4x4List.fromValues(transforms)
 
@@ -66,29 +73,6 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
 
         return allTransforms, allChars, len(allChars)
 
-    def getCharWidth(self, fontID, char, fontRatio, charSpacing, wordSpacing):
-        width = blf.dimensions(fontID, char)[0] * fontRatio
-        if char == " ":
-            width *= wordSpacing
-        return width + charSpacing / 2 - 0.5
-
-    @lru_cache()
-    def getFontRatio(self, font, fontID):
-        data = bpy.data.curves.new("an_helper_font_curve", type = "FONT")
-        textObject = bpy.data.objects.new("an_helper_text_object", data)
-
-        referenceChar = "W"
-
-        data.font = font
-        data.body = referenceChar
-        data.body_format[0].use_underline = True
-
-        actualWidth = textObject.dimensions[0]
-        blfWidth = blf.dimensions(fontID, referenceChar)[0]
-
-        bpy.data.curves.remove(data)
-
-        return actualWidth / blfWidth
 
     def getFontID(self, font):
         if font is None or font.filepath == "<builtin>":
@@ -105,3 +89,29 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
     def validateAlignment(self, align):
         if align not in ("LEFT", "RIGHT", "CENTER"):
             self.raiseErrorMessage("Invalid alignment. Possible values are 'LEFT', 'CENTER', and 'RIGHT'.")
+
+
+def getCharWidth(fontID, char, fontRatio, charSpacing, wordSpacing):
+    width = blf.dimensions(fontID, char)[0] * fontRatio
+    if char == " ":
+        width *= wordSpacing
+    return width + charSpacing / 2 - 0.5
+
+@lru_cache()
+def getFontRatio(font, fontID):
+    data = bpy.data.curves.new("an_helper_font_curve", type = "FONT")
+    textObject = bpy.data.objects.new("an_helper_text_object", data)
+
+    referenceChar = "W"
+
+    data.font = font
+    data.body = referenceChar
+    data.body_format[0].use_underline = True
+
+    actualWidth = textObject.dimensions[0]
+    blfWidth = blf.dimensions(fontID, referenceChar)[0]
+
+    bpy.data.curves.remove(data)
+
+    return actualWidth / blfWidth
+
