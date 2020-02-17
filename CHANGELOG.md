@@ -30,6 +30,7 @@
 - Fixed the Distribute Matrices node for the Spiral option.
 - Fixed VirtualPyList for singleton lists.
 - Fixed error due to duplication of nodes with code effects.
+- Fixed unexpected results and crashes during exporting.
 
 ### Changed
 
