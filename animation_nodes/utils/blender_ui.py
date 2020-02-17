@@ -66,6 +66,9 @@ def redrawAreaType(areaType):
 def isViewportRendering():
     return any([space.shading.type == "RENDERED" for space in iterActiveSpacesByType("VIEW_3D")])
 
+def isInterfaceLocked():
+    return getattr(bpy.context.window_manager, "is_interface_locked", False)
+
 def getDpiFactor():
     return getDpi() / 72
 
