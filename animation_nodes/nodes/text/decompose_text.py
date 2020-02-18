@@ -6,14 +6,18 @@ from string import whitespace
 from functools import lru_cache
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import Matrix4x4List, VirtualDoubleList
+from ... data_structures import Matrix4x4List, VirtualDoubleList, VirtualPyList
 
 class DecomposeTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DecomposeTextNode"
     bl_label = "Decompose Text"
     errorHandlingType = "EXCEPTION"
 
-    useScaleList : VectorizedSocket.newProperty()
+    useSizeList : VectorizedSocket.newProperty()
+    useCharSpacingList : VectorizedSocket.newProperty()
+    useWordSpacingList : VectorizedSocket.newProperty()
+    useLineSpacingList : VectorizedSocket.newProperty()
+    useAlignmentList : VectorizedSocket.newProperty()
 
     includeWhiteSpaces : BoolProperty(name = "Include White Spaces", default = True,
         update = propertyChanged)
@@ -21,13 +25,21 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Text", "Text", "text")
         self.newInput("Font", "Font", "font")
-        self.newInput(VectorizedSocket("Float", "useScaleList",
+        self.newInput(VectorizedSocket("Float", "useSizeList",
             ("Size", "size", dict(value = 1, hide = True)),
             ("Sizes", "sizes")))
-        self.newInput("Float", "Character Spacing", "charSpacing", value = 1, hide = True)
-        self.newInput("Float", "Word Spacing", "wordSpacing", value = 1, hide = True)
-        self.newInput("Float", "Line Spacing", "lineSpacing", value = 1, hide = True)
-        self.newInput("Text", "Alignment", "align", value = "LEFT", hide = True)
+        self.newInput(VectorizedSocket("Float", "useCharSpacingList",
+            ("Character Spacing", "charSpacing", dict(value = 1, hide = True)),
+            ("Characters Spacing", "charsSpacing")))
+        self.newInput(VectorizedSocket("Float", "useWordSpacingList",
+            ("Word Spacing", "wordSpacing", dict(value = 1, hide = True)),
+            ("Words Spacing", "wordsSpacing")))
+        self.newInput(VectorizedSocket("Float", "useLineSpacingList",
+            ("Line Spacing", "lineSpacing", dict(value = 1, hide = True)),
+            ("Lines Spacing", "linesSpacing")))
+        self.newInput(VectorizedSocket("Text", "useAlignmentList",
+            ("Alignment", "alignment", dict(value = "LEFT", hide = True)),
+            ("Alignments", "alignments")))
 
         self.newOutput("Matrix List", "Transforms", "transforms")
         self.newOutput("Text List", "Characters", "characters")
@@ -36,38 +48,46 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "includeWhiteSpaces")
 
-    def execute(self, text, font, sizes, charSpacing, wordSpacing, lineSpacing, align):
-        self.validateAlignment(align)
+    def execute(self, text, font, sizes, charsSpacing, wordsSpacing, linesSpacing, alignments):
+        self.validateAlignments(alignments)
         fontID = self.getFontID(font)
         fontRatio = getFontRatio(font, fontID)
 
-        return self.getCharTransforms(text, fontID, fontRatio, sizes, charSpacing, wordSpacing, lineSpacing, align)
+        sizes, charsSpacing, wordsSpacing, linesSpacing = VirtualDoubleList.createMultiple(
+                (sizes, 1), (charsSpacing, 1), (wordsSpacing, 1), (linesSpacing, 1))
+        alignments = VirtualPyList.create(alignments, "LEFT")
 
-    def getCharTransforms(self, text, fontID, fontRatio, sizes, charSpacing, wordSpacing, lineSpacing, align):
-        _sizes = VirtualDoubleList.create(sizes, 1)
+        return self.getCharTransforms(text, fontID, fontRatio, sizes,
+            charsSpacing, wordsSpacing, linesSpacing, alignments)
 
+    def getCharTransforms(self, text, fontID, fontRatio, sizes,
+            charsSpacing, wordsSpacing, linesSpacing, alignments):
         allChars = []
         allTransforms = Matrix4x4List()
         for i, line in enumerate(text.splitlines()):
             chars = []
             transforms = []
+            numberOfSpaces = 0
             cumulativeWidth = 0
             for j, char in enumerate(line):
                 if self.includeWhiteSpaces or char not in whitespace:
-                    scale = Matrix.Scale(_sizes[j], 4)
-                    translation = Matrix.Translation((cumulativeWidth, -i * lineSpacing, 0))
+                    scale = Matrix.Scale(sizes[j], 4)
+                    translation = Matrix.Translation((cumulativeWidth, -i * linesSpacing[i], 0))
                     transforms.append(translation @ scale)
                     chars.append(char)
+                
+                cumulativeWidth += getCharWidth(fontID, char, fontRatio,
+                    charsSpacing[j], wordsSpacing[numberOfSpaces]) * sizes[j]
 
-                cumulativeWidth += getCharWidth(fontID, char, fontRatio, charSpacing, wordSpacing) * _sizes[j]
+                if char == " ": numberOfSpaces += 1
 
             transforms = Matrix4x4List.fromValues(transforms)
 
-            if align == "CENTER":
-                offset = (-cumulativeWidth + (charSpacing / 2 - 0.5) * _sizes[len(line) - 1]) / 2
-                transforms.transform(Matrix.Translation((offset, 0, 0)))
-            elif align == "RIGHT":
-                offset = -cumulativeWidth + (charSpacing / 2 - 0.5) * _sizes[len(line) - 1]
+            if alignments[i] != "LEFT":
+                lastCharIndex = len(line) - 1
+                spacing, size = charsSpacing[lastCharIndex], sizes[lastCharIndex]
+                offset = -cumulativeWidth + (spacing / 2 - 0.5) * size
+                if alignments[i] == "CENTER": offset /= 2
                 transforms.transform(Matrix.Translation((offset, 0, 0)))
 
             allChars += chars
@@ -88,9 +108,13 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
         blf.size(fontID, 50, 72)
         return fontID
 
-    def validateAlignment(self, align):
-        if align not in ("LEFT", "RIGHT", "CENTER"):
-            self.raiseErrorMessage("Invalid alignment. Possible values are 'LEFT', 'CENTER', and 'RIGHT'.")
+    def validateAlignments(self, alignments):
+        if not self.useAlignmentList:
+            alignments = [alignments]
+
+        for alignment in alignments:
+            if alignment not in ("LEFT", "RIGHT", "CENTER"):
+                self.raiseErrorMessage("Invalid alignment. Possible values are 'LEFT', 'CENTER', and 'RIGHT'.")
 
 
 def getCharWidth(fontID, char, fontRatio, charSpacing, wordSpacing):
