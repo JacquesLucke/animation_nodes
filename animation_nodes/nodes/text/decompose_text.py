@@ -51,21 +51,23 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
         for i, line in enumerate(text.splitlines()):
             chars = []
             transforms = []
-            comulativeWidth = 0
+            cumulativeWidth = 0
             for j, char in enumerate(line):
                 if self.includeWhiteSpaces or char not in whitespace:
-                    transforms.append(Matrix.Translation((comulativeWidth, -i * lineSpacing, 0)))
+                    scale = Matrix.Scale(_sizes[j], 4)
+                    translation = Matrix.Translation((cumulativeWidth, -i * lineSpacing, 0))
+                    transforms.append(translation @ scale)
                     chars.append(char)
 
-                comulativeWidth += getCharWidth(fontID, char, fontRatio, charSpacing, wordSpacing) * _sizes[j]
+                cumulativeWidth += getCharWidth(fontID, char, fontRatio, charSpacing, wordSpacing) * _sizes[j]
 
             transforms = Matrix4x4List.fromValues(transforms)
 
             if align == "CENTER":
-                offset = (-comulativeWidth + charSpacing / 2 - 0.5) / 2
+                offset = (-cumulativeWidth + (charSpacing / 2 - 0.5) * _sizes[len(line) - 1]) / 2
                 transforms.transform(Matrix.Translation((offset, 0, 0)))
             elif align == "RIGHT":
-                offset = -comulativeWidth + charSpacing / 2 - 0.5
+                offset = -cumulativeWidth + (charSpacing / 2 - 0.5) * _sizes[len(line) - 1]
                 transforms.transform(Matrix.Translation((offset, 0, 0)))
 
             allChars += chars
@@ -111,6 +113,7 @@ def getFontRatio(font, fontID):
     actualWidth = textObject.dimensions[0]
     blfWidth = blf.dimensions(fontID, referenceChar)[0]
 
+    # textObject will be removed automatically.
     bpy.data.curves.remove(data)
 
     return actualWidth / blfWidth
