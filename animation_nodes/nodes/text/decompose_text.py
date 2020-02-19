@@ -1,3 +1,4 @@
+import re
 import bpy
 import blf
 from bpy.props import *
@@ -7,6 +8,11 @@ from functools import lru_cache
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import Matrix4x4List, VirtualDoubleList, VirtualPyList
+
+decomposeTypeItems = [
+    ("CHARACTER", "Character", "", "NONE", 0),
+    ("WORD", "Word", "", "NONE", 1),
+]
 
 class DecomposeTextNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DecomposeTextNode"
@@ -22,6 +28,9 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
 
     includeWhiteSpaces : BoolProperty(name = "Include White Spaces", default = True,
         update = propertyChanged)
+
+    decomposeType: EnumProperty(name = "Decompose Type", default = "CHARACTER",
+        items = decomposeTypeItems, update = AnimationNode.refresh)
 
     def create(self):
         self.newInput("Text", "Text", "text")
@@ -45,8 +54,14 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
             ("Alignments", "alignments")))
 
         self.newOutput("Matrix List", "Transforms", "transforms")
-        self.newOutput("Text List", "Characters", "characters")
+        if self.decomposeType == "CHARACTER":
+            self.newOutput("Text List", "Characters", "characters")
+        else:
+            self.newOutput("Text List", "Words", "words")
         self.newOutput("Integer", "Length", "length")
+
+    def draw(self, layout):
+        layout.prop(self, "decomposeType", text = "")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "includeWhiteSpaces")
@@ -62,8 +77,12 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
         fontIDs, fontRatios, alignments = VirtualPyList.createMultiple(
                 (fontIDs, 0), (fontRatios, 1), (alignments, "LEFT"))
 
-        return self.getCharTransforms(text, fontIDs, fontRatios, sizes,
-            charsSpacing, wordsSpacing, linesSpacing, alignments)
+        if self.decomposeType == "CHARACTER":
+            return self.getCharTransforms(text, fontIDs, fontRatios, sizes,
+                charsSpacing, wordsSpacing, linesSpacing, alignments)
+        else:
+            return self.getWordTransforms(text, fontIDs, fontRatios, sizes,
+                charsSpacing, wordsSpacing, linesSpacing, alignments)
 
     def getCharTransforms(self, text, fontIDs, fontRatios, sizes,
             charsSpacing, wordsSpacing, linesSpacing, alignments):
@@ -82,7 +101,7 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
                     transforms.append(translation @ scale)
                     chars.append(char)
                 
-                cumulativeWidth += getCharWidth(fontIDs[charIndex], char, fontRatios[charIndex],
+                cumulativeWidth += getCharWidth(char, fontIDs[charIndex], fontRatios[charIndex],
                     charsSpacing[charIndex], wordsSpacing[numberOfSpaces]) * sizes[charIndex]
 
                 charIndex += 1
@@ -101,6 +120,40 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
 
         return allTransforms, allChars, len(allChars)
 
+    def getWordTransforms(self, text, fontIDs, fontRatios, sizes,
+            charsSpacing, wordsSpacing, linesSpacing, alignments):
+        allWords = []
+        wordIndex = 0
+        allTransforms = Matrix4x4List()
+        for i, line in enumerate(text.splitlines()):
+            words = []
+            transforms = []
+            cumulativeWidth = 0
+            for word in re.split(r"(\s+)", line):
+                isWord = len(word) != 0 and word[0] not in whitespace
+                if isWord:
+                    scale = Matrix.Scale(sizes[wordIndex], 4)
+                    translation = Matrix.Translation((cumulativeWidth, -i * linesSpacing[i], 0))
+                    transforms.append(translation @ scale)
+                    words.append(word)
+
+                cumulativeWidth += getWordWidth(word, fontIDs[wordIndex], fontRatios[wordIndex],
+                    charsSpacing[wordIndex], wordsSpacing[wordIndex]) * sizes[wordIndex]
+
+                if isWord: wordIndex += 1
+
+            transforms = Matrix4x4List.fromValues(transforms)
+
+            if alignments[i] != "LEFT":
+                spacing, size = charsSpacing[wordIndex - 1], sizes[wordIndex - 1]
+                offset = -cumulativeWidth + (spacing / 2 - 0.5) * size
+                if alignments[i] == "CENTER": offset /= 2
+                transforms.transform(Matrix.Translation((offset, 0, 0)))
+
+            allWords += words
+            allTransforms.extend(transforms)
+
+        return allTransforms, allWords, len(allWords)
 
     def getFontID(self, font):
         if font is None or font.filepath == "<builtin>":
@@ -123,11 +176,14 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
                 self.raiseErrorMessage("Invalid alignment. Possible values are 'LEFT', 'CENTER', and 'RIGHT'.")
 
 
-def getCharWidth(fontID, char, fontRatio, charSpacing, wordSpacing):
+def getCharWidth(char, fontID, fontRatio, charSpacing, wordSpacing):
     width = blf.dimensions(fontID, char)[0] * fontRatio
     if char == " ":
         width *= wordSpacing
     return width + charSpacing / 2 - 0.5
+
+def getWordWidth(word, fontID, fontRatio, charSpacing, wordSpacing):
+    return sum(getCharWidth(char, fontID, fontRatio, charSpacing, wordSpacing) for char in word)
 
 @lru_cache()
 def getFontRatio(font, fontID):
