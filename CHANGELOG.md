@@ -21,6 +21,7 @@
 - Added Replicate GP Layer node.
 - Added Offset GP Layer Frames node.
 - Added Set Edge Crease node.
+- Added Decompose Text node.
 
 ### Fixed
 
