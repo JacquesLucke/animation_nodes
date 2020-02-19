@@ -19,13 +19,6 @@ cdef class VirtualLISTNAME(VirtualList):
     def fromElement(cls, element):
         return VirtualLISTNAME_Element(element)
 
-    @classmethod
-    def createMultiple(cls, *elements):
-        cdef list virtualLists = []
-        for src, default in elements:
-            virtualLists.append(VirtualLISTNAME.fromListOrElement(src, default))
-        return virtualLists
-
     def materialize(self, Py_ssize_t length, bint canUseOriginal = False):
         cdef LISTNAME newList = LISTNAME(length = length)
         cdef Py_ssize_t i

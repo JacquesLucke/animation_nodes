@@ -23,6 +23,7 @@
 - Added Set Edge Crease node.
 - Added Set Polygon Material Index node.
 - Added Deep Copy option to the Copy Object Data node.
+- Added Decompose Text node.
 
 ### Fixed
 
