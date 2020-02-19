@@ -4,6 +4,13 @@ cdef class VirtualList:
         return cls.fromListOrElement(source, default)
 
     @classmethod
+    def createMultiple(cls, *elements):
+        cdef list virtualLists = []
+        for src, default in elements:
+            virtualLists.append(cls.fromListOrElement(src, default))
+        return virtualLists
+
+    @classmethod
     def getMaxRealLength(cls, *args):
         return max(obj.getRealLength() for obj in args)
 
