@@ -344,6 +344,8 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ArmatureInfoNode", "Armature Info")
         layout.menu("AN_MT_object_utils_menu", text = "Utils")
         layout.separator()
+        insertNode(layout, "an_ObjectViewportColorNode", "Viewport Color")
+        layout.separator()
         insertNode(layout, "an_ObjectInstancerNode", "Instancer")
 
 class ObjectUtilsMenu(bpy.types.Menu):
