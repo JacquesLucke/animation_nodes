@@ -26,9 +26,6 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
     useLineSpacingList : VectorizedSocket.newProperty()
     useAlignmentList : VectorizedSocket.newProperty()
 
-    includeWhiteSpaces : BoolProperty(name = "Include White Spaces", default = True,
-        update = propertyChanged)
-
     decomposeType: EnumProperty(name = "Decompose Type", default = "CHARACTER",
         items = decomposeTypeItems, update = AnimationNode.refresh)
 
@@ -52,6 +49,8 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Text", "useAlignmentList",
             ("Alignment", "alignment", dict(value = "LEFT", hide = True)),
             ("Alignments", "alignments")))
+        self.newInput("Boolean", "Include Whitespaces", "includeWhitespaces",
+            value = True, hide = True)
 
         self.newOutput("Matrix List", "Transforms", "transforms")
         if self.decomposeType == "CHARACTER":
@@ -63,10 +62,8 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "decomposeType", text = "")
 
-    def drawAdvanced(self, layout):
-        layout.prop(self, "includeWhiteSpaces")
-
-    def execute(self, text, fonts, sizes, charsSpacing, wordsSpacing, linesSpacing, alignments):
+    def execute(self, text, fonts, sizes, charsSpacing, wordsSpacing, linesSpacing,
+            alignments, includeWhitespaces):
         self.validateAlignments(alignments)
         if not self.useFontList: fonts = [fonts]
         fontIDs = [self.getFontID(font) for font in fonts]
@@ -79,33 +76,33 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
 
         if self.decomposeType == "CHARACTER":
             return self.getCharTransforms(text, fontIDs, fontRatios, sizes,
-                charsSpacing, wordsSpacing, linesSpacing, alignments)
+                charsSpacing, wordsSpacing, linesSpacing, alignments, includeWhitespaces)
         else:
             return self.getWordTransforms(text, fontIDs, fontRatios, sizes,
                 charsSpacing, wordsSpacing, linesSpacing, alignments)
 
     def getCharTransforms(self, text, fontIDs, fontRatios, sizes,
-            charsSpacing, wordsSpacing, linesSpacing, alignments):
+            charsSpacing, wordsSpacing, linesSpacing, alignments, includeWhitespaces):
         allChars = []
         charIndex = 0
-        numberOfSpaces = 0
+        spaceIndex = 0
         allTransforms = Matrix4x4List()
         for i, line in enumerate(text.splitlines()):
             chars = []
             transforms = []
             cumulativeWidth = 0
             for char in line:
-                if self.includeWhiteSpaces or char not in whitespace:
+                if includeWhitespaces or char not in whitespace:
                     scale = Matrix.Scale(sizes[charIndex], 4)
                     translation = Matrix.Translation((cumulativeWidth, -i * linesSpacing[i], 0))
                     transforms.append(translation @ scale)
                     chars.append(char)
                 
                 cumulativeWidth += getCharWidth(char, fontIDs[charIndex], fontRatios[charIndex],
-                    charsSpacing[charIndex], wordsSpacing[numberOfSpaces]) * sizes[charIndex]
+                    charsSpacing[charIndex], wordsSpacing[spaceIndex]) * sizes[charIndex]
 
                 charIndex += 1
-                if char == " ": numberOfSpaces += 1
+                if char == " ": spaceIndex += 1
 
             transforms = Matrix4x4List.fromValues(transforms)
 
@@ -124,6 +121,7 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
             charsSpacing, wordsSpacing, linesSpacing, alignments):
         allWords = []
         wordIndex = 0
+        spaceIndex = 0
         allTransforms = Matrix4x4List()
         for i, line in enumerate(text.splitlines()):
             words = []
@@ -138,9 +136,10 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
                     words.append(word)
 
                 cumulativeWidth += getWordWidth(word, fontIDs[wordIndex], fontRatios[wordIndex],
-                    charsSpacing[wordIndex], wordsSpacing[wordIndex]) * sizes[wordIndex]
+                    charsSpacing[wordIndex], wordsSpacing[spaceIndex]) * sizes[wordIndex]
 
                 if isWord: wordIndex += 1
+                else: spaceIndex += 1
 
             transforms = Matrix4x4List.fromValues(transforms)
 
