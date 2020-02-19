@@ -21,6 +21,8 @@
 - Added Replicate GP Layer node.
 - Added Offset GP Layer Frames node.
 - Added Set Edge Crease node.
+- Added Set Polygon Material Index node.
+- Added Deep Copy option to the Copy Object Data node.
 - Added Decompose Text node.
 
 ### Fixed
@@ -30,6 +32,7 @@
 - Fixed the Distribute Matrices node for the Spiral option.
 - Fixed VirtualPyList for singleton lists.
 - Fixed error due to duplication of nodes with code effects.
+- Fixed unexpected results and crashes during exporting.
 
 ### Changed
 

@@ -5,10 +5,10 @@ from bpy.props import *
 from .. utils.handlers import eventHandler
 from .. utils.nodes import getAnimationNodeTrees
 from .. utils.animation import isAnimationPlaying
-from .. utils.blender_ui import isViewportRendering
 from . tree_auto_execution import AutoExecutionProperties
 from .. events import treeChanged, isRendering, propertyChanged
 from .. preferences import getBlenderVersion, getAnimationNodesVersion
+from .. utils.blender_ui import isViewportRendering, isInterfaceLocked
 from .. tree_info import getNetworksByNodeTree, getSubprogramNetworksByNodeTree
 from .. execution.units import getMainUnitsByNodeTree, setupExecutionUnits, finishExecutionUnits
 
@@ -64,8 +64,8 @@ class AnimationNodeTree(bpy.types.NodeTree):
         if not self.hasMainExecutionUnits: return False
 
         if "Frame" in events and (a.sceneUpdate or a.frameChanged): return True
-        # TODO: We should also check if we are not exporting.
-        if not isRendering():
+
+        if not (isRendering() or isInterfaceLocked()):
             if self.timeSinceLastAutoExecution < a.minTimeDifference: return False
 
             if "Property" in events and a.propertyChanged: return True

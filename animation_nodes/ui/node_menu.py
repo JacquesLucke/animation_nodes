@@ -422,6 +422,7 @@ class MeshDataMenu(bpy.types.Menu):
         insertNode(layout, "an_GetUVMapNode", "Get UV Map")
         insertNode(layout, "an_InsertUVMapNode", "Insert UV Map")
         insertNode(layout, "an_SetUVMapNode", "Set UV Map")
+        insertNode(layout, "an_SetPolygonMaterialIndexNode", "Set Polygon Material Index")
 
 class MeshGeneratorsMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_generators_menu"
@@ -608,6 +609,7 @@ class MaterialMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_DataInputNode", "Material", {"assignedType" : repr("Material")})
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
+        insertNode(layout, "an_SetPolygonMaterialIndexNode", "Set Polygon Material Index")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
         insertNode(layout, "an_GPMaterialOutputNode", "GP Material Output")
