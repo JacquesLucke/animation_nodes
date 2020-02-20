@@ -169,7 +169,7 @@ cdef class Average_Index_SoundFalloff(BaseFalloff):
         self.smoothingSamples = smoothingSamples
         self.kaiserBeta = kaiserBeta
         self.reductionFunction = reductionFunction
-        self.dataType = "None"
+        self.dataType = "NONE"
         self.clamped = False
 
     cdef float evaluate(self, void *object, Py_ssize_t index):

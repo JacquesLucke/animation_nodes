@@ -46,15 +46,15 @@ cdef dict pyConversionPerDataType = dict()
 cdef dict convertListFunctions = dict()
 
 cdef initializeFalloffDataTypes():
-    dataTypes.add("None")
-    cSizePerDataType["None"] = 0
-    noConversionRequired.add(("None", "None"))
-    pyConversionPerDataType["None"] = pointerToInt(<void*>pyToNone)
+    dataTypes.add("NONE")
+    cSizePerDataType["NONE"] = 0
+    noConversionRequired.add(("NONE", "NONE"))
+    pyConversionPerDataType["NONE"] = pointerToInt(<void*>pyToNone)
 
 cdef registerFalloffDataType(str identifier, Py_ssize_t cSize, PyConversionFunction pyConversion):
     dataTypes.add(identifier)
     cSizePerDataType[identifier] = cSize
-    noConversionRequired.add((identifier, "None"))
+    noConversionRequired.add((identifier, "NONE"))
     noConversionRequired.add((identifier, identifier))
     pyConversionPerDataType[identifier] = pointerToInt(<void*>pyConversion)
 
@@ -70,18 +70,18 @@ cdef registerConversion(str source, str target,
 initializeFalloffDataTypes()
 
 registerFalloffDataType(
-    identifier = "Location",
+    identifier = "LOCATION",
     cSize = sizeof(Vector3),
     pyConversion = pyToLocation
 )
 
 registerFalloffDataType(
-    identifier = "Transformation Matrix",
+    identifier = "TRANSFORMATION_MATRIX",
     cSize = sizeof(Matrix4),
     pyConversion = pyToTransformationMatrix
 )
 
-registerConversion("Transformation Matrix", "Location",
+registerConversion("TRANSFORMATION_MATRIX", "LOCATION",
     callConverted = callConverted_TransformationMatrix_Location,
     convertList = convertList_TransformationMatrix_Location
 )

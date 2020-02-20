@@ -25,7 +25,7 @@ cdef class CustomFalloff(BaseFalloff):
         self.length = strengths.length
         self.fallback = fallback
         self.clamped = False
-        self.dataType = "None"
+        self.dataType = "NONE"
 
     cdef float evaluate(self, void *object, Py_ssize_t index):
         if index < self.length:

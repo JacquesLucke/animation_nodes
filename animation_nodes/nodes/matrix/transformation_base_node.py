@@ -236,7 +236,7 @@ class MatrixTransformationBase:
         if self.specifiedState == "END":
             falloff = InvertFalloff(falloff)
 
-        try: evaluator = falloff.getEvaluator("Transformation Matrix")
+        try: evaluator = falloff.getEvaluator("TRANSFORMATION_MATRIX")
         except: self.raiseErrorMessage("cannot evaluate falloff with matrices")
 
         return evaluator.evaluateList(matrices)

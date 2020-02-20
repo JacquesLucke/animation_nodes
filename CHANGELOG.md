@@ -33,6 +33,7 @@
 - Fixed VirtualPyList for singleton lists.
 - Fixed error due to duplication of nodes with code effects.
 - Fixed unexpected results and crashes during exporting.
+- Fixed enum identifiers that has spaces.
 
 ### Changed
 
