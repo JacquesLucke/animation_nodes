@@ -23,9 +23,4 @@ class ObjectViewportColorNode(bpy.types.Node, AnimationNode):
             ("Objects", "objects")))
 
     def getExecutionCode(self, required):
-        return "self.execute_object_color(object, color)"
-
-    def execute_object_color(self, object, color):
-        if object is None: return None
-        object.color = color
-        return object
+        return "if object is not None: object.color = color"
