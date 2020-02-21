@@ -12,7 +12,8 @@ class ObjectViewportColorNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects")))
+            ("Objects", "objects"),
+            codeProperties = dict(allowListExtension = False)))
 
         self.newInput(VectorizedSocket("Color", "useColorList",
             ("Color", "color"), ("Colors", "colors")))
