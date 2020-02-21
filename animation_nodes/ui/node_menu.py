@@ -330,6 +330,7 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectMatrixOutputNode", "Matrix Output")
         insertNode(layout, "an_ObjectAttributeInputNode", "Attribute Input")
         insertNode(layout, "an_ObjectAttributeOutputNode", "Attribute Output")
+        insertNode(layout, "an_ObjectColorOutputNode", "Color Output")
         insertNode(layout, "an_ObjectDataPathOutputNode", "Data Path Output")
         layout.separator()
         insertNode(layout, "an_ObjectVisibilityInputNode", "Visibility Input")
@@ -343,8 +344,6 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_SetKeyframesNode", "Set Keyframes")
         insertNode(layout, "an_ArmatureInfoNode", "Armature Info")
         layout.menu("AN_MT_object_utils_menu", text = "Utils")
-        layout.separator()
-        insertNode(layout, "an_ObjectViewportColorNode", "Viewport Color")
         layout.separator()
         insertNode(layout, "an_ObjectInstancerNode", "Instancer")
 

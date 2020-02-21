@@ -1,9 +1,9 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectViewportColorNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectViewportColorNode"
-    bl_label = "Object Viewport Color"
+class ObjectColorOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectColorOutputNode"
+    bl_label = "Object Color Output"
     codeEffects = [VectorizedSocket.CodeEffect]
 
     useObjectList: VectorizedSocket.newProperty()
