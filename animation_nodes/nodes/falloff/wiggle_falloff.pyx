@@ -39,7 +39,7 @@ cdef class WiggleFalloff(BaseFalloff):
         self.offset = offset
         self.octaves = min(max(octaves, 0), 100)
         self.clamped = False
-        self.dataType = "None"
+        self.dataType = "NONE"
 
     cdef float evaluate(self, void *object, Py_ssize_t index):
         cdef double x = self.evolution + index * 1127

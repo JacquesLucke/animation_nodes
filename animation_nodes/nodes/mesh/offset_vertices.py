@@ -25,5 +25,5 @@ class OffsetVerticesNode(bpy.types.Node, AnimationNode):
         return mesh
 
     def getFalloffEvaluator(self, falloff):
-        try: return falloff.getEvaluator("Location")
+        try: return falloff.getEvaluator("LOCATION")
         except: self.raiseErrorMessage("This falloff cannot be evaluated for vectors")

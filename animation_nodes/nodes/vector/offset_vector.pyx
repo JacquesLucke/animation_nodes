@@ -76,7 +76,7 @@ class OffsetVectorNode(bpy.types.Node, AnimationNode):
         return vectors
 
     def getFalloffEvaluator(self, falloff):
-        try: return falloff.getEvaluator("Location", self.clampFalloff)
+        try: return falloff.getEvaluator("LOCATION", self.clampFalloff)
         except: self.raiseErrorMessage("This falloff cannot be evaluated for vectors")
 
 

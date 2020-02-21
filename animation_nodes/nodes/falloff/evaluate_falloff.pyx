@@ -5,9 +5,9 @@ from ... utils.clamp cimport clampLong
 from ... data_structures cimport Falloff, FalloffEvaluator, DoubleList, CList
 
 falloffTypeItems = [
-    ("None", "None", "", "", 0),
-    ("Location", "Location", "", "", 1),
-    ("Transformation Matrix", "Transformation Matrix", "", "", 2)
+    ("NONE", "None", "", "", 0),
+    ("LOCATION", "Location", "", "", 1),
+    ("TRANSFORMATION_MATRIX", "Transformation Matrix", "", "", 2)
 ]
 
 class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
@@ -27,17 +27,17 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
         self.newInput("Falloff", "Falloff", "falloff")
 
         if self.useList:
-            if self.falloffType == "None":
+            if self.falloffType == "NONE":
                 self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
-            elif self.falloffType == "Location":
+            elif self.falloffType == "LOCATION":
                 self.newInput("Vector List", "Locations", "locations")
-            elif self.falloffType == "Transformation Matrix":
+            elif self.falloffType == "TRANSFORMATION_MATRIX":
                 self.newInput("Matrix List", "Matrices", "matrices")
             self.newOutput("Float List", "Strengths", "strengths")
         else:
-            if self.falloffType == "Location":
+            if self.falloffType == "LOCATION":
                 self.newInput("Vector", "Location", "location")
-            elif self.falloffType == "Transformation Matrix":
+            elif self.falloffType == "TRANSFORMATION_MATRIX":
                 self.newInput("Matrix", "Matrix", "matrix")
             self.newInput("Integer", "Index", "index")
             self.newOutput("Float", "Strength", "strength")
@@ -49,19 +49,19 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
 
     def getExecutionFunctionName(self):
         if self.useList:
-            if self.falloffType == "None":
+            if self.falloffType == "NONE":
                 return "execute_List_None"
-            elif self.falloffType in ("Location", "Transformation Matrix"):
+            elif self.falloffType in ("LOCATION", "TRANSFORMATION_MATRIX"):
                 return "execute_List_CList"
         else:
-            if self.falloffType == "None":
+            if self.falloffType == "NONE":
                 return "execute_Single_None"
-            elif self.falloffType in ("Location", "Transformation Matrix"):
+            elif self.falloffType in ("LOCATION", "TRANSFORMATION_MATRIX"):
                 return "execute_Single_Object"
 
     def execute_Single_None(self, Falloff falloff, index):
         cdef Py_ssize_t _index = clampLong(index)
-        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff, "None")
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff, "NONE")
         return evaluator.evaluate(NULL, _index)
 
     def execute_Single_Object(self, Falloff falloff, object, index):
@@ -72,7 +72,7 @@ class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
     def execute_List_None(self, falloff, amount):
         cdef Py_ssize_t i
         cdef DoubleList strengths
-        cdef FalloffEvaluator _falloff = self.getFalloffEvaluator(falloff, "None")
+        cdef FalloffEvaluator _falloff = self.getFalloffEvaluator(falloff, "NONE")
 
         amount = max(amount, 0)
         strengths = DoubleList(length = amount)

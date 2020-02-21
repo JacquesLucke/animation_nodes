@@ -15,13 +15,13 @@ lastSourceHashes = {}
 lastSceneHashes = {}
 
 objectTypeItems = [
-    ("Mesh", "Mesh", "", "MESH_DATA", 0),
-    ("Text", "Text", "", "FONT_DATA", 1),
-    ("Camera", "Camera", "", "CAMERA_DATA", 2),
-    ("Point Lamp", "Point Lamp", "", "LIGHT_POINT", 3),
-    ("Curve 2D", "Curve 2D", "", "FORCE_CURVE", 4),
-    ("Curve 3D", "Curve 3D", "", "CURVE_DATA", 5),
-    ("Empty", "Empty", "", "EMPTY_DATA", 6) ]
+    ("MESH", "Mesh", "", "MESH_DATA", 0),
+    ("TEXT", "Text", "", "FONT_DATA", 1),
+    ("CAMERA", "Camera", "", "CAMERA_DATA", 2),
+    ("POINT_LAMP", "Point Lamp", "", "LIGHT_POINT", 3),
+    ("CURVE_2D", "Curve 2D", "", "FORCE_CURVE", 4),
+    ("CURVE_3D", "Curve 3D", "", "CURVE_DATA", 5),
+    ("EMPTY", "Empty", "", "EMPTY_DATA", 6) ]
 
 emptyDisplayTypeItems = []
 for item in bpy.types.Object.bl_rna.properties["empty_display_type"].enum_items:
@@ -54,7 +54,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
     deepCopy: BoolProperty(name = "Deep Copy", default = False, update = resetInstancesEvent,
         description = "Make the instances independent of the source object (e.g. copy mesh)")
 
-    objectType: EnumProperty(name = "Object Type", default = "Mesh",
+    objectType: EnumProperty(name = "Object Type", default = "MESH",
         items = objectTypeItems, update = resetInstancesEvent)
 
     copyObjectProperties: BoolProperty(name = "Copy Full Object", default = False,
@@ -267,15 +267,15 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             else:
                 return sourceObject.data
         else:
-            if self.objectType == "Mesh":
+            if self.objectType == "MESH":
                 data = bpy.data.meshes.new(getPossibleMeshName("instance mesh"))
-            elif self.objectType == "Text":
+            elif self.objectType == "TEXT":
                 data = bpy.data.curves.new(getPossibleCurveName("instance text"), type = "FONT")
-            elif self.objectType == "Camera":
+            elif self.objectType == "CAMERA":
                 data = bpy.data.cameras.new(getPossibleCameraName("instance camera"))
-            elif self.objectType == "Point Lamp":
+            elif self.objectType == "POINT_LAMP":
                 data = bpy.data.lights.new(getPossibleLightName("instance lamp"), type = "POINT")
-            elif self.objectType.startswith("Curve"):
+            elif self.objectType.startswith("CURVE"):
                 data = bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
                 data.dimensions = self.objectType[-2:]
 
