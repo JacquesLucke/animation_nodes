@@ -7,7 +7,9 @@ class AutoExecutionPanel(bpy.types.Panel):
     bl_idname = "AN_PT_auto_execution_panel"
     bl_label = "Auto Execution"
     bl_space_type = "NODE_EDITOR"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
+    bl_category = "Node Tree"
+    bl_order = 0
 
     @classmethod
     def poll(cls, context):

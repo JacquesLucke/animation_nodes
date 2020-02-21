@@ -7,8 +7,10 @@ class OverviewPanel(bpy.types.Panel):
     bl_idname = "AN_PT_overview_panel"
     bl_label = "Overview"
     bl_space_type = "NODE_EDITOR"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
+    bl_category = "Node Tree"
     bl_options = {"DEFAULT_CLOSED"}
+    bl_order = 2
 
     @classmethod
     def poll(cls, context):
