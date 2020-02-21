@@ -14,7 +14,7 @@ class ObjectViewportColorNode(bpy.types.Node, AnimationNode):
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
             ("Objects", "objects")))
 
-        self.newInput(VectorizedSocket("Color", ["useObjectList", "useColorList"],
+        self.newInput(VectorizedSocket("Color", "useColorList",
             ("Color", "color"), ("Colors", "colors")))
 
         self.newOutput(VectorizedSocket("Object", "useObjectList",
@@ -22,7 +22,7 @@ class ObjectViewportColorNode(bpy.types.Node, AnimationNode):
             ("Objects", "objects")))
 
     def getExecutionCode(self, required):
-        return "newSpline = self.execute_object_color(object, color)"
+        return "self.execute_object_color(object, color)"
 
     def execute_object_color(self, object, color):
         if object is None: return None
