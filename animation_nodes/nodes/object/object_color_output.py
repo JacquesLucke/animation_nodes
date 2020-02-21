@@ -1,10 +1,10 @@
 import bpy
-from ... data_structures import Color, VirtualColorList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectViewportColorNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectViewportColorNode"
-    bl_label = "Object Viewport Color"
+class ObjectColorOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_ObjectColorOutputNode"
+    bl_label = "Object Color Output"
+    codeEffects = [VectorizedSocket.CodeEffect]
 
     useObjectList: VectorizedSocket.newProperty()
     useColorList: VectorizedSocket.newProperty()
@@ -12,43 +12,15 @@ class ObjectViewportColorNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects")))
+            ("Objects", "objects"),
+            codeProperties = dict(allowListExtension = False)))
 
-        self.newInput(VectorizedSocket("Color", ["useObjectList", "useColorList"],
+        self.newInput(VectorizedSocket("Color", "useColorList",
             ("Color", "color"), ("Colors", "colors")))
 
         self.newOutput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
             ("Objects", "objects")))
 
-    def getExecutionFunctionName(self):
-        if self.useObjectList:
-            if self.useColorList:
-                return "execute_Objects_ColorsList"
-            else:
-                return "execute_Objects_SingleColor"
-        else:
-            return "execute_Object_Color"
-
-    def execute_Object_Color(self, object, color):
-        if object is None: return None
-        object.color = color
-        return object
-
-    def execute_Objects_SingleColor(self, objects, color):
-        amount = len(objects)
-        if amount == 0: return objects
-        colors = VirtualColorList.create(color, Color((1, 1, 1, 1)))
-        for i, object in enumerate(objects):
-            if object is None: pass
-            object.color = colors[i]
-        return objects
-
-    def execute_Objects_ColorsList(self, objects, colors):
-        amount = len(objects)
-        if amount == 0 or len(colors) == 0: return objects
-        colors = VirtualColorList.create(colors, Color((1, 1, 1, 1)))
-        for i, object in enumerate(objects):
-            if object is None: pass
-            object.color = colors[i]
-        return objects
+    def getExecutionCode(self, required):
+        return "if object is not None: object.color = color"

@@ -24,6 +24,7 @@
 - Added Set Polygon Material Index node.
 - Added Deep Copy option to the Copy Object Data node.
 - Added Decompose Text node.
+- Added Object Color Output node.
 
 ### Fixed
 
