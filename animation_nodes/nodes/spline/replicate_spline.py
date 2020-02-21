@@ -5,8 +5,8 @@ from ... data_structures import Spline
 from ... base_types import AnimationNode, VectorizedSocket
 
 transformationTypeItems = [
-    ("Matrix List", "Matrices", "", "NONE", 0),
-    ("Vector List", "Vectors", "", "NONE", 1)
+    ("MATRIX_LIST", "Matrices", "", "NONE", 0),
+    ("VECTOR_LIST", "Vectors", "", "NONE", 1)
 ]
 
 class ReplicateSplineNode(bpy.types.Node, AnimationNode):
@@ -15,7 +15,7 @@ class ReplicateSplineNode(bpy.types.Node, AnimationNode):
 
     useSplineList: VectorizedSocket.newProperty()
 
-    transformationType: EnumProperty(name = "Transformation Type", default = "Matrix List",
+    transformationType: EnumProperty(name = "Transformation Type", default = "MATRIX_LIST",
         items = transformationTypeItems, update = AnimationNode.refresh)
 
     def create(self):
@@ -31,9 +31,9 @@ class ReplicateSplineNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "transformationType", text = "")
 
     def getExecutionFunctionName(self):
-        if self.transformationType == "Matrix List":
+        if self.transformationType == "MATRIX_LIST":
             return "execute_MatrixList"
-        elif self.transformationType == "Vector List":
+        elif self.transformationType == "VECTOR_LIST":
             return "execute_VectorList"
 
     def execute_MatrixList(self, splines, matrices):

@@ -94,7 +94,7 @@ cdef class SplineFalloff(BaseFalloff):
         self.distance = distance
         self.width = max(width, 0.000001)
         self.clamped = False
-        self.dataType = "Location"
+        self.dataType = "LOCATION"
 
     cdef float evaluate(self, void *point, Py_ssize_t index):
         cdef Vector3 closestPoint

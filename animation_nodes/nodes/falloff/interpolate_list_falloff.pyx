@@ -47,7 +47,7 @@ cdef class BaseInterpolateDoubleListFalloff(BaseFalloff):
         self.length = length
         self.offset = offset
         self.interpolation = interpolation
-        self.dataType = "None"
+        self.dataType = "NONE"
         self.clamped = False
 
 cdef class Loop_InterpolateDoubleListFalloff(BaseInterpolateDoubleListFalloff):

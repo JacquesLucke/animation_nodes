@@ -32,7 +32,7 @@ cdef class NoiseFalloff(BaseFalloff):
     def __cinit__(self, PyNoise noise):
         self.noise = noise
         self.clamped = False
-        self.dataType = "Location"
+        self.dataType = "LOCATION"
 
     cdef float evaluate(self, void *value, Py_ssize_t index):
         return self.noise.calculateSingle_LowLevel(<Vector3*>value)

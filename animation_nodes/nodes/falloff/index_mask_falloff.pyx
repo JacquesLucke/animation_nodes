@@ -56,7 +56,7 @@ cdef class MaskEveryNthFalloff(BaseFalloff):
         self.offset = max(min(offset, LONG_MAX), LONG_MIN)
         self.valueA = valueA
         self.valueB = valueB
-        self.dataType = "None"
+        self.dataType = "NONE"
 
     @cython.cdivision(True)
     cdef float evaluate(self, void *object, Py_ssize_t index):
@@ -74,7 +74,7 @@ cdef class MaskRandomFalloff(BaseFalloff):
         self.probability = probability
         self.valueA = valueA
         self.valueB = valueB
-        self.dataType = "None"
+        self.dataType = "NONE"
 
     @cython.cdivision(True)
     cdef float evaluate(self, void *object, Py_ssize_t index):

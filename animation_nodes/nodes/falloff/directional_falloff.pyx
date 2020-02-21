@@ -49,7 +49,7 @@ cdef class DirectionalFalloff(BaseFalloff):
         normalizeVec3_InPlace(&self.direction)
         self.size = size
         self.clamped = True
-        self.dataType = "Location"
+        self.dataType = "LOCATION"
 
 cdef class UniDirectionalFalloff(DirectionalFalloff):
     cdef float evaluate(self, void *value, Py_ssize_t index):

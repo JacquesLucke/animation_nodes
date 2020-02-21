@@ -35,7 +35,7 @@ cdef class PointDistanceFalloff(BaseFalloff):
         self.factor = 1 / (self.maxDistance - self.minDistance)
         setVector3(&self.origin, vector)
 
-        self.dataType = "Location"
+        self.dataType = "LOCATION"
         self.clamped = True
 
     cdef float evaluate(self, void *value, Py_ssize_t index):

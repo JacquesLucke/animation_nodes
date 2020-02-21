@@ -26,7 +26,7 @@ cdef class RandomFalloff(BaseFalloff):
         self.seed = (seed * 534523) % 0x7fffffff
         self.minValue = minValue
         self.maxValue = maxValue
-        self.dataType = "None"
+        self.dataType = "NONE"
         self.clamped = 0 <= min(minValue, maxValue) <= max(minValue, maxValue) <= 1
 
     cdef float evaluate(self, void *object, Py_ssize_t index):

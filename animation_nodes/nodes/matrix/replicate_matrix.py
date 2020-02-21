@@ -9,8 +9,8 @@ from . c_utils import (
 )
 
 transformationTypeItems = [
-    ("Matrix List", "Matrices", "", "NONE", 0),
-    ("Vector List", "Vectors", "", "NONE", 1)
+    ("MATRIX_LIST", "Matrices", "", "NONE", 0),
+    ("VECTOR_LIST", "Vectors", "", "NONE", 1)
 ]
 
 class ReplicateMatrixNode(bpy.types.Node, AnimationNode):
@@ -19,7 +19,7 @@ class ReplicateMatrixNode(bpy.types.Node, AnimationNode):
 
     useMatrixList: VectorizedSocket.newProperty()
 
-    transformationType: EnumProperty(name = "Transformation Type", default = "Matrix List",
+    transformationType: EnumProperty(name = "Transformation Type", default = "MATRIX_LIST",
         items = transformationTypeItems, update = AnimationNode.refresh)
 
     def create(self):
@@ -34,12 +34,12 @@ class ReplicateMatrixNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "transformationType", text = "")
 
     def getExecutionFunctionName(self):
-        if self.transformationType == "Matrix List":
+        if self.transformationType == "MATRIX_LIST":
             if self.useMatrixList:
                 return "execute_List_Matrices"
             else:
                 return "execute_Single_Matrices"
-        elif self.transformationType == "Vector List":
+        elif self.transformationType == "VECTOR_LIST":
             if self.useMatrixList:
                 return "execute_List_Vectors"
             else:
