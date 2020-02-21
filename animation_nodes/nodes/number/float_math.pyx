@@ -205,11 +205,11 @@ class FloatMathNode(bpy.types.Node, AnimationNode):
 
             subcol = col.column(align = True)
             row = subcol.row(align = True)
-            self.invokeFunction(row, "setOperation", "Add", data = "Add")
-            self.invokeFunction(row, "setOperation", "Sub", data = "Subtract")
+            self.invokeFunction(row, "setOperation", "Add", data = "ADD")
+            self.invokeFunction(row, "setOperation", "Sub", data = "SUBTRACT")
             row = subcol.row(align = True)
-            self.invokeFunction(row, "setOperation", "Mul", data = "Multiply")
-            self.invokeFunction(row, "setOperation", "Div", data = "Divide")
+            self.invokeFunction(row, "setOperation", "Mul", data = "MULTIPLY")
+            self.invokeFunction(row, "setOperation", "Div", data = "DIVIDE")
 
     def drawAdvanced(self, layout):
         self.invokeFunction(layout, "removeQuickSettings", "Remove Quick Settings",
