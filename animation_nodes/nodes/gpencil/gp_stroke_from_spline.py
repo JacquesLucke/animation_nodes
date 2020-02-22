@@ -1,10 +1,10 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import GPStroke, VirtualDoubleList, DoubleList
+from ... data_structures import GPStroke, VirtualFloatList, DoubleList
 
-class GPStrokesFromSplinesNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_GPStrokesFromSplinesNode"
-    bl_label = "GP Strokes From Splines"
+class GPStrokeFromSplineNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_GPStrokeFromSplineNode"
+    bl_label = "GP Stroke From Spline"
     codeEffects = [VectorizedSocket.CodeEffect]
 
     useSplineList: VectorizedSocket.newProperty()
@@ -13,7 +13,6 @@ class GPStrokesFromSplinesNode(bpy.types.Node, AnimationNode):
         socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline"), ("Splines", "splines")))
         socket.defaultDrawType = "PROPERTY_ONLY"
-        socket.dataIsModified = True
 
         self.newOutput(VectorizedSocket("GPStroke", "useSplineList",
             ("Stroke", "stroke"),
@@ -27,9 +26,9 @@ class GPStrokesFromSplinesNode(bpy.types.Node, AnimationNode):
 
         vertices = spline.points
         amount = len(vertices)
-        strengths = VirtualDoubleList.create(1, 1).materialize(amount)
-        pressures = DoubleList.fromValues(spline.radii)
-        uvRotations = VirtualDoubleList.create(0, 0).materialize(amount)
+        pressures = spline.radii
+        strengths = VirtualFloatList.create(1, 1).materialize(amount)
+        uvRotations = VirtualFloatList.create(0, 0).materialize(amount)
 
         return GPStroke(vertices = vertices, strengths = strengths, pressures = pressures,
                         uvRotations = uvRotations, drawCyclic = spline.cyclic)

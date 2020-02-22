@@ -1,5 +1,5 @@
 import textwrap
-from .. lists.base_lists import DoubleList, Vector3DList
+from .. lists.base_lists import FloatList, Vector3DList
 
 class GPStroke:
     def __init__(self, vertices = None, strengths = None, pressures = None,
@@ -8,9 +8,9 @@ class GPStroke:
                  displayMode = None):
 
         if vertices is None: vertices = Vector3DList()
-        if strengths is None: strengths = DoubleList()
-        if pressures is None: pressures = DoubleList()
-        if uvRotations is None: uvRotations = DoubleList()
+        if strengths is None: strengths = FloatList()
+        if pressures is None: pressures = FloatList()
+        if uvRotations is None: uvRotations = FloatList()
         if lineWidth is None: lineWidth = 250
         if drawCyclic is None: drawCyclic = False
         if startCapMode is None: startCapMode = "ROUND"

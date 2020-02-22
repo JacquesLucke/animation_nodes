@@ -25,8 +25,8 @@
 - Added Deep Copy option to the Copy Object Data node.
 - Added Decompose Text node.
 - Added Object Color Output node.
-- Added GP Strokes From Splines node.
-- Added Splines From GP Strokes node.
+- Added GP Stroke From Spline node.
+- Added Spline From GP Stroke node.
 
 ### Fixed
 
