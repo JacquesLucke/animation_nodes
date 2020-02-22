@@ -6,7 +6,7 @@
 
 ### Fixed
 
-
+- Fixed Decompose Text node for fonts relative path.
 
 ### Changed
 
