@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import GPStroke, VirtualFloatList, DoubleList
+from ... data_structures import GPStroke, VirtualFloatList
 
 class GPStrokeFromSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPStrokeFromSplineNode"

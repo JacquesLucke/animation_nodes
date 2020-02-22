@@ -1,5 +1,5 @@
 import bpy
-from ... data_structures import PolySpline, FloatList
+from ... data_structures import PolySpline
 from ... base_types import AnimationNode, VectorizedSocket
 
 class SplineFromGPStrokeNode(bpy.types.Node, AnimationNode):
