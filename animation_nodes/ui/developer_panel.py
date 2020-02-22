@@ -7,8 +7,10 @@ class DeveloperPanel(bpy.types.Panel):
     bl_idname = "AN_PT_developer_panel"
     bl_label = "Developer"
     bl_space_type = "NODE_EDITOR"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
+    bl_category = "Node Tree"
     bl_options = {"DEFAULT_CLOSED"}
+    bl_order = 3
 
     @classmethod
     def poll(cls, context):

@@ -42,6 +42,7 @@
 - Make all numeric types comparable.
 - Vectorize *Combine Color* node.
 - Replace the Font socket pick operator with a *Load Font* operator.
+- Moved panels from the Tool region to the UI region.
 
 ## 2.1.6
 
