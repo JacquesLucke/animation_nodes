@@ -2,6 +2,20 @@
 
 ### Added
 
+
+
+### Fixed
+
+- Fixed Decompose Text node for fonts relative path.
+
+### Changed
+
+
+
+## 2.1.7
+
+### Added
+
 - Added GP Object Input node.
 - Added GP Layer Info node.
 - Added GP Frame Info node.
@@ -34,7 +48,7 @@
 - Fixed VirtualPyList for singleton lists.
 - Fixed error due to duplication of nodes with code effects.
 - Fixed unexpected results and crashes during exporting.
-- Fixed enum identifiers that has spaces.
+- Fixed enum identifiers that had spaces.
 
 ### Changed
 

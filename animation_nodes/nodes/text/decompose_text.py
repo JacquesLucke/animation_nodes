@@ -158,7 +158,8 @@ class DecomposeTextNode(bpy.types.Node, AnimationNode):
         if font is None or font.filepath == "<builtin>":
             self.raiseErrorMessage("BFont is not supported!")
 
-        fontID = blf.load(font.filepath)
+        path = bpy.path.abspath(font.filepath, library = font.library)
+        fontID = blf.load(path)
 
         if fontID == -1:
             self.raiseErrorMessage("Can't load font!")
