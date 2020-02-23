@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... utils.depsgraph import getEvaluatedID
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import GPLayer, GPFrame, GPStroke, DoubleList, Vector3DList
+from ... data_structures import GPLayer, GPFrame, GPStroke, FloatList, Vector3DList
 
 importTypeItems = [
     ("ALL", "All", "Get all grease pencil layers", "NONE", 0),
@@ -91,9 +91,9 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         amount = len(strokePoints)
 
         vertices = Vector3DList(length = amount)
-        strengths = DoubleList(length = amount)
-        pressures = DoubleList(length = amount)
-        uvRotations = DoubleList(length = amount)
+        strengths = FloatList(length = amount)
+        pressures = FloatList(length = amount)
+        uvRotations = FloatList(length = amount)
 
         strokePoints.foreach_get("co", vertices.asNumpyArray())
         if useWorldSpace: vertices.transform(object.matrix_world)
