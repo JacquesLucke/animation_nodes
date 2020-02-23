@@ -21,9 +21,9 @@ class GPStrokeInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Text", "Display Mode", "displayMode", hide = True)
 
     def execute(self, stroke):
-        strengths = DoubleList.fromValues(stroke.strengths.copy())
-        pressures = DoubleList.fromValues(stroke.pressures.copy())
-        uvRotations = DoubleList.fromValues(stroke.uvRotations.copy())
+        strengths = DoubleList.fromValues(stroke.strengths)
+        pressures = DoubleList.fromValues(stroke.pressures)
+        uvRotations = DoubleList.fromValues(stroke.uvRotations)
         return (stroke.vertices, strengths, pressures, uvRotations, stroke.lineWidth,
                 stroke.drawCyclic, stroke.startCapMode, stroke.endCapMode, stroke.materialIndex,
                 stroke.displayMode)
