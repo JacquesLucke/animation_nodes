@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import GPStroke, VirtualDoubleList
+from ... data_structures import GPStroke, VirtualDoubleList, FloatList
 
 class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPStrokeFromPointsNode"
@@ -31,9 +31,9 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
                 startCapMode, endCapMode, materialIndex, displayMode):
 
         amount = len(vertices)
-        strengths = VirtualDoubleList.create(strengths, 1).materialize(amount)
-        pressures = VirtualDoubleList.create(pressures, 1).materialize(amount)
-        uvRotations = VirtualDoubleList.create(uvRotations, 0).materialize(amount)
+        strengths = FloatList.fromValues(VirtualDoubleList.create(strengths, 1).materialize(amount))
+        pressures = FloatList.fromValues(VirtualDoubleList.create(pressures, 1).materialize(amount))
+        uvRotations = FloatList.fromValues(VirtualDoubleList.create(uvRotations, 0).materialize(amount))
 
         if startCapMode not in ['ROUND', 'FLAT']:
             self.raiseErrorMessage("The Start Cap Mode is invalid. \n\nPossible values for 'Start Cap Mode' are: 'ROUND', 'FLAT'")
