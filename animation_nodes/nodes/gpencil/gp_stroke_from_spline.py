@@ -1,6 +1,6 @@
 import bpy
+from ... data_structures import GPStroke, FloatList
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import GPStroke, VirtualFloatList
 
 class GPStrokeFromSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GPStrokeFromSplineNode"
@@ -24,11 +24,13 @@ class GPStrokeFromSplineNode(bpy.types.Node, AnimationNode):
     def strokesFromSplines(self, spline):
         if spline is None: return GPStroke()
 
-        vertices = spline.points
+        vertices = spline.points.copy()
+        pressures = spline.radii.copy()
         amount = len(vertices)
-        pressures = spline.radii
-        strengths = VirtualFloatList.create(1, 1).materialize(amount)
-        uvRotations = VirtualFloatList.create(0, 0).materialize(amount)
-
-        return GPStroke(vertices = vertices, strengths = strengths, pressures = pressures,
-                        uvRotations = uvRotations, drawCyclic = spline.cyclic)
+        strengths = FloatList(length = amount)
+        uvRotations = FloatList(length = amount)
+        strengths.fill(1)
+        uvRotations.fill(0)
+        return GPStroke(vertices = vertices, strengths = strengths,
+                        pressures = pressures, uvRotations = uvRotations,
+                        drawCyclic = spline.cyclic)

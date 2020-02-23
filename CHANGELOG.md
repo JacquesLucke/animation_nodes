@@ -2,7 +2,8 @@
 
 ### Added
 
-
+- Added GP Stroke From Spline node.
+- Added Spline From GP Stroke node.
 
 ### Fixed
 
@@ -39,8 +40,6 @@
 - Added Deep Copy option to the Copy Object Data node.
 - Added Decompose Text node.
 - Added Object Color Output node.
-- Added GP Stroke From Spline node.
-- Added Spline From GP Stroke node.
 
 ### Fixed
 
