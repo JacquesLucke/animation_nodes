@@ -25,7 +25,10 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("GPLayer", "useLayerList",
             ("Layer", "layers"), ("Layers", "layers")), dataIsModified = True)
-        self.newInput(self.transformationType, "Transformations", "transformations")
+        if self.transformationType == "MATRIX_LIST":
+            self.newInput("Matrix List", "Transformations", "transformations")
+        else:
+            self.newInput("Vector List", "Transformations", "transformations")
         self.newInput(VectorizedSocket("Float", "useOffsetList",
             ("Offset Frame", "offsets"), ("Offset Frames", "offsets")), value = 0, hide = True)
         self.newInput(VectorizedSocket("Color", "useTintColorList",

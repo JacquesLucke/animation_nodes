@@ -9,6 +9,7 @@
 ### Fixed
 
 - Fixed Decompose Text node for fonts relative path.
+- Fixed fatal error when using replicate nodes.
 
 ### Changed
 

@@ -26,7 +26,10 @@ class ReplicateMatrixNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Matrix", "useMatrixList",
             ("Matrix", "inMatrix"), ("Matrices", "inMatrices")))
 
-        self.newInput(self.transformationType, "Transformations", "transformations")
+        if self.transformationType == "MATRIX_LIST":
+            self.newInput("Matrix List", "Transformations", "transformations")
+        else:
+            self.newInput("Vector List", "Transformations", "transformations")
 
         self.newOutput("Matrix List", "Matrices", "outMatrices")
 

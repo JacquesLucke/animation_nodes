@@ -23,7 +23,10 @@ class ReplicateSplineNode(bpy.types.Node, AnimationNode):
             ("Spline", "spline", dict(defaultDrawType = "PROPERTY_ONLY")),
             ("Splines", "splines")))
 
-        self.newInput(self.transformationType, "Transformations", "transformations")
+        if self.transformationType == "MATRIX_LIST":
+            self.newInput("Matrix List", "Transformations", "transformations")
+        else:
+            self.newInput("Vector List", "Transformations", "transformations")
 
         self.newOutput("Spline List", "Splines", "outSplines")
 
