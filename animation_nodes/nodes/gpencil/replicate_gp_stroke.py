@@ -22,7 +22,10 @@ class ReplicateGPStrokeNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "strokes"), ("Strokes", "strokes")), dataIsModified = True)
 
-        self.newInput(self.transformationType, "Transformations", "transformations")
+        if self.transformationType == "MATRIX_LIST":
+            self.newInput("Matrix List", "Transformations", "transformations")
+        else:
+            self.newInput("Vector List", "Transformations", "transformations")
 
         self.newOutput("GPStroke List", "Strokes", "outStrokes")
 
