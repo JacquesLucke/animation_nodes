@@ -1,7 +1,10 @@
 # cython: profile=True
+from ... data_structures import GPStroke
 from ... data_structures cimport (
     Mesh,
     LongList,
+    FloatList,
+    PolySpline,
     DoubleList,
     Vector3DList,
 )
@@ -10,7 +13,7 @@ from . line import getLinesMesh
 from ... math cimport distanceVec3
 
 # Dijkstra's algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) but is implemented such a way to handle multi-sources and mesh with multiple islands.
-def getShortestPath(Mesh mesh, LongList sources):
+def getShortestPath(Mesh mesh, LongList sources, str pathType):
     cdef Vector3DList vertices = mesh.vertices
     cdef long vertexCount = vertices.length
     cdef float maxWeight = 1000000
@@ -50,18 +53,55 @@ def getShortestPath(Mesh mesh, LongList sources):
                         weights.data[linkedIndex] = weight
                         previousVertices.data[linkedIndex] = currentIndex
 
+    cdef long index, amount
     cdef Vector3DList sortLocations
-    cdef long index
+    cdef list meshes, splines, strokes
 
-    meshes = []
-    for i in range(vertexCount):
-        sortLocations = Vector3DList()
-        index = i
-        if previousVertices.data[index] == -1: continue
-        for j in range(vertexCount):
-            sortLocations.append(vertices[index])
-            index = previousVertices.data[index]
-            if index == -1: break
-        meshes.append(getLinesMesh(sortLocations, False))
+    if pathType == "MESH":
+        meshes = []
+        for i in range(vertexCount):
+            sortLocations = Vector3DList()
+            index = i
+            if previousVertices.data[index] == -1: continue
+            for j in range(vertexCount):
+                sortLocations.append(vertices[index])
+                index = previousVertices.data[index]
+                if index == -1: break
+            meshes.append(getLinesMesh(sortLocations, False))
 
-    return meshes
+        return meshes
+
+    elif pathType == "SPLINE":
+        splines = []
+        for i in range(vertexCount):
+            sortLocations = Vector3DList()
+            index = i
+            if previousVertices.data[index] == -1: continue
+            for j in range(vertexCount):
+                sortLocations.append(vertices[index])
+                index = previousVertices.data[index]
+                if index == -1: break
+
+            splines.append(PolySpline.__new__(PolySpline, sortLocations))
+
+        return splines
+
+    elif pathType == "STROKE":
+        strokes = []
+        for i in range(vertexCount):
+            sortLocations = Vector3DList()
+            index = i
+            if previousVertices.data[index] == -1: continue
+            for j in range(vertexCount):
+                sortLocations.append(vertices[index])
+                index = previousVertices.data[index]
+                if index == -1: break
+            strengths = FloatList(length = amount)
+            pressures = FloatList(length = amount)
+            uvRotations = FloatList(length = amount)
+            strengths.fill(1)
+            pressures.fill(1)
+            uvRotations.fill(0)
+            strokes.append(GPStroke(sortLocations, strengths, pressures, uvRotations, 10))
+
+        return strokes
