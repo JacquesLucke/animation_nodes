@@ -96,6 +96,7 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType):
                 sortLocations.append(vertices[index])
                 index = previousVertices.data[index]
                 if index == -1: break
+            amount = sortLocations.length
             strengths = FloatList(length = amount)
             pressures = FloatList(length = amount)
             uvRotations = FloatList(length = amount)
