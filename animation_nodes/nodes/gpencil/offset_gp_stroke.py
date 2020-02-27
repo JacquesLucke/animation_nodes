@@ -65,7 +65,6 @@ class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
         self.inputs[5].hide = not self.useUVRotation
 
     def execute(self, stroke, falloff, offsetLocations, offsetStrengths, offsetPressures, offsetUVRotations):
-
         if not any((self.useLocation, self.useStrength, self.usePressure, self.useUVRotation)):
             return stroke
 
