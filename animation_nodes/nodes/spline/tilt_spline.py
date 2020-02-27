@@ -20,6 +20,7 @@ class TiltSplineNode(bpy.types.Node, AnimationNode):
             ("Spline", "spline"), ("Splines", "splines")))
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.dataIsModified = True
+
         self.newInput(VectorizedSocket("Float", "useTiltList",
             ("Tilt", "tilt"), ("Tilts", "tilts")))
 
@@ -58,17 +59,6 @@ class TiltSplineNode(bpy.types.Node, AnimationNode):
         return spline
 
     def execute_SingleSpline_MultipleTilts(self, spline, tilts):
-        _tilts = VirtualFloatList.fromList(self.prepareRadiusList(tilts, len(spline.points)), 0)
+        _tilts = VirtualFloatList.fromList(FloatList.fromValues(tilts), 0)
         tiltSplinePoints(spline, _tilts, self.accumulateTilts)
         return spline
-
-    def prepareRadiusList(self, tilts, length):
-        if len(tilts) == length:
-            return FloatList.fromValues(tilts)
-        elif len(tilts) < length:
-            if len(tilts) == 0:
-                return FloatList.fromValue(0, length = length)
-            else:
-                return FloatList.fromValues(tilts).repeated(length = length)
-        else:
-            return FloatList.fromValues(tilts[:length])
