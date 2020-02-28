@@ -520,6 +520,7 @@ class GPencilMenu(bpy.types.Menu):
         insertNode(layout, "an_SetGPStrokeAttributesNode", "Set Stroke Attributes")
         insertNode(layout, "an_ReplicateGPStrokeNode", "Replicate Stroke")
         insertNode(layout, "an_TransformGPStrokeNode", "Transform Stroke")
+        insertNode(layout, "an_OffsetGPStrokeNode", "Offset GP Stroke")
         layout.separator()
         insertNode(layout, "an_GPStrokeFromPointsNode", "Stroke From Points")
         insertNode(layout, "an_GPStrokeFromSplineNode", "Stroke From Spline")
