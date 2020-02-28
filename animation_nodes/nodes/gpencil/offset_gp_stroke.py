@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
+from . c_utils import offsetFloatList
 from ... events import executionCodeChanged
-from .. number.offset_number import offsetFloatList
 from .. vector.offset_vector import offsetVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList, VirtualDoubleList
@@ -46,17 +46,15 @@ class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
         self.updateSocketVisibility()
 
     def draw(self, layout):
-        col = layout.column()
+        col = layout.column(align = True)
 
-        row = col.row()
-        subrow = row.row(align = True)
-        subrow.prop(self, "useLocation", text = "Location", toggle = True)
-        subrow.prop(self, "useStrength", text = "Strength", toggle = True)
+        row = col.row(align = True)
+        row.prop(self, "useLocation", text = "Location", toggle = True)
+        row.prop(self, "useStrength", text = "Strength", toggle = True)
 
-        row = col.row()
-        subrow = row.row(align = True)
-        subrow.prop(self, "usePressure", text = "Pressure", toggle = True)
-        subrow.prop(self, "useUVRotation", text = "UVRotation", toggle = True)
+        row = col.row(align = True)
+        row.prop(self, "usePressure", text = "Pressure", toggle = True)
+        row.prop(self, "useUVRotation", text = "UVRotation", toggle = True)
 
     def updateSocketVisibility(self):
         self.inputs[2].hide = not self.useLocation
