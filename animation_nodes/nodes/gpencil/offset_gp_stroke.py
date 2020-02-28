@@ -68,25 +68,23 @@ class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
         if not any((self.useLocation, self.useStrength, self.usePressure, self.useUVRotation)):
             return stroke
 
-        vertices = stroke.vertices.copy()
         falloffEvaluator = self.getFalloffEvaluator(falloff)
 
         if self.useStrength:
             _offsetStrengths = VirtualDoubleList.create(offsetStrengths, 0)
-            offsetFloatList(vertices, stroke.strengths, _offsetStrengths, falloffEvaluator)
+            offsetFloatList(stroke.vertices, stroke.strengths, _offsetStrengths, falloffEvaluator)
 
         if self.usePressure:
             _offsetPressures = VirtualDoubleList.create(offsetPressures, 0)
-            offsetFloatList(vertices, stroke.pressures, _offsetPressures, falloffEvaluator)
+            offsetFloatList(stroke.vertices, stroke.pressures, _offsetPressures, falloffEvaluator)
 
         if self.useUVRotation:
             _offsetUVRotations = VirtualDoubleList.create(offsetUVRotations, 0)
-            offsetFloatList(vertices, stroke.uvRotations, _offsetUVRotations, falloffEvaluator)
+            offsetFloatList(stroke.vertices, stroke.uvRotations, _offsetUVRotations, falloffEvaluator)
 
         if self.useLocation:
             _offsetLocations = VirtualVector3DList.create(offsetLocations, (0, 0, 0))
-            offsetVector3DList(vertices, _offsetLocations, falloffEvaluator)
-            stroke.vertices = vertices
+            offsetVector3DList(stroke.vertices, _offsetLocations, falloffEvaluator)
 
         return stroke
 
