@@ -13,7 +13,7 @@
 
 ### Changed
 
-
+- Vectorized the Tilt Spline node.
 
 ## 2.1.7
 
