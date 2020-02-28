@@ -5,6 +5,7 @@
 - Added GP Stroke From Spline node.
 - Added Spline From GP Stroke node.
 - Added Offset GP Stroke node.
+- Added Offset Spline Node.
 
 ### Fixed
 

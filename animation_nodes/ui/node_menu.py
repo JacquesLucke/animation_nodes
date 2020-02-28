@@ -488,6 +488,7 @@ class SplineMenu(bpy.types.Menu):
         insertNode(layout, "an_ChangeSplineTypeNode", "Change Type")
         insertNode(layout, "an_ChangeSplineDirectionNode", "Change Direction")
         insertNode(layout, "an_ReplicateSplineNode", "Replicate")
+        insertNode(layout, "an_OffsetSplineNode", "Offset Spline")
         layout.separator()
         insertNode(layout, "an_SplineInfoNode", "Info")
         insertNode(layout, "an_EvaluateSplineNode", "Evaluate")
