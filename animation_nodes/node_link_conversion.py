@@ -80,7 +80,8 @@ class SimpleConvert(LinkCorrection):
         ("Float List", "Falloff") : "an_CustomFalloffNode",
         ("Object", "Mesh") : "an_MeshObjectInputNode",
         ("Mesh", "Vector List") : "an_MeshInfoNode",
-        ("Matrix List", "Vector List") : "an_DecomposeMatrixNode"
+        ("Matrix List", "Vector List") : "an_DecomposeMatrixNode",
+        ("Polygon Indices List", "Edge Indices List") : "an_EdgesOfPolygonsNode",
     }
 
     def check(self, origin, target):
