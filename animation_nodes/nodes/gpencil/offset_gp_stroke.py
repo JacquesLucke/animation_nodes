@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
-from . c_utils import offsetFloatList
 from ... events import executionCodeChanged
+from .. falloff.falloffs import offsetFloatList
 from .. vector.offset_vector import offsetVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList, VirtualDoubleList
@@ -29,17 +29,17 @@ class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
         self.newInput("GPStroke", "Stroke", "stroke", dataIsModified = True)
         self.newInput("Falloff", "Falloff", "falloff")
         self.newInput(VectorizedSocket("Vector", "useVectorList",
-            ("Offset Location", "offsetLocations", dict(value = (0, 0, 1))),
-            ("Offset Locations", "offsetLocations")))
+            ("Location", "offsetLocations", dict(value = (0, 0, 1))),
+            ("Locations", "offsetLocations")))
         self.newInput(VectorizedSocket("Float", "useStrengthList",
-            ("Offset Strength", "offsetStrength", dict(value = 1)),
-            ("Offset Strengths", "offsetStrengths")))
+            ("Strength", "offsetStrength", dict(value = 1)),
+            ("Strengths", "offsetStrengths")))
         self.newInput(VectorizedSocket("Float", "usePressureList",
-            ("Offset Pressure", "offsetPressure", dict(value = 1)),
-            ("Offset Pressures", "offsetPressures")))
+            ("Pressure", "offsetPressure", dict(value = 1)),
+            ("Pressures", "offsetPressures")))
         self.newInput(VectorizedSocket("Float", "useUVRotationList",
-            ("Offset UV-Rotation", "offsetUVRotation", dict(value = 1)),
-            ("Offset UV-Rotations", "offsetUVRotations")))
+            ("UV-Rotation", "offsetUVRotation", dict(value = 1)),
+            ("UV-Rotations", "offsetUVRotations")))
 
         self.newOutput("GPStroke", "Stroke", "stroke")
 
