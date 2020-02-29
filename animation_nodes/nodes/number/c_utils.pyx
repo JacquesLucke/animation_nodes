@@ -1,7 +1,9 @@
 from ... data_structures cimport (
-    DoubleList,
     LongList,
-    Interpolation
+    FloatList,
+    DoubleList,
+    Interpolation,
+    VirtualDoubleList
 )
 
 from ... utils.limits cimport INT_MAX
@@ -82,3 +84,11 @@ def mapRange_DoubleList_Interpolated(DoubleList values, Interpolation interpolat
          newValues.data[i] = outMin + interpolation.evaluate((x - inMin) * factor1) * factor2
 
      return newValues
+
+def offsetFloats(FloatList numbers, VirtualDoubleList offsets, FloatList influences):
+    cdef double offset
+    cdef Py_ssize_t i
+
+    for i in range(len(numbers)):
+        offset = offsets.get(i)
+        numbers.data[i] += offset * influences.data[i]
