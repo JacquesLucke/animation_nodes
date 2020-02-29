@@ -102,14 +102,6 @@ class OffsetSplineNode(bpy.types.Node, AnimationNode):
 
         falloffEvaluator = self.getFalloffEvaluator(falloff)
 
-        if self.useLeftHandle:
-            _offsetLeftHandles = VirtualVector3DList.create(offsetLeftHandles, (0, 0, 0))
-            offsetVector3DList(spline.leftHandles, _offsetLeftHandles, falloffEvaluator)
-
-        if self.useRightHandle:
-            _offsetRightHandles = VirtualVector3DList.create(offsetRightHandles, (0, 0, 0))
-            offsetVector3DList(spline.rightHandles, _offsetRightHandles, falloffEvaluator)
-
         if self.useRadius:
             _offsetRadii = VirtualDoubleList.create(offsetRadii, 0)
             offsetFloatList(spline.points, spline.radii, _offsetRadii, falloffEvaluator)
@@ -121,6 +113,16 @@ class OffsetSplineNode(bpy.types.Node, AnimationNode):
         if self.useLocation:
             _offsetLocations = VirtualVector3DList.create(offsetLocations, (0, 0, 0))
             offsetVector3DList(spline.points, _offsetLocations, falloffEvaluator)
+            offsetVector3DList(spline.leftHandles, _offsetLocations, falloffEvaluator)
+            offsetVector3DList(spline.rightHandles, _offsetLocations, falloffEvaluator)
+
+        if self.useLeftHandle:
+            _offsetLeftHandles = VirtualVector3DList.create(offsetLeftHandles, (0, 0, 0))
+            offsetVector3DList(spline.leftHandles, _offsetLeftHandles, falloffEvaluator)
+
+        if self.useRightHandle:
+            _offsetRightHandles = VirtualVector3DList.create(offsetRightHandles, (0, 0, 0))
+            offsetVector3DList(spline.rightHandles, _offsetRightHandles, falloffEvaluator)
 
         return spline
 
