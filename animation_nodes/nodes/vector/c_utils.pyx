@@ -1,7 +1,7 @@
 from ... math cimport Vector3, distanceVec3, lengthVec3
 from ... data_structures cimport (
     DoubleList, Vector3DList, CDefaultList, Vector2DList,
-    VirtualDoubleList, VirtualVector3DList)
+    VirtualDoubleList, VirtualVector3DList, FloatList)
 
 def combineVectorList(Py_ssize_t amount,
                       VirtualDoubleList x, VirtualDoubleList y, VirtualDoubleList z):
@@ -93,3 +93,15 @@ def convert_Vector2DList_to_Vector3DList(Vector2DList vectors):
         vectors3D.data[i].y = vectors.data[i].y
         vectors3D.data[i].z = <float>0.0
     return vectors3D
+
+def offset3DVectors(Vector3DList vectors, VirtualVector3DList offsets, FloatList influences):
+    cdef Vector3 *offset
+    cdef float influence
+    cdef Py_ssize_t i
+
+    for i in range(len(vectors)):
+        influence = influences.data[i]
+        offset = offsets.get(i)
+        vectors.data[i].x += offset.x * influence
+        vectors.data[i].y += offset.y * influence
+        vectors.data[i].z += offset.z * influence

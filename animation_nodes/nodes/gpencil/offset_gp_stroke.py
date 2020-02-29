@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
+from .. number.c_utils import offsetFloats
 from ... events import executionCodeChanged
-from .. falloff.falloffs import offsetFloatList
-from .. vector.offset_vector import offsetVector3DList
+from .. vector.c_utils import offset3DVectors
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList, VirtualDoubleList
 
@@ -67,22 +67,23 @@ class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
             return stroke
 
         falloffEvaluator = self.getFalloffEvaluator(falloff)
+        influences = falloffEvaluator.evaluateList(stroke.vertices)
 
         if self.useStrength:
             _offsetStrengths = VirtualDoubleList.create(offsetStrengths, 0)
-            offsetFloatList(stroke.vertices, stroke.strengths, _offsetStrengths, falloffEvaluator)
+            offsetFloats(stroke.strengths, _offsetStrengths, influences)
 
         if self.usePressure:
             _offsetPressures = VirtualDoubleList.create(offsetPressures, 0)
-            offsetFloatList(stroke.vertices, stroke.pressures, _offsetPressures, falloffEvaluator)
+            offsetFloats(stroke.pressures, _offsetPressures, influences)
 
         if self.useUVRotation:
             _offsetUVRotations = VirtualDoubleList.create(offsetUVRotations, 0)
-            offsetFloatList(stroke.vertices, stroke.uvRotations, _offsetUVRotations, falloffEvaluator)
+            offsetFloats(stroke.uvRotations, _offsetUVRotations, influences)
 
         if self.useLocation:
             _offsetLocations = VirtualVector3DList.create(offsetLocations, (0, 0, 0))
-            offsetVector3DList(stroke.vertices, _offsetLocations, falloffEvaluator)
+            offset3DVectors(stroke.vertices, _offsetLocations, influences)
 
         return stroke
 

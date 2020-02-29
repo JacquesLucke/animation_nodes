@@ -1,9 +1,10 @@
 import bpy
 from bpy.props import *
+from .. number.c_utils import offsetFloats
 from ... events import executionCodeChanged
+from .. vector.c_utils import offset3DVectors
 from ... base_types import AnimationNode, VectorizedSocket
-from .. falloff.falloffs import offsetFloatList, offsetVector3DList
-from ... data_structures import VirtualVector3DList, VirtualDoubleList, VirtualFloatList
+from ... data_structures import VirtualVector3DList, VirtualDoubleList
 
 class OffsetSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_OffsetSplineNode"
@@ -59,22 +60,22 @@ class OffsetSplineNode(bpy.types.Node, AnimationNode):
             return spline
 
         falloffEvaluator = self.getFalloffEvaluator(falloff)
+        influences = falloffEvaluator.evaluateList(spline.points)
 
         if self.useRadius:
             _offsetRadii = VirtualDoubleList.create(offsetRadii, 0)
-            offsetFloatList(spline.points, spline.radii, _offsetRadii, falloffEvaluator)
+            offsetFloats(spline.radii, _offsetRadii, influences)
 
         if self.useTilt:
             _offsetTilts = VirtualDoubleList.create(offsetTilts, 0)
-            offsetFloatList(spline.points, spline.tilts, _offsetTilts, falloffEvaluator)
+            offsetFloats(spline.tilts, _offsetTilts, influences)
 
         if self.useLocation:
             _offsetLocations = VirtualVector3DList.create(offsetLocations, (0, 0, 0))
-            influences = VirtualFloatList.create(falloffEvaluator.evaluateList(spline.points), 0)
-            offsetVector3DList(spline.points, _offsetLocations, influences)
+            offset3DVectors(spline.points, _offsetLocations, influences)
             if spline.type == "BEZIER":
-                offsetVector3DList(spline.leftHandles, _offsetLocations, influences)
-                offsetVector3DList(spline.rightHandles, _offsetLocations, influences)
+                offset3DVectors(spline.leftHandles, _offsetLocations, influences)
+                offset3DVectors(spline.rightHandles, _offsetLocations, influences)
 
         return spline
 
