@@ -90,6 +90,7 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         if self.originType != "DEFAULT":
             setOriginType(self.originType)
 
+        scene = bpy.context.scene
         for i, (object, originalCharacter) in enumerate(zip(objects, originalTexts)):
             object.hide_select = True
             object[idPropertyName] = self.currentID
@@ -98,6 +99,11 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
             object.id_keys.set("Integer", "Index", i)
             object.id_keys.set("Transforms", "Initial Transforms",
                 (object.location, object.rotation_euler, object.scale))
+
+            scene.collection.objects.unlink(object)
+            getMainObjectContainer(scene).objects.link(object)
+
+
         bpy.ops.an.update_id_keys_list()
         self.objectCount = len(objects)
 
@@ -162,7 +168,7 @@ def newCharacterObject(name, sourceData, index):
     copyTextCharacterFormat(sourceData.body_format[index], newTextData.body_format[0])
 
     characterObject = bpy.data.objects.new(name, newTextData)
-    getMainObjectContainer(bpy.context.scene).objects.link(characterObject)
+    bpy.context.scene.collection.objects.link(characterObject)
     return characterObject
 
 def copyTextCharacterFormat(source, target):
