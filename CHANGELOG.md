@@ -16,6 +16,7 @@
 - Fixed Decompose Text node for fonts relative path.
 - Fixed fatal error when using replicate nodes.
 - Fixed crash upon updating the Separate Text node when main collection is hidden.
+- Fixed the New Text Block operator in the script node.
 
 ### Changed
 
