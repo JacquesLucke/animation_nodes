@@ -136,6 +136,14 @@ class ConvertElementToList(LinkCorrection):
         node.assignBaseDataType(dataOrigin.dataType, inputAmount = 1)
         insertBasicLinking(nodeTree, origin, node, target)
 
+class ConvertListToElement(LinkCorrection):
+    def check(self, origin, target):
+        return isList(origin.bl_idname) and target.dataType != "Integer" and target.bl_idname == toBaseIdName(origin.bl_idname)
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertNode(nodeTree, "an_GetListElementNode", origin, target)
+        node.assignListDataType(dataOrigin.dataType)
+        insertBasicLinking(nodeTree, origin, node, target)
+
 class ConvertObjectToShapeKey(LinkCorrection):
     def check(self, origin, target):
         return origin.dataType == "Object" and target.dataType == "Shape Key"
@@ -226,9 +234,11 @@ linkCorrectors = [
     ConvertQuaternionToEuler(),
     ConvertFloatToScale(),
     ConvertElementToList(),
+    ConvertListToElement(),
     ConvertObjectToShapeKey(),
-	ConvertListToLength(),
+    ConvertListToLength(),
     SimpleConvert(),
     ConvertToText(),
     ConvertFromGenericList(),
-    ConvertFromGeneric() ]
+    ConvertFromGeneric(),
+]

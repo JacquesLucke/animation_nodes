@@ -8,6 +8,7 @@
 - Added Polygon Indices List to Edge Indices List link conversion.
 - Added Offset Spline Node.
 - Added Grease Pencil type to the Object Instancer node.
+- Added List to Element link conversion.
 
 ### Fixed
 
