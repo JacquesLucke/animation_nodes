@@ -193,12 +193,11 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.linkedObjects.remove(index)
 
     def removeObject(self, object):
-        if object.users < 3:
-            data = object.data
-            type = object.type
-            self.removeShapeKeys(object)
-            bpy.data.objects.remove(object)
-            self.removeObjectData(data, type)
+        data = object.data
+        type = object.type
+        self.removeShapeKeys(object)
+        bpy.data.objects.remove(object)
+        self.removeObjectData(data, type)
 
     def removeObjectData(self, data, type):
         if data is None: return # the object was an empty

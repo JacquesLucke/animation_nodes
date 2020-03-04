@@ -17,6 +17,7 @@
 ### Changed
 
 - Vectorized the Tilt Spline node.
+- Instancer node objects are now removed regardless of their numbers of users.
 
 ## 2.1.7
 
