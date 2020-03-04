@@ -7,6 +7,7 @@
 - Added Offset GP Stroke node.
 - Added Polygon Indices List to Edge Indices List link conversion.
 - Added Offset Spline Node.
+- Added Grease Pencil type to the Object Instancer node.
 
 ### Fixed
 

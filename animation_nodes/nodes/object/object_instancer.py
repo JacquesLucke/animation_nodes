@@ -9,7 +9,8 @@ from ... nodes.container_provider import getMainObjectContainer
 from ... utils.names import (getPossibleMeshName,
                              getPossibleCameraName,
                              getPossibleLightName,
-                             getPossibleCurveName)
+                             getPossibleCurveName,
+                             getPossibleGreasePencilName)
 
 lastSourceHashes = {}
 lastSceneHashes = {}
@@ -21,7 +22,9 @@ objectTypeItems = [
     ("POINT_LAMP", "Point Lamp", "", "LIGHT_POINT", 3),
     ("CURVE_2D", "Curve 2D", "", "FORCE_CURVE", 4),
     ("CURVE_3D", "Curve 3D", "", "CURVE_DATA", 5),
-    ("EMPTY", "Empty", "", "EMPTY_DATA", 6) ]
+    ("EMPTY", "Empty", "", "EMPTY_DATA", 6),
+    ("GREASE_PENCIL", "Grease Pencil", "", "OUTLINER_DATA_GREASEPENCIL", 7),
+]
 
 emptyDisplayTypeItems = []
 for item in bpy.types.Object.bl_rna.properties["empty_display_type"].enum_items:
@@ -277,6 +280,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             elif self.objectType.startswith("CURVE"):
                 data = bpy.data.curves.new(getPossibleCurveName("instance curve"), type = "CURVE")
                 data.dimensions = self.objectType[-2:]
+            elif self.objectType == "GREASE_PENCIL":
+                data = bpy.data.grease_pencils.new(getPossibleGreasePencilName("instance grease pencil"))
 
         if data is None:
             return None
