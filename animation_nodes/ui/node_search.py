@@ -1,6 +1,7 @@
 import bpy
 import itertools
 from bpy.props import *
+from .. utils.enum_items import cacheEnumItems
 from .. tree_info import getSubprogramNetworks
 from .. utils.nodes import iterAnimationNodeClasses, newNodeAtCursor, invokeTranslation
 
@@ -20,7 +21,7 @@ class NodeSearch(bpy.types.Operator):
             items.append((item.identifier, item.searchTag, ""))
         return items
 
-    item: EnumProperty(items = getSearchItems)
+    item: EnumProperty(items = cacheEnumItems(getSearchItems))
 
     @classmethod
     def poll(cls, context):

@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. id_keys import getAllIDKeys
+from .. utils.enum_items import cacheEnumItems
 from .. utils.unicode import toValidString, fromValidString
 
 class IDKeySearch(bpy.types.Operator):
@@ -16,7 +17,7 @@ class IDKeySearch(bpy.types.Operator):
             items.append((identifier, name, ""))
         return items
 
-    item: EnumProperty(items = getSearchItems)
+    item: EnumProperty(items = cacheEnumItems(getSearchItems))
     callback: StringProperty()
 
     def invoke(self, context, event):

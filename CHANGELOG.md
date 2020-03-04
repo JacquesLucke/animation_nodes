@@ -17,6 +17,7 @@
 - Fixed fatal error when using replicate nodes.
 - Fixed crash upon updating the Separate Text node when main collection is hidden.
 - Fixed the New Text Block operator in the script node.
+- Fixed enum callbacks by caching them.
 
 ### Changed
 

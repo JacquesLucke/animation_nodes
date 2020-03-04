@@ -4,6 +4,7 @@ from ... sockets.info import toDataType
 from ... base_types import AnimationNode
 from ... events import executionCodeChanged
 from ... utils.blender_ui import getDpiFactor
+from ... utils.enum_items import cacheEnumItems
 from ... tree_info import (getSubprogramNetworks,
                            getNodeByIdentifier,
                            getNetworkByIdentifier)
@@ -183,7 +184,7 @@ class ChangeSubprogram(bpy.types.Operator):
         return items
 
     nodeIdentifier: StringProperty()
-    subprogram: EnumProperty(name = "Subprogram", items = getSubprogramItems)
+    subprogram: EnumProperty(name = "Subprogram", items = cacheEnumItems(getSubprogramItems))
 
     @classmethod
     def poll(cls, context):

@@ -3,6 +3,7 @@ import bpy
 from bpy.props import *
 from .. events import propertyChanged
 from .. base_types import AnimationNodeSocket
+from .. utils.enum_items import cacheEnumItems
 from .. algorithms.hashing import strToEnumItemID
 from .. data_structures import Sound, SoundSequence
 from .. utils.sequence_editor import getOrCreateSequencer, getEmptyChannel
@@ -25,7 +26,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = False
     comparable = False
 
-    soundSequence: EnumProperty(name = "Sound Sequence", items = getSoundSequenceItems,
+    soundSequence: EnumProperty(name = "Sound Sequence", items = cacheEnumItems(getSoundSequenceItems),
         update = propertyChanged)
 
     def drawProperty(self, layout, text, node):
