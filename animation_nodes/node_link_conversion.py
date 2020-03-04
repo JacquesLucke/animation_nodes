@@ -82,6 +82,12 @@ class SimpleConvert(LinkCorrection):
         ("Mesh", "Vector List") : "an_MeshInfoNode",
         ("Matrix List", "Vector List") : "an_DecomposeMatrixNode",
         ("Polygon Indices List", "Edge Indices List") : "an_EdgesOfPolygonsNode",
+        ("GPLayer", "GPFrame") : "an_GPLayerInfoNode",
+        ("GPFrame", "GPStroke") : "an_GPFrameInfoNode",
+        ("GPStroke", "GPFrame") : "an_GPFrameFromStrokesNode",
+        ("GPStroke List", "GPFrame") : "an_GPFrameFromStrokesNode",
+        ("GPFrame", "GPLayer") : "an_GPLayerFromFramesNode",
+        ("GPFrame List", "GPLayer") : "an_GPLayerFromFramesNode",
     }
 
     def check(self, origin, target):

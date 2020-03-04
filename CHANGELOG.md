@@ -9,6 +9,7 @@
 - Added Offset Spline Node.
 - Added Grease Pencil type to the Object Instancer node.
 - Added List to Element link conversion.
+- Added GP sockets link conversions.
 
 ### Fixed
 
