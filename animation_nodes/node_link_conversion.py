@@ -82,6 +82,12 @@ class SimpleConvert(LinkCorrection):
         ("Mesh", "Vector List") : "an_MeshInfoNode",
         ("Matrix List", "Vector List") : "an_DecomposeMatrixNode",
         ("Polygon Indices List", "Edge Indices List") : "an_EdgesOfPolygonsNode",
+        ("GPLayer", "GPFrame") : "an_GPLayerInfoNode",
+        ("GPFrame", "GPStroke") : "an_GPFrameInfoNode",
+        ("GPStroke", "GPFrame") : "an_GPFrameFromStrokesNode",
+        ("GPStroke List", "GPFrame") : "an_GPFrameFromStrokesNode",
+        ("GPFrame", "GPLayer") : "an_GPLayerFromFramesNode",
+        ("GPFrame List", "GPLayer") : "an_GPLayerFromFramesNode",
     }
 
     def check(self, origin, target):
@@ -134,6 +140,14 @@ class ConvertElementToList(LinkCorrection):
     def insert(self, nodeTree, origin, target, dataOrigin):
         node = insertNode(nodeTree, "an_CreateListNode", origin, target)
         node.assignBaseDataType(dataOrigin.dataType, inputAmount = 1)
+        insertBasicLinking(nodeTree, origin, node, target)
+
+class ConvertListToElement(LinkCorrection):
+    def check(self, origin, target):
+        return isList(origin.bl_idname) and target.dataType != "Integer" and target.bl_idname == toBaseIdName(origin.bl_idname)
+    def insert(self, nodeTree, origin, target, dataOrigin):
+        node = insertNode(nodeTree, "an_GetListElementNode", origin, target)
+        node.assignListDataType(dataOrigin.dataType)
         insertBasicLinking(nodeTree, origin, node, target)
 
 class ConvertObjectToShapeKey(LinkCorrection):
@@ -226,9 +240,11 @@ linkCorrectors = [
     ConvertQuaternionToEuler(),
     ConvertFloatToScale(),
     ConvertElementToList(),
+    ConvertListToElement(),
     ConvertObjectToShapeKey(),
-	ConvertListToLength(),
+    ConvertListToLength(),
     SimpleConvert(),
     ConvertToText(),
     ConvertFromGenericList(),
-    ConvertFromGeneric() ]
+    ConvertFromGeneric(),
+]

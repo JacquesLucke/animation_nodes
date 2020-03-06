@@ -160,7 +160,6 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     def createNewTextBlock(self):
         textBlock = bpy.data.texts.new(name = self.subprogramName)
-        textBlock.use_tabs_as_spaces = True
         self.textBlock = textBlock
         self.writeToTextBlock()
 

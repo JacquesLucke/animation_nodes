@@ -7,16 +7,23 @@
 - Added Offset GP Stroke node.
 - Added Polygon Indices List to Edge Indices List link conversion.
 - Added Offset Spline Node.
+- Added Grease Pencil type to the Object Instancer node.
+- Added List to Element link conversion.
+- Added GP sockets link conversions.
+- Added input range to Remap Falloff node.
 
 ### Fixed
 
 - Fixed Decompose Text node for fonts relative path.
 - Fixed fatal error when using replicate nodes.
 - Fixed crash upon updating the Separate Text node when main collection is hidden.
+- Fixed the New Text Block operator in the script node.
+- Fixed enum callbacks by caching them.
 
 ### Changed
 
 - Vectorized the Tilt Spline node.
+- Instancer node objects are now removed regardless of their numbers of users.
 
 ## 2.1.7
 

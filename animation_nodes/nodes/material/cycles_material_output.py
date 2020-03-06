@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
+from ... utils.enum_items import cacheEnumItems
 
 allowedSocketTypes = {
     "NodeSocketVector" : "an_VectorSocket",
@@ -33,7 +34,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
 
     materialName: StringProperty(update = AnimationNode.refresh)
     nodeName: StringProperty(update = AnimationNode.refresh)
-    socketIdentifier: EnumProperty(name = "Socket", items = getPossibleSocketItems,
+    socketIdentifier: EnumProperty(name = "Socket", items = cacheEnumItems(getPossibleSocketItems),
         update = AnimationNode.refresh)
 
     def create(self):

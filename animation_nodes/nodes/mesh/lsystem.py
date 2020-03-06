@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
+from ... utils.enum_items import cacheEnumItems
 from ... data_structures import Mesh, DoubleList
 from ... algorithms.lsystem import calculateLSystem
 
@@ -19,7 +20,7 @@ class LSystemNode(bpy.types.Node, AnimationNode):
         description = "To prevent freezing Blender when trying to calculate too many generations",
         min = 0)
 
-    preset: EnumProperty(name = "Preset", items = getPresetItems)
+    preset: EnumProperty(name = "Preset", items = cacheEnumItems(getPresetItems))
 
     def create(self):
         self.newInput("Text", "Axiom", "axiom")

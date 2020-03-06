@@ -25,6 +25,9 @@ def getPossibleLightName(name = "lamp"):
 def getPossibleNodeName(nodeTree, name = "node"):
     return getPossibleName(nodeTree.nodes, name)
 
+def getPossibleGreasePencilName(name = "grease_pencil"):
+    return getPossibleName(bpy.data.grease_pencils, name)
+
 def getPossibleSocketName(node, name = "socket"):
     while True:
         name = getPossibleName(node.inputs, name)

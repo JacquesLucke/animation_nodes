@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from .. tree_info import getNodeByIdentifier
+from .. utils.enum_items import cacheEnumItems
 from .. sockets.info import getDataTypeItems, getListDataTypeItems, getDrawableDataTypeItems
 
 socketGroupItems = [
@@ -21,7 +22,7 @@ class ChooseSocketType(bpy.types.Operator):
         if self.socketGroup == "DRAWABLE":
             return getDrawableDataTypeItems()
 
-    selectedDataType: EnumProperty(items = getItems)
+    selectedDataType: EnumProperty(items = cacheEnumItems(getItems))
     socketGroup: EnumProperty(items = socketGroupItems)
 
     callback: StringProperty()
