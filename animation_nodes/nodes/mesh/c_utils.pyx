@@ -1,11 +1,13 @@
 # cython: profile=True
 cimport cython
+from libc.math cimport sqrt
+from ... math cimport Vector3
 from libc.string cimport memcpy
-
 from ... algorithms.mesh_generation.cylinder import getCylinderMesh
 
 from ... data_structures cimport (
     LongList,
+    FloatList,
     DoubleList,
     UIntegerList,
     Vector2DList,
@@ -715,3 +717,44 @@ def getReplicatedLoopEdges(UIntegerList loopEdges, Py_ssize_t amount, Py_ssize_t
             _newLoopEdges[index] = _loopEdges[j] + offset
             index += 1
     return newLoopEdges
+
+def trianglePolygonsArea(Vector3DList vertices, PolygonIndicesList polygons):
+    cdef Py_ssize_t amount = polygons.getLength()
+    cdef FloatList areas = FloatList(length = amount)
+    cdef Py_ssize_t i
+    cdef Vector3 v1, v2, v3, vs1, vs2, vc
+    for i in range(amount):
+        polygon = polygons[i]
+        v1 = vertices.data[polygon[0]]
+        v2 = vertices.data[polygon[1]]
+        v3 = vertices.data[polygon[2]]
+
+        vs1.x = v1.x - v3.x
+        vs1.y = v1.y - v3.y
+        vs1.z = v1.z - v3.z
+
+        vs2.x = v2.x - v3.x
+        vs2.y = v2.y - v3.y
+        vs2.z = v2.z - v3.z
+
+        vc.x = vs1.y * vs2.z - vs1.z * vs2.y
+        vc.y = vs1.z * vs2.x - vs1.x * vs2.z
+        vc.z = vs1.x * vs2.y - vs1.y * vs2.x
+
+        areas.data[i] =  sqrt(vc.x * vc.x + vc.y * vc.y + vc.z * vc.z)/2.
+    return areas
+
+def triangulatePolygons(PolygonIndicesList polygons):
+    cdef PolygonIndicesList newPolygons = PolygonIndicesList()
+    cdef UIntegerList polyLengths = polygons.polyLengths
+    cdef Py_ssize_t amount = polygons.getLength()
+    cdef Py_ssize_t i, j, polyLength
+    for i in range (amount):
+        polygon = polygons[i]
+        polyLength = polyLengths.data[i]
+        if polyLength > 3:
+            for j in range(polyLength - 2):
+                newPolygons.append(tuple((polygon[0], polygon[j+1], polygon[j+2])))
+        else:
+            newPolygons.append(polygon)
+    return newPolygons
