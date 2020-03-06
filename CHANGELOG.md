@@ -10,6 +10,7 @@
 - Added Grease Pencil type to the Object Instancer node.
 - Added List to Element link conversion.
 - Added GP sockets link conversions.
+- Added input range to Remap Falloff node.
 
 ### Fixed
 
