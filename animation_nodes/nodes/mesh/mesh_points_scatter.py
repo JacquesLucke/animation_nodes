@@ -1,4 +1,5 @@
 import bpy
+import math
 import random
 from bpy.props import *
 from ... events import propertyChanged
@@ -92,13 +93,12 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         return p[0] * v1 + p[1] * v2 + p[2] * v3
 
     def randomPairGenerator(self, index, seed):
-        i = 0
-        while i < 100:
-            i = i + 1
-            p1 = uniformRandomDoubleWithTwoSeeds(seed + index + i, self.nodeSeed + index, 0, 1)
-            p2 = uniformRandomDoubleWithTwoSeeds(seed + index + i + 100, self.nodeSeed + index + 100, 0, 1)
-            p3 = p1 + p2
-            if p3 <= 1: return p1, p2, 1 - p3
+        p1 = uniformRandomDoubleWithTwoSeeds(seed + index, self.nodeSeed + index, 0, 1)
+        p2 = uniformRandomDoubleWithTwoSeeds(seed + index + 100, self.nodeSeed + index + 100, 0, 1)
+        u = 1 - math.sqrt(p1)
+        v = p2 * math.sqrt(p1)
+        w = 1 - u - v
+        return u, v, w
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
