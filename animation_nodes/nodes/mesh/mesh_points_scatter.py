@@ -3,7 +3,6 @@ import random
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from . c_utils import triangulatePolygons
 from . points_scatter import randomPointsScatter
 from ... data_structures import Vector3DList, VirtualDoubleList
 
@@ -35,8 +34,11 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         if len(vertices) == 0 or len(polygons) == 0 or amount == 0:
             return Vector3DList()
 
-        if polygons.polyLengths.getMaxValue() > 3:
-            polygons = triangulatePolygons(polygons)
-
         weights = VirtualDoubleList.create(weights, 1)
         return randomPointsScatter(vertices, polygons, weights, seed, self.nodeSeed, amount)
+
+    def duplicate(self, sourceNode):
+        self.randomizeNodeSeed()
+
+    def randomizeNodeSeed(self):
+        self.nodeSeed = int(random.random() * 100)
