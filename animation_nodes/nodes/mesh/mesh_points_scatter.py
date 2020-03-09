@@ -35,7 +35,8 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
             return Vector3DList()
 
         weights = VirtualDoubleList.create(weights, 1)
-        return randomPointsScatter(vertices, polygons, weights, seed, self.nodeSeed, amount)
+        seed  = (seed * 674523 + self.nodeSeed * 3465284) % 0x7fffffff
+        return randomPointsScatter(vertices, polygons, weights, seed, amount)
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
