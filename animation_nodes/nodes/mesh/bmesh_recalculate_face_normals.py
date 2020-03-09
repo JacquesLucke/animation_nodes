@@ -1,6 +1,5 @@
-import bpy, bmesh
+import bpy
 from bpy.props import *
-from ... events import executionCodeChanged
 from ... base_types import AnimationNode
 
 class BMeshRecalculateFaceNormalsNode(bpy.types.Node, AnimationNode):
@@ -12,8 +11,7 @@ class BMeshRecalculateFaceNormalsNode(bpy.types.Node, AnimationNode):
         self.newOutput("BMesh", "BMesh", "bm")
 
     def getExecutionCode(self, required):
-        recalcString = "bmesh.ops.recalc_face_normals(bm, faces = bm.faces)"
-        return recalcString
+        return "bmesh.ops.recalc_face_normals(bm, faces = bm.faces)"
 
     def getUsedModules(self):
         return ["bmesh"]
