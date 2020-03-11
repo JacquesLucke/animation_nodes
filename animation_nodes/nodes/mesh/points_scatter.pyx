@@ -88,8 +88,7 @@ cdef trianglesDistribution(Py_ssize_t triAmount, FloatList triAreas, FloatList t
 
 cdef totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t triAmount,
                             Py_ssize_t pointAmount):
-    cdef LongList totalTriPoints = LongList(length = triAmount)
-    totalTriPoints.fill(0)
+    cdef LongList totalTriPoints = LongList.fromValue(0, length = triAmount)
     cdef Py_ssize_t i
     for i in range(pointAmount):
         totalTriPoints.data[distribution.data[int(randomDouble_Range(i + seed, 0, distLength))]] += 1
