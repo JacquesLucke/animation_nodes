@@ -13,6 +13,9 @@ class BMeshInvertNormalsNode(bpy.types.Node, AnimationNode):
         self.newInput("BMesh", "BMesh", "bm").dataIsModified = True
         self.newOutput("BMesh", "BMesh", "bm")
 
+    def drawAdvanced(self, layout):
+        layout.prop(self, "flipMultires")
+
     def getExecutionCode(self, required):
         return "bmesh.ops.reverse_faces(bm, faces = bm.faces, flip_multires = self.flipMultires)"
 
