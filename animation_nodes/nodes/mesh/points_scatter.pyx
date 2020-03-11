@@ -37,24 +37,26 @@ cdef calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList pol
         else:
             triAmount += 1
 
-    cdef Py_ssize_t j, index, polyIndex1, polyIndex2, polyIndex3
+    cdef Py_ssize_t j, triangleIndex, start, polyIndex1, polyIndex2, polyIndex3
     cdef FloatList triWeights = FloatList(length = triAmount)
     cdef FloatList triAreas = FloatList(length = triAmount)
-    index = 0
+    cdef UIntegerList polyStarts = polygons.polyStarts
+    cdef UIntegerList polyIndices = polygons.indices
+    cdef Vector3 vectorStart
+    cdef double weightStart
+    triangleIndex = 0
     for i in range (polyAmount):
-        polygon = polygons[i]
-        polyIndex1 = polygon[0]
-        v1 = vertices.data[polyIndex1]
+        start = polyStarts.data[i]
+        polyIndex1 = polyIndices.data[start]
+        vectorStart = vertices.data[polyIndex1]
+        weightStart = weights.get(polyIndex1)
         for j in range(polyLengths.data[i] - 2):
-            polyIndex2 = polygon[1 + j]
-            polyIndex3 = polygon[2 + j]
+            polyIndex2 = polyIndices.data[start + 1 + j]
+            polyIndex3 = polyIndices.data[start + 2 + j]
 
-            v2 = vertices.data[polyIndex2]
-            v3 = vertices.data[polyIndex3]
-            triAreas.data[index] = triangleArea(v1, v2, v3)
-
-            triWeights.data[index] = (weights.get(polyIndex1) + weights.get(polyIndex2) + weights.get(polyIndex3)) / 3.0
-            index += 1
+            triAreas.data[triangleIndex] = triangleArea(vectorStart, vertices.data[polyIndex2], vertices.data[polyIndex3])
+            triWeights.data[triangleIndex] = (weightStart + weights.get(polyIndex2) + weights.get(polyIndex3)) / 3.0
+            triangleIndex += 1
     return triAmount, triAreas, triWeights
 
 cdef triangleArea(Vector3 v1, Vector3 v2, Vector3 v3):
@@ -101,21 +103,23 @@ cdef sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, Long
     for i in range(pointAmount):
         randomPoints.data[i] = randomDouble_Range(i + seed, 0.0, 1.0)
 
-    cdef Py_ssize_t j, k, triangleIndex, index, polyIndex1, polyIndex2, polyIndex3
+    cdef Py_ssize_t j, k, index, triangleIndex, start, polyIndex1, polyIndex2, polyIndex3
     cdef Vector3DList points = Vector3DList(length = pointAmount)
     cdef UIntegerList polyLengths = polygons.polyLengths
+    cdef UIntegerList polyStarts = polygons.polyStarts
     cdef Py_ssize_t polyAmount = polygons.getLength()
+    cdef UIntegerList polyIndices = polygons.indices
     cdef Vector3 v1, v2, v3, v
     cdef double p1, p2, p3
     index = 0
     triangleIndex = 0
     for i in range(polyAmount):
-        polygon = polygons[i]
-        polyIndex1 = polygon[0]
+        start = polyStarts.data[i]
+        polyIndex1 = polyIndices.data[start]
         v1 = vertices.data[polyIndex1]
         for j in range(polyLengths.data[i] - 2):
-            polyIndex2 = polygon[1 + j]
-            polyIndex3 = polygon[2 + j]
+            polyIndex2 = polyIndices.data[start + 1 + j]
+            polyIndex3 = polyIndices.data[start + 2 + j]
 
             v2 = vertices.data[polyIndex2]
             v3 = vertices.data[polyIndex3]
