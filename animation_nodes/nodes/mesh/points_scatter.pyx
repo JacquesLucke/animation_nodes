@@ -4,6 +4,7 @@ from ... algorithms.random cimport randomDouble_Range
 from ... data_structures cimport (
     LongList,
     FloatList,
+    DoubleList,
     UIntegerList,
     Vector3DList,
     VirtualDoubleList,
@@ -23,7 +24,7 @@ def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, Virt
     cdef LongList totalTriPoints = totalPointsOnTriangles(distribution, distLength, seed, triAmount, pointAmount)
     return sampleRandomPoints(vertices, polygons, totalTriPoints, distLength, seed, pointAmount)
 
-def calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
+cdef calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
     cdef UIntegerList polyLengths = polygons.polyLengths
     cdef Py_ssize_t polyAmount = polygons.getLength()
     cdef Py_ssize_t i, triAmount, polyLength
@@ -56,7 +57,7 @@ def calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList poly
             index += 1
     return triAmount, triAreas, triWeights
 
-def triangleArea(Vector3 v1, Vector3 v2, Vector3 v3):
+cdef triangleArea(Vector3 v1, Vector3 v2, Vector3 v3):
     cdef Vector3 vs1, vs2, vc
     vs1.x = v1.x - v3.x
     vs1.y = v1.y - v3.y
@@ -71,7 +72,7 @@ def triangleArea(Vector3 v1, Vector3 v2, Vector3 v3):
     vc.z = vs1.x * vs2.y - vs1.y * vs2.x
     return sqrt(vc.x * vc.x + vc.y * vc.y + vc.z * vc.z) / 2.0
 
-def trianglesDistribution(Py_ssize_t triAmount, FloatList triAreas, FloatList triWeights):
+cdef trianglesDistribution(Py_ssize_t triAmount, FloatList triAreas, FloatList triWeights):
     cdef double triAreaMin, triArea
     cdef Py_ssize_t i
     triAreaMin = triAreas.getMaxValue()
@@ -85,24 +86,28 @@ def trianglesDistribution(Py_ssize_t triAmount, FloatList triAreas, FloatList tr
         for j in range(int(triAreas.data[i] * triWeights.data[i] / triAreaMin)): distribution.append(i)
     return distribution
 
-def totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t triAmount,
-                           Py_ssize_t pointAmount):
+cdef totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t triAmount,
+                            Py_ssize_t pointAmount):
     cdef LongList totalTriPoints = LongList(length = triAmount)
     totalTriPoints.fill(0)
     cdef Py_ssize_t i
     for i in range(pointAmount):
-        totalTriPoints.data[distribution.data[int(randomDouble_Range(seed + i, 0, distLength))]] += 1
+        totalTriPoints.data[distribution.data[int(randomDouble_Range(i + seed, 0, distLength))]] += 1
     return totalTriPoints
 
-def sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongList totalTriPoints,
-                       Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t pointAmount):
+cdef sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongList totalTriPoints,
+                        Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t pointAmount):
+    cdef DoubleList randomPoints = DoubleList(length = pointAmount)
+    cdef Py_ssize_t i
+    for i in range(pointAmount):
+        randomPoints.data[i] = randomDouble_Range(i + seed, 0.0, 1.0)
+
+    cdef Py_ssize_t j, k, triangleIndex, index, polyIndex1, polyIndex2, polyIndex3
     cdef Vector3DList points = Vector3DList(length = pointAmount)
     cdef UIntegerList polyLengths = polygons.polyLengths
     cdef Py_ssize_t polyAmount = polygons.getLength()
-    cdef Py_ssize_t i, j, k, triangleIndex, index, polyIndex1, polyIndex2, polyIndex3, randSeed
     cdef Vector3 v1, v2, v3, v
     cdef double p1, p2, p3
-
     index = 0
     triangleIndex = 0
     for i in range(polyAmount):
@@ -115,10 +120,9 @@ def sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongL
 
             v2 = vertices.data[polyIndex2]
             v3 = vertices.data[polyIndex3]
-            randSeed = int(randomDouble_Range(i + j + seed, 0, distLength))
             for k in range(totalTriPoints.data[triangleIndex]):
-                p1 = randomDouble_Range(i + j + k + seed + randSeed, 0.0, 1.0)
-                p2 = randomDouble_Range(i + j + k + 2 * seed + randSeed + 100, 0.0, 1.0)
+                p1 = randomPoints.data[index]
+                p2 = randomPoints.data[pointAmount - index - 1]
                 if p1 + p2 > 1.0:
                     p1 = 1.0 - p1
                     p2 = 1.0 - p2
