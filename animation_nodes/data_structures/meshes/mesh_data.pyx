@@ -65,6 +65,7 @@ cdef class Mesh:
 
     def topologyChanged(self):
         self.derivedMeshDataCache.pop("Linked Vertices", None)
+        self.derivedMeshDataCache.pop("Triangled Polygons", None)
 
     def getPolygonOrientationMatrices(self, normalized = True):
         normals = self.getPolygonNormals(normalized)
@@ -99,6 +100,10 @@ cdef class Mesh:
     @derivedMeshDataCacheHelper("Linked Vertices")
     def getLinkedVertices(self):
         return calculateLinkedVertices(self.vertices.length, self.edges)
+
+    @derivedMeshDataCacheHelper("Triangled Polygons")
+    def getTrianglePolygons(self):
+        return calculateTrianglePolygons(self.polygons)
 
     def setLoopEdges(self, UIntegerList loopEdges):
         if len(loopEdges) == len(self.polygons.indices):
@@ -370,3 +375,44 @@ def calculateLinkedVertices(int verticesAmount, EdgeIndicesList edges):
         usedSlots.data[v2] += 1
 
     return neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
+
+def calculateTrianglePolygons(PolygonIndicesList polygons):
+    cdef unsigned int *_oldPolyLengths = polygons.polyLengths.data
+    cdef Py_ssize_t polygonAmount = polygons.getLength()
+    cdef Py_ssize_t i, triAmount, polyLength
+
+    triAmount = 0
+    for i in range(polygonAmount):
+        polyLength = _oldPolyLengths[i]
+        if polyLength > 3:
+            triAmount += polyLength - 2
+        else:
+            triAmount += 1
+
+    cdef unsigned int *_oldIndices = polygons.indices.data
+    cdef unsigned int *_oldPolyStarts = polygons.polyStarts.data
+
+    cdef PolygonIndicesList newPolygons = PolygonIndicesList(
+                                          indicesAmount = 3 * triAmount,
+                                          polygonAmount = triAmount)
+    cdef unsigned int *_newIndices = newPolygons.indices.data
+    cdef unsigned int *_newPolyStarts = newPolygons.polyStarts.data
+    cdef unsigned int *_newPolyLengths = newPolygons.polyLengths.data
+
+    cdef Py_ssize_t j, index, triIndex, start
+
+    index = 0
+    triIndex = 0
+    for i in range(polygonAmount):
+        start = _oldPolyStarts[i]
+        for j in range(_oldPolyLengths[i] - 2):
+            _newPolyStarts[triIndex] = index
+            _newPolyLengths[triIndex] = 3
+            triIndex += 1
+
+            _newIndices[index] = _oldIndices[start]
+            _newIndices[index + 1] = _oldIndices[start + 1 + j]
+            _newIndices[index + 2] = _oldIndices[start + 2 + j]
+            index += 3
+
+    return newPolygons

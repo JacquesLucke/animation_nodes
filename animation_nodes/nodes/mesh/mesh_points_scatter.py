@@ -34,6 +34,9 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         if len(vertices) == 0 or len(polygons) == 0 or amount == 0:
             return Vector3DList()
 
+        if polygons.polyLengths.getMaxValue() > 3:
+            polygons = mesh.getTrianglePolygons()
+
         weights = VirtualDoubleList.create(weights, 1)
         seed  = (seed * 674523 + self.nodeSeed * 3465284) % 0x7fffffff
         return randomPointsScatter(vertices, polygons, weights, seed, amount)
