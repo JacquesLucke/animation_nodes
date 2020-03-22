@@ -33,7 +33,7 @@ class Sound:
     def computeTimeSmoothedSpectrum(self, start, end, attack, release, smoothingSamples = 5, beta = 6):
         FFT = None
         duration = end - start
-        for i in range(min(smoothingSamples, int(start // duration)), -1, -1):
+        for i in range(smoothingSamples, -1, -1):
             newFFT = self.computeSpectrum(start - i * duration, end - i * duration, beta = beta)
             if FFT is None: FFT = newFFT
             else:
