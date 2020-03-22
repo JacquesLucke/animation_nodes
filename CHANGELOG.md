@@ -20,6 +20,7 @@
 - Fixed the New Text Block operator in the script node.
 - Fixed enum callbacks by caching them.
 - Fixed the Triangulate BMesh node.
+- Fixed smooth sound spectrum evaluation.
 
 ### Changed
 
