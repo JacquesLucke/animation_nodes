@@ -1,0 +1,54 @@
+import bpy
+from bpy.props import *
+from mathutils.bvhtree import BVHTree
+from ... events import propertyChanged
+from ... base_types import AnimationNode
+from . mesh_falloff_utils import calculateMeshSurfaceFalloff, calculateMeshVolumeFalloff
+
+modeItems = [
+    ("SURFACE", "Surface", "Falloff w.r.t mesh surface", "NONE", 0),
+    ("VOLUME", "Volume", "Falloff w.r.t mesh volume", "NONE", 1)
+]
+
+class MeshFalloffNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_MeshFalloffNode"
+    bl_label = "Mesh Falloff"
+
+    mode: EnumProperty(name = "Mode", default = "SURFACE",
+        items = modeItems, update = AnimationNode.refresh)
+
+    def create(self):
+        self.newInput("Vector List", "Locations", "locations")
+        self.newInput("Mesh", "Mesh", "mesh")
+        if self.mode == "SURFACE":
+            self.newInput("Float", "Size", "size")
+            self.newInput("Float", "Falloff Width", "falloffWidth", value = 1)
+            self.newInput("Float", "Max Distance", "bvhMaxDistance", minValue = 0, value = 1e6, hide = True)
+        self.newInput("Float", "Fallback", "fallback", hide = True).setRange(0, 1)
+        self.newInput("Float", "Epsilon", "epsilon", hide = True, minValue = 0)
+        self.newInput("Boolean", "Invert", "invert")
+        self.newOutput("Falloff", "Falloff", "falloff")
+    def draw(self, layout):
+        layout.prop(self, "mode", text = "")
+
+    def getExecutionFunctionName(self):
+        if self.mode == "SURFACE":
+            return "execute_MeshSurfaceFalloff"
+        elif self.mode == "VOLUME":
+            return "execute_MeshVolumeFalloff"
+
+    def execute_MeshSurfaceFalloff(self, locations, mesh, size, falloffWidth, bvhMaxDistance, fallback, epsilon, invert):
+        vectorList = mesh.vertices
+        polygonsIndices = mesh.polygons
+        if len(locations) == 0 or len(polygonsIndices) == 0: return
+
+        bvhTree = BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = max(epsilon, 0))
+        return calculateMeshSurfaceFalloff(locations, bvhTree, fallback, size, falloffWidth, bvhMaxDistance, invert)
+
+    def execute_MeshVolumeFalloff(self, locations, mesh, fallback, epsilon, invert):
+        vectorList = mesh.vertices
+        polygonsIndices = mesh.polygons
+        if len(locations) == 0 or len(polygonsIndices) == 0: return
+
+        bvhTree = BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = max(epsilon, 0))
+        return calculateMeshVolumeFalloff(locations, bvhTree, fallback, invert)
