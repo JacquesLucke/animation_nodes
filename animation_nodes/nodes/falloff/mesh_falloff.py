@@ -13,21 +13,22 @@ modeItems = [
 class MeshFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshFalloffNode"
     bl_label = "Mesh Falloff"
+    errorHandlingType = "EXCEPTION"
 
     mode: EnumProperty(name = "Mode", default = "SURFACE",
         items = modeItems, update = AnimationNode.refresh)
 
     def create(self):
-        self.newInput("Vector List", "Locations", "locations")
         self.newInput("Mesh", "Mesh", "mesh")
         if self.mode == "SURFACE":
             self.newInput("Float", "Size", "size")
             self.newInput("Float", "Falloff Width", "falloffWidth", value = 1)
             self.newInput("Float", "Max Distance", "bvhMaxDistance", minValue = 0, value = 1e6, hide = True)
-        self.newInput("Float", "Fallback", "fallback", hide = True).setRange(0, 1)
         self.newInput("Float", "Epsilon", "epsilon", hide = True, minValue = 0)
         self.newInput("Boolean", "Invert", "invert")
+
         self.newOutput("Falloff", "Falloff", "falloff")
+
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
 
@@ -37,18 +38,23 @@ class MeshFalloffNode(bpy.types.Node, AnimationNode):
         elif self.mode == "VOLUME":
             return "execute_MeshVolumeFalloff"
 
-    def execute_MeshSurfaceFalloff(self, locations, mesh, size, falloffWidth, bvhMaxDistance, fallback, epsilon, invert):
-        vectorList = mesh.vertices
-        polygonsIndices = mesh.polygons
-        if len(locations) == 0 or len(polygonsIndices) == 0: return
-
+    def execute_MeshSurfaceFalloff(self, mesh, size, falloffWidth, bvhMaxDistance, epsilon, invert):
+        vectorList, polygonsIndices = self.validMesh(mesh)
         bvhTree = BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = max(epsilon, 0))
-        return calculateMeshSurfaceFalloff(locations, bvhTree, fallback, size, falloffWidth, bvhMaxDistance, invert)
+        return calculateMeshSurfaceFalloff(bvhTree, size, falloffWidth, bvhMaxDistance, invert)
 
-    def execute_MeshVolumeFalloff(self, locations, mesh, fallback, epsilon, invert):
-        vectorList = mesh.vertices
-        polygonsIndices = mesh.polygons
-        if len(locations) == 0 or len(polygonsIndices) == 0: return
-
+    def execute_MeshVolumeFalloff(self, mesh, epsilon, invert):
+        vectorList, polygonsIndices = self.validMesh(mesh)
         bvhTree = BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = max(epsilon, 0))
-        return calculateMeshVolumeFalloff(locations, bvhTree, fallback, invert)
+        return calculateMeshVolumeFalloff(bvhTree, invert)
+
+    def validMesh(self, mesh):
+        vectorList = mesh.vertices
+        if len(vectorList) == 0:
+            self.raiseErrorMessage("Invalid Mesh.")
+
+        polygonsIndices = mesh.polygons
+        if len(polygonsIndices.indices) == 0:
+            self.raiseErrorMessage("Invalid Mesh.")
+
+        return vectorList, polygonsIndices
