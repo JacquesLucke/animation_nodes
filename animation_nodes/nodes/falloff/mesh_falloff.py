@@ -25,7 +25,7 @@ class MeshFalloffNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "Falloff Width", "falloffWidth", value = 1)
             self.newInput("Float", "Max Distance", "bvhMaxDistance", minValue = 0, value = 1e6, hide = True)
         self.newInput("Float", "Epsilon", "epsilon", hide = True, minValue = 0)
-        self.newInput("Boolean", "Invert", "invert")
+        self.newInput("Boolean", "Invert", "invert", value = False)
 
         self.newOutput("Falloff", "Falloff", "falloff")
 
