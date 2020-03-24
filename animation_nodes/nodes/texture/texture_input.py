@@ -13,6 +13,8 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
         self.newInput("Texture", "Texture", "texture", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Vector", "useVectorList",
             ("Location", "location"), ("Locations", "locations")))
+        self.newInput("Scene", "Scene", "scene", hide = True)
+
         self.newOutput(VectorizedSocket("Color", "useVectorList",
             ("Color", "color"), ("Colors", "colors")))
         self.newOutput(VectorizedSocket("Float", "useVectorList",
@@ -41,15 +43,23 @@ class TextureInputNode(bpy.types.Node, AnimationNode):
         else:
             return "executeSingle"
 
-    def executeSingle(self, texture, location):
+    def executeSingle(self, texture, location, scene):
         if texture is None:
             return Color((0, 0, 0, 0)), 0, 0, 0, 0
+
+        if texture.type == "IMAGE":
+            if texture.image.source in ["SEQUENCE", "MOVIE"]:
+                texture.image_user.frame_current = scene.frame_current
 
         color = Color(texture.evaluate(location))
         return color, color.r, color.g, color.b, color.a
 
-    def executeList(self, texture, locations):
+    def executeList(self, texture, locations, scene):
         if texture is None or len(locations) == 0:
             return ColorList(), DoubleList(), DoubleList(), DoubleList(), DoubleList()
+
+        if texture.type == "IMAGE":
+            if texture.image.source in ["SEQUENCE", "MOVIE"]:
+                texture.image_user.frame_current = scene.frame_current
 
         return getTextureColors(texture, locations)
