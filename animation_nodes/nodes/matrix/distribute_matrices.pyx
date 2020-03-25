@@ -90,11 +90,11 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "Start Angle", "startAngle", value = 0)
             self.newInput("Float", "End Angle", "endAngel", value = 6 * PI)
         elif self.mode == "FIBONACCI":
-            self.newInput("Integer", "Amount", "amount", value = 100, minValue = 1)
-            self.newInput("Integer", "Center mask", "centermask",value = 0, minValue = 0)
+            self.newInput("Integer", "Amount", "amount", value = 100, minValue = 0)
+            self.newInput("Integer", "Center Mask", "centerMask",value = 0, minValue = 0)
             self.newInput("Float", "Angle", "angle", value = 137.5)
-            self.newInput("Float", "Start size", "startsize", value = 1.0)
-            self.newInput("Float", "End size", "endsize", value = 1.0) 
+            self.newInput("Float", "Start Size", "startSize", value = 1.0)
+            self.newInput("Float", "End Size", "endSize", value = 1.0) 
             self.newInput("Float", "Overall Scale", "scale", value = 1.0)     
 
         self.newOutput("Matrix List", "Matrices", "matrices")
@@ -138,7 +138,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         elif self.mode == "SPIRAL":
             yield "matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel)"
         elif self.mode == "FIBONACCI":
-            yield "matrices = self.execute_Fibonacci(amount, centermask, angle, startsize, endsize, scale)"    
+            yield "matrices = self.execute_Fibonacci(amount, centerMask, angle, startSize, endSize, scale)"    
 
         if "vectors" in required:
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
@@ -259,33 +259,31 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
         return matrices
 
-    def execute_Fibonacci(self, Py_ssize_t amount, Py_ssize_t centermask, float angle, float startsize, float endsize, float scale):
-        cdef Py_ssize_t i 
+    def execute_Fibonacci(self, Py_ssize_t amount, Py_ssize_t centerMask, float angle, float startSize, float endSize, float scale):
+        centerMask = min(centerMask, amount)
 
-        if centermask >= amount:
-            centermask = amount
-        i = centermask 
-
-        cdef float factor = 1 / <float>((amount-centermask) - 1) if (amount-centermask) > 1 else 0
-        cdef float golden_angle = angle * (PI/180)
+        cdef Py_ssize_t i = centerMask
+        cdef float factor = 1 / <float>((amount - centerMask) - 1) if (amount - centerMask) > 1 else 0
+        cdef float goldenAngle = angle * (PI / 180)
         cdef float r, theta, size, f
         cdef Vector3 vector
-        cdef Matrix4x4List matrices = Matrix4x4List(length = amount-centermask)
+        cdef Matrix4x4List matrices = Matrix4x4List(length = amount - centerMask)
 
         while i < amount:
-            f = <float>(i-centermask) * factor
-            size = f * (endsize - startsize) + startsize
+            f = <float>(i - centerMask) * factor
+            size = f * (endSize - startSize) + startSize
             
-            theta = i * golden_angle
-            r = sqrt(i)/sqrt(amount)*scale
+            theta = i * goldenAngle
+            r = sqrt(i) / sqrt(amount) * scale
 
-            vector.x = cos(theta)*r
-            vector.y = sin(theta)*r
+            vector.x = cos(theta) * r
+            vector.y = sin(theta) * r
             vector.z = 0
 
-            setTranslationMatrix(matrices.data + i-centermask, &vector)
-            scaleMatrix3x3Part(matrices.data + i-centermask, size)
-            i+=1
+            setTranslationMatrix(matrices.data + i - centerMask, &vector)
+            scaleMatrix3x3Part(matrices.data + i - centerMask, size)
+            i += 1
+
         return matrices 
 
 cdef int limitAmount(n):
