@@ -616,13 +616,14 @@ class MaterialMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        insertNode(layout, "an_DataInputNode", "Material", {"assignedType" : repr("Material")})
+        insertNode(layout, "an_DataInputNode", "Material Input", {"assignedType" : repr("Material")})
+        insertNode(layout, "an_ObjectMaterialInputNode", "Object Material Input")
         insertNode(layout, "an_BlendDataByNameNode", "Material By Name", {"dataType" : repr("Material")})
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
-        insertNode(layout, "an_SetPolygonMaterialIndexNode", "Set Polygon Material Index")
-        insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
+        insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
         insertNode(layout, "an_GPMaterialOutputNode", "GP Material Output")
+        insertNode(layout, "an_SetPolygonMaterialIndexNode", "Set Polygon Material Index")
         insertNode(layout, "an_MaterialAttributeInputNode", "Material Attribute Input")
         insertNode(layout, "an_MaterialAttributeOutputNode", "Material Attribute Output")
         insertNode(layout, "an_FilterBlendDataListByNameNode", "Filter Material List", {"dataType" : repr("Material")})
