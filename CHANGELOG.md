@@ -11,6 +11,8 @@
 - Added List to Element link conversion.
 - Added GP sockets link conversions.
 - Added input range to Remap Falloff node.
+- Added Bmesh Invert Normals node.
+- Added Object Material Input node.
 
 ### Fixed
 
