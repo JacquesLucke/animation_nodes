@@ -23,6 +23,7 @@
 - Fixed enum callbacks by caching them.
 - Fixed the Triangulate BMesh node.
 - Fixed smooth sound spectrum evaluation.
+- Fixed Grease Pencil nodes for latest Blender API changes.
 
 ### Changed
 

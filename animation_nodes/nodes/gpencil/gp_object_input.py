@@ -45,7 +45,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         layer = self.getLayer(evaluatedObject, layerName)
         return GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
                        layer.blend_mode, layer.opacity, layer.tint_color, layer.tint_factor,
-                       layer.line_change, layer.pass_index, layer.mask_layer)
+                       layer.line_change, layer.pass_index, layer.use_mask_layer, self.getMaskLayers(layer))
 
     def executeList(self, object, useWorldSpace):
         if object is None:
@@ -56,7 +56,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         for layer in self.getLayers(evaluatedObject):
             gpencilLayers.append(GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
                                          layer.blend_mode, layer.opacity, layer.tint_color, layer.tint_factor,
-                                         layer.line_change, layer.pass_index, layer.mask_layer))
+                                         layer.line_change, layer.pass_index, layer.use_mask_layer, self.getMaskLayers(layer)))
         return gpencilLayers
 
     def getLayer(self, object, layerName):
@@ -69,6 +69,12 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
     def getLayers(self, object):
         gpencil = self.getObjectData(object)
         return gpencil.layers
+
+    def getMaskLayers(self, layer):
+        maskLayers = {}
+        for maskLayer in layer.mask_layers:
+            maskLayers[maskLayer.name] = maskLayer.invert
+        return maskLayers
 
     def getObjectData(self, object):
         if object.type != "GPENCIL":
@@ -102,5 +108,5 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         strokePoints.foreach_get("pressure", pressures.asNumpyArray())
         strokePoints.foreach_get("uv_rotation", uvRotations.asNumpyArray())
 
-        return GPStroke(vertices, strengths, pressures, uvRotations, stroke.line_width, stroke.draw_cyclic,
+        return GPStroke(vertices, strengths, pressures, uvRotations, stroke.line_width, stroke.hardeness, stroke.draw_cyclic,
                         stroke.start_cap_mode, stroke.end_cap_mode, stroke.material_index, stroke.display_mode)

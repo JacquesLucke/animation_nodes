@@ -20,6 +20,7 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Float", "useUVRotationsList",
             ("UV-Rotation", "uvRotation"), ("UV-Rotations", "uvRotations")), hide = True)
         self.newInput("Float", "Line Width", "lineWidth", value = 250)
+        self.newInput("Float", "Hardeness", "hardeness", value = 1)
         self.newInput("Boolean", "Cyclic", "drawCyclic", value = False, hide = True)
         self.newInput("Text", "Start Cap Mode", "startCapMode", value = 'ROUND', hide = True)
         self.newInput("Text", "End Cap Mode", "endCapMode", value = 'ROUND', hide = True)
@@ -27,8 +28,8 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Display Mode", "displayMode", value = '3DSPACE', hide = True)
         self.newOutput("GPStroke", "Stroke", "stroke")
 
-    def execute(self, vertices, strengths, pressures, uvRotations, lineWidth, drawCyclic,
-                startCapMode, endCapMode, materialIndex, displayMode):
+    def execute(self, vertices, strengths, pressures, uvRotations, lineWidth, hardeness,
+                drawCyclic, startCapMode, endCapMode, materialIndex, displayMode):
 
         amount = len(vertices)
         strengths = FloatList.fromValues(VirtualDoubleList.create(strengths, 1).materialize(amount))
@@ -42,5 +43,5 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
         if displayMode not in ['SCREEN', '3DSPACE', '2DSPACE', '2DIMAGE']:
             self.raiseErrorMessage("The Display Mode is invalid. \n\nPossible values for 'Display Mode' are: 'SCREEN', '3DSPACE', '2DSPACE', '2DIMAGE'")
 
-        return GPStroke(vertices, strengths, pressures, uvRotations, lineWidth, drawCyclic,
-                        startCapMode, endCapMode, materialIndex, displayMode)
+        return GPStroke(vertices, strengths, pressures, uvRotations, lineWidth, hardeness,
+                        drawCyclic, startCapMode, endCapMode, materialIndex, displayMode)
