@@ -31,13 +31,19 @@ class midiTrack:
             return 0.0
 
         if useNoteNumberList:
-            notesFiltered = [note for note in self.notes if note.channel == channel and
-                time >= note.timeOn and time <= note.timeOff + releaseTime and
-                note.noteNumber in noteNumber]
-            return DoubleList.fromValues([noteP(N) for N in noteNumber])
+            if self.notes is None:
+                return DoubleList.fromValues([0.0])
+            else:
+                notesFiltered = [note for note in self.notes if note.channel == channel and
+                    time >= note.timeOn and time <= note.timeOff + releaseTime and
+                    note.noteNumber in noteNumber]
+                return DoubleList.fromValues([noteP(N) for N in noteNumber])
         else:
-            notesFiltered = [note for note in self.notes if note.channel == channel and
-                time >= note.timeOn and time <= note.timeOff + releaseTime and
-                note.noteNumber == noteNumber]
-            return noteP(noteNumber)
+            if self.notes is None:
+                return 0
+            else:
+                notesFiltered = [note for note in self.notes if note.channel == channel and
+                    time >= note.timeOn and time <= note.timeOff + releaseTime and
+                    note.noteNumber == noteNumber]
+                return noteP(noteNumber)
 

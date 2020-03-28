@@ -24,5 +24,11 @@ class midiTrackEvaluateNode(bpy.types.Node, AnimationNode):
 
     def execute(self, track, channel, noteNumber, time, attackTime, attackInterpolation,
         releaseTime, releaseInterpolation):
-        return track.evaluate(channel, self.useNoteNumberList, noteNumber, time, attackTime,
-            attackInterpolation, releaseTime, releaseInterpolation)
+        if track is None:
+            if self.useNoteNumberList:
+                return DoubleList.fromValues([0.0])
+            else:
+                return 0.0
+        else:
+            return track.evaluate(channel, self.useNoteNumberList, noteNumber, time, attackTime,
+                attackInterpolation, releaseTime, releaseInterpolation)

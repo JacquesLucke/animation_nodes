@@ -1,34 +1,30 @@
-from mido import MidiFile
+from ..libs.midiparser.parser import MidiFile
+from ..libs.midiparser.events import NoteOnEvent,NoteOffEvent,TrackNameEvent,TempoEvent,SysExEvent
 from ..data_structures.midi.midi_track import midiTrack
 from ..data_structures.midi.midi_note import midiNote
 
-class Tempo_Class:
+class Tempo:
     def __init__(self, trackToAnalyze, ppq):
-        self.track = trackToAnalyze
         self.tempoMap = [[]]
+        self.ppq = ppq
         timeInTicksCumul = 0
         ticksPrevious = 0
         tempoPrevious = 0
         tempoCount = 0
         secCumul = 0
-        for msg in self.track:
-            timeInTicksCumul += msg.time
-            if msg.type == 'set_tempo':
-                if msg.tempo != 0:
+        for event in trackToAnalyze.events:
+            timeInTicksCumul += event.deltaTime
+            if isinstance(event, TempoEvent):
+                if event.tempo != 0:
                     tempoCount += 1
                     row = []
-                    tempo = msg.tempo
-                    bpm = int(60000/(tempo/1000))
+                    tempo = event.tempo
                     deltaTicks = timeInTicksCumul - ticksPrevious
                     secPerTicks = (tempoPrevious / ppq) / 1000000
                     sec = deltaTicks * secPerTicks
                     secCumul += sec
                     row.append(timeInTicksCumul)
                     row.append(tempo)
-                    row.append(bpm)
-                    row.append(deltaTicks)
-                    row.append(secPerTicks)
-                    row.append(sec)
                     row.append(secCumul)
                     self.tempoMap.append(row)
                     ticksPrevious = timeInTicksCumul
@@ -37,14 +33,10 @@ class Tempo_Class:
             row = []
             row.append(0)
             row.append(500000)
-            row.append(120)
-            row.append(0)
-            row.append(0)
-            row.append(0)
             row.append(0)
             self.tempoMap.append(row)
 
-    def getRealtime(self, ticksCumul, ppq):
+    def getRealtime(self, ticksCumul):
         if ticksCumul == 0:
             return 0
         for row in self.tempoMap:
@@ -53,36 +45,66 @@ class Tempo_Class:
                     break
                 else:
                     foundedRow = row
-        seconds = foundedRow[6]
+        # seconds = foundedRow[6]
+        seconds = foundedRow[2]
         delta = ticksCumul - foundedRow[0]
-        secPerTicks = (foundedRow[1] / ppq) / 1000000
+        secPerTicks = (foundedRow[1] / self.ppq) / 1000000
         seconds += delta * secPerTicks
         return seconds
 
-def MIDI_ParseFile(filemid):
-    mid = MidiFile(filemid)
-    if (mid.type == 2):
-        raise RuntimeError("Only MIDI file type 0 or 1, type 2 is not yet supported")
-    ppq = mid.ticks_per_beat
-    timeMap = Tempo_Class(mid.tracks[0], ppq)
-    tracks = []
-    for trackIndex, curTracks in enumerate(mid.tracks):
-        track = midiTrack(trackIndex, curTracks.name)
+
+def MidiParseFile(filemid):
+
+    print("start parse file")
+    midi = MidiFile.fromFile(filemid)
+    print(midi)
+    newTracks = []
+    for trackIndex, track in enumerate(midi.tracks):
+        if midi.midiFormat == 2:
+            timeMap = Tempo(track, midi.ppqn)
+        else:
+            timeMap = Tempo(midi.tracks[0], midi.ppqn)
+
+        newTrack = midiTrack(trackIndex, "undefined")
         timeInTicksCumul = 0
         lastNoteOn = {}
-        for msg in curTracks:
-            if msg.type == "sysex": continue
-            timeInTicksCumul += msg.time
-            if msg.is_meta: continue
-            if (msg.type == 'note_on') and (msg.velocity == 0):
+        for event in track.events:
+
+            if isinstance(event, SysExEvent): continue
+
+            msgType = 'not evalued'
+            timeInTicksCumul += event.deltaTime
+            # if msg.is_meta: continue
+
+            if isinstance(event, TrackNameEvent):
+                newTrack.name = event.name
+                continue
+
+            if isinstance(event, NoteOnEvent):
+                if event.velocity == 0:
+                    msgType = 'note_off'
+                else:
+                    msgType = 'note_on'
+            if isinstance(event, NoteOffEvent):
                 msgType = 'note_off'
-            else:
-                msgType = msg.type
-            currentTime = timeMap.getRealtime(timeInTicksCumul, ppq)
+
             if msgType == 'note_on':
-                lastNoteOn[msg.note] = [msg.channel, currentTime, msg.velocity / 127]
+                currentTime = timeMap.getRealtime(timeInTicksCumul)
+                key = str(event.channel) + "/" + str(event.note)
+                lastNoteOn[key] = [currentTime, event.velocity / 127]
+                # lastNoteOn[event.note] = [event.channel, currentTime, event.velocity / 127]
             if msgType == 'note_off':
-                track.addNote(midiNote(msg.channel, msg.note, lastNoteOn[msg.note][1],
-                    currentTime, lastNoteOn[msg.note][2]))
-        tracks.append(track)
-    return tracks
+                currentTime = timeMap.getRealtime(timeInTicksCumul)
+                key = str(event.channel) + "/" + str(event.note)
+                if key in lastNoteOn:
+                    print(key, event.channel, event.note, lastNoteOn[key][0], currentTime, lastNoteOn[key][1])
+                    newTrack.addNote(midiNote(event.channel, event.note, lastNoteOn[key][0], currentTime, lastNoteOn[key][1]))
+                    # newTrack.addNote(midiNote(event.channel, event.note, lastNoteOn[event.note][1], currentTime, lastNoteOn[event.note][2]))
+                    lastNoteOn.pop(key, None)
+                else:
+                    print("no noteOn for ", event.channel, event.note)
+        newTracks.append(newTrack)
+        print("+++++++++++++++++++")
+        print(midi.midiFormat, newTrack.index, newTrack.name)
+        print("-------------------")
+    return newTracks

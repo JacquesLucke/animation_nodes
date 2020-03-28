@@ -25,11 +25,18 @@ class midiNoteNode(bpy.types.Node, AnimationNode):
 
     def execute(self, note):
         if self.useNotesList:
-            return (DoubleList.fromValues([note.channel for note in note]),
-             DoubleList.fromValues([note.noteNumber for note in note]),
-             DoubleList.fromValues([note.timeOn for note in note]),
-             DoubleList.fromValues([note.timeOff for note in note]),
-             DoubleList.fromValues([note.velocity for note in note]))
+            if note is None:
+                return (DoubleList.fromValues([0]),
+                DoubleList.fromValues([0]),
+                DoubleList.fromValues([0]),
+                DoubleList.fromValues([0]),
+                DoubleList.fromValues([0]))
+            else:
+                return (DoubleList.fromValues([note.channel for note in note]),
+                DoubleList.fromValues([note.noteNumber for note in note]),
+                DoubleList.fromValues([note.timeOn for note in note]),
+                DoubleList.fromValues([note.timeOff for note in note]),
+                DoubleList.fromValues([note.velocity for note in note]))
         else:
             if note is None:
                 return(0,0,0.0,0.0,0.0)
