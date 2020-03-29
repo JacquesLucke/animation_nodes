@@ -1,16 +1,17 @@
 import textwrap
-from .. lists.base_lists import FloatList, Vector3DList
+from .. lists.base_lists import FloatList, Vector3DList, ColorList
 
 class GPStroke:
     def __init__(self, vertices = None, strengths = None, pressures = None,
-                 uvRotations = None, lineWidth = None, hardeness = None,
-                 drawCyclic = None, startCapMode = None, endCapMode = None,
-                 materialIndex = None, displayMode = None):
+                 uvRotations = None, vertexColors = None, lineWidth = None,
+                 hardeness = None, drawCyclic = None, startCapMode = None,
+                 endCapMode = None, materialIndex = None, displayMode = None):
 
         if vertices is None: vertices = Vector3DList()
         if strengths is None: strengths = FloatList()
         if pressures is None: pressures = FloatList()
         if uvRotations is None: uvRotations = FloatList()
+        if vertexColors is None: vertexColors = ColorList()
         if lineWidth is None: lineWidth = 250
         if hardeness is None: hardeness = 1
         if drawCyclic is None: drawCyclic = False
@@ -23,6 +24,7 @@ class GPStroke:
         self.strengths = strengths
         self.pressures = pressures
         self.uvRotations = uvRotations
+        self.vertexColors = vertexColors
         self.lineWidth = lineWidth
         self.hardeness = hardeness
         self.drawCyclic = drawCyclic
@@ -45,5 +47,6 @@ class GPStroke:
 
     def copy(self):
         return GPStroke(self.vertices.copy(), self.strengths.copy(), self.pressures.copy(),
-                        self.uvRotations.copy(), self.lineWidth, self.hardeness, self.drawCyclic,
-                        self.startCapMode, self.endCapMode, self.materialIndex, self.displayMode)
+                        self.uvRotations.copy(), self.vertexColors.copy(), self.lineWidth,
+                        self.hardeness, self.drawCyclic, self.startCapMode, self.endCapMode,
+                        self.materialIndex, self.displayMode)

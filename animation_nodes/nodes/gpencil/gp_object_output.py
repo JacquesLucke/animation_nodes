@@ -71,6 +71,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
                     gpPoints.foreach_set("strength", stroke.strengths)
                     gpPoints.foreach_set("pressure", stroke.pressures)
                     gpPoints.foreach_set("uv_rotation", stroke.uvRotations)
+                    gpPoints.foreach_set("vertex_color", stroke.vertexColors.asNumpyArray())
             gpFrame.strokes.update()
 
     def setMaskLayers(self, gpencil, layer):

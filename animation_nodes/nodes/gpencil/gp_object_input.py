@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... utils.depsgraph import getEvaluatedID
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import GPLayer, GPFrame, GPStroke, FloatList, Vector3DList
+from ... data_structures import GPLayer, GPFrame, GPStroke, FloatList, Vector3DList, ColorList
 
 importTypeItems = [
     ("ALL", "All", "Get all grease pencil layers", "NONE", 0),
@@ -100,6 +100,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         strengths = FloatList(length = amount)
         pressures = FloatList(length = amount)
         uvRotations = FloatList(length = amount)
+        vertexColors = ColorList(length = amount)
 
         strokePoints.foreach_get("co", vertices.asNumpyArray())
         if useWorldSpace: vertices.transform(object.matrix_world)
@@ -107,6 +108,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         strokePoints.foreach_get("strength", strengths.asNumpyArray())
         strokePoints.foreach_get("pressure", pressures.asNumpyArray())
         strokePoints.foreach_get("uv_rotation", uvRotations.asNumpyArray())
+        strokePoints.foreach_get("vertex_color", vertexColors.asNumpyArray())
 
-        return GPStroke(vertices, strengths, pressures, uvRotations, stroke.line_width, stroke.hardeness, stroke.draw_cyclic,
-                        stroke.start_cap_mode, stroke.end_cap_mode, stroke.material_index, stroke.display_mode)
+        return GPStroke(vertices, strengths, pressures, uvRotations, vertexColors, stroke.line_width, stroke.hardeness,
+                        stroke.draw_cyclic, stroke.start_cap_mode, stroke.end_cap_mode, stroke.material_index, stroke.display_mode)
