@@ -30,8 +30,8 @@ class MIDIFileParserNode(bpy.types.Node, AnimationNode):
 
     def execute(self, path):
         loadFile = False
-        print(loadFile)
-        print(cache)
+        # print(loadFile)
+        # print(cache)
 
         if not os.path.exists(path):
             self.raiseErrorMessage("Path does not exist")
@@ -45,7 +45,7 @@ class MIDIFileParserNode(bpy.types.Node, AnimationNode):
                 if lastModification > oldLastModification:
                     loadFile = True
 
-        print(loadFile)
+        # print(loadFile)
         if loadFile:
             try:
                 tracks = MIDI_ParseFile(path)
