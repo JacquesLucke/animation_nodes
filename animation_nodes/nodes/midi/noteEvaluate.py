@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import DoubleList
 from ... base_types import AnimationNode, ListTypeSelectorSocket, VectorizedSocket
 
-class MidiNoteEvaluateNode(bpy.types.Node, AnimationNode):
+class midiNoteEvaluateNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MidiNoteEvaluateNode"
     bl_label = "MIDI Note Evaluate"
     bl_width_default = 180

@@ -1,4 +1,4 @@
-class MIDINote:
+class midiNote:
     def __init__(self, channel, noteNumber, timeOn, timeOff, velocity):
         self.channel = channel
         self.noteNumber = noteNumber

@@ -1,6 +1,6 @@
 from mido import MidiFile
-from ..data_structures.midi.midi_track import MIDITrack
-from ..data_structures.midi.midi_note import MIDINote
+from ..data_structures.midi.midi_track import midiTrack
+from ..data_structures.midi.midi_note import midiNote
 
 class Tempo_Class:
     def __init__(self, trackToAnalyze, ppq):
@@ -67,7 +67,7 @@ def MIDI_ParseFile(filemid):
     timeMap = Tempo_Class(mid.tracks[0], ppq)
     tracks = []
     for trackIndex, curTracks in enumerate(mid.tracks):
-        track = MIDITrack(trackIndex, curTracks.name)
+        track = midiTrack(trackIndex, curTracks.name)
         timeInTicksCumul = 0
         lastNoteOn = {}
         for msg in curTracks:
@@ -82,7 +82,7 @@ def MIDI_ParseFile(filemid):
             if msgType == 'note_on':
                 lastNoteOn[msg.note] = [msg.channel, currentTime, msg.velocity / 127]
             if msgType == 'note_off':
-                track.addNote(MIDINote(msg.channel, msg.note, lastNoteOn[msg.note][1],
+                track.addNote(midiNote(msg.channel, msg.note, lastNoteOn[msg.note][1],
                     currentTime, lastNoteOn[msg.note][2]))
         tracks.append(track)
     return tracks

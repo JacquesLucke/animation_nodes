@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import DoubleList
 from ... base_types import AnimationNode, ListTypeSelectorSocket, VectorizedSocket
 
-class MidiTrackEvaluateNode(bpy.types.Node, AnimationNode):
+class midiTrackEvaluateNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MidiTrackEvaluateNode"
     bl_label = "MIDI Track Evaluate"
     bl_width_default = 180
@@ -10,7 +10,7 @@ class MidiTrackEvaluateNode(bpy.types.Node, AnimationNode):
     useNoteNumberList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("MIDITrack", "Track", "track")
+        self.newInput("midiTrack", "Track", "track")
         self.newInput("Integer", "Channel", "channel")
         self.newInput(VectorizedSocket("Integer", "useNoteNumberList",
             ("noteNumber", "noteNumber"), ("numbers", "numbers")))

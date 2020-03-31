@@ -4,7 +4,7 @@ from .. base_types import AnimationNodeSocket, PythonListSocket
 class MIDITrackSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MIDITrackSocket"
     bl_label = "MIDI Track Socket"
-    dataType = "MIDITrack"
+    dataType = "midiTrack"
     drawColor = (0.9, 0.7, 0.4, 1)
     storable = True
     comparable = False
@@ -12,7 +12,7 @@ class MIDITrackSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     def getCurrentDataType(self):
         linkedDataTypes = tuple(self.linkedDataTypes)
         if len(linkedDataTypes) == 0:
-            return "MIDITrack"
+            return "midiTrack"
         else:
             return linkedDataTypes[0]
 

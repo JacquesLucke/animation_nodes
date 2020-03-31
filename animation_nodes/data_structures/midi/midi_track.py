@@ -1,7 +1,7 @@
-from . midi_note import MIDINote
+from . midi_note import midiNote
 from ... data_structures import DoubleList
 
-class MIDITrack:
+class midiTrack:
     def __init__(self, trackIndex, trackName):
         self.index = trackIndex
         self.name = trackName

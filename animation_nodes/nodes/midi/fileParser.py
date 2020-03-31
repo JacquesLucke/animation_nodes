@@ -6,7 +6,7 @@ from ... utils.midi import MIDI_ParseFile
 # path : last modification, content
 cache = {}
 
-class MIDIFileParserNode(bpy.types.Node, AnimationNode):
+class midiFileParserNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MidiFileParserNode"
     bl_label = "MIDI File Parser"
     bl_width_default = 180

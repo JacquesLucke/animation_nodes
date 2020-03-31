@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode, ListTypeSelectorSocket, VectorizedSocket
 from ... data_structures import DoubleList
 
-class MidiNoteNode(bpy.types.Node, AnimationNode):
+class midiNoteNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MidiNoteInfoNode"
     bl_label = "MIDI Note Info"
     bl_width_default = 180
@@ -10,7 +10,7 @@ class MidiNoteNode(bpy.types.Node, AnimationNode):
     useNotesList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("MIDINote", "useNotesList",
+        self.newInput(VectorizedSocket("midiNote", "useNotesList",
             ("note", "note"), ("notes", "notes")))
         self.newOutput(VectorizedSocket("Integer", "useNotesList",
             ("Channel", "channel"), ("Channels", "channels")))
