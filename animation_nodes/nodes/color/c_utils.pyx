@@ -9,6 +9,7 @@ from ... math cimport (
 from ... data_structures cimport (
     Color,
     LongList,
+    FloatList,
     ColorList,
     VirtualColorList,
     VirtualDoubleList,
@@ -62,13 +63,13 @@ def getLoopColorsFromVertexColors(PolygonIndicesList polygons, VirtualColorList 
     for i in range(loopsCount):
         loopsColors.data[i] = colors.get(polygons.indices.data[i])[0]
     return loopsColors
-    
+
 def getLoopColorsFromPolygonColors(PolygonIndicesList polygons, VirtualColorList colors):
     cdef ColorList loopsColors = ColorList(length = polygons.indices.length)
-    
+
     cdef long i, j, index
     cdef Color polygonColor
-    index = 0 
+    index = 0
     for i in range(polygons.getLength()):
         polygonColor = colors.get(i)[0]
         for j in range(polygons.polyLengths.data[i]):
@@ -79,7 +80,7 @@ def getLoopColorsFromPolygonColors(PolygonIndicesList polygons, VirtualColorList
 @cython.cdivision(True)
 def getVertexColorsFromLoopColors(long vertexCount, PolygonIndicesList polygons, VirtualColorList colors):
     cdef ColorList vertexColors = ColorList(length = vertexCount)
-    cdef LongList loopCounts = LongList(length = vertexCount)        
+    cdef LongList loopCounts = LongList(length = vertexCount)
     loopCounts.fill(0)
     vertexColors.fill(0)
 
@@ -109,3 +110,35 @@ def getPolygonColorsFromLoopColors(PolygonIndicesList polygons, VirtualColorList
         scaleColor_Inplace(polygonColors.data + i, 1.0 / polyLength)
     return polygonColors
 
+def offsetColors(ColorList colors, VirtualColorList offsets, FloatList influences, str method = "ADD"):
+    cdef Color *offset
+    cdef float influence
+    cdef Py_ssize_t i
+
+    if method == "ADD":
+        for i in range(colors.length):
+            influence = influences.data[i]
+            offset = offsets.get(i)
+            colors.data[i].r += offset.r * influence
+            colors.data[i].g += offset.g * influence
+            colors.data[i].b += offset.b * influence
+            colors.data[i].a += offset.a * influence
+    elif method == "MULTIPLY":
+        for i in range(colors.length):
+            influence = influences.data[i]
+            offset = offsets.get(i)
+            colors.data[i].r *= offset.r * influence
+            colors.data[i].g *= offset.g * influence
+            colors.data[i].b *= offset.b * influence
+            colors.data[i].a *= offset.a * influence
+    elif method == "MIX":
+        for i in range(colors.length):
+            influence = influences.data[i]
+            offset = offsets.get(i)
+            colors.data[i].r = lerp(colors.data[i].r, offset.r, influence)
+            colors.data[i].g = lerp(colors.data[i].g, offset.g, influence)
+            colors.data[i].b = lerp(colors.data[i].b, offset.b, influence)
+            colors.data[i].a = lerp(colors.data[i].a, offset.a, influence)
+
+cdef lerp(float x, float y, float p):
+    return (1.0 - p) * x + p * y
