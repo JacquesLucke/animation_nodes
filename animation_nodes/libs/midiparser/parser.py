@@ -85,10 +85,10 @@ def parseEvent(memoryMap, parseState):
     runningStatus = parseState.runningStatus
     if runningStatus == 0xFF:
         return parseMetaEvent(deltaTime, memoryMap)
-    elif runningStatus >= 0x80:
-        return parseChannelEvent(deltaTime, runningStatus, memoryMap)
     elif runningStatus == 0xF0 or runningStatus == 0xF7:
         return parseSysExEvent(deltaTime, runningStatus, memoryMap)
+    elif runningStatus >= 0x80:
+        return parseChannelEvent(deltaTime, runningStatus, memoryMap)
 
 @dataclass
 class MidiParseState:
