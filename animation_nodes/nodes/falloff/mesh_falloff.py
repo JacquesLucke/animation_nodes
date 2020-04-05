@@ -23,9 +23,13 @@ class MeshFalloffNode(bpy.types.Node, AnimationNode):
         if self.mode == "SURFACE":
             self.newInput("Float", "Size", "size")
             self.newInput("Float", "Falloff Width", "falloffWidth", value = 1)
+            self.newInput("Boolean", "Use Volume", "useVolume", value = False)
+            self.newInput("Boolean", "Invert", "invert", value = False)
             self.newInput("Float", "Max Distance", "bvhMaxDistance", minValue = 0, value = 1e6, hide = True)
-        self.newInput("Float", "Epsilon", "epsilon", hide = True, minValue = 0)
-        self.newInput("Boolean", "Invert", "invert", value = False)
+            self.newInput("Float", "Epsilon", "epsilon", minValue = 0, hide = True)
+        else:
+            self.newInput("Boolean", "Invert", "invert", value = False)
+            self.newInput("Float", "Epsilon", "epsilon", minValue = 0, hide = True)
 
         self.newOutput("Falloff", "Falloff", "falloff")
 
@@ -38,12 +42,12 @@ class MeshFalloffNode(bpy.types.Node, AnimationNode):
         elif self.mode == "VOLUME":
             return "execute_MeshVolumeFalloff"
 
-    def execute_MeshSurfaceFalloff(self, mesh, size, falloffWidth, bvhMaxDistance, epsilon, invert):
+    def execute_MeshSurfaceFalloff(self, mesh, size, falloffWidth, useVolume, invert, bvhMaxDistance, epsilon):
         vectorList, polygonsIndices = self.validMesh(mesh)
         bvhTree = BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = max(epsilon, 0))
-        return calculateMeshSurfaceFalloff(bvhTree, size, falloffWidth, bvhMaxDistance, invert)
+        return calculateMeshSurfaceFalloff(bvhTree, bvhMaxDistance, size, falloffWidth, useVolume, invert)
 
-    def execute_MeshVolumeFalloff(self, mesh, epsilon, invert):
+    def execute_MeshVolumeFalloff(self, mesh, invert, epsilon):
         vectorList, polygonsIndices = self.validMesh(mesh)
         bvhTree = BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = max(epsilon, 0))
         return calculateMeshVolumeFalloff(bvhTree, invert)

@@ -7,15 +7,18 @@ from ... data_structures cimport BaseFalloff, FloatList, Vector3DList
 cdef class calculateMeshSurfaceFalloff(BaseFalloff):
     cdef:
         bvhTree
+        bint useVolume
         bint invert
         float factor
         float minDistance, maxDistance
         double bvhMaxDistance
 
     @cython.cdivision(True)
-    def __cinit__(self, bvhTreeInput, float size, float falloffWidth, double bvhMaxDistance1, bint invertInput):
+    def __cinit__(self, bvhTreeInput, double bvhMaxDistanceInput, float size, float falloffWidth,
+                  bint useVolumeInput, bint invertInput):
         self.bvhTree = bvhTreeInput
-        self.bvhMaxDistance = bvhMaxDistance1
+        self.bvhMaxDistance = bvhMaxDistanceInput
+        self.useVolume = useVolumeInput
         self.invert = invertInput
         if falloffWidth < 0:
             size += falloffWidth
@@ -34,25 +37,31 @@ cdef class calculateMeshSurfaceFalloff(BaseFalloff):
         return calcDistance(self, <Vector3*>value)
 
     cdef void evaluateList(self, void *values, Py_ssize_t startIndex, Py_ssize_t amount, float *target):
+        cdef float distance
+        cdef float strength
+        cdef Vector3* v
         cdef Py_ssize_t i
-        for i in range(amount):
-            target[i] = calcDistance(self, <Vector3*>values + i)
+
+        if self.useVolume:
+            for i in range(amount):
+                v = <Vector3*>values + i
+                strength = hitsPerLocation(self.bvhTree, Vector((v.x, v.y, v.z)))
+                distance = calcDistance(self, v)
+                distance = max(distance, strength)
+                if self.invert: distance = 1 - distance
+                target[i] = distance
+        else:
+            for i in range(amount):
+                distance = calcDistance(self, <Vector3*>values + i)
+                if self.invert: distance = 1 - distance
+                target[i] = distance
 
 cdef inline float calcDistance(calculateMeshSurfaceFalloff self, Vector3 *v):
     cdef float distance = self.bvhTree.find_nearest(Vector((v.x, v.y, v.z)), self.bvhMaxDistance)[3]
-    if self.invert:
-        distance = linearCampInterpolation(distance, self.minDistance, self.maxDistance, 1, 0)
-    else:
-        distance = linearCampInterpolation(distance, self.minDistance, self.maxDistance, 0, 1)
     if distance <= self.minDistance: return 1
     if distance <= self.maxDistance: return 1 - (distance - self.minDistance) * self.factor
     return 0
 
-@cython.cdivision(True)
-cdef linearCampInterpolation(float x, float xMin, float xMax, float yMin, float yMax):
-    cdef float y = yMin + (x - xMin)*(yMax - yMin) / (xMax - xMin)
-    if y > 1: return 1
-    return y
 
 cdef class calculateMeshVolumeFalloff(BaseFalloff):
     cdef:
