@@ -87,7 +87,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def setStrokeProperties(self, gpStroke, stroke):
         gpStroke.line_width = stroke.lineWidth
-        gpStroke.hardeness = stroke.hardeness
+        gpStroke.hardness = stroke.hardness
         gpStroke.material_index = stroke.materialIndex
         gpStroke.display_mode = stroke.displayMode
         gpStroke.draw_cyclic = stroke.drawCyclic

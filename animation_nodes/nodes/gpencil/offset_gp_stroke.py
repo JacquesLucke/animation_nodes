@@ -95,7 +95,7 @@ class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
             offsetFloats(stroke.uvRotations, _offsetUVRotations, influences)
 
         if self.useVertexColor:
-            _offsetVertexColors = VirtualColorList.create(offsetVertexColors, (0, 0, 0))
+            _offsetVertexColors = VirtualColorList.create(offsetVertexColors, (0, 0, 0, 0))
             if method not in ["ADD", "MULTIPLY", "MIX"]:
                 self.raiseErrorMessage("Invalid color method, possible methods are: 'ADD', 'MULTIPLY', 'MIX'.")
             offsetColors(stroke.vertexColors, _offsetVertexColors, influences, method)
