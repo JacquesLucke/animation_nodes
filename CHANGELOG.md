@@ -13,6 +13,7 @@
 - Added input range to Remap Falloff node.
 - Added Bmesh Invert Normals node.
 - Added Object Material Input node.
+- Added Vector Noise node to the node menu.
 - Added Mesh Points Scatter node.
 
 ### Fixed
@@ -24,6 +25,7 @@
 - Fixed enum callbacks by caching them.
 - Fixed the Triangulate BMesh node.
 - Fixed smooth sound spectrum evaluation.
+- Fixed the None material issue of the Material Output node.
 
 ### Changed
 
