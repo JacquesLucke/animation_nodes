@@ -10,6 +10,9 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshPointsScatterNode"
     bl_label = "Mesh Points Scatter"
 
+    methodType: BoolProperty(name = "Use Advanced Method For Mesh Sampling", default = False,
+                             update = propertyChanged)
+
     nodeSeed: IntProperty(update = propertyChanged)
 
     def setup(self):
@@ -27,6 +30,9 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         row = layout.row(align = True)
         row.prop(self, "nodeSeed", text = "Node Seed")
 
+    def drawAdvanced(self, layout):
+        layout.prop(self, "methodType", text = "Use advanced method for mesh sampling")
+
     def execute(self, mesh, seed, amount, weights):
         vertices = mesh.vertices
         polygons = mesh.polygons
@@ -35,7 +41,8 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
             return Vector3DList()
 
         if polygons.polyLengths.getMaxValue() > 3:
-            polygons = mesh.getTrianglePolygons()
+            if self.methodType: polygons = mesh.getTrianglePolygons(method = "EAR")
+            else: polygons = mesh.getTrianglePolygons(method = "FAN")
 
         weights = VirtualDoubleList.create(weights, 1)
         seed  = (seed * 674523 + self.nodeSeed * 3465284) % 0x7fffffff
