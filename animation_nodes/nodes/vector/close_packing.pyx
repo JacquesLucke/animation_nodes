@@ -49,7 +49,7 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         if self.mode == "POINTS":
-            self.newInput("Vector List", "Points", "points")
+            self.newInput("Vector List", "Points", "points", dataIsModified = True)
             self.newInput("Float", "Margin", "margin", value = 0.01, minValue = 0)
             self.newInput("Float", "Radius Max", "radiusMax", value = 0.1, minValue = 0)
             if self.methodTypeForPoints in ["DYNAMICRADIUS", "NEIGHBOURRADIUS"]:
@@ -57,7 +57,7 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
             self.newInput("Falloff", "Falloff", "falloff")
             self.newInput("Boolean", "Mask", "mask", value = False, hide = True)
         elif self.mode == "RELAX":
-            self.newInput("Vector List", "Points", "points")
+            self.newInput("Vector List", "Points", "points", dataIsModified = True)
             self.newInput("Float", "Margin", "margin", value = 0.01, minValue = 0)
             self.newInput("Float", "Radius Max", "radiusMax", value = 0.1, minValue = 0)
             self.newInput("Float", "Repulsion Factor", "repulsionFactor", value = 0.5, minValue = 0, maxValue = 1)
@@ -66,7 +66,7 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
             self.newInput("Falloff", "Falloff", "falloff")
             self.newInput("Boolean", "Mask", "mask", value = False, hide = True)
         elif self.mode == "POLYGONS":
-            self.newInput("Mesh", "Mesh", "mesh")
+            self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
             self.newInput("Falloff", "Falloff", "falloff")
             self.newInput("Boolean", "Align To Normal", "alignToNormal", value = False)
 
