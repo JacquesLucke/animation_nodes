@@ -122,7 +122,7 @@
 - Added Points mode to the Line Mesh node.
 - Added the `__repr__` function for spline.
 
-## 2.1.5
+## 2.1.5 (0832e2e 7Mar2019 - d3deba4 12Oct2019)
 
 ### Added
 
@@ -145,7 +145,13 @@
 - Fixed *Material Output* node's color output.
 - Fixed *Create Execution Trigger* operators.
 - Fixed *getSelectedObjectNames* function.
+- Fixed crash on context view_layer access and *Get Selected Objects* node.
+- Fixed *Separate Text Object* node.
+- Fixed *Time Code* node.
+- Fixed: Fails when try to rename an object.
+- Fixed baking for *Text Object Output* node.
 - Fixed the *Offset Vertices* and *Offset Polygons* nodes. Copy the input mesh if needed.
+- Fixed crash upon linking to a *Script* node
 - Fixed bad precision in the *Wiggle Falloff* node.
 - Fixed header alignment for the *Subprograms* menu and the *Remove* nodetree operator.
 
@@ -160,3 +166,215 @@
 - Allow spline radius to affect the object's scale in the Follow Spline Action.
 - Vectorized the *Number Wiggle*, *Euler Wiggle*, and *Quaternion Wiggle* nodes.
 - Inform the user that no *Viewport Input* node exist in the *Data Input* panel.
+
+## 2.1.4 (9cfdb0b 16Dec2018 - dd5573b, 7Mar2019)
+
+### Added
+
+- Added new sound system.
+- Added *Vectors* output and *Center* options for *Distribute Matrices* node.
+- Added a system for materials, *Object Material Output* and *Material Output* node.
+- Added error handing code when sound files don't exist on disk.
+- Added support for packed sounds.
+- Added *Viewport Input* node.
+
+### Fixed
+
+- Fixed toggleObjectVisibilty function.
+- Fixed *Bake To Keyframes* operator.
+- Fixed the preferences.
+- Fixed *Separate Text Object* node.
+- Fixed *Compose Matrix* node.
+- Fixed *getSoundData* function, and changed a default value.
+- Fixed *Wiggle Action* node.
+- Fixed *Mesh Object Input* node.
+- Fixed *Vectorized* sockets stops automatic conversion upon duplication #928 #929.
+- Fixed *Sort* node.
+
+### Changed
+
+- Add instances to a container collection.
+- Automatically unlink objects by calling remove.
+- Limit count input in *Vector Wiggle* node.
+- Allow access to depsgraph through context.
+
+## 2.1.3 (dfacb9d 8Apr2018 - c41163a 15Dec2018)
+
+### Added
+
+- Added more troubleshooting info unsuccessful installation of addon.
+- Added the *Combine Mesh* node to the menu.
+- Added *Collection Info* node.
+- Added *Sort* node.
+- Added *Sort* node to menu.
+- Added *BOTTOM_BASELINE* text align in *Text Object Output* node.
+
+### Fixed
+
+- Fixed the node menu.
+- Fixed the *UV Maps*.
+- Fixed the *UI Split*.
+- Fixed the *Spline Normals*.
+- Fixed no tabs in left sidebar (tools panel) anymore.
+- Fixed node editor *HUD* position.
+- Fixed *Create Auto Execution Trigger* operator.
+- Fixed Transform Vector node.
+- Fix Quaternion Math node.
+- Fixed Quaternion List Combine node.
+- Fix Separate Text Object WIP. Poll fails.
+- Fixed Set Vertex Color node.
+- Fixed Get Selected Objects node.
+- Fix Transform Object node.
+- Fix Armature Info node.
+- Fixed Spline Revolve node.
+
+### Changed
+
+- New algorithm for *The Splines From Edges* node #922.
+- *Port Animation Nodes to Blender 2.8* (1c2bbe1 17Oct2018).
+- Move ID and Input Data panels to UI.
+- Change editor name to *Animation Nodes*.
+- Enable error border.
+- Removed the *Objects From Group* and *Set Layer Visibility* nodes.
+- Updated the *Object Visibility Input/Output* nodes.
+- Removed the *Object Group* generic nodes.
+- Move *Advanced Node Settings* to *Node* category.
+
+## 2.1.2 (72af0a4 25Mar2018 - 93f1945 8Apr2018)
+
+### Added
+
+- Added *J*, *K* and *M* variables to store current turtle state as matrix for *L System*.
+- Added frame current network operator in pie menu.
+
+### Fixed
+
+- Fixed the sound baking #885, #864.
+- Fixed cannot *Evaluate Falloff* with matrices #887.
+- Fixed *Separate Text Object* node crash when clicking on update #892.
+- Fixed remove unknown sockets from undefined nodes as well #891.
+
+### Changed
+
+## 2.1.1 (7d3153d 17Aug2017 - 2563c53 25Mar2018)
+
+### Added
+
+- Added *Action From Object* node.
+- Added *Constant Action* node.
+- Added *Wiggle Location Action* node.
+- Added *Object Action Output* node.
+- Added different modes in *Action Output* node.
+- Added *Delay Action* node.
+- Added *Follow Spline Action* node.
+- Added *Overlay Action* node.
+- Added the normal and tilt for splines.
+- Added the normal and tilt for Poly splines.
+- Added the output tilt attribute in *Evaluate Spline* node.
+- Added the tilt for spline nodes (*Connect*, *Append Point to Spline*, *Change Spline Type*, *Spline From Points*, *SPline Info*).
+- Added new *errorHandlingType* to the nodes.
+- Added compilation support for *MAC OS*.
+- Added *Noise Falloff* node.
+- Added *Action* support in *Offset Matrix* node.
+- Added unbounded action support for *Overlay Action* node.
+- Added *Chain Action* node.
+- Added *Action Viewer* node.
+- Added *Mesh Validity* check for mesh object.
+- Added *Construct Mesh* node.
+- Added *UV Maps* support for mesh object.
+- Added *Mesh Info* node.
+- Added output mesh object in *Cylinder Mesh* node.
+- Added *Circle* node.
+- Added *Solidify* node.
+- Added custom pivots option in *Transform Polygons* node.
+- Added *Transform Mesh* node.
+- Added *Evaluate Sound* node in menu.
+- Added support for auto insert in Mesh and Vector List and Matrix List and Vector List.
+- Added *Polygon* and *Spiral* mode in *Distribute Matrices* node.
+- Added *Tilt Spline* and *Mesh From Spline* nodes.
+- Added *Cap Ends* option in *Mesh from Spline* node.
+- Added initial version of the *L System* node.
+- Added partial *L System* generations.
+- Added more symbols for *L System*.
+- Added presets for *L System*.
+
+### Fixed
+
+- Fixed Zero Division in case of *Geometry* nodes.
+- Fixed Wrong Input Name of *Project Point On Plane* node.
+- Fixed preferences class name for Blender 2.79.
+- Fixed *Wiggle Location Action* node.
+- Fixed the spline trimming.
+- Fixed bezier spline projection.
+- Fixed Compilation on Linux and Fast Noise Wraper.
+- Fixed the *Evaluate Falloff* node.
+- Fixed *Follow Spline Action* and *Wiggle Action* nodes.
+- Fixed *Action From Object* node.
+- Fixed spelling in error message for missing mumpy lib.
+- Fixed the *Object Transforms Output* node outputs nothing.
+- Fixed *Cap Ends* of *Mesh From Spline* node.
+
+### Changed
+
+- Show path when there is an error in any file.
+- Removed *Scale* and *Translation Matrix* nodes, which are now part of *Compose Matrix* node.
+- Replace Rotation Matrix* node with Axis Rotation Matrix* node.
+- Update default conf to version Blender 2.79.
+- Removed *Constant Action* node.
+- Join *Get Spline Samples* node into *Evaluate Spline* node.
+- Vectorized the *Vector Angle* node.
+- Better handles for straight bezier segments.
+- Remove *Barycentric Transform* node.
+- Implemented list evaluation for falloffs which roughly *30%* speedup the falloff nodes.
+- Improved the *Mesh Input*, *Replicate Mesh*, *Edge to Tube* nodes.
+- Changed functionality of the *Transform Polygons* node.
+- Removed *Prepare Polygon Transforms* node.
+- Speedup *Transform Polygons* node.
+- Speedup *Edges of Polygons* node.
+- Removed *Separate Mesh Data* node.
+- Rendered merge booleans into options in *Circle* node.
+- Vectorized *Combine Euler* node.
+- Removed *Solidify* Node.
+- *Transform Polygons* node supports 3 basis modes.
+- Renamed the *Circle* node as *Circle Mesh* node and added in menu.
+- Renamed the modes of the *Transform Polygons* node.
+- Removed the *Construct Mesh*, *Mesh Data From Object* and *Object Mesh Data* nodes.
+- Choose edge based on distance in *Extract Polygons Transforms* node.
+- Removed the *Replicate Mesh* node, replaced by *Transform Mesh* node.
+- *Mesh* generation nodes should output only a mesh.
+- Renamed *Transform Polygons* node to *Offset Polygons* node.
+- Speedup the *Circle* and *Spiral* mode of *Distribute Matrices* node.
+- Vectorized *Replace Text* node.
+- Allowed to skip validation in *Combine Mesh Data* node.
+
+## 2.1.0 (b0e7697 16Jul2017 - 3776c70 17Aug2017)
+
+### Added
+
+- Raise exception when the folder has a wrong name.
+- Added the Unity *Triangle* node.
+- Store info in setup_summary.json.
+- Implement copy the addon at the specified path the JSON file.
+- Added *Compose Matrix* node.
+
+### Fixed
+
+- Avoid double frame update.
+- Bring back 0.8 transparency for vectorized sockets.
+- Fixed *PermissionError* during copy the addon at the specified path.
+
+### Changed
+
+- Show degrees instead of radians in *Viewer* node.
+- Vectorized the *Separate Euler* node.
+- Removed the different frames option from *Object Transforms Output* node.
+- Allow custom default list element when the list is empty.
+- Allow lists with different lengths in *Float Math* node.
+- Removed Reference(Basis) key From Shape Key List.
+- Cythonized and Vectorized *Line Plane Intersection* node.
+- Cythonized and Vectorized *Intersect Line Sphere* node.
+- Cythonized aNd Vectorized *Plane Plane Intersection* node.
+- Cythonized and Vectorized *Intersect Sphere Plane* node.
+- Cythonized and Vectorized *Intersect Sphere Sphere* node.
+- Cythonized and Vectorized *Project Point On Line* node.
+- Cythonized and Vectorized *Project Point On Plane* node.
