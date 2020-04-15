@@ -173,7 +173,7 @@
 
 - Added new sound system for *Sound* nodes.
 - Added *Vectors* output and *Center* options for *Distribute Matrices* node.
-- Added *Object Material Output* and *Material Output* node.
+- Added *Object Material Output* and *Material Output* nodes.
 - Added error handing code when sound files don't exist on disk.
 - Added support for packed sounds.
 - Added *Viewport Input* node.
@@ -301,7 +301,7 @@
 ### Fixed
 
 - Fixed *Zero Division* in case of *Geometry* nodes.
-- Fixed wrong input Name of *Project Point On Plane* node.
+- Fixed wrong input name of *Project Point On Plane* node.
 - Fixed preferences class name for Blender 2.79.
 - Fixed *Wiggle Location Action* node.
 - Fixed *Spline* trimming.
@@ -343,7 +343,7 @@
 - Removed the *Replicate Mesh* node, replaced by *Transform Mesh* node.
 - *Mesh* generation nodes should output only a mesh.
 - Renamed *Transform Polygons* node to *Offset Polygons* node.
-- Speedup the *Circle* and *Spiral* mode of *Distribute Matrices* node.
+- Speedup the *Circle* and *Spiral* modes of *Distribute Matrices* node.
 - Vectorized *Replace Text* node.
 - Allowed to skip mesh validation in *Combine Mesh Data* node.
 
