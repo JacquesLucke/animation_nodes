@@ -171,16 +171,16 @@
 
 ### Added
 
-- Added new sound system.
+- Added new sound system for *Sound* nodes.
 - Added *Vectors* output and *Center* options for *Distribute Matrices* node.
-- Added a system for materials, *Object Material Output* and *Material Output* node.
+- Added *Object Material Output* and *Material Output* node.
 - Added error handing code when sound files don't exist on disk.
 - Added support for packed sounds.
 - Added *Viewport Input* node.
 
 ### Fixed
 
-- Fixed toggleObjectVisibilty function.
+- Fixed *toggleObjectVisibilty* function.
 - Fixed *Bake To Keyframes* operator.
 - Fixed the preferences.
 - Fixed *Separate Text Object* node.
@@ -202,12 +202,12 @@
 
 ### Added
 
-- Added more troubleshooting info unsuccessful installation of addon.
-- Added the *Combine Mesh* node to the menu.
+- Added more *troubleshooting info* unsuccessful installation of addon.
+- Added *Combine Mesh* node to the menu.
 - Added *Collection Info* node.
 - Added *Sort* node.
 - Added *Sort* node to menu.
-- Added *BOTTOM_BASELINE* text align in *Text Object Output* node.
+- Added *BOTTOM_BASELINE* align option in *Text Object Output* node.
 
 ### Fixed
 
@@ -218,21 +218,21 @@
 - Fixed no tabs in left sidebar (tools panel) anymore.
 - Fixed node editor *HUD* position.
 - Fixed *Create Auto Execution Trigger* operator.
-- Fixed Transform Vector node.
-- Fix Quaternion Math node.
-- Fixed Quaternion List Combine node.
-- Fix Separate Text Object WIP. Poll fails.
-- Fixed Set Vertex Color node.
-- Fixed Get Selected Objects node.
-- Fix Transform Object node.
-- Fix Armature Info node.
-- Fixed Spline Revolve node.
+- Fixed *Transform Vector* node.
+- Fixed *Quaternion Math* node.
+- Fixed *Quaternion List Combine* node.
+- Fixed *Separate Text Object WIP. Poll fails.
+- Fixed *Set Vertex Color* node.
+- Fixed *Get Selected Objects* node.
+- Fixed *Transform Object* node.
+- Fixed *Armature Info* node.
+- Fixed *Spline Revolve* node.
 
 ### Changed
 
 - New algorithm for *The Splines From Edges* node #922.
 - *Port Animation Nodes to Blender 2.8* (1c2bbe1 17Oct2018).
-- Move ID and Input Data panels to UI.
+- Move *ID* and *Input Data* panels to *UI*.
 - Change editor name to *Animation Nodes*.
 - Enable error border.
 - Removed the *Objects From Group* and *Set Layer Visibility* nodes.
