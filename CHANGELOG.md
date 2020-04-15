@@ -148,7 +148,7 @@
 - Fixed crash on context view_layer access and *Get Selected Objects* node.
 - Fixed *Separate Text Object* node.
 - Fixed *Time Code* node.
-- Fixed: Fails when try to rename an object.
+- Fixed: Fails when trying to rename an object.
 - Fixed baking for *Text Object Output* node.
 - Fixed the *Offset Vertices* and *Offset Polygons* nodes. Copy the input mesh if needed.
 - Fixed crash upon linking to a *Script* node
@@ -158,14 +158,14 @@
 ### Changed
 
 - Redesigned *Execution Triggers* UI.
-- Allow multiple comma separated data paths per *Execution Trigger*.
+- Allow multiple comma-separated data paths per *Execution Trigger*.
 - Replaced colored icons in the *Node Menu* to be more uniform.
 - Started following Blender's class naming conventions.
 - Made dependent nodes unsearchable like *Loop Generator* and *Group Output* nodes.
 - Changed location of Animation Nodes to Animation Nodes Editor.
-- Allow spline radius to affect the object's scale in the Follow Spline Action.
+- Allow the spline radius to affect the object's scale in the Follow Spline Action.
 - Vectorized the *Number Wiggle*, *Euler Wiggle*, and *Quaternion Wiggle* nodes.
-- Inform the user that no *Viewport Input* node exist in the *Data Input* panel.
+- Inform the user that no *Viewport Input* node exists in the *Data Input* panel.
 
 ## 2.1.4 (9cfdb0b 16Dec2018 - dd5573b, 7Mar2019)
 
@@ -174,7 +174,7 @@
 - Added new sound system for *Sound* nodes.
 - Added *Vectors* output and *Center* options for *Distribute Matrices* node.
 - Added *Object Material Output* and *Material Output* nodes.
-- Added error handing code when sound files don't exist on disk.
+- Added error handling code when sound files don't exist on disk.
 - Added support for packed sounds.
 - Added *Viewport Input* node.
 
@@ -188,7 +188,7 @@
 - Fixed *getSoundData* function, and changed a default value.
 - Fixed *Wiggle Action* node.
 - Fixed *Mesh Object Input* node.
-- Fixed *Vectorized* sockets stops automatic conversion upon duplication #928 #929.
+- Fixed *Vectorized* sockets stop automatic conversion upon duplication #928 #929.
 - Fixed *Sort* node.
 
 ### Changed
@@ -202,11 +202,11 @@
 
 ### Added
 
-- Added more *troubleshooting info* unsuccessful installation of addon.
+- Added more *troubleshooting info* unsuccessful installation of the addon.
 - Added *Combine Mesh* node to the menu.
 - Added *Collection Info* node.
 - Added *Sort* node.
-- Added *Sort* node to menu.
+- Added *Sort* node to the menu.
 - Added *BOTTOM_BASELINE* align option in *Text Object Output* node.
 
 ### Fixed
@@ -215,7 +215,7 @@
 - Fixed *UV Maps*.
 - Fixed *UI Split*.
 - Fixed *Spline Normals*.
-- Fixed no tabs in left sidebar (tools panel) anymore.
+- Fixed no tabs in the left sidebar (tools panel) anymore.
 - Fixed node editor *HUD* position.
 - Fixed *Create Auto Execution Trigger* operator.
 - Fixed *Transform Vector* node.
@@ -230,7 +230,7 @@
 
 ### Changed
 
-- New algorithm for *Splines From Edges* node #922.
+- A new algorithm for *Splines From Edges* node #922.
 - *Port Animation Nodes to Blender 2.8* (1c2bbe1 17Oct2018).
 - Move *ID* and *Input Data* panels to *UI*.
 - Change editor name to *Animation Nodes*.
@@ -244,8 +244,8 @@
 
 ### Added
 
-- Added *J*, *K* and *M* variables to store current turtle state as matrix for *L System*.
-- Added frame current network operator in pie menu.
+- Added *J*, *K* and *M* variables to store current turtle state as a matrix for *L System*.
+- Added frame current network operator in the pie menu.
 
 ### Fixed
 
@@ -310,13 +310,13 @@
 - Fixed *Evaluate Falloff* node.
 - Fixed *Follow Spline Action* and *Wiggle Action* nodes.
 - Fixed *Action From Object* node.
-- Fixed spelling in error message for missing *NumPy*.
+- Fixed spelling in the error message for missing *NumPy*.
 - Fixed *Object Transforms Output* node outputs nothing.
 - Fixed *Cap Ends* of *Mesh From Spline* node.
 
 ### Changed
 
-- Show file path when there is an error in the file.
+- Show the file path when there is an error in the file.
 - Removed *Scale* and *Translation Matrix* nodes, which are now part of *Compose Matrix* node.
 - Replace *Rotation Matrix* node with *Axis Rotation Matrix* node.
 - Updated default *conf* to version Blender 2.79.
@@ -359,7 +359,7 @@
 
 - Fixed double frame update.
 - Bring back 0.8 transparency for vectorized sockets.
-- Fixed *PermissionError* during copy the addon at the specified path.
+- Fixed *PermissionError* during copying the addon at the specified path.
 
 ### Changed
 
