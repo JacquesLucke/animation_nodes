@@ -212,9 +212,9 @@
 ### Fixed
 
 - Fixed the node menu.
-- Fixed the *UV Maps*.
-- Fixed the *UI Split*.
-- Fixed the *Spline Normals*.
+- Fixed *UV Maps*.
+- Fixed *UI Split*.
+- Fixed *Spline Normals*.
 - Fixed no tabs in left sidebar (tools panel) anymore.
 - Fixed node editor *HUD* position.
 - Fixed *Create Auto Execution Trigger* operator.
@@ -230,14 +230,14 @@
 
 ### Changed
 
-- New algorithm for *The Splines From Edges* node #922.
+- New algorithm for *Splines From Edges* node #922.
 - *Port Animation Nodes to Blender 2.8* (1c2bbe1 17Oct2018).
 - Move *ID* and *Input Data* panels to *UI*.
 - Change editor name to *Animation Nodes*.
 - Enable error border.
-- Removed the *Objects From Group* and *Set Layer Visibility* nodes.
-- Updated the *Object Visibility Input/Output* nodes.
-- Removed the *Object Group* generic nodes.
+- Removed *Objects From Group* and *Set Layer Visibility* nodes.
+- Updated *Object Visibility Input/Output* nodes.
+- Removed *Object Group* generic nodes.
 - Move *Advanced Node Settings* to *Node* category.
 
 ## 2.1.2 (72af0a4 25Mar2018 - 93f1945 8Apr2018)
@@ -249,7 +249,7 @@
 
 ### Fixed
 
-- Fixed the sound baking #885, #864.
+- Fixed sound baking #885, #864.
 - Fixed cannot *Evaluate Falloff* with matrices #887.
 - Fixed *Separate Text Object* node crash when clicking on update #892.
 - Fixed remove unknown sockets from undefined nodes as well #891.
@@ -268,10 +268,10 @@
 - Added *Delay Action* node.
 - Added *Follow Spline Action* node.
 - Added *Overlay Action* node.
-- Added the normal and tilt for splines.
-- Added the normal and tilt for Poly splines.
-- Added the output tilt attribute in *Evaluate Spline* node.
-- Added the tilt for spline nodes (*Connect*, *Append Point to Spline*, *Change Spline Type*, *Spline From Points*, *SPline Info*).
+- Added *Normals* and *Tilt* for *Spline*.
+- Added *Normals* and *Tilt* for *Poly Spline*.
+- Added output *Tilt* attribute in *Evaluate Spline* node.
+- Added *Tilt* for spline nodes (*Connect*, *Append Point to Spline*, *Change Spline Type*, *Spline From Points*, *SPline Info*).
 - Added new *errorHandlingType* to the nodes.
 - Added compilation support for *MAC OS*.
 - Added *Noise Falloff* node.
@@ -289,7 +289,7 @@
 - Added custom pivots option in *Transform Polygons* node.
 - Added *Transform Mesh* node.
 - Added *Evaluate Sound* node in menu.
-- Added support for auto insert in Mesh and Vector List and Matrix List and Vector List.
+- Added support for auto insert in *Mesh* and *Vector List*, and *Matrix List* and *Vector List*.
 - Added *Polygon* and *Spiral* mode in *Distribute Matrices* node.
 - Added *Tilt Spline* and *Mesh From Spline* nodes.
 - Added *Cap Ends* option in *Mesh from Spline* node.
@@ -300,31 +300,31 @@
 
 ### Fixed
 
-- Fixed Zero Division in case of *Geometry* nodes.
-- Fixed Wrong Input Name of *Project Point On Plane* node.
+- Fixed *Zero Division* in case of *Geometry* nodes.
+- Fixed wrong input Name of *Project Point On Plane* node.
 - Fixed preferences class name for Blender 2.79.
 - Fixed *Wiggle Location Action* node.
-- Fixed the spline trimming.
-- Fixed bezier spline projection.
-- Fixed Compilation on Linux and Fast Noise Wraper.
-- Fixed the *Evaluate Falloff* node.
+- Fixed *Spline* trimming.
+- Fixed *Bezier Spline* projection.
+- Fixed compilation on *Linux* and fast *Noise Wraper*.
+- Fixed *Evaluate Falloff* node.
 - Fixed *Follow Spline Action* and *Wiggle Action* nodes.
 - Fixed *Action From Object* node.
-- Fixed spelling in error message for missing mumpy lib.
-- Fixed the *Object Transforms Output* node outputs nothing.
+- Fixed spelling in error message for missing *NumPy*.
+- Fixed *Object Transforms Output* node outputs nothing.
 - Fixed *Cap Ends* of *Mesh From Spline* node.
 
 ### Changed
 
-- Show path when there is an error in any file.
+- Show file path when there is an error in the file.
 - Removed *Scale* and *Translation Matrix* nodes, which are now part of *Compose Matrix* node.
-- Replace Rotation Matrix* node with Axis Rotation Matrix* node.
-- Update default conf to version Blender 2.79.
+- Replace *Rotation Matrix* node with *Axis Rotation Matrix* node.
+- Updated default *conf* to version Blender 2.79.
 - Removed *Constant Action* node.
-- Join *Get Spline Samples* node into *Evaluate Spline* node.
+- Joined *Get Spline Samples* node into *Evaluate Spline* node.
 - Vectorized the *Vector Angle* node.
-- Better handles for straight bezier segments.
-- Remove *Barycentric Transform* node.
+- Better handles for straight *Bezier* segments.
+- Removed *Barycentric Transform* node.
 - Implemented list evaluation for falloffs which roughly *30%* speedup the falloff nodes.
 - Improved the *Mesh Input*, *Replicate Mesh*, *Edge to Tube* nodes.
 - Changed functionality of the *Transform Polygons* node.
@@ -345,32 +345,31 @@
 - Renamed *Transform Polygons* node to *Offset Polygons* node.
 - Speedup the *Circle* and *Spiral* mode of *Distribute Matrices* node.
 - Vectorized *Replace Text* node.
-- Allowed to skip validation in *Combine Mesh Data* node.
+- Allowed to skip mesh validation in *Combine Mesh Data* node.
 
 ## 2.1.0 (b0e7697 16Jul2017 - 3776c70 17Aug2017)
 
 ### Added
 
-- Raise exception when the folder has a wrong name.
-- Added the Unity *Triangle* node.
-- Store info in setup_summary.json.
-- Implement copy the addon at the specified path the JSON file.
+- Added the *Unity Triangle* node.
+- Implement copy the addon at the specified path the *JSON* file.
 - Added *Compose Matrix* node.
 
 ### Fixed
 
-- Avoid double frame update.
+- Fixed double frame update.
 - Bring back 0.8 transparency for vectorized sockets.
 - Fixed *PermissionError* during copy the addon at the specified path.
 
 ### Changed
 
+- Raise exception when the folder has a wrong name for addon installation.
 - Show degrees instead of radians in *Viewer* node.
 - Vectorized the *Separate Euler* node.
 - Removed the different frames option from *Object Transforms Output* node.
-- Allow custom default list element when the list is empty.
+- Allow *Custom Default* list element when the list is empty.
 - Allow lists with different lengths in *Float Math* node.
-- Removed Reference(Basis) key From Shape Key List.
+- Removed *Reference (Basis)* key from *Shape Key* list.
 - Cythonized and Vectorized *Line Plane Intersection* node.
 - Cythonized and Vectorized *Intersect Line Sphere* node.
 - Cythonized aNd Vectorized *Plane Plane Intersection* node.
