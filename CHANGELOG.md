@@ -14,6 +14,7 @@
 - Added Bmesh Invert Normals node.
 - Added Object Material Input node.
 - Added Vector Noise node to the node menu.
+- Added *Use Spline Radius* option in *Spline Falloff* node.
 
 ### Fixed
 

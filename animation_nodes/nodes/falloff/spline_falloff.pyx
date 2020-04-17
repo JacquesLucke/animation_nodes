@@ -35,7 +35,9 @@ class SplineFalloffNode(bpy.types.Node, AnimationNode):
             ("Spline", "spline", socketProps),
             ("Splines", "splines", socketProps)))
 
+        self.newInput("Boolean", "Use Radius for Distance", "useSplineRadiusForDistance", value = False)
         self.newInput("Float", "Distance", "distance", value = 0)
+        self.newInput("Boolean", "Use Radius for Width", "useSplineRadiusForWidth", value = False)
         self.newInput("Float", "Width", "width", value = 1, minValue = 0)
         self.newInput("Interpolation", "Interpolation", "interpolation",
             defaultDrawType = "PROPERTY_ONLY")
@@ -55,15 +57,15 @@ class SplineFalloffNode(bpy.types.Node, AnimationNode):
         else:
             return "execute_Single"
 
-    def execute_Single(self, spline, distance, width, interpolation):
-        falloff = self.falloffFromSpline(spline, distance, width)
+    def execute_Single(self, spline, useSplineRadiusForDistance, distance, useSplineRadiusForWidth, width, interpolation):
+        falloff = self.falloffFromSpline(spline, useSplineRadiusForDistance, distance, useSplineRadiusForWidth, width)
         return InterpolateFalloff(falloff, interpolation)
 
-    def execute_List(self, splines, distance, width, interpolation):
+    def execute_List(self, splines, useSplineRadiusForDistance, distance, useSplineRadiusForWidth, width, interpolation):
         falloffs = []
         for spline in splines:
             if spline.isEvaluable():
-                falloffs.append(self.falloffFromSpline(spline, distance, width))
+                falloffs.append(self.falloffFromSpline(spline, useSplineRadiusForDistance, distance, useSplineRadiusForWidth, width))
 
         if self.mixListType == "ADD":
             interpolatedFalloffs = [InterpolateFalloff(f, interpolation) for f in falloffs]
@@ -72,27 +74,34 @@ class SplineFalloffNode(bpy.types.Node, AnimationNode):
             falloff = MixFalloffs(falloffs, "MAX", default = 0)
             return InterpolateFalloff(falloff, interpolation)
 
-    def falloffFromSpline(self, spline, distance, width):
+    def falloffFromSpline(self, spline, useSplineRadiusForDistance, distance, useSplineRadiusForWidth, width):
         if not spline.isEvaluable():
             return ConstantFalloff(0)
 
         if spline.type == "POLY":
             falloffSpline = spline
         else:
-            falloffSpline = PolySpline(spline.getDistributedPoints(self.resolution * (len(spline.points) - 1)))
+            if useSplineRadiusForDistance or useSplineRadiusForWidth:
+                falloffSpline = PolySpline(spline.getDistributedPoints(self.resolution * (len(spline.points) - 1)),
+                                           spline.getDistributedRadii(self.resolution * (len(spline.points) - 1)))
+            else:
+                falloffSpline = PolySpline(spline.getDistributedPoints(self.resolution * (len(spline.points) - 1)))
             falloffSpline.cyclic = spline.cyclic
 
-        return SplineFalloff(falloffSpline, distance, width)
+        return SplineFalloff(falloffSpline, useSplineRadiusForDistance, distance, useSplineRadiusForWidth, width)
 
 
 cdef class SplineFalloff(BaseFalloff):
     cdef Spline spline
     cdef float distance, width
+    cdef bint useSplineRadiusForDistance, useSplineRadiusForWidth
 
-    def __cinit__(self, Spline spline, float distance, float width):
+    def __cinit__(self, Spline spline, bint useSplineRadiusForDistance, float distance, bint useSplineRadiusForWidth, float width):
         self.spline = spline
+        self.useSplineRadiusForDistance = useSplineRadiusForDistance
         self.distance = distance
-        self.width = max(width, 0.000001)
+        self.useSplineRadiusForWidth = useSplineRadiusForWidth
+        self.width = width
         self.clamped = False
         self.dataType = "LOCATION"
 
@@ -101,10 +110,18 @@ cdef class SplineFalloff(BaseFalloff):
         cdef float parameter = self.spline.project_LowLevel(<Vector3*>point)
         self.spline.evaluatePoint_LowLevel(parameter, &closestPoint)
         cdef float distance = distanceVec3(<Vector3*>point, &closestPoint)
+        cdef float _distance = self.distance
+        cdef float _width = self.width
+        cdef float radius
+        if self.useSplineRadiusForDistance or self.useSplineRadiusForWidth:
+            radius = self.spline.evaluateRadius_LowLevel(parameter)
+            if self.useSplineRadiusForDistance: _distance *= radius
+            if self.useSplineRadiusForWidth: _width *= radius
 
-        if distance < self.distance:
+        _width = max(_width, 0.000001)
+        if distance < _distance:
             return 1.0
-        elif distance > self.distance + self.width:
+        elif distance > _distance + _width:
             return 0.0
         else:
-            return 1.0 - (distance - self.distance) / self.width
+            return 1.0 - (distance - _distance) / _width
