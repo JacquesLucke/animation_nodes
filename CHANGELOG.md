@@ -32,6 +32,7 @@
 
 - Vectorized the Tilt Spline node.
 - Instancer node objects are now removed regardless of their numbers of users.
+- Return empty spline from Trim Spline node if start and end are equal.
 
 ## 2.1.7
 
