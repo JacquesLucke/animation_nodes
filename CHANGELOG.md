@@ -15,6 +15,7 @@
 - Added Object Material Input node.
 - Added Vector Noise node to the node menu.
 - Added *Use Spline Radius* option in *Spline Falloff* node.
+- Added mesh *Triangulation* methods and *Triangulate Mesh* node.
 
 ### Fixed
 
