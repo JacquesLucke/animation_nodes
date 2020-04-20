@@ -5,6 +5,7 @@ import textwrap
 import functools
 from libc.math cimport sin, cos, pi
 from collections import OrderedDict
+from . validate import createValidEdgesList
 from . validate import checkMeshData, calculateLoopEdges
 from .. lists.base_lists cimport (
     UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList)
@@ -69,7 +70,6 @@ cdef class Mesh:
 
     def topologyChanged(self):
         self.derivedMeshDataCache.pop("Linked Vertices", None)
-        self.derivedMeshDataCache.pop("Triangled Polygons", None)
 
     def getPolygonOrientationMatrices(self, normalized = True):
         normals = self.getPolygonNormals(normalized)
@@ -104,13 +104,6 @@ cdef class Mesh:
     @derivedMeshDataCacheHelper("Linked Vertices")
     def getLinkedVertices(self):
         return calculateLinkedVertices(self.vertices.length, self.edges)
-
-    @derivedMeshDataCacheHelper("Triangled Polygons")
-    def getTrianglePolygons(self, str method = "FAN"):
-        if method == "FAN":
-            return triangulatePolygonsUsingFanSpanMethod(self.polygons)
-        elif method == "EAR":
-            return triangulatePolygonsUsingEarClipMethod(self.vertices, self.polygons)
 
     def setLoopEdges(self, UIntegerList loopEdges):
         if len(loopEdges) == len(self.polygons.indices):
@@ -184,6 +177,15 @@ cdef class Mesh:
     def move(self, translation):
         self.vertices.move(translation)
         self.verticesMoved()
+
+    def triangulateMesh(self, str method = "FAN"):
+        polygons = self.polygons
+        if method == "FAN":
+            newPolygons = triangulatePolygonsUsingFanSpanMethod(polygons)
+        elif method == "EAR":
+            newPolygons = triangulatePolygonsUsingEarClipMethod(self.vertices, polygons)
+        self.edges = createValidEdgesList(polygons = newPolygons)
+        self.polygons = newPolygons
 
     def __repr__(self):
         return textwrap.dedent(
@@ -450,7 +452,7 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList oldVertices, PolygonIndic
     cdef unsigned int *_newPolyLengths = newPolygons.polyLengths.data
 
     cdef Vector3 preVertex, earVertex, nexVertex, ab, bc, v1, v2, v3
-    cdef LongList neighbors, indices, angles, sortAngles, sth
+    cdef LongList neighbors, indices, angles, sortAngles
     cdef Vector3DList polyVertices
     cdef float angle
     cdef Py_ssize_t polyStart, triIndex, polyIndex
@@ -490,10 +492,7 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList oldVertices, PolygonIndic
             # Calculate inner-angle for all vertices of polygon
             angles = LongList(length = amount)
             for k in range(amount):
-                if k == 0:
-                    preVertex = polyVertices.data[indices.data[amount - 1]]
-                else:
-                    preVertex = polyVertices.data[indices.data[k - 1]]
+                preVertex = polyVertices.data[indices.data[(amount + k - 1) % amount]]
                 earVertex = polyVertices.data[indices.data[k]]
                 nexVertex = polyVertices.data[indices.data[(k + 1) % amount]]
 
@@ -510,10 +509,7 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList oldVertices, PolygonIndic
             # Removing an ear which has smallest inner-angle
             for k in range(amount):
                 index = angles.index(sortAngles[k])
-                if index == 0:
-                    preIndex = indices.data[amount - 1]
-                else:
-                    preIndex = indices.data[index - 1]
+                preIndex = indices.data[(amount + index - 1) % amount]
                 earIndex = indices.data[index]
                 nexIndex = indices.data[(index + 1) % amount]
 
