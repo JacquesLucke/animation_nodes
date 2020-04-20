@@ -12,25 +12,40 @@ from ... data_structures cimport (
     )
 
 def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights,
-                        Py_ssize_t seed, Py_ssize_t pointAmount):
+                        bint useWeightForDensity, Py_ssize_t seed, Py_ssize_t pointAmount, Py_ssize_t resolution):
     cdef FloatList triWeights, triAreas
     cdef Py_ssize_t polyAmount
     polyAmount, triAreas, triWeights = calculateTriangleWeightsAreas(vertices, polygons, weights)
 
-    cdef LongList distribution = trianglesDistribution(polyAmount, triAreas, triWeights)
+    cdef LongList distribution = trianglesDistribution(polyAmount, triAreas, triWeights, useWeightForDensity,
+                                                       resolution)
     cdef Py_ssize_t distLength = distribution.getLength()
     if distLength == 0: return Vector3DList()
 
-    cdef LongList totalTriPoints = totalPointsOnTriangles(distribution, distLength, seed, polyAmount, pointAmount)
-    return sampleRandomPoints(vertices, polygons, totalTriPoints, distLength, seed, polyAmount, pointAmount)
+    cdef LongList totalTriPoints
+    cdef Py_ssize_t newPointAmount
+    totalTriPoints, newPointAmount = totalPointsOnTriangles(distribution, distLength, triWeights, useWeightForDensity,
+                                                            seed, polyAmount, pointAmount)
+    return sampleRandomPoints(vertices, polygons, totalTriPoints, distLength, seed, polyAmount, newPointAmount)
 
 cdef calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
+    cdef Py_ssize_t vertexAmount = vertices.length
+    cdef float weightMax = 1
+    cdef float weightCurrent
+    cdef Py_ssize_t i
+
+    for i in range(vertexAmount):
+        weightCurrent = weights.get(i)
+        if weightCurrent > weightMax: weightMax = weightCurrent
+
+    if weightMax == 0: weightMax = 1
+
     cdef UIntegerList polyIndices = polygons.indices
     cdef UIntegerList polyStarts = polygons.polyStarts
     cdef Py_ssize_t polyAmount = polygons.getLength()
     cdef FloatList triAreas = FloatList(length = polyAmount)
     cdef FloatList triWeights = FloatList(length = polyAmount)
-    cdef Py_ssize_t i, start, polyIndex1, polyIndex2, polyIndex3
+    cdef Py_ssize_t start, polyIndex1, polyIndex2, polyIndex3
 
     for i in range (polyAmount):
         start = polyStarts.data[i]
@@ -39,7 +54,7 @@ cdef calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList pol
         polyIndex3 = polyIndices.data[start + 2]
 
         triAreas.data[i] = triangleArea(vertices.data[polyIndex1], vertices.data[polyIndex2], vertices.data[polyIndex3])
-        triWeights.data[i] = (weights.get(polyIndex1) + weights.get(polyIndex2) + weights.get(polyIndex3)) / 3.0
+        triWeights.data[i] = (weights.get(polyIndex1) + weights.get(polyIndex2) + weights.get(polyIndex3)) / weightMax / 3.0
 
     return polyAmount, triAreas, triWeights
 
@@ -58,7 +73,8 @@ cdef triangleArea(Vector3 v1, Vector3 v2, Vector3 v3):
     vc.z = vs1.x * vs2.y - vs1.y * vs2.x
     return sqrt(vc.x * vc.x + vc.y * vc.y + vc.z * vc.z) / 2.0
 
-cdef trianglesDistribution(Py_ssize_t polyAmount, FloatList triAreas, FloatList triWeights):
+cdef trianglesDistribution(Py_ssize_t polyAmount, FloatList triAreas, FloatList triWeights, bint useWeightForDensity,
+                           Py_ssize_t resolution):
     cdef double triAreaMin, triArea
     cdef Py_ssize_t i
     triAreaMin = triAreas.getMaxValue()
@@ -68,26 +84,41 @@ cdef trianglesDistribution(Py_ssize_t polyAmount, FloatList triAreas, FloatList 
 
     cdef LongList distribution = LongList()
     cdef Py_ssize_t j
+    if useWeightForDensity:
+        for i in range(polyAmount):
+            for j in range(int(triAreas.data[i] / triAreaMin)): distribution.append(i)
+        return distribution
+
     for i in range(polyAmount):
-        for j in range(int(triAreas.data[i] * triWeights.data[i] / triAreaMin)): distribution.append(i)
+        for j in range(int(triAreas.data[i] * triWeights.data[i] * resolution / triAreaMin)): distribution.append(i)
     return distribution
 
-cdef totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t polyAmount,
+cdef totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, FloatList triWeights,
+                            bint useWeightForDensity, Py_ssize_t seed, Py_ssize_t polyAmount,
                             Py_ssize_t pointAmount):
     cdef LongList totalTriPoints = LongList.fromValue(0, length = polyAmount)
     cdef Py_ssize_t i
     for i in range(pointAmount):
         totalTriPoints.data[distribution.data[int(randomDouble_Range(i + seed, 0, distLength))]] += 1
-    return totalTriPoints
+
+    cdef Py_ssize_t newPointAmount = pointAmount
+    cdef Py_ssize_t amount
+    if useWeightForDensity:
+        newPointAmount = 0
+        for i in range(polyAmount):
+            amount = int(totalTriPoints.data[i] * triWeights.data[i])
+            totalTriPoints.data[i] = amount
+            newPointAmount += amount
+    return totalTriPoints, newPointAmount
 
 cdef sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongList totalTriPoints,
-                        Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t polyAmount, Py_ssize_t pointAmount):
-    cdef DoubleList randomPoints = DoubleList(length = pointAmount)
+                        Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t polyAmount, Py_ssize_t newPointAmount):
+    cdef DoubleList randomPoints = DoubleList(length = newPointAmount)
     cdef Py_ssize_t i
-    for i in range(pointAmount):
+    for i in range(newPointAmount):
         randomPoints.data[i] = randomDouble_Range(i + seed, 0.0, 1.0)
 
-    cdef Vector3DList points = Vector3DList(length = pointAmount)
+    cdef Vector3DList points = Vector3DList(length = newPointAmount)
     cdef UIntegerList polyLengths = polygons.polyLengths
     cdef UIntegerList polyStarts = polygons.polyStarts
     cdef UIntegerList polyIndices = polygons.indices
@@ -102,7 +133,7 @@ cdef sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, Long
         v3 = vertices.data[polyIndices.data[start + 2]]
         for j in range(totalTriPoints.data[i]):
             p1 = randomPoints.data[index]
-            p2 = randomPoints.data[pointAmount - index - 1]
+            p2 = randomPoints.data[newPointAmount - index - 1]
             if p1 + p2 > 1.0:
                 p1 = 1.0 - p1
                 p2 = 1.0 - p2

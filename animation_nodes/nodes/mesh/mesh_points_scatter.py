@@ -10,8 +10,12 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshPointsScatterNode"
     bl_label = "Mesh Points Scatter"
 
-    methodType: BoolProperty(name = "Use Advanced Method For Mesh Sampling", default = False,
+    methodType: BoolProperty(name = "Use Advanced Method for Mesh sampling", default = False,
                              update = propertyChanged)
+
+    resolution: IntProperty(name = "Resolution", default = 1, min = 1, max = 10,
+                            description = "Refine the scattering of points with 'weights' when 'Use For Density' is disabled",
+                            update = propertyChanged)
 
     nodeSeed: IntProperty(update = propertyChanged)
 
@@ -23,6 +27,7 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Seed", "seed")
         self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
         self.newInput("Float List", "Weights", "weights", hide = True)
+        self.newInput("Boolean", "Use For Density", "useWeightForDensity", value = False, hide = True)
 
         self.newOutput("Vector List", "Points", "points")
 
@@ -31,9 +36,10 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         row.prop(self, "nodeSeed", text = "Node Seed")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "methodType", text = "Use advanced method for mesh sampling")
+        layout.prop(self, "resolution", text = "Resolution")
+        layout.prop(self, "methodType", text = "Use Advanced Method for Mesh sampling")
 
-    def execute(self, mesh, seed, amount, weights):
+    def execute(self, mesh, seed, amount, weights, useWeightForDensity):
         vertices = mesh.vertices
         polygons = mesh.polygons
 
@@ -44,9 +50,12 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
             if self.methodType: polygons = mesh.getTrianglePolygons(method = "EAR")
             else: polygons = mesh.getTrianglePolygons(method = "FAN")
 
+        resolution = self.resolution
+        if len(weights) == 0: resolution = 1
+
         weights = VirtualDoubleList.create(weights, 1)
         seed  = (seed * 674523 + self.nodeSeed * 3465284) % 0x7fffffff
-        return randomPointsScatter(vertices, polygons, weights, seed, amount)
+        return randomPointsScatter(vertices, polygons, weights, useWeightForDensity, seed, amount, resolution)
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
