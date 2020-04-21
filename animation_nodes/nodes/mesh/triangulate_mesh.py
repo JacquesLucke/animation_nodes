@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from ... data_structures import Mesh
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures.meshes.validate import checkMeshData
