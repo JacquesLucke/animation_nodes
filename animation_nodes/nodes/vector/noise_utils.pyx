@@ -1,0 +1,75 @@
+from mathutils import Vector, noise
+from ... data_structures cimport (DoubleList, Vector3DList)
+
+#Blender Fractal Functions:
+
+def blFractal(str noiseBasis, Vector3DList vectors, float fractalDimension, float lacunarity ,int octaves):
+    cdef Py_ssize_t i
+    cdef DoubleList values = DoubleList(length = len(vectors))
+    for i in range(len(vectors)):
+        v = vectors.data[i]
+        values.data[i] = noise.fractal(Vector((v.x, v.y, v.z)), fractalDimension, lacunarity, octaves, noise_basis=noiseBasis)
+    return values
+
+def blMultiFractal(str noiseBasis, Vector3DList vectors, float fractalDimension, float lacunarity ,int octaves):
+    cdef Py_ssize_t i
+    cdef DoubleList values = DoubleList(length = len(vectors))
+    for i in range(len(vectors)):
+        v = vectors.data[i]
+        values.data[i] = noise.multi_fractal(Vector((v.x, v.y, v.z)), fractalDimension, lacunarity, octaves, noise_basis=noiseBasis)
+    return values 
+
+def blHeteroTerrain(str noiseBasis, Vector3DList vectors, float fractalDimension, float lacunarity ,int octaves, float offset):
+    cdef Py_ssize_t i
+    cdef DoubleList values = DoubleList(length = len(vectors))
+    for i in range(len(vectors)):
+        v = vectors.data[i]
+        values.data[i] = noise.hetero_terrain(Vector((v.x, v.y, v.z)), fractalDimension, lacunarity, octaves, offset, noise_basis=noiseBasis)
+    return values  
+
+def blRigidMultiFractal(str noiseBasis, Vector3DList vectors, float fractalDimension, float lacunarity ,int octaves, float offset, float gain):
+    cdef Py_ssize_t i
+    cdef DoubleList values = DoubleList(length = len(vectors))
+    for i in range(len(vectors)):
+        v = vectors.data[i]
+        values.data[i] = noise.ridged_multi_fractal(Vector((v.x, v.y, v.z)), fractalDimension, lacunarity, octaves, offset, gain, noise_basis=noiseBasis)
+    return values
+
+def blHybridMultiFractal(str noiseBasis, Vector3DList vectors, float fractalDimension, float lacunarity ,int octaves, float offset, float gain):
+    cdef Py_ssize_t i
+    cdef DoubleList values = DoubleList(length = len(vectors))
+    for i in range(len(vectors)):
+        v = vectors.data[i]
+        values.data[i] = noise.hybrid_multi_fractal(Vector((v.x, v.y, v.z)), fractalDimension, lacunarity, octaves, offset, gain, noise_basis=noiseBasis)
+    return values  
+
+#Blender Variable Lacunarity Functions:
+
+def blVariableLacunarity(str noiseBasis, str noiseBasis2, Vector3DList vectors, float distortion):
+    cdef Py_ssize_t i
+    cdef DoubleList values = DoubleList(length = len(vectors))
+    for i in range(len(vectors)):
+        v = vectors.data[i]
+        values.data[i] = noise.variable_lacunarity(Vector((v.x, v.y, v.z)), distortion, noise_type1=noiseBasis, noise_type2=noiseBasis2)
+    return values
+
+#Blender Turbulence Functions:
+
+def blTurbulence(str noiseBasis, Vector3DList vectors, int seed, int octaves, bint hard, float amplitude, float frequency):
+    cdef Py_ssize_t i
+    cdef Vector3DList values = Vector3DList(length = len(vectors))
+    if seed != 0:
+        noise.seed_set(seed)
+    for i in range(len(vectors)):
+        v = vectors.data[i]
+        p = noise.turbulence_vector(Vector((v.x, v.y, v.z)), octaves, hard, noise_basis=noiseBasis, amplitude_scale=amplitude, frequency_scale=frequency)
+        values.data[i].x = p[0]
+        values.data[i].y = p[1]
+        values.data[i].z = p[2]
+    return values
+
+
+
+
+         
+
