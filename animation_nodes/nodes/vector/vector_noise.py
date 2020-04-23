@@ -7,8 +7,8 @@ from ... data_structures import DoubleList, Vector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 
 noiseSelectItems = [
-    ("FASTNOISE", "Fast Noise", "Use FastNoise SIMD", "", 0),
-    ("BLENDERNOISE", "Blender Noise", "Use builtin blender noises", "", 1)
+    ("FASTNOISE", "Fast Noise", "Use fast noises from SIMD", "", 0),
+    ("BLENDERNOISE", "Blender Noise", "Use builtin Blender noises", "", 1)
 ]
 
 blenderNoiseTypeItems = [
@@ -67,26 +67,26 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     bl_label = "Vector Noise"
     bl_width_default = 160
 
-    noiseSelect = EnumProperty(name = "Type ", default = "FASTNOISE",
+    noiseSelect = EnumProperty(name = "Type", default = "FASTNOISE",
         items = noiseSelectItems, update = AnimationNode.refresh)
 
-    blenderNoiseType = EnumProperty(name = "Type ", default = "NOISE",
+    blenderNoiseType = EnumProperty(name = "Type", default = "NOISE",
         description = "Blender noise type",
         items = blenderNoiseTypeItems, update = AnimationNode.refresh)
 
-    noiseMode = EnumProperty(name = "Mode ", default = "FRACTAL",
+    noiseMode = EnumProperty(name = "Mode", default = "FRACTAL",
         description = "Blender noise mode",
         items = noiseModeItems, update = AnimationNode.refresh)
 
-    noiseBasis = EnumProperty(name = "Basis ", default = "BLENDER",
+    noiseBasis = EnumProperty(name = "Basis", default = "BLENDER",
         description = "Noise basis type",
         items = noiseBasisModeItems, update = AnimationNode.refresh)
 
-    noiseBasis2 = EnumProperty(name = "Basis ", default = "PERLIN_ORIGINAL",
+    noiseBasis2 = EnumProperty(name = "Basis", default = "PERLIN_ORIGINAL",
         description = "Noise basis type",
         items = noiseBasisModeItems2, update = AnimationNode.refresh)
 
-    voronoiDistanceMetric = EnumProperty(name = "Mode ", default = "DISTANCE",
+    voronoiDistanceMetric = EnumProperty(name = "Mode", default = "DISTANCE",
         description = "Voronoi distance metric modes",
         items = voronoiDistanceMetricItems, update = AnimationNode.refresh)        
 
@@ -97,6 +97,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
             self.newInput("Vector List", "Vectors", "vectors")
             self.createNoiseInputs()
             self.newOutput("Float List", "Value", "value")
+
         elif self.noiseSelect == "BLENDERNOISE":
             if self.blenderNoiseType == "NOISE":
                 self.newInput(VectorizedSocket("Vector", "useVectorList",
@@ -104,14 +105,12 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
                 self.newInput("Float", "Fractal Dimension", "fractalDimension")
                 self.newInput("Float", "Lacunarity", "lacunarity")
                 self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 1)
-
                 if self.noiseMode == "HETERO_TERRAIN":
                     self.newInput("Float", "Offset", "offset")
                 if self.noiseMode in ["RIDGED_MULTI_FRACTAL", "HYBRID_MULTI_FRACTAL"]:
                     self.newInput("Float", "Offset", "offset")
                     self.newInput("Float", "Gain", "gain")
-
-                self.newOutput(VectorizedSocket("Float", ["useVectorList"],
+                self.newOutput(VectorizedSocket("Float", "useVectorList",
                     ("Value", "value"), ("Values", "values")))
 
             elif self.blenderNoiseType == "3DNOISE":
@@ -122,22 +121,19 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
                 self.newInput("Boolean", "Hard", "hard", value = 0)
                 self.newInput("Float", "Amplitude", "amplitude", value = 0.5)
                 self.newInput("Float", "Frequency", "frequency", value = 2.5)
-    
-                self.newOutput(VectorizedSocket("Vector", ["useVectorList"],
+                self.newOutput(VectorizedSocket("Vector", "useVectorList",
                     ("Value", "value"), ("Values", "values")))
 
             elif self.blenderNoiseType == "VARIABLELACUNARITY":
                 self.newInput(VectorizedSocket("Vector", "useVectorList",
                     ("Vector", "vector"), ("Vectors", "vectors")))    
                 self.newInput("Float", "Distortion", "distortion")
-
-                self.newOutput(VectorizedSocket("Float", ["useVectorList"],
+                self.newOutput(VectorizedSocket("Float", "useVectorList",
                     ("Value", "value"), ("Values", "values")))
 
             elif self.blenderNoiseType == "VORONOI":
                 self.newInput("Vector", "Vector", "vector")
                 self.newInput("Float", "Exponent", "exponent", value = 2.5)
-
                 self.newOutput("Float", "Distance 1","distance1")
                 self.newOutput("Float", "Distance 2","distance2")
                 self.newOutput("Float", "Distance 3","distance3")
@@ -191,87 +187,67 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
             elif self.blenderNoiseType == "VORONOI":
                 return "execute_Voronoi"    
 
-
-
     def execute_FastNoise(self, vectors, *settings):
         noise = self.calculateNoise(vectors, *settings)
         return DoubleList.fromValues(noise)
 
-    #Fractal Noise Methods:
-
-    def execute_Fractal(self, vectors, fractalDimension, lacunarity ,octaves):
+    # Fractal Noise Methods:
+    def execute_Fractal(self, vectors, fractalDimension, lacunarity, octaves):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
         noiseBasis = self.noiseBasis
-        values = blFractal(noiseBasis, vectors, fractalDimension, lacunarity ,octaves)
-        if not self.useVectorList:
-            return values[0]
-        else:
-            return values    
+        values = blFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves)
+        return self.valuesOut(values)    
 
-    def execute_MultiFractal(self, vectors, fractalDimension, lacunarity ,octaves):
+    def execute_MultiFractal(self, vectors, fractalDimension, lacunarity, octaves):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
         noiseBasis = self.noiseBasis
-        values = blMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity ,octaves)
-        if not self.useVectorList:
-            return values[0]
-        else:
-            return values
+        values = blMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves)
+        return self.valuesOut(values)
 
-    def execute_HeteroTerrain(self, vectors, fractalDimension, lacunarity ,octaves, offset):
+    def execute_HeteroTerrain(self, vectors, fractalDimension, lacunarity, octaves, offset):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
         noiseBasis = self.noiseBasis
-        values = blHeteroTerrain(noiseBasis, vectors, fractalDimension, lacunarity ,octaves, offset)
-        if not self.useVectorList:
-            return values[0]
-        else:
-            return values
+        values = blHeteroTerrain(noiseBasis, vectors, fractalDimension, lacunarity, octaves, offset)
+        return self.valuesOut(values)
 
-    def execute_RigidMultiFractal(self, vectors, fractalDimension, lacunarity ,octaves, offset, gain):
+    def execute_RigidMultiFractal(self, vectors, fractalDimension, lacunarity, octaves, offset, gain):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
         noiseBasis = self.noiseBasis
-        values = blRigidMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity ,octaves, offset, gain)
-        if not self.useVectorList:
-            return values[0]
-        else:
-            return values
+        values = blRigidMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves, offset, gain)
+        return self.valuesOut(values)
 
-    def execute_HybridMultiFractal(self, vectors, fractalDimension, lacunarity ,octaves, offset, gain):
+    def execute_HybridMultiFractal(self, vectors, fractalDimension, lacunarity, octaves, offset, gain):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)           
         noiseBasis = self.noiseBasis
-        values = blHybridMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity ,octaves, offset, gain)
-        if not self.useVectorList:
-            return values[0]
-        else:
-            return values 
+        values = blHybridMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves, offset, gain)
+        return self.valuesOut(values) 
 
-    #3D Noise Methods:
-
+    # 3D Noise Methods:
     def execute_3dNoise(self, vectors, seed, octaves, hard, amplitude, frequency):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors) 
+        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
+        seed = max(seed, 1) 
         noiseBasis = self.noiseBasis
         values = blTurbulence(noiseBasis, vectors, seed, octaves, hard, amplitude, frequency)
-        if not self.useVectorList:
-            return values[0]
-        else:
-            return values
+        return self.valuesOut(values)
 
-    #Variable Lacunarity Methods:
-
+    # Variable Lacunarity Methods:
     def execute_VariableLacunarity(self, vectors, distortion):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
         noiseBasis = self.noiseBasis
         noiseBasis2 = self.noiseBasis2
         values = blVariableLacunarity(noiseBasis, noiseBasis2, vectors, distortion)
-        if not self.useVectorList:
-            return values[0]
-        else:
-            return values 
+        return self.valuesOut(values) 
 
-    #Voronoi Methods:
-
-    def execute_Voronoi(self,vector, exponent):
+    # Voronoi Methods:
+    def execute_Voronoi(self, vector, exponent):
         voronoiDistanceMetric = self.voronoiDistanceMetric
         out = noise.voronoi(vector, distance_metric=voronoiDistanceMetric, exponent=exponent)
         distances = out[0]
         points = out[1]
-        return distances[0],distances[1],distances[2],distances[3],points[0],points[1],points[2],points[3]                         
+        return distances[0],distances[1],distances[2],distances[3],points[0],points[1],points[2],points[3]
+
+    def valuesOut(self, values):
+        if not self.useVectorList:
+            return values[0]
+        else:
+            return values                             
