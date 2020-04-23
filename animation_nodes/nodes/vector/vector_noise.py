@@ -88,9 +88,9 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
 
     voronoiDistanceMetric = EnumProperty(name = "Mode", default = "DISTANCE",
         description = "Voronoi distance metric modes",
-        items = voronoiDistanceMetricItems, update = AnimationNode.refresh)        
+        items = voronoiDistanceMetricItems, update = AnimationNode.refresh)
 
-    useVectorList: VectorizedSocket.newProperty()                
+    useVectorList: VectorizedSocket.newProperty()
 
     def create(self):
         if self.noiseSelect == "FASTNOISE":
@@ -101,7 +101,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
         elif self.noiseSelect == "BLENDERNOISE":
             if self.blenderNoiseType == "NOISE":
                 self.newInput(VectorizedSocket("Vector", "useVectorList",
-                    ("Vector", "vector"), ("Vectors", "vectors"))) 
+                    ("Vector", "vector"), ("Vectors", "vectors")))
                 self.newInput("Float", "Fractal Dimension", "fractalDimension")
                 self.newInput("Float", "Lacunarity", "lacunarity")
                 self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 1)
@@ -116,7 +116,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
             elif self.blenderNoiseType == "3DNOISE":
                 self.newInput(VectorizedSocket("Vector", "useVectorList",
                     ("Vector", "vector"), ("Vectors", "vectors")))
-                self.newInput("Integer", "Seed", "seed")    
+                self.newInput("Integer", "Seed", "seed")
                 self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 1)
                 self.newInput("Boolean", "Hard", "hard", value = 0)
                 self.newInput("Float", "Amplitude", "amplitude", value = 0.5)
@@ -126,7 +126,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
 
             elif self.blenderNoiseType == "VARIABLELACUNARITY":
                 self.newInput(VectorizedSocket("Vector", "useVectorList",
-                    ("Vector", "vector"), ("Vectors", "vectors")))    
+                    ("Vector", "vector"), ("Vectors", "vectors")))
                 self.newInput("Float", "Distortion", "distortion")
                 self.newOutput(VectorizedSocket("Float", "useVectorList",
                     ("Value", "value"), ("Values", "values")))
@@ -141,10 +141,10 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
                 self.newOutput("Vector", "Point 1","point1")
                 self.newOutput("Vector", "Point 2","point2")
                 self.newOutput("Vector", "Point 3","point3")
-                self.newOutput("Vector", "Point 4","point4")        
+                self.newOutput("Vector", "Point 4","point4")
 
     def draw(self, layout):
-        layout.prop(self, "noiseSelect")
+        layout.prop(self, "noiseSelect", text = "")
         if self.noiseSelect == "FASTNOISE":
             self.drawNoiseSettings(layout)
         else:
@@ -157,7 +157,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
                 layout.prop(self, "noiseBasis", text = "")
                 layout.prop(self, "noiseBasis2", text = "")
             elif self.blenderNoiseType == "VORONOI":
-                layout.prop(self, "voronoiDistanceMetric", text = "")    
+                layout.prop(self, "voronoiDistanceMetric", text = "")
 
     def drawAdvanced(self, layout):
         if self.noiseSelect == "FASTNOISE":
@@ -185,7 +185,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
             elif self.blenderNoiseType == "VARIABLELACUNARITY":
                 return "execute_VariableLacunarity"
             elif self.blenderNoiseType == "VORONOI":
-                return "execute_Voronoi"    
+                return "execute_Voronoi"
 
     def execute_FastNoise(self, vectors, *settings):
         noise = self.calculateNoise(vectors, *settings)
@@ -196,7 +196,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
         noiseBasis = self.noiseBasis
         values = blFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves)
-        return self.valuesOut(values)    
+        return self.valuesOut(values)
 
     def execute_MultiFractal(self, vectors, fractalDimension, lacunarity, octaves):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
@@ -217,15 +217,15 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
         return self.valuesOut(values)
 
     def execute_HybridMultiFractal(self, vectors, fractalDimension, lacunarity, octaves, offset, gain):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)           
+        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
         noiseBasis = self.noiseBasis
         values = blHybridMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves, offset, gain)
-        return self.valuesOut(values) 
+        return self.valuesOut(values)
 
     # 3D Noise Methods:
     def execute_3dNoise(self, vectors, seed, octaves, hard, amplitude, frequency):
         if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
-        seed = max(seed, 1) 
+        seed = max(seed, 1)
         noiseBasis = self.noiseBasis
         values = blTurbulence(noiseBasis, vectors, seed, octaves, hard, amplitude, frequency)
         return self.valuesOut(values)
@@ -236,7 +236,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
         noiseBasis = self.noiseBasis
         noiseBasis2 = self.noiseBasis2
         values = blVariableLacunarity(noiseBasis, noiseBasis2, vectors, distortion)
-        return self.valuesOut(values) 
+        return self.valuesOut(values)
 
     # Voronoi Methods:
     def execute_Voronoi(self, vector, exponent):
@@ -250,4 +250,4 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
         if not self.useVectorList:
             return values[0]
         else:
-            return values                             
+            return values
