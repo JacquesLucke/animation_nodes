@@ -1,4 +1,3 @@
-import numpy
 import cython
 from libc.stdlib cimport qsort
 from libc.math cimport sin, cos, pi
@@ -121,7 +120,8 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
 
                 break
 
-            sortAngles = LongList.fromNumpyArray(numpy.sort(angles.asMemoryView()).astype(int))
+            sortAngles = angles.copy()
+            qsort(sortAngles.data, sortAngles.length, sizeof(long), &compare)
 
             # Removing an ear which has smallest inner-angle
             for k in range(polyLength):
@@ -319,3 +319,6 @@ cdef projectPolygonVertices(Vector3DList vertices, LongList polygonIndices):
         rotPolyVertices.data[i].z = 0.0
 
     return rotPolyVertices
+
+cdef int compare(const void * a, const void * b) nogil:
+   return (<int*>a)[0] - (<int*>b)[0]
