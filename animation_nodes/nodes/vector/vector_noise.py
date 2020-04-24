@@ -1,29 +1,47 @@
 import bpy
 from bpy.props import *
-from . noise_utils import *
 from mathutils import noise
+from ... data_structures import DoubleList
 from ... libs.FastNoiseSIMD import Noise3DNodeBase
-from ... data_structures import DoubleList, Vector3DList
 from ... base_types import AnimationNode, VectorizedSocket
+from . noise_utils import (
+    blNoise,
+    blTurbulence,
+    blFractal,
+    blMultiFractal,
+    blHeteroTerrain,
+    blRigidMultiFractal,
+    blHybridMultiFractal,
+    blVariableLacunarity,
+    blNoiseVector,
+    blTurbulenceVector
+)
 
 noiseSelectItems = [
-    ("FASTNOISE", "Fast Noise", "Use fast noises from SIMD", "", 0),
-    ("BLENDERNOISE", "Blender Noise", "Use builtin Blender noises", "", 1)
+    ("FASTNOISE", "Fast Noises", "Use fast noises from SIMD", "", 0),
+    ("BLENDERNOISE", "Blender Noises", "Use builtin Blender noises", "", 1)
 ]
 
 blenderNoiseTypeItems = [
     ("NOISE", "Noise", "Blender Fractal Noise", "", 0),
     ("3DNOISE", "3D Noise", "Blender Vector Turbulence Noise", "", 1),
-    ("VARIABLELACUNARITY", "Variable Lacunarity", "Blender Variable Lacunarity", "", 2),
+    ("VARIABLELACUNARITY", "Variable Lacunarity", "Blender Variable Lacunarity Noise", "", 2),
     ("VORONOI", "Voronoi", "Blender Voronoi Noise", "", 3)
 ]
 
 noiseModeItems = [
-    ("FRACTAL", "Fractal", "", "", 0),
-    ("MULTI_FRACTAL", "Multi Fractal", "", "", 1),
-    ("HETERO_TERRAIN", "Hetero Terrain", "", "", 2),
-    ("RIDGED_MULTI_FRACTAL", "Ridged Multi Fractal", "", "", 3),
-    ("HYBRID_MULTI_FRACTAL", "Hybrid Multi Fractal", "", "", 4)
+    ("NOISE", "Noise", "", "", 0),
+    ("TURBULENCE", "Turbulence", "", "", 1),
+    ("FRACTAL", "Fractal", "", "", 2),
+    ("MULTI_FRACTAL", "Multi Fractal", "", "", 3),
+    ("HETERO_TERRAIN", "Hetero Terrain", "", "", 4),
+    ("RIDGED_MULTI_FRACTAL", "Ridged Multi Fractal", "", "", 5),
+    ("HYBRID_MULTI_FRACTAL", "Hybrid Multi Fractal", "", "", 6)
+]
+
+noiseVectorModeItems = [
+    ("NOISE", "Noise", "", "", 0),
+    ("TURBULENCE", "Turbulence", "", "", 1)
 ]
 
 noiseBasisModeItems = [
@@ -67,73 +85,98 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     bl_label = "Vector Noise"
     bl_width_default = 160
 
-    noiseSelect = EnumProperty(name = "Type", default = "FASTNOISE",
+    noiseSelect: EnumProperty(name = "Type", default = "FASTNOISE",
         items = noiseSelectItems, update = AnimationNode.refresh)
 
-    blenderNoiseType = EnumProperty(name = "Type", default = "NOISE",
+    blenderNoiseType: EnumProperty(name = "Type", default = "NOISE",
         description = "Blender noise type",
         items = blenderNoiseTypeItems, update = AnimationNode.refresh)
 
-    noiseMode = EnumProperty(name = "Mode", default = "FRACTAL",
+    noiseMode: EnumProperty(name = "Mode", default = "NOISE",
         description = "Blender noise mode",
         items = noiseModeItems, update = AnimationNode.refresh)
 
-    noiseBasis = EnumProperty(name = "Basis", default = "BLENDER",
+    noiseVectorMode: EnumProperty(name = "Mode", default = "NOISE",
+        description = "Blender 3d noise mode",
+        items = noiseVectorModeItems, update = AnimationNode.refresh)
+
+    noiseBasis: EnumProperty(name = "Basis", default = "PERLIN_ORIGINAL",
         description = "Noise basis type",
         items = noiseBasisModeItems, update = AnimationNode.refresh)
 
-    noiseBasis2 = EnumProperty(name = "Basis", default = "PERLIN_ORIGINAL",
+    noiseBasis2: EnumProperty(name = "Basis", default = "BLENDER",
         description = "Noise basis type",
         items = noiseBasisModeItems2, update = AnimationNode.refresh)
 
-    voronoiDistanceMetric = EnumProperty(name = "Mode", default = "DISTANCE",
+    voronoiDistanceMetric: EnumProperty(name = "Mode", default = "DISTANCE",
         description = "Voronoi distance metric modes",
         items = voronoiDistanceMetricItems, update = AnimationNode.refresh)
 
-    useVectorList: VectorizedSocket.newProperty()
+    normalization: BoolProperty(name = "Normalized Noise Output", default = True,
+        update = AnimationNode.refresh)
 
     def create(self):
         if self.noiseSelect == "FASTNOISE":
             self.newInput("Vector List", "Vectors", "vectors")
             self.createNoiseInputs()
-            self.newOutput("Float List", "Value", "value")
+
+            self.newOutput("Float List", "Values", "values")
 
         elif self.noiseSelect == "BLENDERNOISE":
             if self.blenderNoiseType == "NOISE":
-                self.newInput(VectorizedSocket("Vector", "useVectorList",
-                    ("Vector", "vector"), ("Vectors", "vectors")))
-                self.newInput("Float", "Fractal Dimension", "fractalDimension")
-                self.newInput("Float", "Lacunarity", "lacunarity")
-                self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 1)
-                if self.noiseMode == "HETERO_TERRAIN":
-                    self.newInput("Float", "Offset", "offset")
-                if self.noiseMode in ["RIDGED_MULTI_FRACTAL", "HYBRID_MULTI_FRACTAL"]:
-                    self.newInput("Float", "Offset", "offset")
-                    self.newInput("Float", "Gain", "gain")
-                self.newOutput(VectorizedSocket("Float", "useVectorList",
-                    ("Value", "value"), ("Values", "values")))
+                self.newInput("Vector List", "Vectors", "vectors")
+                self.newInput("Integer", "Seed", "seed")
+                self.newInput("Float", "Amplitude", "amplitude", value = 0.1)
+                self.newInput("Float", "Frequency", "frequency", value = 1.0)
+                self.newInput("Vector", "Axis Scale", "axisScale", value = (1, 1, 1), hide = True)
+                self.newInput("Vector", "Offset", "offset")
+                if self.noiseMode not in ["NOISE", "TURBULENCE"]:
+                    self.newInput("Integer", "Octaves", "octaves", value = 3, minValue = 1)
+                    self.newInput("Float", "H Factor", "hFactor", hide = True)
+                    self.newInput("Float", "Lacunarity", "lacunarity", value = 0.1, hide = True)
+                    if self.noiseMode == "HETERO_TERRAIN":
+                        self.newInput("Float", "Noise Offset", "noiseOffset", hide = True)
+                    if self.noiseMode in ["RIDGED_MULTI_FRACTAL", "HYBRID_MULTI_FRACTAL"]:
+                        self.newInput("Float", "Noise Offset", "noiseOffset", hide = True)
+                        self.newInput("Float", "Noise Gain", "noiseGain", hide = True)
+                if self.noiseMode == "TURBULENCE":
+                    self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 1)
+                    self.newInput("Boolean", "Hard", "hard", value = False, hide = True)
+                    self.newInput("Float", "Scale", "noiseAmplitude", value = 0.5, hide = True)
+                    self.newInput("Float", "Detail", "noiseFrequency", value = 2.5, hide = True)
+
+                self.newOutput("Float List", "Values", "values")
 
             elif self.blenderNoiseType == "3DNOISE":
-                self.newInput(VectorizedSocket("Vector", "useVectorList",
-                    ("Vector", "vector"), ("Vectors", "vectors")))
+                self.newInput("Vector List", "Vectors", "vectors")
                 self.newInput("Integer", "Seed", "seed")
-                self.newInput("Integer", "Octaves", "octaves", value = 2, minValue = 1)
-                self.newInput("Boolean", "Hard", "hard", value = 0)
-                self.newInput("Float", "Amplitude", "amplitude", value = 0.5)
-                self.newInput("Float", "Frequency", "frequency", value = 2.5)
-                self.newOutput(VectorizedSocket("Vector", "useVectorList",
-                    ("Value", "value"), ("Values", "values")))
+                self.newInput("Float", "Amplitude", "amplitude", value = 0.1)
+                self.newInput("Float", "Frequency", "frequency", value = 1.0)
+                self.newInput("Vector", "Axis Scale", "axisScale", value = (1, 1, 1), hide = True)
+                self.newInput("Vector", "Offset", "offset")
+                if self.noiseVectorMode == "TURBULENCE":
+                    self.newInput("Integer", "Octaves", "octaves", value = 3, minValue = 1)
+                    self.newInput("Boolean", "Hard", "hard", value = False, hide = True)
+                    self.newInput("Float", "Scale", "noiseAmplitude", value = 0.5, hide = True)
+                    self.newInput("Float", "Detail", "noiseFrequency", value = 2.5, hide = True)
+
+                self.newOutput("Vector List", "Values", "values")
 
             elif self.blenderNoiseType == "VARIABLELACUNARITY":
-                self.newInput(VectorizedSocket("Vector", "useVectorList",
-                    ("Vector", "vector"), ("Vectors", "vectors")))
-                self.newInput("Float", "Distortion", "distortion")
-                self.newOutput(VectorizedSocket("Float", "useVectorList",
-                    ("Value", "value"), ("Values", "values")))
+                self.newInput("Vector List", "Vectors", "vectors")
+                self.newInput("Integer", "Seed", "seed")
+                self.newInput("Float", "Amplitude", "amplitude", value = 0.1)
+                self.newInput("Float", "Frequency", "frequency", value = 1.0)
+                self.newInput("Vector", "Axis Scale", "axisScale", value = (1, 1, 1), hide = True)
+                self.newInput("Vector", "Offset", "offset")
+                self.newInput("Float", "Distortion", "distortion", value = 0.2)
+
+                self.newOutput("Float List", "Values", "values")
 
             elif self.blenderNoiseType == "VORONOI":
                 self.newInput("Vector", "Vector", "vector")
                 self.newInput("Float", "Exponent", "exponent", value = 2.5)
+
                 self.newOutput("Float", "Distance 1","distance1")
                 self.newOutput("Float", "Distance 2","distance2")
                 self.newOutput("Float", "Distance 3","distance3")
@@ -152,6 +195,7 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
                 layout.prop(self, "noiseMode", text = "")
                 layout.prop(self, "noiseBasis", text = "")
             elif self.blenderNoiseType == "3DNOISE":
+                layout.prop(self, "noiseVectorMode", text = "")
                 layout.prop(self, "noiseBasis", text = "")
             elif self.blenderNoiseType == "VARIABLELACUNARITY":
                 layout.prop(self, "noiseBasis", text = "")
@@ -164,13 +208,44 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
             self.drawAdvancedNoiseSettings(layout)
         else:
             layout.prop(self, "blenderNoiseType")
+            layout.prop(self, "normalization")
+
+            if self.blenderNoiseType == "NOISE" and self.noiseMode != "NOISE":
+                box = layout.box()
+                col = box.column(align = True)
+                col.label(text = "Info", icon = "INFO")
+                if self.noiseMode == "TURBULENCE":
+                    col.label(text = "Hard - ON Sharp transitions, OFF Smooth transitions.")
+                    col.label(text = "Scale - Amplitude of details.")
+                    col.label(text = "Detail - Frequency of details.")
+                else:
+                    col.label(text = "Lacunarity - The gap between successive frequencies.")
+                    if self.noiseMode in ["FRACTAL", "MULTI_FRACTAL"]:
+                        col.label(text = "'H' Factor - The fractal increment factor.")
+                    if self.noiseMode in ["HETERO_TERRAIN", "RIDGED_MULTI_FRACTAL", "HYBRID_MULTI_FRACTAL"]:
+                        col.label(text = "'H' Factor - The fractal dimension of the roughest areas.")
+                        col.label(text = "Noise 'Offset' - The height of the terrain above 'sea level'.")
+                    if self.noiseMode in ["RIDGED_MULTI_FRACTAL", "HYBRID_MULTI_FRACTAL"]:
+                        col.label(text = "Noise 'Gain' - Scaling applied to the values.")
+
+            if self.noiseVectorMode == "TURBULENCE":
+                box = layout.box()
+                col = box.column(align = True)
+                col.label(text = "Info", icon = "INFO")
+                col.label(text = "Hard - ON: sharp transitions, OFF: smooth transitions.")
+                col.label(text = "Scale - Amplitude of details.")
+                col.label(text = "Detail - Frequency of details.")
 
     def getExecutionFunctionName(self):
         if self.noiseSelect == "FASTNOISE":
             return "execute_FastNoise"
         else:
             if self.blenderNoiseType == "NOISE":
-                if self.noiseMode == "FRACTAL":
+                if self.noiseMode == "NOISE":
+                    return "execute_Noise"
+                elif self.noiseMode == "TURBULENCE":
+                    return "execute_Turbulence"
+                elif self.noiseMode == "FRACTAL":
                     return "execute_Fractal"
                 elif self.noiseMode == "MULTI_FRACTAL":
                     return "execute_MultiFractal"
@@ -180,10 +255,16 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
                     return "execute_RigidMultiFractal"
                 elif self.noiseMode == "HYBRID_MULTI_FRACTAL":
                     return "execute_HybridMultiFractal"
+
             elif self.blenderNoiseType == "3DNOISE":
-                return "execute_3dNoise"
+                if self.noiseVectorMode == "NOISE":
+                    return "execute_NoiseVector"
+                elif self.noiseVectorMode == "TURBULENCE":
+                    return "execute_TurbulenceVector"
+
             elif self.blenderNoiseType == "VARIABLELACUNARITY":
                 return "execute_VariableLacunarity"
+
             elif self.blenderNoiseType == "VORONOI":
                 return "execute_Voronoi"
 
@@ -191,63 +272,57 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
         noise = self.calculateNoise(vectors, *settings)
         return DoubleList.fromValues(noise)
 
+    def execute_Noise(self, vectors, seed, amplitude, frequency, axisScale, offset):
+        return blNoise(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, self.normalization)
+
+    def execute_Turbulence(self, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hard, noiseAmplitude, noiseFrequency):
+        return blTurbulence(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hard, noiseAmplitude,
+                            noiseFrequency, self.normalization)
+
     # Fractal Noise Methods:
-    def execute_Fractal(self, vectors, fractalDimension, lacunarity, octaves):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
-        noiseBasis = self.noiseBasis
-        values = blFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves)
-        return self.valuesOut(values)
+    def execute_Fractal(self, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hFactor,
+                        lacunarity):
+        return blFractal(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, hFactor,
+                         lacunarity, octaves, self.normalization)
 
-    def execute_MultiFractal(self, vectors, fractalDimension, lacunarity, octaves):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
-        noiseBasis = self.noiseBasis
-        values = blMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves)
-        return self.valuesOut(values)
+    def execute_MultiFractal(self, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hFactor,
+                             lacunarity):
+        return blMultiFractal(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, hFactor,
+                              lacunarity, octaves, self.normalization)
 
-    def execute_HeteroTerrain(self, vectors, fractalDimension, lacunarity, octaves, offset):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
-        noiseBasis = self.noiseBasis
-        values = blHeteroTerrain(noiseBasis, vectors, fractalDimension, lacunarity, octaves, offset)
-        return self.valuesOut(values)
+    def execute_HeteroTerrain(self, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hFactor,
+                              lacunarity, noiseOffset):
+        return blHeteroTerrain(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, hFactor,
+                               lacunarity, octaves, noiseOffset, self.normalization)
 
-    def execute_RigidMultiFractal(self, vectors, fractalDimension, lacunarity, octaves, offset, gain):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
-        noiseBasis = self.noiseBasis
-        values = blRigidMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves, offset, gain)
-        return self.valuesOut(values)
+    def execute_RigidMultiFractal(self, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hFactor,
+                                  lacunarity, noiseOffset, noiseGain):
+        return blRigidMultiFractal(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, hFactor,
+                                   lacunarity, octaves, noiseOffset, noiseGain, self.normalization)
 
-    def execute_HybridMultiFractal(self, vectors, fractalDimension, lacunarity, octaves, offset, gain):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
-        noiseBasis = self.noiseBasis
-        values = blHybridMultiFractal(noiseBasis, vectors, fractalDimension, lacunarity, octaves, offset, gain)
-        return self.valuesOut(values)
+    def execute_HybridMultiFractal(self, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hFactor,
+                                   lacunarity, noiseOffset, noiseGain):
+        return blHybridMultiFractal(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, hFactor,
+                                    lacunarity, octaves, noiseOffset, noiseGain, self.normalization)
 
     # 3D Noise Methods:
-    def execute_3dNoise(self, vectors, seed, octaves, hard, amplitude, frequency):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
-        seed = max(seed, 1)
-        noiseBasis = self.noiseBasis
-        values = blTurbulence(noiseBasis, vectors, seed, octaves, hard, amplitude, frequency)
-        return self.valuesOut(values)
+    def execute_NoiseVector(self, vectors, seed, amplitude, frequency, axisScale, offset):
+        return blNoiseVector(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, self.normalization)
+
+    def execute_TurbulenceVector(self, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hard, noiseAmplitude, noiseFrequency):
+        return blTurbulenceVector(self.noiseBasis, vectors, seed, amplitude, frequency, axisScale, offset, octaves, hard, noiseAmplitude,
+                            noiseFrequency, self.normalization)
 
     # Variable Lacunarity Methods:
-    def execute_VariableLacunarity(self, vectors, distortion):
-        if not self.useVectorList: vectors = Vector3DList.fromValue(vectors)
-        noiseBasis = self.noiseBasis
-        noiseBasis2 = self.noiseBasis2
-        values = blVariableLacunarity(noiseBasis, noiseBasis2, vectors, distortion)
-        return self.valuesOut(values)
+    def execute_VariableLacunarity(self, vectors, seed, amplitude, frequency, axisScale, offset, distortion):
+        return blVariableLacunarity(self.noiseBasis, self.noiseBasis2, vectors, seed, amplitude, frequency, axisScale, offset,
+                                    distortion, self.normalization)
 
     # Voronoi Methods:
     def execute_Voronoi(self, vector, exponent):
         voronoiDistanceMetric = self.voronoiDistanceMetric
-        out = noise.voronoi(vector, distance_metric=voronoiDistanceMetric, exponent=exponent)
-        distances = out[0]
-        points = out[1]
-        return distances[0],distances[1],distances[2],distances[3],points[0],points[1],points[2],points[3]
-
-    def valuesOut(self, values):
-        if not self.useVectorList:
-            return values[0]
-        else:
-            return values
+        output = noise.voronoi(vector, distance_metric = voronoiDistanceMetric, exponent = exponent)
+        distances = output[0]
+        points = output[1]
+        return (distances[0], distances[1], distances[2], distances[3], points[0], points[1], points[2],
+                points[3])
