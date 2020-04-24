@@ -25,8 +25,7 @@ noiseSelectItems = [
 blenderNoiseTypeItems = [
     ("NOISE", "Noise", "Blender Fractal Noise", "", 0),
     ("3DNOISE", "3D Noise", "Blender Vector Turbulence Noise", "", 1),
-    ("VARIABLELACUNARITY", "Variable Lacunarity", "Blender Variable Lacunarity Noise", "", 2),
-    ("VORONOI", "Voronoi", "Blender Voronoi Noise", "", 3)
+    ("VARIABLELACUNARITY", "Mix Noise", "Blender Variable Lacunarity Noise", "", 2),
 ]
 
 noiseModeItems = [
@@ -70,16 +69,6 @@ noiseBasisModeItems2 = [
     ("CELLNOISE", "Cell Noise", "", "", 9)
 ]
 
-voronoiDistanceMetricItems = [
-    ("DISTANCE", "Distance", "", "", 0),
-    ("DISTANCE_SQUARED", "Distance Squared", "", "", 1),
-    ("MANHATTAN", "Manhattan", "", "", 2),
-    ("CHEBYCHEV", "Chebychev", "", "", 3),
-    ("MINKOVSKY", "Minkovsky", "", "", 4),
-    ("MINKOVSKY_HALF", "Minkovsky Half", "", "", 5),
-    ("MINKOVSKY_FOUR", "Minkovsky Four", "", "", 6)
-]
-
 class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     bl_idname = "an_VectorNoiseNode"
     bl_label = "Vector Noise"
@@ -107,10 +96,6 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     noiseBasis2: EnumProperty(name = "Basis", default = "BLENDER",
         description = "Noise basis type",
         items = noiseBasisModeItems2, update = AnimationNode.refresh)
-
-    voronoiDistanceMetric: EnumProperty(name = "Mode", default = "DISTANCE",
-        description = "Voronoi distance metric modes",
-        items = voronoiDistanceMetricItems, update = AnimationNode.refresh)
 
     normalization: BoolProperty(name = "Normalized Noise Output", default = True,
         update = AnimationNode.refresh)
@@ -173,19 +158,6 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
 
                 self.newOutput("Float List", "Values", "values")
 
-            elif self.blenderNoiseType == "VORONOI":
-                self.newInput("Vector", "Vector", "vector")
-                self.newInput("Float", "Exponent", "exponent", value = 2.5)
-
-                self.newOutput("Float", "Distance 1","distance1")
-                self.newOutput("Float", "Distance 2","distance2")
-                self.newOutput("Float", "Distance 3","distance3")
-                self.newOutput("Float", "Distance 4","distance4")
-                self.newOutput("Vector", "Point 1","point1")
-                self.newOutput("Vector", "Point 2","point2")
-                self.newOutput("Vector", "Point 3","point3")
-                self.newOutput("Vector", "Point 4","point4")
-
     def draw(self, layout):
         layout.prop(self, "noiseSelect", text = "")
         if self.noiseSelect == "FASTNOISE":
@@ -200,8 +172,6 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
             elif self.blenderNoiseType == "VARIABLELACUNARITY":
                 layout.prop(self, "noiseBasis", text = "")
                 layout.prop(self, "noiseBasis2", text = "")
-            elif self.blenderNoiseType == "VORONOI":
-                layout.prop(self, "voronoiDistanceMetric", text = "")
 
     def drawAdvanced(self, layout):
         if self.noiseSelect == "FASTNOISE":
@@ -265,9 +235,6 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
             elif self.blenderNoiseType == "VARIABLELACUNARITY":
                 return "execute_VariableLacunarity"
 
-            elif self.blenderNoiseType == "VORONOI":
-                return "execute_Voronoi"
-
     def execute_FastNoise(self, vectors, *settings):
         noise = self.calculateNoise(vectors, *settings)
         return DoubleList.fromValues(noise)
@@ -317,12 +284,4 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     def execute_VariableLacunarity(self, vectors, seed, amplitude, frequency, axisScale, offset, distortion):
         return blVariableLacunarity(self.noiseBasis, self.noiseBasis2, vectors, seed, amplitude, frequency, axisScale, offset,
                                     distortion, self.normalization)
-
-    # Voronoi Methods:
-    def execute_Voronoi(self, vector, exponent):
-        voronoiDistanceMetric = self.voronoiDistanceMetric
-        output = noise.voronoi(vector, distance_metric = voronoiDistanceMetric, exponent = exponent)
-        distances = output[0]
-        points = output[1]
-        return (distances[0], distances[1], distances[2], distances[3], points[0], points[1], points[2],
-                points[3])
+                                    

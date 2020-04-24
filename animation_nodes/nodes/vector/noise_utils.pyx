@@ -15,7 +15,7 @@ def blNoise(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float amplitu
     cdef Vector3 v
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         value = noise.noise(Vector((v.x, v.y, v.z)), noise_basis = noiseBasis)
         values.data[i] = amplitude * value
     if normalization:
@@ -32,7 +32,7 @@ def blTurbulence(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float am
     cdef Vector3 v
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         value = noise.turbulence(Vector((v.x, v.y, v.z)), octaves, hard, noise_basis = noiseBasis,
                                  amplitude_scale = noiseAmplitude, frequency_scale = noiseFrequency)
         values.data[i] = amplitude * value
@@ -51,7 +51,7 @@ def blFractal(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float ampli
     cdef Vector3 v
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         value = noise.fractal(Vector((v.x, v.y, v.z)), hFactor,
                               lacunarity, octaves, noise_basis = noiseBasis)
         values.data[i] = amplitude * value
@@ -69,7 +69,7 @@ def blMultiFractal(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float 
     cdef Vector3 v
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         value = noise.multi_fractal(Vector((v.x, v.y, v.z)), hFactor,
                                     lacunarity, octaves, noise_basis = noiseBasis)
         values.data[i] = amplitude * value
@@ -88,7 +88,7 @@ def blHeteroTerrain(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float
     cdef Vector3 v
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         value = noise.hetero_terrain(Vector((v.x, v.y, v.z)), hFactor,
                                      lacunarity, octaves, noiseOffset, noise_basis = noiseBasis)
         values.data[i] = amplitude * value
@@ -107,7 +107,7 @@ def blRigidMultiFractal(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, f
     cdef Vector3 v
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         value = noise.ridged_multi_fractal(Vector((v.x, v.y, v.z)), hFactor, lacunarity,
                                            octaves, noiseOffset, gain, noise_basis = noiseBasis)
         values.data[i] = amplitude * value
@@ -126,7 +126,7 @@ def blHybridMultiFractal(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, 
     cdef Vector3 v
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         value = noise.hybrid_multi_fractal(Vector((v.x, v.y, v.z)), hFactor, lacunarity,
                                            octaves, noiseOffset, gain, noise_basis = noiseBasis)
         values.data[i] = amplitude * value
@@ -145,7 +145,7 @@ def blVariableLacunarity(str noiseBasis, str noiseBasis2, Vector3DList vectors, 
     cdef Vector3 v
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         value = noise.variable_lacunarity(Vector((v.x, v.y, v.z)), distortion, noise_type1 = noiseBasis,
                                           noise_type2 = noiseBasis2)
         values.data[i] = amplitude * value
@@ -163,7 +163,7 @@ def blNoiseVector(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float a
     cdef Vector3 v, p
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         p = toVector3(noise.noise_vector(Vector((v.x, v.y, v.z)), noise_basis = noiseBasis))
         scaleVec3_Inplace(&p, amplitude)
         values.data[i] = p
@@ -180,7 +180,7 @@ def blTurbulenceVector(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, fl
     cdef Vector3 v, p
     cdef Py_ssize_t i
     for i in range(amount):
-        v = vecOffset(vectors.data[i], newAxisScale, newOffset, frequency)
+        v = vectorOffset(vectors.data[i], newAxisScale, newOffset, frequency)
         p = toVector3(noise.turbulence_vector(Vector((v.x, v.y, v.z)), octaves, hard, noise_basis = noiseBasis,
                                               amplitude_scale = noiseAmplitude, frequency_scale = noiseFrequency))
         scaleVec3_Inplace(&p, amplitude)
@@ -189,7 +189,7 @@ def blTurbulenceVector(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, fl
         return normalizedVectors(values)
     return values
 
-cdef Vector3 vecOffset(Vector3 vector, Vector3 axisScale, Vector3 offset, float frequency):
+cdef vectorOffset(Vector3 vector, Vector3 axisScale, Vector3 offset, float frequency):
     scaleVec3_Inplace(&axisScale, frequency)
 
     vector.x *= axisScale.x
@@ -202,7 +202,7 @@ cdef Vector3 vecOffset(Vector3 vector, Vector3 axisScale, Vector3 offset, float 
     return vector
 
 @cython.cdivision(True)
-cdef DoubleList normalizedNumbers(DoubleList values):
+cdef normalizedNumbers(DoubleList values):
     cdef Py_ssize_t amount = values.length
     cdef float avgValue = 0
     cdef Py_ssize_t i
@@ -217,7 +217,7 @@ cdef DoubleList normalizedNumbers(DoubleList values):
     return values
 
 @cython.cdivision(True)
-cdef Vector3DList normalizedVectors(Vector3DList vectors):
+cdef normalizedVectors(Vector3DList vectors):
     cdef Py_ssize_t amount = vectors.length
     cdef Vector3 avgValue = toVector3((0, 0, 0))
     cdef Vector3 v
@@ -237,3 +237,4 @@ cdef Vector3DList normalizedVectors(Vector3DList vectors):
         v.z -= avgValue.z
         vectors.data[i] = v
     return vectors
+    
