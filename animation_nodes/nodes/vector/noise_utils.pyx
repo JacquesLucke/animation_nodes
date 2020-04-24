@@ -4,7 +4,7 @@ from ... algorithms.random import getRandom3DVector
 from ... data_structures cimport DoubleList, Vector3DList
 from ... math cimport Vector3, toVector3, scaleVec3_Inplace
 
-# Blender Noise and Turbulance-Noise Functions:
+# Blender Noise and Turbulance-Noise Functions.
 def blNoise(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float amplitude, float frequency,
               axisScale, offset, bint normalization):
     cdef Py_ssize_t amount = vectors.length
@@ -40,7 +40,7 @@ def blTurbulence(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float am
         return normalizedNumbers(values)
     return values
 
-# Blender Fractal Functions:
+# Blender Fractal Functions.
 def blFractal(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float amplitude, float frequency,
               axisScale, offset, float hFactor, float lacunarity, Py_ssize_t octaves, bint normalization):
     cdef Py_ssize_t amount = vectors.length
@@ -134,7 +134,7 @@ def blHybridMultiFractal(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, 
         return normalizedNumbers(values)
     return values
 
-# Blender Variable Lacunarity Functions:
+# Blender Variable Lacunarity Functions.
 def blVariableLacunarity(str noiseBasis, str noiseBasis2, Vector3DList vectors, Py_ssize_t seed, float amplitude,float frequency,
                          axisScale, offset, float distortion, bint normalization):
     cdef Py_ssize_t amount = vectors.length
@@ -153,7 +153,7 @@ def blVariableLacunarity(str noiseBasis, str noiseBasis2, Vector3DList vectors, 
         return normalizedNumbers(values)
     return values
 
-# Blender Noise-Vector and Turbulence-Vector Functions:
+# Blender Noise-Vector and Turbulence-Vector Functions.
 def blNoiseVector(str noiseBasis, Vector3DList vectors, Py_ssize_t seed, float amplitude, float frequency,
                   axisScale, offset, bint normalization):
     cdef Py_ssize_t amount = vectors.length
@@ -237,4 +237,3 @@ cdef normalizedVectors(Vector3DList vectors):
         v.z -= avgValue.z
         vectors.data[i] = v
     return vectors
-    
