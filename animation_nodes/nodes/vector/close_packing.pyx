@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... algorithms.mesh_generation.close_packing import(
     neighbourRadiusSpherePacking,
@@ -7,6 +8,7 @@ from ... algorithms.mesh_generation.close_packing import(
     fixedRadiusSpherePacking,
     spherePackingOnMesh,
     relaxSpherePacking,
+    relaxSpherePackingOnMesh,
 )
 from ... data_structures cimport(
     Mesh,
@@ -40,12 +42,16 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
     __annotations__ = {}
 
     __annotations__["mode"] = EnumProperty(name = "Mode", default = "POINTS",
-        items = modeItems, update = AnimationNode.refresh)
+        items = modeItems, update = propertyChanged)
 
     __annotations__["methodTypeForPoints"] = EnumProperty(name = "Method Type", default = "DYNAMICRADIUS",
-        items = methodTypeForPointsItems, update = AnimationNode.refresh)
+        items = methodTypeForPointsItems, update = propertyChanged)
 
-    __annotations__["neighbourAmount"] = IntProperty(name = "Neighbour Amount", min = 1, max = 10, default = 1)
+    __annotations__["pointsOnMesh"] = BoolProperty(name = "Points on Mesh", default = False,
+        description = "Keep relaxed points on mesh surface", update = AnimationNode.refresh)
+
+    __annotations__["neighbourAmount"] = IntProperty(name = "Neighbour Amount", min = 1, max = 10,
+        default = 1, update = propertyChanged)
 
     def create(self):
         if self.mode == "POINTS":
@@ -58,13 +64,23 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
             self.newInput("Boolean", "Mask", "mask", value = False, hide = True)
         elif self.mode == "RELAX":
             self.newInput("Vector List", "Points", "points", dataIsModified = True)
+            if self.pointsOnMesh:
+                self.newInput("Mesh", "Mesh", "mesh")
             self.newInput("Float", "Margin", "margin", value = 0.01, minValue = 0)
             self.newInput("Float", "Radius Max", "radiusMax", value = 0.1, minValue = 0)
             self.newInput("Float", "Repulsion Factor", "repulsionFactor", value = 0.5, minValue = 0, maxValue = 1)
             self.newInput("Float", "Error Max(%)", "errorMax", value = 2, minValue = 0.001, maxValue = 100, hide = True)
-            self.newInput("Integer", "Iterations Max", "iterations", value = 100, minValue = 0, hide = True)
+            if self.pointsOnMesh:
+                self.newInput("Integer", "Iterations Max", "iterations", value = 50, minValue = 0, hide = True)
+            else:
+                self.newInput("Integer", "Iterations Max", "iterations", value = 100, minValue = 0, hide = True)
             self.newInput("Falloff", "Falloff", "falloff")
             self.newInput("Boolean", "Mask", "mask", value = False, hide = True)
+            if self.pointsOnMesh:
+                self.newInput("Float", "Epsilon", "epsilon", value = 0, hide = True)
+                self.newInput("Float", "Max Distance", "maxDistance", value = 1e6, hide = True)
+                self.newInput("Boolean", "Align To Normal", "alignToNormal", value = False)
+
         elif self.mode == "POLYGONS":
             self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
             self.newInput("Falloff", "Falloff", "falloff")
@@ -72,12 +88,16 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Float List", "Radii", "radii", hide = True)
+        if self.pointsOnMesh:
+            self.newOutput("Vector List", "Normals", "normals", hide = True)
 
     def draw(self, layout):
-        col = layout.column()
+        col = layout.column(align = True)
         col.prop(self, "mode", text = "")
         if self.mode == "POINTS":
             col.prop(self, "methodTypeForPoints", text = "")
+        if self.mode == "RELAX":
+            col.prop(self, "pointsOnMesh")
 
     def drawAdvanced(self, layout):
         col = layout.column()
@@ -93,7 +113,10 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
             elif self.methodTypeForPoints == "FIXEDRADIUS":
                 return "execute_FixedSpherePacking"
         elif self.mode == "RELAX":
-            return "execute_RelaxSpherePacking"
+            if self.pointsOnMesh:
+                return "execute_RelaxSpherePackingOnMesh"
+            else:
+                return "execute_RelaxSpherePacking"
         elif self.mode == "POLYGONS":
             return "execute_SpherePackingForMesh"
 
@@ -128,6 +151,20 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
         cdef FloatList influences = evaluator.evaluateList(points)
         return relaxSpherePacking(points, margin, radiusMax, repulsionFactor, iterations, errorMax, self.neighbourAmount,
                                   influences, mask)
+
+    def execute_RelaxSpherePackingOnMesh(self, Vector3DList points, Mesh mesh, float margin, float radiusMax, float repulsionFactor,
+                                         float errorMax, Py_ssize_t iterations, Falloff falloff, bint mask, float epsilon, float maxDistance,
+                                         bint alignToNormal):
+        if points.length == 0: return Matrix4x4List(), DoubleList(), Vector3DList()
+
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
+        cdef FloatList influences = evaluator.evaluateList(points)
+        cdef Vector3DList vertices = mesh.vertices
+        cdef PolygonIndicesList polygons = mesh.polygons
+        if vertices.length == 0 or polygons.getLength() == 0: return Matrix4x4List(), DoubleList(), Vector3DList()
+        if 0 <= polygons.getMinIndex() <= polygons.getMaxIndex() < len(vertices):
+            return relaxSpherePackingOnMesh(points, margin, radiusMax, repulsionFactor, iterations, errorMax, self.neighbourAmount,
+                                            influences, mask, vertices, polygons, maxDistance, epsilon, alignToNormal)
 
     def execute_SpherePackingForMesh(self, Mesh mesh, Falloff falloff, bint alignToNormal):
         cdef Vector3DList vertices = mesh.vertices

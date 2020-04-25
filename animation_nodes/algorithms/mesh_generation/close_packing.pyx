@@ -2,6 +2,7 @@ import cython
 from libc.math cimport sqrt
 from mathutils import Vector
 from mathutils.kdtree import KDTree
+from mathutils.bvhtree import BVHTree
 from ... math cimport Vector3, distanceVec3
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... data_structures cimport (
@@ -204,7 +205,7 @@ def relaxSpherePacking(Vector3DList points, float margin, float radiusMax, float
                     prePoints.data[j].y = point.y + force.y * forceScale
                     prePoints.data[j].z = point.z + force.z * forceScale
 
-        relaxPoints = prePoints
+        relaxPoints.data = prePoints.data
         if count == 0: break
 
     cdef Py_ssize_t totalMatrices = totalPoints
@@ -228,7 +229,116 @@ def relaxSpherePacking(Vector3DList points, float margin, float radiusMax, float
             index += 1
     return matrices, newRadii
 
-cdef calulateMaxRadius(Py_ssize_t iterations, float margin, float radiusStep, DoubleList radii, LongList indices, DoubleList distances):
+@cython.cdivision(True)
+def relaxSpherePackingOnMesh(Vector3DList points, float margin, float radiusMax, float repulsionFactor,
+                             Py_ssize_t iterations, float errorMax, Py_ssize_t neighbourAmount, FloatList influences,
+                             bint mask, Vector3DList vertices, PolygonIndicesList polygons, float maxDistance,
+                             float epsilon, bint alignToNormal):
+    bvhTree = buildBVHTree(vertices, polygons, epsilon)
+    cdef Py_ssize_t totalPoints = points.length
+    cdef Vector3DList prePoints = points
+    cdef Vector3DList relaxPoints = points
+    cdef DoubleList radii = DoubleList(length = totalPoints)
+    radii.fill(radiusMax)
+    cdef float radius, totalRadius, distance, forceScale, error, x, y, z
+    cdef Vector3 point, force
+    cdef DoubleList distances
+    cdef LongList indices
+    cdef Py_ssize_t i, j, k, count, index, totalNonZeros
+
+    totalNonZeros = 0
+    for i in range(totalPoints):
+        radii.data[i] *= influences.data[i]
+        if radii.data[i] > 0:
+            totalNonZeros += 1
+
+    for k in range(iterations):
+        count = 0
+        kdTree = buildKDTree(totalPoints, relaxPoints)
+        for j in range(totalPoints):
+            radius = radii.data[j]
+            point = relaxPoints.data[j]
+            indices, distances = calculateDistancesByAmount(kdTree, point, 1 + neighbourAmount)
+
+            if radius > 0:
+                for i in range(1, indices.length):
+                    index = indices.data[i]
+                    distance = distances.data[i]
+
+                    totalRadius = margin + radius + radii.data[index]
+                    error = (totalRadius - distance) * 100 / totalRadius
+                    if distance > 0 and distance < totalRadius and error >= errorMax:
+                        count += 1
+                        forceScale = (totalRadius - distance) * repulsionFactor
+
+                        force.x = point.x - relaxPoints.data[index].x
+                        force.y = point.y - relaxPoints.data[index].y
+                        force.z = point.z - relaxPoints.data[index].z
+                        forceScale = forceScale / sqrt(force.x * force.x + force.y * force.y + force.z * force.z)
+
+                        x = point.x + force.x * forceScale
+                        y = point.y + force.y * forceScale
+                        z = point.z + force.z * forceScale
+                        prePoints.data[j] = toVector3(bvhTree.find_nearest(Vector((x, y, z)), maxDistance)[0])
+
+        relaxPoints.data = prePoints.data
+        if count == 0: break
+
+    cdef Py_ssize_t totalMatrices = totalPoints
+    if mask: totalMatrices = totalNonZeros
+
+    cdef Matrix4x4List matrices = Matrix4x4List(length = totalMatrices)
+    cdef Vector3DList normals = Vector3DList(length = totalMatrices)
+    cdef Vector3 guide = toVector3((0, 0, 1))
+    cdef Vector3 normal
+    if not mask:
+        if alignToNormal:
+            for i in range(totalPoints):
+                point = relaxPoints.data[i]
+                normal = toVector3(bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1])
+                normals.data[i] = normal
+                directionToMatrix_LowLevel(matrices.data + i, &normal, &guide, 2, 0)
+                setMatrixTranslation(matrices.data + i, &point)
+                scaleMatrix3x3Part(matrices.data + i, radii.data[i])
+            return matrices, radii, normals
+        else:
+            for i in range(totalPoints):
+                normal = toVector3(bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1])
+                normals.data[i] = normal
+                setTranslationMatrix(matrices.data + i, &relaxPoints.data[i])
+                scaleMatrix3x3Part(matrices.data + i, radii.data[i])
+            return matrices, radii, normals
+
+    cdef DoubleList newRadii = DoubleList(length = totalNonZeros)
+    index = 0
+
+    if alignToNormal:
+        for i in range(totalPoints):
+            radius = radii.data[i]
+            if radius > 0:
+                newRadii.data[index] = radius
+                point = relaxPoints.data[i]
+                normal = toVector3(bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1])
+                normals.data[i] = normal
+                directionToMatrix_LowLevel(matrices.data + index, &normal, &guide, 2, 0)
+                setMatrixTranslation(matrices.data + index, &point)
+                scaleMatrix3x3Part(matrices.data + index, radius)
+                index += 1
+        return matrices, newRadii, normals
+    else:
+        for i in range(totalPoints):
+            radius = radii.data[i]
+            if radius > 0:
+                newRadii.data[index] = radius
+                normal = toVector3(bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1])
+                normals.data[i] = normal
+                setTranslationMatrix(matrices.data + index, &points.data[i])
+                scaleMatrix3x3Part(matrices.data + index, radius)
+                index += 1
+        return matrices, newRadii, normals
+
+
+cdef float calulateMaxRadius(Py_ssize_t iterations, float margin, float radiusStep, DoubleList radii, LongList indices, DoubleList distances):
     cdef float newRadius = 0
     cdef Py_ssize_t i
     for i in range(iterations):
@@ -238,7 +348,7 @@ cdef calulateMaxRadius(Py_ssize_t iterations, float margin, float radiusStep, Do
             break
     return newRadius
 
-cdef comapareRadiusDistance(float newRadius, DoubleList radii, LongList indices, DoubleList distances):
+cdef bint comapareRadiusDistance(float newRadius, DoubleList radii, LongList indices, DoubleList distances):
     cdef bint newRadiusCheck = True
     cdef Py_ssize_t i
     for i in range(1, distances.length):
@@ -280,6 +390,9 @@ cdef buildKDTree(Py_ssize_t totalPoints, Vector3DList points):
         kdTree.insert(Vector((vector.x, vector.y, vector.z)), i)
     kdTree.balance()
     return kdTree
+
+cdef buildBVHTree(Vector3DList vertices, PolygonIndicesList polygons, epsilon):
+    return BVHTree.FromPolygons(vertices, polygons, epsilon = max(epsilon, 0))
 
 
 @cython.cdivision(True)
