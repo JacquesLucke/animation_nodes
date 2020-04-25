@@ -284,4 +284,3 @@ class VectorNoiseNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
     def execute_VariableLacunarity(self, vectors, seed, amplitude, frequency, axisScale, offset, distortion):
         return blVariableLacunarity(self.noiseBasis, self.noiseBasis2, vectors, seed, amplitude, frequency, axisScale, offset,
                                     distortion, self.normalization)
-                                    

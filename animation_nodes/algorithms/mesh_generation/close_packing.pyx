@@ -157,14 +157,12 @@ def fixedRadiusSpherePacking(Vector3DList points, float margin, float radiusMax,
 
 # Some reference http://www.codeplastic.com/2017/09/09/controlled-circle-packing-with-processing/
 @cython.cdivision(True)
-def relaxSpherePacking(Vector3DList points, float margin, float radiusMax, float repulsionFactor,
+def relaxSpherePacking(Vector3DList points, float margin, DoubleList radii, float repulsionFactor,
                        Py_ssize_t iterations, float errorMax, Py_ssize_t neighbourAmount, FloatList influences,
                        bint mask):
     cdef Py_ssize_t totalPoints = points.length
     cdef Vector3DList prePoints = points
     cdef Vector3DList relaxPoints = points
-    cdef DoubleList radii = DoubleList(length = totalPoints)
-    radii.fill(radiusMax)
     cdef float radius, totalRadius, distance, forceScale, error
     cdef Vector3 point, force
     cdef DoubleList distances
@@ -185,25 +183,26 @@ def relaxSpherePacking(Vector3DList points, float margin, float radiusMax, float
             point = relaxPoints.data[j]
             indices, distances = calculateDistancesByAmount(kdTree, point, 1 + neighbourAmount)
 
-            for i in range(1, indices.length):
-                index = indices.data[i]
-                distance = distances.data[i]
+            if radius > 0:
+                for i in range(1, indices.length):
+                    index = indices.data[i]
+                    distance = distances.data[i]
 
-                totalRadius = margin + radius + radii.data[index]
-                error = (totalRadius - distance) * 100 / totalRadius
-                if distance > 0 and distance < totalRadius and error >= errorMax:
-                    count += 1
-                    forceScale = (totalRadius - distance) * repulsionFactor
+                    totalRadius = margin + radius + radii.data[index]
+                    error = (totalRadius - distance) * 100 / totalRadius
+                    if distance > 0 and distance < totalRadius and error >= errorMax:
+                        count += 1
+                        forceScale = (totalRadius - distance) * repulsionFactor
 
-                    force.x = point.x - relaxPoints.data[index].x
-                    force.y = point.y - relaxPoints.data[index].y
-                    force.z = point.z - relaxPoints.data[index].z
+                        force.x = point.x - relaxPoints.data[index].x
+                        force.y = point.y - relaxPoints.data[index].y
+                        force.z = point.z - relaxPoints.data[index].z
 
-                    forceScale = forceScale / sqrt(force.x * force.x + force.y * force.y + force.z * force.z)
+                        forceScale = forceScale / sqrt(force.x * force.x + force.y * force.y + force.z * force.z)
 
-                    prePoints.data[j].x = point.x + force.x * forceScale
-                    prePoints.data[j].y = point.y + force.y * forceScale
-                    prePoints.data[j].z = point.z + force.z * forceScale
+                        prePoints.data[j].x = point.x + force.x * forceScale
+                        prePoints.data[j].y = point.y + force.y * forceScale
+                        prePoints.data[j].z = point.z + force.z * forceScale
 
         relaxPoints.data = prePoints.data
         if count == 0: break
@@ -230,7 +229,7 @@ def relaxSpherePacking(Vector3DList points, float margin, float radiusMax, float
     return matrices, newRadii
 
 @cython.cdivision(True)
-def relaxSpherePackingOnMesh(Vector3DList points, float margin, float radiusMax, float repulsionFactor,
+def relaxSpherePackingOnMesh(Vector3DList points, float margin, DoubleList radii, float repulsionFactor,
                              Py_ssize_t iterations, float errorMax, Py_ssize_t neighbourAmount, FloatList influences,
                              bint mask, Vector3DList vertices, PolygonIndicesList polygons, float maxDistance,
                              float epsilon, bint alignToNormal):
@@ -238,8 +237,6 @@ def relaxSpherePackingOnMesh(Vector3DList points, float margin, float radiusMax,
     cdef Py_ssize_t totalPoints = points.length
     cdef Vector3DList prePoints = points
     cdef Vector3DList relaxPoints = points
-    cdef DoubleList radii = DoubleList(length = totalPoints)
-    radii.fill(radiusMax)
     cdef float radius, totalRadius, distance, forceScale, error, x, y, z
     cdef Vector3 point, force
     cdef DoubleList distances
@@ -279,7 +276,9 @@ def relaxSpherePackingOnMesh(Vector3DList points, float margin, float radiusMax,
                         x = point.x + force.x * forceScale
                         y = point.y + force.y * forceScale
                         z = point.z + force.z * forceScale
-                        prePoints.data[j] = toVector3(bvhTree.find_nearest(Vector((x, y, z)), maxDistance)[0])
+                        bvhVector = bvhTree.find_nearest(Vector((x, y, z)), maxDistance)[0]
+                        if bvhVector is not None:
+                            prePoints.data[j] = toVector3(bvhVector)
 
         relaxPoints.data = prePoints.data
         if count == 0: break
@@ -290,12 +289,13 @@ def relaxSpherePackingOnMesh(Vector3DList points, float margin, float radiusMax,
     cdef Matrix4x4List matrices = Matrix4x4List(length = totalMatrices)
     cdef Vector3DList normals = Vector3DList(length = totalMatrices)
     cdef Vector3 guide = toVector3((0, 0, 1))
-    cdef Vector3 normal
+    cdef Vector3 normal = guide
     if not mask:
         if alignToNormal:
             for i in range(totalPoints):
                 point = relaxPoints.data[i]
-                normal = toVector3(bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1])
+                bvhNormal = bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1]
+                if bvhNormal is not None: normal = toVector3(bvhNormal)
                 normals.data[i] = normal
                 directionToMatrix_LowLevel(matrices.data + i, &normal, &guide, 2, 0)
                 setMatrixTranslation(matrices.data + i, &point)
@@ -303,7 +303,8 @@ def relaxSpherePackingOnMesh(Vector3DList points, float margin, float radiusMax,
             return matrices, radii, normals
         else:
             for i in range(totalPoints):
-                normal = toVector3(bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1])
+                bvhNormal = bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1]
+                if bvhNormal is not None: normal = toVector3(bvhNormal)
                 normals.data[i] = normal
                 setTranslationMatrix(matrices.data + i, &relaxPoints.data[i])
                 scaleMatrix3x3Part(matrices.data + i, radii.data[i])
@@ -318,7 +319,8 @@ def relaxSpherePackingOnMesh(Vector3DList points, float margin, float radiusMax,
             if radius > 0:
                 newRadii.data[index] = radius
                 point = relaxPoints.data[i]
-                normal = toVector3(bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1])
+                bvhNormal = bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1]
+                if bvhNormal is not None: normal = toVector3(bvhNormal)
                 normals.data[i] = normal
                 directionToMatrix_LowLevel(matrices.data + index, &normal, &guide, 2, 0)
                 setMatrixTranslation(matrices.data + index, &point)
@@ -330,7 +332,8 @@ def relaxSpherePackingOnMesh(Vector3DList points, float margin, float radiusMax,
             radius = radii.data[i]
             if radius > 0:
                 newRadii.data[index] = radius
-                normal = toVector3(bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1])
+                bvhNormal = bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1]
+                if bvhNormal is not None: normal = toVector3(bvhNormal)
                 normals.data[i] = normal
                 setTranslationMatrix(matrices.data + index, &points.data[i])
                 scaleMatrix3x3Part(matrices.data + index, radius)
