@@ -30,8 +30,6 @@ class midiFileParserNode(bpy.types.Node, AnimationNode):
 
     def execute(self, path):
         loadFile = False
-        # print(loadFile)
-        # print(cache)
 
         if not os.path.exists(path):
             self.raiseErrorMessage("Path does not exist")
