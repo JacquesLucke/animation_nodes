@@ -113,24 +113,25 @@ def neighbourRadiusSpherePacking(Vector3DList points, float margin, float radius
 
 
 @cython.cdivision(True)
-def fixedRadiusSpherePacking(Vector3DList points, float margin, float radiusMax, FloatList influences, bint mask):
+def fixedRadiusSpherePacking(Vector3DList points, float margin, DoubleList radii, FloatList influences, bint mask):
     cdef Py_ssize_t totalPoints = points.length
     kdTree = buildKDTree(totalPoints, points)
-    cdef DoubleList radii = DoubleList(length = totalPoints)
-    radii.fill(0)
-    cdef float searchRadius = max(2 * (radiusMax + margin), 0)
+    cdef float radius, searchRadius
     cdef DoubleList distances
     cdef LongList indices
-    cdef float influence
     cdef Py_ssize_t i, totalNonZeros
 
     totalNonZeros = 0
     for i in range(totalPoints):
+        radius = radii.data[i] * influences.data[i]
+        searchRadius = max(2 * (radius + margin), 0)
         indices, distances = calculateDistancesByRange(kdTree, points.data[i], searchRadius)
         influence = influences.data[i]
-        if comapareRadiusDistance(margin + radiusMax * influence, radii, indices, distances):
-            radii.data[i] = radiusMax * influence
+        if comapareRadiusDistance(margin + radius, radii, indices, distances):
+            radii.data[i] = radius
             totalNonZeros += 1
+        else:
+            radii.data[i] = 0
 
     cdef Py_ssize_t totalMatrices = totalPoints
     if mask: totalMatrices = totalNonZeros
@@ -144,7 +145,6 @@ def fixedRadiusSpherePacking(Vector3DList points, float margin, float radiusMax,
 
     cdef DoubleList newRadii = DoubleList(length = totalNonZeros)
     cdef Py_ssize_t index = 0
-    cdef float radius
     for i in range(totalPoints):
         radius = radii.data[i]
         if radius > 0:
