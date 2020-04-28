@@ -44,15 +44,11 @@ class midiFileParserNode(bpy.types.Node, AnimationNode):
                     loadFile = True
 
         if loadFile:
-            # try:
-            tracks = MidiParseFile(path)
-            cache[key] = (lastModification, tracks)
-            # except Exception as ex:
-            #     template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-            #     message = template.format(type(ex).__name__, ex.args)
-            #     print( message)
-            # except LookupError:
-            #     self.raiseErrorMessage("Invalid Encoding")
+            try:
+                tracks = MidiParseFile(path)
+                cache[key] = (lastModification, tracks)
+            except LookupError:
+                self.raiseErrorMessage("Invalid Encoding")
         else:
             tracks = None
 

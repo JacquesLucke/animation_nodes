@@ -55,9 +55,7 @@ class Tempo:
 
 def MidiParseFile(filemid):
 
-    # print("start parse file")
     midi = MidiFile.fromFile(filemid)
-    # print(midi)
     newTracks = []
     for trackIndex, track in enumerate(midi.tracks):
         if midi.midiFormat == 2:
@@ -74,7 +72,6 @@ def MidiParseFile(filemid):
 
             msgType = 'not evalued'
             timeInTicksCumul += event.deltaTime
-            # if msg.is_meta: continue
 
             if isinstance(event, TrackNameEvent):
                 newTrack.name = event.name
@@ -92,19 +89,13 @@ def MidiParseFile(filemid):
                 currentTime = timeMap.getRealtime(timeInTicksCumul)
                 key = str(event.channel) + "/" + str(event.note)
                 lastNoteOn[key] = [currentTime, event.velocity / 127]
-                # lastNoteOn[event.note] = [event.channel, currentTime, event.velocity / 127]
             if msgType == 'note_off':
                 currentTime = timeMap.getRealtime(timeInTicksCumul)
                 key = str(event.channel) + "/" + str(event.note)
                 if key in lastNoteOn:
-                    # print(key, event.channel, event.note, lastNoteOn[key][0], currentTime, lastNoteOn[key][1])
                     newTrack.addNote(midiNote(event.channel, event.note, lastNoteOn[key][0], currentTime, lastNoteOn[key][1]))
-                    # newTrack.addNote(midiNote(event.channel, event.note, lastNoteOn[event.note][1], currentTime, lastNoteOn[event.note][2]))
                     lastNoteOn.pop(key, None)
                 else:
                     print("no noteOn for ", event.channel, event.note)
         newTracks.append(newTrack)
-        # print("+++++++++++++++++++")
-        # print(midi.midiFormat, newTrack.index, newTrack.name)
-        # print("-------------------")
     return newTracks
