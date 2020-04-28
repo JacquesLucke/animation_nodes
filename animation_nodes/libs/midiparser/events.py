@@ -105,7 +105,7 @@ class TextEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        text = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        text = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, text)
 
 @dataclass
@@ -115,7 +115,7 @@ class CopyrightEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        copyright = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        copyright = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, copyright)
 
 @dataclass
@@ -125,7 +125,7 @@ class TrackNameEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        name = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        name = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, name)
 
 @dataclass
@@ -135,7 +135,7 @@ class InstrumentNameEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        name = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        name = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, name)
 
 @dataclass
@@ -145,7 +145,7 @@ class LyricEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        lyric = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        lyric = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, lyric)
 
 @dataclass
@@ -155,7 +155,7 @@ class MarkerEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        marker = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        marker = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, marker)
 
 @dataclass
@@ -165,7 +165,7 @@ class CuePointEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        cuePoint = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        cuePoint = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, cuePoint)
 
 @dataclass
@@ -175,7 +175,7 @@ class ProgramNameEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        name = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        name = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, name)
 
 @dataclass
@@ -185,7 +185,7 @@ class DeviceNameEvent:
 
     @classmethod
     def fromMemoryMap(cls, deltaTime, length, memoryMap):
-        name = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("ascii")
+        name = struct.unpack(f"{length}s", memoryMap.read(length))[0].decode("latin_1")
         return cls(deltaTime, name)
 
 @dataclass

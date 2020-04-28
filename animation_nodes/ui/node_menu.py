@@ -105,6 +105,7 @@ class VectorMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_RandomVectorNode", "Random")
         insertNode(layout, "an_VectorWiggleNode", "Wiggle")
+        insertNode(layout, "an_VectorNoiseNode", "Noise")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Vector")})
         layout.separator()
         insertNode(layout, "an_VectorDistanceNode", "Distance")

@@ -10,7 +10,7 @@ stages:
       vmImage: ubuntu-18.04
     steps:
     - script: >-
-        docker run -v $PWD:/build ubuntu:rolling /bin/bash -c "
+        docker run -v $PWD:/build ubuntu:eoan /bin/bash -c "
         cd /build;
         apt-get -y update;
         apt-get -y install python3.7 cython3 g++;
