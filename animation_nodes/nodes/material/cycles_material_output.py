@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from bpy.types import Material
 from ... base_types import AnimationNode
 from ... utils.enum_items import cacheEnumItems
 
@@ -32,7 +33,7 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
                     identifiers.append(socket)
         return identifiers
 
-    materialName: StringProperty(update = AnimationNode.refresh)
+    material: PointerProperty(type = Material, update = AnimationNode.refresh)
     nodeName: StringProperty(update = AnimationNode.refresh)
     socketIdentifier: EnumProperty(name = "Socket", items = cacheEnumItems(getPossibleSocketItems),
         update = AnimationNode.refresh)
@@ -45,15 +46,14 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
             self.inputs["Data"].setProperty(data)
 
     def draw(self, layout):
-        layout.prop_search(self, "materialName", bpy.data, "materials", text = "", icon = "MATERIAL_DATA")
-        material = bpy.data.materials.get(self.materialName)
-        if material is None: return
+        layout.prop(self, "material", text = "")
+        if self.material is None: return
 
-        nodeTree = material.node_tree
+        nodeTree = self.material.node_tree
         if nodeTree is None: return
 
         layout.prop_search(self, "nodeName", nodeTree, "nodes", text = "", icon = "NODE")
-        node = material.node_tree.nodes.get(self.nodeName)
+        node = self.material.node_tree.nodes.get(self.nodeName)
         if node is None: return
 
         if self.hasPossibleInputs(node):
@@ -106,10 +106,9 @@ class CyclesMaterialOutputNode(bpy.types.Node, AnimationNode):
         return identifiers
 
     def getSelectedNode(self):
-        material = bpy.data.materials.get(self.materialName)
-        if material is None: return None
+        if self.material is None: return None
 
-        nodeTree = material.node_tree
+        nodeTree = self.material.node_tree
         if nodeTree is None: return
 
         node = nodeTree.nodes.get(self.nodeName)
