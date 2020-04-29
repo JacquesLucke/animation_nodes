@@ -27,6 +27,7 @@
 - Fixed the Triangulate BMesh node.
 - Fixed smooth sound spectrum evaluation.
 - Fixed the None material issue of the Material Output node.
+- Fixed the Cycles Material Output node.
 
 ### Changed
 
