@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
-from ... data_structures import Mesh
-from ... base_types import AnimationNode
+from ... data_structures import Mesh, LongList
+from ... base_types import AnimationNode, VectorizedSocket
 from ... algorithms.mesh_generation.find_shortest_path import getShortestPath
 
 pathTypeItems = [
@@ -21,9 +21,14 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
     joinMeshes: BoolProperty(name = "Join Meshes", default = True,
         update = AnimationNode.refresh)
 
+    useSourceList: VectorizedSocket.newProperty()
+
     def create(self):
         self.newInput("Mesh", "Mesh", "mesh")
-        self.newInput("Integer List", "Sources", "sources")
+        self.newInput(VectorizedSocket("Integer", "useSourceList",
+                ("Source", "sources"), ("Sources", "sources")))
+        self.newInput("Boolean", "Change Direction", "changeDirection", value = False)
+
         if self.pathType == "MESH":
             if not self.joinMeshes:
                 self.newOutput("Mesh List", "Meshes", "outMeshes")
@@ -39,7 +44,8 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
         if self.pathType == "MESH":
             layout.prop(self, "joinMeshes")
 
-    def execute(self, mesh, sources):
+    def execute(self, mesh, sources, changeDirection):
+        if not self.useSourceList: sources = LongList.fromValue(sources)
         if mesh is None or len(sources) == 0:
             if self.joinMeshes and self.pathType == "MESH":
                 return Mesh()
@@ -51,10 +57,10 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
 
         if self.pathType == "MESH":
             if self.joinMeshes:
-                return Mesh.join(*getShortestPath(mesh, sources, "MESH"))
+                return Mesh.join(*getShortestPath(mesh, sources, "MESH", changeDirection))
             else:
-                return getShortestPath(mesh, sources, "MESH")
+                return getShortestPath(mesh, sources, "MESH", changeDirection)
         elif self.pathType == "SPLINE":
-            return getShortestPath(mesh, sources, "SPLINE")
+            return getShortestPath(mesh, sources, "SPLINE", changeDirection)
         elif self.pathType == "STROKE":
-            return getShortestPath(mesh, sources, "STROKE")
+            return getShortestPath(mesh, sources, "STROKE", changeDirection)

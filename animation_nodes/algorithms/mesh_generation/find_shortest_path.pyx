@@ -1,4 +1,3 @@
-# cython: profile=True
 from ... data_structures import GPStroke
 from ... data_structures cimport (
     Mesh,
@@ -13,21 +12,21 @@ from . line import getLinesMesh
 from ... math cimport distanceVec3
 
 # Dijkstra's algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) but is implemented such a way to handle multi-sources and mesh with multiple islands.
-def getShortestPath(Mesh mesh, LongList sources, str pathType):
+def getShortestPath(Mesh mesh, LongList sources, str pathType, bint changeDirection = False):
     cdef Vector3DList vertices = mesh.vertices
-    cdef long vertexCount = vertices.length
+    cdef Py_ssize_t vertexCount = vertices.length
     cdef float maxWeight = 1000000
     cdef DoubleList weights = DoubleList.fromValue(maxWeight, length = vertexCount)
-    cdef LongList visitedVertices = LongList.fromValue(0, length = vertexCount)
     cdef LongList previousVertices = LongList.fromValue(-1, length = vertexCount)
-    cdef long i
+    cdef LongList visitedVertices = LongList.fromValue(0, length = vertexCount)
+    cdef Py_ssize_t i
 
     for i in range (sources.length):
         weights.data[sources.data[i]] = 0.0
 
     cdef LongList linkedVertices
-    cdef long k, l, linkedIndex, currentIndex
     cdef float weight, minWeight
+    cdef Py_ssize_t k, l, linkedIndex, currentIndex
 
     for i in range(vertexCount):
 
@@ -53,7 +52,7 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType):
                         weights.data[linkedIndex] = weight
                         previousVertices.data[linkedIndex] = currentIndex
 
-    cdef long index, amount
+    cdef Py_ssize_t index, amount
     cdef Vector3DList sortLocations
     cdef list meshes, splines, strokes
 
@@ -67,6 +66,8 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType):
                 sortLocations.append(vertices[index])
                 index = previousVertices.data[index]
                 if index == -1: break
+
+            if not changeDirection: sortLocations = sortLocations.reversed()
             meshes.append(getLinesMesh(sortLocations, False))
 
         return meshes
@@ -82,6 +83,7 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType):
                 index = previousVertices.data[index]
                 if index == -1: break
 
+            if not changeDirection: sortLocations = sortLocations.reversed()
             splines.append(PolySpline.__new__(PolySpline, sortLocations))
 
         return splines
@@ -96,6 +98,8 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType):
                 sortLocations.append(vertices[index])
                 index = previousVertices.data[index]
                 if index == -1: break
+
+            if not changeDirection: sortLocations = sortLocations.reversed()
             amount = sortLocations.length
             strengths = FloatList(length = amount)
             pressures = FloatList(length = amount)
