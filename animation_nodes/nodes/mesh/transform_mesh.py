@@ -20,6 +20,9 @@ class TransformMeshNode(bpy.types.Node, AnimationNode):
     joinMeshes: BoolProperty(name = "Join Meshes", default = True,
         update = AnimationNode.refresh)
 
+    loadUVs: BoolProperty(name = "Load UVs", default = False,
+        update = AnimationNode.refresh)
+
     useMeshList: VectorizedSocket.newProperty()
     useTransformationList: VectorizedSocket.newProperty()
 
@@ -44,6 +47,8 @@ class TransformMeshNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "transformationType", text = "")
         if self.hasListInput:
             layout.prop(self, "joinMeshes")
+            if self.joinMeshes and self.useMeshList:
+                layout.prop(self, "loadUVs")
 
     def getExecutionFunctionName(self):
         if self.transformationType == "MATRIX":
@@ -143,7 +148,7 @@ class TransformMeshNode(bpy.types.Node, AnimationNode):
 
     def joinWhenNecessary(self, meshes):
         if self.joinMeshes:
-            return Mesh.join(*meshes)
+            return Mesh.join(*meshes, loadUVs = self.loadUVs)
         else:
             return meshes
 

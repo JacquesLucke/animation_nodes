@@ -191,10 +191,28 @@ cdef class Mesh:
                 self.vertexColorLayers[name] = calcNewLoopProperty(vertexColorLayer)
 
     @classmethod
-    def join(cls, *meshes):
+    def join(cls, *meshes, bint loadUVs = False):
         cdef Mesh newMesh = Mesh()
         for meshData in meshes:
             newMesh.append(meshData)
+        if not loadUVs: return newMesh
+
+        cdef Vector2DList newUVPositions = Vector2DList(length = newMesh.polygons.indices.length)
+        cdef Vector2DList uvPositions
+        cdef Py_ssize_t i, index, polyAmount
+        index = 0
+        for meshData in meshes:
+            polyAmount = len(meshData.polygons.indices)
+            uvMapNames = meshData.getUVMapNames()
+            if len(uvMapNames) == 0:
+                index += polyAmount
+                continue
+            uvPositions = meshData.getUVMapPositions(uvMapNames[0])
+            for i in range(polyAmount):
+                newUVPositions.data[index] = uvPositions.data[i]
+                index += 1
+
+        newMesh.insertUVMap("AN-UV Map", newUVPositions)
         return newMesh
 
     def append(self, Mesh meshData):
