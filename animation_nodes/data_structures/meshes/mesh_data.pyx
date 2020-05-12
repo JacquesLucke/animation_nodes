@@ -218,8 +218,9 @@ cdef class Mesh:
             self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
 
     def transferMeshesProperties(self, meshes):
-        cdef LongList colorLayerCounts = LongList(length = len(meshes))
-        cdef LongList uvCounts = LongList(length = len(meshes))
+        cdef Py_ssize_t amount = len(meshes)
+        cdef LongList uvCounts = LongList(length = amount)
+        cdef LongList colorLayerCounts = LongList(length = amount)
         cdef Py_ssize_t i
         for i, meshData in enumerate(meshes):
             uvCounts.data[i] = len(meshData.getUVMapNames())
@@ -236,7 +237,7 @@ cdef class Mesh:
                 polyAmount = len(meshData.polygons.indices)
                 uvMapNames = meshData.getUVMapNames()
 
-                if uvCounts.data[j] < i + 1:
+                if uvCounts.data[j] <= i:
                     index += polyAmount
                     continue
 
@@ -255,7 +256,7 @@ cdef class Mesh:
             for j, meshData in enumerate(meshes):
                 polyAmount = len(meshData.polygons.indices)
                 colorLayerNames = meshData.getVertexColorLayerNames()
-                if colorLayerCounts.data[j] < i + 1:
+                if colorLayerCounts.data[j] <= i:
                     index += polyAmount
                     continue
 
