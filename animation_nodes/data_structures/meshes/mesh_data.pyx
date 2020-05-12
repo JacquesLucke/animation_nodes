@@ -1,6 +1,7 @@
 # cython: profile=True
 import textwrap
 import functools
+from mathutils import Vector
 from collections import OrderedDict
 from . validate import checkMeshData, calculateLoopEdges
 from .. lists.base_lists cimport (
@@ -191,28 +192,12 @@ cdef class Mesh:
                 self.vertexColorLayers[name] = calcNewLoopProperty(vertexColorLayer)
 
     @classmethod
-    def join(cls, *meshes, bint loadUVs = False):
+    def join(cls, *meshes):
         cdef Mesh newMesh = Mesh()
         for meshData in meshes:
             newMesh.append(meshData)
-        if not loadUVs: return newMesh
 
-        cdef Vector2DList newUVPositions = Vector2DList(length = newMesh.polygons.indices.length)
-        cdef Vector2DList uvPositions
-        cdef Py_ssize_t i, index, polyAmount
-        index = 0
-        for meshData in meshes:
-            polyAmount = len(meshData.polygons.indices)
-            uvMapNames = meshData.getUVMapNames()
-            if len(uvMapNames) == 0:
-                index += polyAmount
-                continue
-            uvPositions = meshData.getUVMapPositions(uvMapNames[0])
-            for i in range(polyAmount):
-                newUVPositions.data[index] = uvPositions.data[i]
-                index += 1
-
-        newMesh.insertUVMap("AN-UV Map", newUVPositions)
+        newMesh.transferMeshesProperties(meshes)
         return newMesh
 
     def append(self, Mesh meshData):
@@ -231,6 +216,55 @@ cdef class Mesh:
         self.polygons.extend(meshData.polygons)
         for i in range(meshData.polygons.indices.length):
             self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
+
+    def transferMeshesProperties(self, meshes):
+        cdef LongList colorLayerCounts = LongList(length = len(meshes))
+        cdef LongList uvCounts = LongList(length = len(meshes))
+        cdef Py_ssize_t i
+        for i, meshData in enumerate(meshes):
+            uvCounts.data[i] = len(meshData.getUVMapNames())
+            colorLayerCounts.data[i] = len(meshData.getVertexColorLayerNames())
+
+        # Transfer UVs
+        cdef Py_ssize_t newPolyAmount = self.polygons.indices.length
+        cdef Vector2DList uvPositions, newUVPositions
+        cdef Py_ssize_t j, k, index, polyAmount
+        for i in range(uvCounts.getMaxValue()):
+            index = 0
+            newUVPositions = Vector2DList.fromValue(Vector((0, 0)), length = newPolyAmount)
+            for j, meshData in enumerate(meshes):
+                polyAmount = len(meshData.polygons.indices)
+                uvMapNames = meshData.getUVMapNames()
+
+                if uvCounts.data[j] < i + 1:
+                    index += polyAmount
+                    continue
+
+                uvPositions = meshData.getUVMapPositions(uvMapNames[i])
+                for k in range(polyAmount):
+                    newUVPositions.data[index] = uvPositions.data[k]
+                    index += 1
+
+            self.insertUVMap("AN-UV Map " + str(i), newUVPositions)
+
+        # Transfer Vertex Colors
+        cdef ColorList colors, newColors
+        for i in range(colorLayerCounts.getMaxValue()):
+            index = 0
+            newColors = ColorList.fromValue((0, 0, 0, 1), length = newPolyAmount)
+            for j, meshData in enumerate(meshes):
+                polyAmount = len(meshData.polygons.indices)
+                colorLayerNames = meshData.getVertexColorLayerNames()
+                if colorLayerCounts.data[j] < i + 1:
+                    index += polyAmount
+                    continue
+
+                colors = meshData.getVertexColors(colorLayerNames[i])
+                for k in range(polyAmount):
+                    newColors.data[index] = colors.data[k]
+                    index += 1
+
+            self.insertVertexColorLayer("AN-Col " + str(i), newColors)
 
 
 def calculatePolygonNormals(Vector3DList vertices, PolygonIndicesList polygons):
