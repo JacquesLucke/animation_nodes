@@ -155,9 +155,9 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
 
     return newPolygons
 
-# Make sure normal (+z) are correct.
+# Make sure normal (+z) is correct.
 @cython.cdivision(True)
-cdef polyCounterClockwise(Vector3DList vertices):
+cdef bint polyCounterClockwise(Vector3DList vertices):
     cdef Py_ssize_t amount = vertices.length
     cdef float area = 0.0
     cdef Vector3 v1, v2
@@ -175,7 +175,7 @@ cdef polyCounterClockwise(Vector3DList vertices):
     return True
 
 # Calculate Inner angle (degree).
-cdef calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVertex):
+cdef int calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVertex):
     cdef Vector3 ab, bc
     cdef float angle
 
@@ -189,7 +189,7 @@ cdef calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVertex):
     return int((angle - angle % 0.001) * 180.0 / pi)
 
 @cython.cdivision(True)
-cdef earNeighborIndices(Py_ssize_t earIndex, Py_ssize_t polyLength, LongList mask):
+cdef LongList earNeighborIndices(Py_ssize_t earIndex, Py_ssize_t polyLength, LongList mask):
     cdef LongList indices = LongList(length = 2)
     cdef Py_ssize_t i, index
     for i in range(polyLength - 1):
@@ -208,8 +208,8 @@ cdef earNeighborIndices(Py_ssize_t earIndex, Py_ssize_t polyLength, LongList mas
     return indices
 
 @cython.cdivision(True)
-cdef earNextNeighborIndices(Py_ssize_t earIndex, Py_ssize_t preIndex, Py_ssize_t nexIndex,
-                            Py_ssize_t polyLength, LongList mask):
+cdef LongList earNextNeighborIndices(Py_ssize_t earIndex, Py_ssize_t preIndex, Py_ssize_t nexIndex,
+                                     Py_ssize_t polyLength, LongList mask):
     cdef LongList indices = LongList(length = 2)
     cdef Py_ssize_t i, index
 
@@ -228,14 +228,14 @@ cdef earNextNeighborIndices(Py_ssize_t earIndex, Py_ssize_t preIndex, Py_ssize_t
 
     return indices
 
-# Make sure normal (+z) are correct, and polygon is counter clockwise.
-cdef convexVertex(Vector3 v1, Vector3 v2, Vector3 v3):
+# Make sure normal (+z) is correct, and the polygon is counter clockwise.
+cdef bint convexVertex(Vector3 v1, Vector3 v2, Vector3 v3):
     cdef float sign = (v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x)
     if sign >= 0: return True
     return False
 
 # Checking points (reflex type) lies in the new triangle.
-cdef pointsInTriangle(Vector3DList vertices, Vector3 v1, Vector3 v2, Vector3 v3,
+cdef bint pointsInTriangle(Vector3DList vertices, Vector3 v1, Vector3 v2, Vector3 v3,
                       Py_ssize_t preIndex, Py_ssize_t earIndex, Py_ssize_t nexIndex):
     cdef Py_ssize_t i
     for i in range(vertices.length):
@@ -244,7 +244,7 @@ cdef pointsInTriangle(Vector3DList vertices, Vector3 v1, Vector3 v2, Vector3 v3,
     return False
 
 @cython.cdivision(True)
-cdef pointInsideTriangle(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 p):
+cdef bint pointInsideTriangle(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 p):
     cdef Vector3 u, v, w, n
     subVec3(&u, &v2, &v1)
     subVec3(&v, &v3, &v1)
@@ -273,7 +273,7 @@ cdef pointInsideTriangle(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 p):
 
 # Transformation of vertices of polygon into xy-plane.
 @cython.cdivision(True)
-cdef projectPolygonVertices(Vector3DList vertices, LongList polygonIndices):
+cdef Vector3DList projectPolygonVertices(Vector3DList vertices, LongList polygonIndices):
     cdef Py_ssize_t polyLength = polygonIndices.length
     cdef Vector3DList polyVertices = Vector3DList(length = polyLength)
 
