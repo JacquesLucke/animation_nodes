@@ -1,3 +1,4 @@
+import cython
 from libc.math cimport sqrt
 from ... math cimport Vector3
 from ... algorithms.random cimport randomDouble_Range
@@ -28,6 +29,7 @@ def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, Virt
                                                             seed, polyAmount, pointAmount)
     return sampleRandomPoints(vertices, polygons, totalTriPoints, distLength, seed, polyAmount, newPointAmount)
 
+@cython.cdivision(True)
 cdef calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
     cdef Py_ssize_t vertexAmount = vertices.length
     cdef float weightMax = 1
@@ -58,7 +60,8 @@ cdef calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList pol
 
     return polyAmount, triAreas, triWeights
 
-cdef triangleArea(Vector3 v1, Vector3 v2, Vector3 v3):
+@cython.cdivision(True)
+cdef float triangleArea(Vector3 v1, Vector3 v2, Vector3 v3):
     cdef Vector3 vs1, vs2, vc
     vs1.x = v1.x - v3.x
     vs1.y = v1.y - v3.y
@@ -73,8 +76,9 @@ cdef triangleArea(Vector3 v1, Vector3 v2, Vector3 v3):
     vc.z = vs1.x * vs2.y - vs1.y * vs2.x
     return sqrt(vc.x * vc.x + vc.y * vc.y + vc.z * vc.z) / 2.0
 
-cdef trianglesDistribution(Py_ssize_t polyAmount, FloatList triAreas, FloatList triWeights, bint useWeightForDensity,
-                           Py_ssize_t resolution):
+@cython.cdivision(True)
+cdef LongList trianglesDistribution(Py_ssize_t polyAmount, FloatList triAreas, FloatList triWeights, bint useWeightForDensity,
+                                    Py_ssize_t resolution):
     cdef double triAreaMin, triArea
     cdef Py_ssize_t i
     triAreaMin = triAreas.getMaxValue()
@@ -111,8 +115,8 @@ cdef totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, FloatL
             newPointAmount += amount
     return totalTriPoints, newPointAmount
 
-cdef sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongList totalTriPoints,
-                        Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t polyAmount, Py_ssize_t newPointAmount):
+cdef Vector3DList sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongList totalTriPoints,
+                                     Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t polyAmount, Py_ssize_t newPointAmount):
     cdef DoubleList randomPoints = DoubleList(length = newPointAmount)
     cdef Py_ssize_t i
     for i in range(newPointAmount):
