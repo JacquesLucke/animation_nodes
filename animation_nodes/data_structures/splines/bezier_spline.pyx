@@ -206,7 +206,7 @@ cdef class BezierSpline(Spline):
         smoothPoint(self, index, strength)
         self.markChanged()
 
-    cpdef BezierSpline getTrimmedCopy_LowLevel(self, float start, float end):
+    cdef BezierSpline getTrimmedCopy_LowLevel(self, float start, float end):
         cdef:
             long startIndices[2]
             long endIndices[2]
