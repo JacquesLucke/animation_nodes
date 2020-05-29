@@ -110,6 +110,7 @@ def getPolygonColorsFromLoopColors(PolygonIndicesList polygons, VirtualColorList
         scaleColor_Inplace(polygonColors.data + i, 1.0 / polyLength)
     return polygonColors
 
+@cython.cdivision(True)
 def offsetColors(ColorList colors, VirtualColorList offsets, FloatList influences, str method = "ADD"):
     cdef Color *offset
     cdef float influence
@@ -123,6 +124,14 @@ def offsetColors(ColorList colors, VirtualColorList offsets, FloatList influence
             colors.data[i].g += offset.g * influence
             colors.data[i].b += offset.b * influence
             colors.data[i].a += offset.a * influence
+    elif method == "SUBTRACT":
+        for i in range(colors.length):
+            influence = influences.data[i]
+            offset = offsets.get(i)
+            colors.data[i].r -= offset.r * influence
+            colors.data[i].g -= offset.g * influence
+            colors.data[i].b -= offset.b * influence
+            colors.data[i].a -= offset.a * influence
     elif method == "MULTIPLY":
         for i in range(colors.length):
             influence = influences.data[i]
@@ -131,6 +140,14 @@ def offsetColors(ColorList colors, VirtualColorList offsets, FloatList influence
             colors.data[i].g *= offset.g * influence
             colors.data[i].b *= offset.b * influence
             colors.data[i].a *= offset.a * influence
+    elif method == "DIVIDE":
+        for i in range(colors.length):
+            influence = influences.data[i]
+            offset = offsets.get(i)
+            colors.data[i].r /= offset.r * influence
+            colors.data[i].g /= offset.g * influence
+            colors.data[i].b /= offset.b * influence
+            colors.data[i].a /= offset.a * influence
     elif method == "MIX":
         for i in range(colors.length):
             influence = influences.data[i]

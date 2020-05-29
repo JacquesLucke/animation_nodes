@@ -10,7 +10,9 @@ from ... data_structures import VirtualVector3DList, VirtualDoubleList, VirtualC
 methodTypeItems = [
     ("MIX", "Mix", "Mix vertex colors", "NONE", 0),
     ("ADD", "Add", "Add vertex colors", "NONE", 1),
-    ("MULTIPLY", "Multiply", "Multiply vertex colors", "NONE", 2)
+    ("SUBTRACT", "Subtract", "Subtract vertex colors", "NONE", 2),
+    ("MULTIPLY", "Multiply", "Multiply vertex colors", "NONE", 3),
+    ("DIVIDE", "Divide", "Divide vertex colors", "NONE", 4)
 ]
 
 class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
@@ -22,8 +24,8 @@ class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
         self.updateSocketVisibility()
         executionCodeChanged()
 
-    methodType: EnumProperty(name = "Method Type", default = "MIX",
-        items = methodTypeItems, update = AnimationNode.refresh)
+    methodType: EnumProperty(name = "Method Type", default = "MIX", items = methodTypeItems,
+        description = "Method types for vertex color blending", update = AnimationNode.refresh)
 
     useLocation: BoolProperty(update = checkedPropertiesChanged)
     useStrength: BoolProperty(update = checkedPropertiesChanged)
