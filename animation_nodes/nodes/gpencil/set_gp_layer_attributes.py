@@ -17,9 +17,8 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
     useTintFactorList: VectorizedSocket.newProperty()
     useLineChangeList: VectorizedSocket.newProperty()
     usePassIndexList: VectorizedSocket.newProperty()
-    useMaskLayerList: VectorizedSocket.newProperty()
 
-    useInMaskLayerList: VectorizedSocket.newProperty()
+    useMaskLayerList: VectorizedSocket.newProperty()
     useInvertMaskLayerList: VectorizedSocket.newProperty()
 
     def create(self):
@@ -39,9 +38,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             ("Stroke Thickness", "lineChanges"), ("Stroke Thicknesses", "lineChanges")), hide = True)
         self.newInput(VectorizedSocket("Integer", "usePassIndexList",
             ("Pass Index", "passIndices"), ("Pass Indices", "passIndices")), value = 0, minValue = 0)
-        self.newInput(VectorizedSocket("Boolean", "useMaskLayerList",
-            ("Use Mask Layer", "useMaskLayers"), ("Use Mask Layers", "useMaskLayers")), value = False)
-        self.newInput(VectorizedSocket("Text", "useInMaskLayerList",
+        self.newInput(VectorizedSocket("Text", "useMaskLayerList",
             ("Mask Layer", "maskLayerNames"), ("Mask Layers", "maskLayerNames")))
         self.newInput(VectorizedSocket("Boolean", "useInvertMaskLayerList",
             ("Invert Mask Layer", "invertMaskLayers"), ("Invert Mask Layers", "invertMaskLayers")),
@@ -49,7 +46,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
 
         self.newOutput(VectorizedSocket("GPLayer",
             ["useLayerList", "useNameList", "useBlendModeList", "useOpacityList", "useTintColorList",
-            "useTintFactorList", "useLineChangeList", "usePassIndexList", "useMaskLayerList"],
+            "useTintFactorList", "useLineChangeList", "usePassIndexList"],
             ("Layer", "outLayer"), ("Layers", "outLayers")))
 
         for socket in self.inputs[1:]:
@@ -65,13 +62,12 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         isTintFactor = s[5].isUsed
         isLineChange = s[6].isUsed
         isPassIndex = s[7].isUsed
-        isUseMaskLayer = s[8].isUsed
-        isMaskLayer = s[9].isUsed
-        isInvertMaskLayer = s[10].isUsed
+        isMaskLayer = s[8].isUsed
+        isInvertMaskLayer = s[9].isUsed
         if any([self.useLayerList, self.useNameList, self.useBlendModeList, self.useOpacityList, self.useTintColorList,
-                self.useTintFactorList, self.useLineChangeList, self.usePassIndexList, self.useMaskLayerList]):
+                self.useTintFactorList, self.useLineChangeList, self.usePassIndexList]):
             if any([isName, isBlendMode, isOpacity, isTintColor, isTintFactor, isLineChange, isPassIndex,
-                    isUseMaskLayer, isMaskLayer, isInvertMaskLayer]):
+                    isMaskLayer, isInvertMaskLayer]):
                 if isName:            yield "_layerNames = VirtualPyList.create(layerNames, 'AN-Layer')"
                 if isBlendMode:       yield "_blendModes = VirtualPyList.create(blendModes, 'REGULAR')"
                 if isOpacity:         yield "_opacities = VirtualDoubleList.create(opacities, 1)"
@@ -79,7 +75,6 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
                 if isTintFactor:      yield "_tintFactors = VirtualDoubleList.create(tintFactors, 0)"
                 if isLineChange:      yield "_lineChanges = VirtualDoubleList.create(lineChanges, 0)"
                 if isPassIndex:       yield "_passIndices = VirtualLongList.create(passIndices, 0)"
-                if isUseMaskLayer:    yield "_useMasksLayer = VirtualBooleanList.create(useMaskLayers, False)"
 
                 yield                       "_layers = VirtualPyList.create(layers, GPLayer())"
                 yield                       "amount = VirtualPyList.getMaxRealLength(_layers"
@@ -90,7 +85,6 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
                 if isTintFactor:      yield "         , _tintFactors"
                 if isLineChange:      yield "         , _lineChanges"
                 if isPassIndex:       yield "         , _passIndices"
-                if isUseMaskLayer:    yield "         , _useMasksLayer"
                 yield                       "         )"
 
                 yield                       "outLayers = []"
@@ -103,7 +97,6 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
                 if isTintFactor:      yield "    layerNew.tintFactor = _tintFactors[i]"
                 if isLineChange:      yield "    layerNew.lineChange = _lineChanges[i]"
                 if isPassIndex:       yield "    layerNew.passIndex = _passIndices[i]"
-                if isUseMaskLayer:    yield "    layerNew.useMaskLayer = _useMasksLayer[i]"
                 if isMaskLayer:       yield "    self.setMaskLayers(layerNew, maskLayerNames)"
                 if isInvertMaskLayer: yield "    self.setInvertMaskLayers(layerNew, invertMaskLayers)"
                 yield                       "    outLayers.append(layerNew)"
@@ -118,7 +111,6 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             if isTintFactor:      yield "outLayer.tintFactor = tintFactors"
             if isLineChange:      yield "outLayer.lineChange = lineChanges"
             if isPassIndex:       yield "outLayer.passIndex = passIndices"
-            if isUseMaskLayer:    yield "outLayer.useMaskLayer = useMaskLayers"
             if isMaskLayer:       yield "self.setMaskLayers(outLayer, maskLayerNames)"
             if isInvertMaskLayer: yield "self.setInvertMaskLayers(outLayer, invertMaskLayers)"
 
@@ -129,10 +121,10 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         return layer
 
     def setMaskLayers(self, layer, maskLayerNames):
-        if not self.useInMaskLayerList:
+        if not self.useMaskLayerList:
             maskLayerNames = [maskLayerNames]
 
-        maskLayers = layer.maskLayers
+        maskLayers = {}
         if len(maskLayerNames) > 0:
             for maskLayerName in maskLayerNames:
                 if maskLayerName != "" and maskLayerName != layer.layerName:

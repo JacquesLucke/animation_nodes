@@ -81,7 +81,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         maskLayers = layer.maskLayers
         maskLayerNames = [*maskLayers]
         for maskLayerName in maskLayerNames:
-            if maskLayerName in gpLayers and maskLayerName != layerName:
+            if maskLayerName in gpLayers and maskLayerName != layerName and maskLayerName != "":
                 gpencilLayer.mask_layers.add(gpLayers[maskLayerName])
                 gpencilLayer.mask_layers[maskLayerName].invert = maskLayers[maskLayerName]
 
@@ -108,7 +108,8 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         gpencilLayer.tint_factor = layer.tintFactor
         gpencilLayer.line_change = layer.lineChange
         gpencilLayer.pass_index = layer.passIndex
-        gpencilLayer.use_mask_layer = layer.useMaskLayer
+        if len(layer.maskLayers) > 0:
+            gpencilLayer.use_mask_layer = True
         return gpencilLayer
 
     def getObjectData(self, object):

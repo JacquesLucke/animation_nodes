@@ -23,7 +23,6 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Tint Factor", "tintFactor", value = 0, minValue = 0, maxValue = 1, hide = True)
         self.newInput("Float", "Stroke Thickness", "lineChange", hide = True)
         self.newInput("Integer", "Pass Index", "passIndex", value = 0, minValue = 0, hide = True)
-        self.newInput("Boolean", "Use Mask Layer", "useMaskLayer", value = False, hide = True)
         self.newInput(VectorizedSocket("Text", "useMaskLayerList",
             ("Mask Layer", "maskLayerName"), ("Mask Layers", "maskLayerNames")), hide = True)
         self.newInput(VectorizedSocket("Boolean", "useInvertMaskLayerList",
@@ -33,7 +32,7 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newOutput("GPLayer", "Layer", "layer")
 
     def execute(self, frames, layerName, blendMode, opacity, tintColor, tintFactor, lineChange, passIndex,
-                useMaskLayer, maskLayerNames, invertMaskLayers):
+                maskLayerNames, invertMaskLayers):
         if not self.useFrameList:
             frames = [frames]
         if not self.useMaskLayerList:
@@ -42,6 +41,8 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         frameNumbers = [frame.frameNumber for frame in frames]
         if len(frameNumbers) != len(set(frameNumbers)):
             self.raiseErrorMessage("Some Frame Numbers are repeated.")
+        if layerName == "":
+            self.raiseErrorMessage("Layer name can't be empty.")
         if blendMode not in ['REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE']:
             self.raiseErrorMessage("The blend mode is invalid. \n\nPossible values for 'Blend Mode' are: 'REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE'")
 
@@ -52,4 +53,4 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
                 if maskLayerName != "" and maskLayerName != layerName:
                     maskLayers[maskLayerName] = invertMaskLayers[i]
         return GPLayer(layerName, frames, blendMode, opacity, tintColor, tintFactor, lineChange, passIndex,
-                       useMaskLayer, maskLayers)
+                       maskLayers)

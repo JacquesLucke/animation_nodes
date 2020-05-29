@@ -10,7 +10,6 @@ class GPLayer:
                        tintFactor = None,
                        lineChange = None,
                        passIndex = None,
-                       useMaskLayer = None,
                        maskLayers = None):
 
         if layerName is None: layerName = "AN-Layer"
@@ -21,7 +20,6 @@ class GPLayer:
         if tintFactor is None: tintFactor = 0
         if lineChange is None: lineChange = 0
         if passIndex is None: passIndex = 0
-        if useMaskLayer is None: useMaskLayer = False
         if maskLayers is None: maskLayers = {}
 
         self.frames = frames
@@ -32,7 +30,6 @@ class GPLayer:
         self.tintFactor = tintFactor
         self.lineChange = lineChange
         self.passIndex = passIndex
-        self.useMaskLayer = useMaskLayer
         self.maskLayers = maskLayers
 
     def __repr__(self):
@@ -46,10 +43,9 @@ class GPLayer:
         Tint Factor: {self.tintFactor}
         Stroke Thickness: {self.lineChange}
         Pass Index: {self.passIndex}
-        Use Mask Layer: {self.useMaskLayer}
         Mask Layers: {[*self.maskLayers]}""")
 
     def copy(self):
         return GPLayer(self.layerName, [frame.copy() for frame in self.frames],
                        self.blendMode, self.opacity, self.tintColor, self.tintFactor,
-                       self.lineChange, self.passIndex, self.useMaskLayer, self.maskLayers.copy())
+                       self.lineChange, self.passIndex, self.maskLayers.copy())

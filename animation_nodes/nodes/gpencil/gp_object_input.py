@@ -45,7 +45,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         layer = self.getLayer(evaluatedObject, layerName)
         return GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
                        layer.blend_mode, layer.opacity, layer.tint_color, layer.tint_factor,
-                       layer.line_change, layer.pass_index, layer.use_mask_layer, self.getMaskLayers(layer))
+                       layer.line_change, layer.pass_index, self.getMaskLayers(layer))
 
     def executeList(self, object, useWorldSpace):
         if object is None:
@@ -56,7 +56,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         for layer in self.getLayers(evaluatedObject):
             gpencilLayers.append(GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
                                          layer.blend_mode, layer.opacity, layer.tint_color, layer.tint_factor,
-                                         layer.line_change, layer.pass_index, layer.use_mask_layer, self.getMaskLayers(layer)))
+                                         layer.line_change, layer.pass_index, self.getMaskLayers(layer)))
         return gpencilLayers
 
     def getLayer(self, object, layerName):
