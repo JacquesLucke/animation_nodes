@@ -38,8 +38,8 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             ("Stroke Thickness", "lineChanges"), ("Stroke Thicknesses", "lineChanges")), hide = True)
         self.newInput(VectorizedSocket("Integer", "usePassIndexList",
             ("Pass Index", "passIndices"), ("Pass Indices", "passIndices")), value = 0, minValue = 0)
-        self.newInput(VectorizedSocket("Text", "useMaskLayerList",
-            ("Mask Layer", "maskLayerNames"), ("Mask Layers", "maskLayerNames")))
+        self.newInput(VectorizedSocket("GPLayer", "useMaskLayerList",
+            ("Mask Layer", "maskLayers"), ("Mask Layers", "maskLayers")))
         self.newInput(VectorizedSocket("Boolean", "useInvertMaskLayerList",
             ("Invert Mask Layer", "invertMaskLayers"), ("Invert Mask Layers", "invertMaskLayers")),
             value = False, hide = True)
@@ -97,7 +97,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
                 if isTintFactor:      yield "    layerNew.tintFactor = _tintFactors[i]"
                 if isLineChange:      yield "    layerNew.lineChange = _lineChanges[i]"
                 if isPassIndex:       yield "    layerNew.passIndex = _passIndices[i]"
-                if isMaskLayer:       yield "    self.setMaskLayers(layerNew, maskLayerNames)"
+                if isMaskLayer:       yield "    self.setMaskLayers(layerNew, maskLayers)"
                 if isInvertMaskLayer: yield "    self.setInvertMaskLayers(layerNew, invertMaskLayers)"
                 yield                       "    outLayers.append(layerNew)"
             else:
@@ -111,7 +111,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             if isTintFactor:      yield "outLayer.tintFactor = tintFactors"
             if isLineChange:      yield "outLayer.lineChange = lineChanges"
             if isPassIndex:       yield "outLayer.passIndex = passIndices"
-            if isMaskLayer:       yield "self.setMaskLayers(outLayer, maskLayerNames)"
+            if isMaskLayer:       yield "self.setMaskLayers(outLayer, maskLayers)"
             if isInvertMaskLayer: yield "self.setInvertMaskLayers(outLayer, invertMaskLayers)"
 
     def setBlendMode(self, layer, blendMode):
@@ -120,15 +120,16 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         layer.blendMode = blendMode
         return layer
 
-    def setMaskLayers(self, layer, maskLayerNames):
+    def setMaskLayers(self, layer, maskLayersIn):
         if not self.useMaskLayerList:
-            maskLayerNames = [maskLayerNames]
+            maskLayersIn = [maskLayersIn]
 
-        maskLayers = {}
-        if len(maskLayerNames) > 0:
-            for maskLayerName in maskLayerNames:
-                if maskLayerName != "" and maskLayerName != layer.layerName:
-                    maskLayers[maskLayerName] = False
+        maskLayers = []
+        if len(maskLayersIn) > 0:
+            for maskLayer in maskLayersIn:
+                maskLayerName = maskLayer.layerName
+                if maskLayerName != "" and maskLayer != layer.layerName:
+                    maskLayers.append(maskLayer)
 
         layer.maskLayers = maskLayers
         return layer
@@ -137,9 +138,8 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         invertMaskLayers = VirtualBooleanList.create(invertMaskLayers, False)
 
         maskLayers = layer.maskLayers
-        maskLayerNames = [*maskLayers]
-        for i, maskLayerName in enumerate(maskLayerNames):
-            maskLayers[maskLayerName] = invertMaskLayers[i]
+        for i, maskLayer in enumerate(maskLayers):
+            maskLayer.invertAsMask = invertMaskLayers[i]
 
         layer.maskLayers = maskLayers
         return layer

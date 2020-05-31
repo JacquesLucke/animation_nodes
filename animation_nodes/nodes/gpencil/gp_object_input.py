@@ -45,7 +45,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         layer = self.getLayer(evaluatedObject, layerName)
         return GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
                        layer.blend_mode, layer.opacity, layer.tint_color, layer.tint_factor,
-                       layer.line_change, layer.pass_index, self.getMaskLayers(layer))
+                       layer.line_change, layer.pass_index, False, self.getMaskLayers(layer, object, useWorldSpace))
 
     def executeList(self, object, useWorldSpace):
         if object is None:
@@ -56,7 +56,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         for layer in self.getLayers(evaluatedObject):
             gpencilLayers.append(GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
                                          layer.blend_mode, layer.opacity, layer.tint_color, layer.tint_factor,
-                                         layer.line_change, layer.pass_index, self.getMaskLayers(layer)))
+                                         layer.line_change, layer.pass_index, False, self.getMaskLayers(layer, object, useWorldSpace)))
         return gpencilLayers
 
     def getLayer(self, object, layerName):
@@ -70,10 +70,12 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         gpencil = self.getObjectData(object)
         return gpencil.layers
 
-    def getMaskLayers(self, layer):
-        maskLayers = {}
+    def getMaskLayers(self, layer, object, useWorldSpace):
+        maskLayers = []
         for maskLayer in layer.mask_layers:
-            maskLayers[maskLayer.name] = maskLayer.invert
+            gpMaskLayer = self.executeSingle(object, useWorldSpace, maskLayer.name)
+            gpMaskLayer.invertAsMask = maskLayer.invert
+            maskLayers.append(gpMaskLayer)
         return maskLayers
 
     def getObjectData(self, object):

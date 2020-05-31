@@ -78,12 +78,11 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
         gpLayers = gpencil.layers
         layerName = layer.layerName
         gpencilLayer = gpLayers[layer.layerName]
-        maskLayers = layer.maskLayers
-        maskLayerNames = [*maskLayers]
-        for maskLayerName in maskLayerNames:
+        for maskLayer in layer.maskLayers:
+            maskLayerName = maskLayer.layerName
             if maskLayerName in gpLayers and maskLayerName != layerName and maskLayerName != "":
                 gpencilLayer.mask_layers.add(gpLayers[maskLayerName])
-                gpencilLayer.mask_layers[maskLayerName].invert = maskLayers[maskLayerName]
+                gpencilLayer.mask_layers[maskLayerName].invert = maskLayer.invertAsMask
 
     def setStrokeProperties(self, gpStroke, stroke):
         gpStroke.line_width = stroke.lineWidth

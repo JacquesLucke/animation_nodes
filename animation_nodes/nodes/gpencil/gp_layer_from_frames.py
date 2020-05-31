@@ -23,8 +23,8 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Tint Factor", "tintFactor", value = 0, minValue = 0, maxValue = 1, hide = True)
         self.newInput("Float", "Stroke Thickness", "lineChange", hide = True)
         self.newInput("Integer", "Pass Index", "passIndex", value = 0, minValue = 0, hide = True)
-        self.newInput(VectorizedSocket("Text", "useMaskLayerList",
-            ("Mask Layer", "maskLayerName"), ("Mask Layers", "maskLayerNames")), hide = True)
+        self.newInput(VectorizedSocket("GPLayer", "useMaskLayerList",
+            ("Mask Layer", "maskLayer"), ("Mask Layers", "maskLayers")), hide = True)
         self.newInput(VectorizedSocket("Boolean", "useInvertMaskLayerList",
             ("Invert Mask Layer", "invertMaskLayer"), ("Invert Mask Layers", "invertMaskLayers")),
             value = False, hide = True)
@@ -32,11 +32,11 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newOutput("GPLayer", "Layer", "layer")
 
     def execute(self, frames, layerName, blendMode, opacity, tintColor, tintFactor, lineChange, passIndex,
-                maskLayerNames, invertMaskLayers):
+                maskLayersIn, invertMaskLayers):
         if not self.useFrameList:
             frames = [frames]
         if not self.useMaskLayerList:
-            maskLayerNames = [maskLayerNames]
+            maskLayersIn = [maskLayersIn]
 
         frameNumbers = [frame.frameNumber for frame in frames]
         if len(frameNumbers) != len(set(frameNumbers)):
@@ -46,11 +46,13 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         if blendMode not in ['REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE']:
             self.raiseErrorMessage("The blend mode is invalid. \n\nPossible values for 'Blend Mode' are: 'REGULAR', 'OVERLAY', 'ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE'")
 
-        maskLayers = {}
-        if len(maskLayerNames) > 0:
+        maskLayers = []
+        if len(maskLayersIn) > 0:
             invertMaskLayers = VirtualBooleanList.create(invertMaskLayers, False)
-            for i, maskLayerName in enumerate(maskLayerNames):
+            for i, maskLayer in enumerate(maskLayersIn):
+                maskLayerName = maskLayer.layerName
                 if maskLayerName != "" and maskLayerName != layerName:
-                    maskLayers[maskLayerName] = invertMaskLayers[i]
+                    maskLayer.invertAsMask = invertMaskLayers[i]
+                    maskLayers.append(maskLayer)
         return GPLayer(layerName, frames, blendMode, opacity, tintColor, tintFactor, lineChange, passIndex,
-                       maskLayers)
+                       False, maskLayers)

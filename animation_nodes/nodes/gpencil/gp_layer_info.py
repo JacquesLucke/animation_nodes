@@ -50,7 +50,7 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float", "Tint Factor", "tintFactor", hide = True)
         self.newOutput("Float", "Stroke Thickness", "lineChange", hide = True)
         self.newOutput("Integer", "Pass Index", "passIndex", hide = True)
-        self.newOutput("Text List", "Mask Layers", "maskLayerNames", hide = True)
+        self.newOutput("GPLayer List", "Mask Layers", "maskLayerNames", hide = True)
         self.newOutput("Boolean List", "Invert Mask Layers", "invertMaskLayers", hide = True)
 
     def draw(self, layout):
@@ -75,68 +75,68 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
     def execute_ActiveFrame(self, layer, scene):
         frames = layer.frames
         if len(frames) == 0:
-            maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+            maskLayers, invertMaskLayers = self.getMaskLayers(layer)
             return (GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
-        maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+        maskLayers, invertMaskLayers = self.getMaskLayers(layer)
         return (self.getActiveFrame(scene.frame_current, frames), layer.layerName, layer.blendMode,
                 layer.opacity, layer.tintColor, layer.tintFactor, layer.lineChange, layer.passIndex,
-                maskLayerNames, invertMaskLayers)
+                maskLayers, invertMaskLayers)
 
     def execute_FrameIndex(self, layer, frameIndex):
         frames = layer.frames
         if len(frames) == 0:
-            maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+            maskLayers, invertMaskLayers = self.getMaskLayers(layer)
             return (GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
         frame = self.getFrame(frames, frameIndex)
-        maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+        maskLayers, invertMaskLayers = self.getMaskLayers(layer)
         return (frame, layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
     def execute_FrameIndices(self, layer, frameIndices):
         frames = layer.frames
         if len(frames) == 0:
-            maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+            maskLayers, invertMaskLayers = self.getMaskLayers(layer)
             return ([], layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
         outFrames = [self.getFrame(frames, index) for index in frameIndices]
-        maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+        maskLayers, invertMaskLayers = self.getMaskLayers(layer)
         return (outFrames, layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
     def execute_FrameNumber(self, layer, frameNumber):
         frames = layer.frames
         if len(frames) == 0:
-            maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+            maskLayers, invertMaskLayers = self.getMaskLayers(layer)
             return (GPFrame(), layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
-        maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+        maskLayers, invertMaskLayers = self.getMaskLayers(layer)
         return (self.getFrameFromNumber(frames, frameNumber), layer.layerName, layer.blendMode,
                 layer.opacity, layer.tintColor, layer.tintFactor, layer.lineChange, layer.passIndex,
-                maskLayerNames, invertMaskLayers)
+                maskLayers, invertMaskLayers)
 
     def execute_FrameNumbers(self, layer, inFrameNumbers):
         frames = layer.frames
         if len(frames) == 0:
-            maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+            maskLayers, invertMaskLayers = self.getMaskLayers(layer)
             return ([], layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                    layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
         outFrames = [self.getFrameFromNumber(frames, frameNumber) for frameNumber in inFrameNumbers]
-        maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+        maskLayers, invertMaskLayers = self.getMaskLayers(layer)
         return (outFrames, layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
     def execute_AllFrames(self, layer):
         frames = layer.frames
-        maskLayerNames, invertMaskLayers = self.getMaskLayers(layer)
+        maskLayers, invertMaskLayers = self.getMaskLayers(layer)
         return (frames, layer.layerName, layer.blendMode, layer.opacity, layer.tintColor,
-                layer.tintFactor, layer.lineChange, layer.passIndex, maskLayerNames, invertMaskLayers)
+                layer.tintFactor, layer.lineChange, layer.passIndex, maskLayers, invertMaskLayers)
 
     def getActiveFrame(self, currentFrame, frames):
         return max((frame for frame in frames if frame.frameNumber <= currentFrame),
@@ -155,4 +155,4 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
 
     def getMaskLayers(self, layer):
         maskLayers = layer.maskLayers
-        return list(maskLayers.keys()), BooleanList.fromListOrTuple(list(maskLayers.values()))
+        return maskLayers, [maskLayer.invertAsMask for maskLayer in maskLayers]
