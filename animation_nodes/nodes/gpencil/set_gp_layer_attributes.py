@@ -127,12 +127,23 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         maskLayers = []
         if len(maskLayersIn) > 0:
             for maskLayer in maskLayersIn:
+                if self.isEmptyLayer(maskLayer): continue
                 maskLayerName = maskLayer.layerName
                 if maskLayerName != "" and maskLayer != layer.layerName:
                     maskLayers.append(maskLayer)
 
         layer.maskLayers = maskLayers
         return layer
+
+    def isEmptyLayer(self, layer):
+        count = 0
+        for frame in layer.frames:
+            count += len(frame.strokes)
+
+        if count == 0:
+            return True
+        else:
+            return False
 
     def setInvertMaskLayers(self, layer, invertMaskLayers):
         invertMaskLayers = VirtualBooleanList.create(invertMaskLayers, False)

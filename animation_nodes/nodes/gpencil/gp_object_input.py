@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... utils.depsgraph import getEvaluatedID
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import GPLayer, GPFrame, GPStroke, FloatList, Vector3DList, ColorList
+from ... data_structures import GPLayer, GPFrame, GPStroke, Color, FloatList, Vector3DList, ColorList
 
 importTypeItems = [
     ("ALL", "All", "Get all grease pencil layers", "NONE", 0),
@@ -44,7 +44,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         evaluatedObject = getEvaluatedID(object)
         layer = self.getLayer(evaluatedObject, layerName)
         return GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
-                       layer.blend_mode, layer.opacity, layer.tint_color, layer.tint_factor,
+                       layer.blend_mode, layer.opacity, self.getTintColor(layer), layer.tint_factor,
                        layer.line_change, layer.pass_index, False, self.getMaskLayers(layer, object, useWorldSpace))
 
     def executeList(self, object, useWorldSpace):
@@ -55,7 +55,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         gpencilLayers = []
         for layer in self.getLayers(evaluatedObject):
             gpencilLayers.append(GPLayer(layer.info, self.getFrames(layer, evaluatedObject, useWorldSpace),
-                                         layer.blend_mode, layer.opacity, layer.tint_color, layer.tint_factor,
+                                         layer.blend_mode, layer.opacity, self.getTintColor(layer), layer.tint_factor,
                                          layer.line_change, layer.pass_index, False, self.getMaskLayers(layer, object, useWorldSpace)))
         return gpencilLayers
 
@@ -69,6 +69,10 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
     def getLayers(self, object):
         gpencil = self.getObjectData(object)
         return gpencil.layers
+
+    def getTintColor(self, layer):
+        color = layer.tint_color
+        return Color((color.r, color.g, color.b, 1))
 
     def getMaskLayers(self, layer, object, useWorldSpace):
         maskLayers = []
