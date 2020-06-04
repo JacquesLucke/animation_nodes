@@ -58,9 +58,8 @@ class GPLayer:
                        self.tintFactor, self.lineChange, self.passIndex, self.invertAsMask,
                        self.maskLayers)
 
-    @classmethod
-    def isEmptyLayer(cls, layer):
-        for frame in layer.frames:
+    def isEmptyLayer(self):
+        for frame in self.frames:
             if len(frame.strokes) > 0:
                 return False
         return True

@@ -134,7 +134,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
 
         maskLayers = []
         for maskLayer in maskLayersIn:
-            if GPLayer.isEmptyLayer(maskLayer): continue
+            if maskLayer.isEmptyLayer(): continue
             maskLayerName = maskLayer.layerName
             if maskLayerName != "" and maskLayer != layer.layerName:
                 maskLayers.append(maskLayer)
