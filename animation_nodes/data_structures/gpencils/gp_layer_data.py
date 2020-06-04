@@ -6,6 +6,7 @@ class GPLayer:
                        frames = None,
                        blendMode = None,
                        opacity = None,
+                       useLights = None,
                        tintColor = None,
                        tintFactor = None,
                        lineChange = None,
@@ -17,6 +18,7 @@ class GPLayer:
         if frames is None: frames = []
         if blendMode is None: blendMode = "REGULAR"
         if opacity is None: opacity = 1
+        if useLights is None: useLights = True
         if tintColor is None: tintColor = Color((0, 0, 0, 0))
         if tintFactor is None: tintFactor = 0
         if lineChange is None: lineChange = 0
@@ -28,6 +30,7 @@ class GPLayer:
         self.layerName = layerName
         self.blendMode = blendMode
         self.opacity = opacity
+        self.useLights = useLights
         self.tintColor = tintColor
         self.tintFactor = tintFactor
         self.lineChange = lineChange
@@ -42,6 +45,7 @@ class GPLayer:
         Frames: {len(self.frames)}
         Blend Mode: {self.blendMode}
         Opacity: {self.opacity}
+        Use Lights: {self.useLights}
         Tint Color: {self.tintColor}
         Tint Factor: {self.tintFactor}
         Stroke Thickness: {self.lineChange}
@@ -50,5 +54,6 @@ class GPLayer:
 
     def copy(self):
         return GPLayer(self.layerName, [frame.copy() for frame in self.frames],
-                       self.blendMode, self.opacity, self.tintColor, self.tintFactor,
-                       self.lineChange, self.passIndex, self.invertAsMask, self.maskLayers)
+                       self.blendMode, self.opacity, self.useLights, self.tintColor,
+                       self.tintFactor, self.lineChange, self.passIndex, self.invertAsMask,
+                       self.maskLayers)

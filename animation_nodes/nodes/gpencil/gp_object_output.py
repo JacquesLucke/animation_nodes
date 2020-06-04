@@ -103,6 +103,7 @@ class GPObjectOutputNode(bpy.types.Node, AnimationNode):
             gpencilLayer = gpLayers.new(layerName, set_active = True)
         gpencilLayer.blend_mode = layer.blendMode
         gpencilLayer.opacity = layer.opacity
+        gpencilLayer.use_lights = layer.useLights
         gpencilLayer.tint_color = layer.tintColor[:3]
         gpencilLayer.tint_factor = layer.tintFactor
         gpencilLayer.line_change = layer.lineChange

@@ -13,6 +13,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
     useNameList: VectorizedSocket.newProperty()
     useBlendModeList: VectorizedSocket.newProperty()
     useOpacityList: VectorizedSocket.newProperty()
+    useLightsList: VectorizedSocket.newProperty()
     useTintColorList: VectorizedSocket.newProperty()
     useTintFactorList: VectorizedSocket.newProperty()
     useLineChangeList: VectorizedSocket.newProperty()
@@ -30,6 +31,8 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             ("Blend Mode", "blendModes"), ("Blend Modes", "blendModes")), value = 'REGULAR', hide = True)
         self.newInput(VectorizedSocket("Float", "useOpacityList",
             ("Opacity", "opacities"), ("Opacities", "opacities")), value = 1, minValue = 0, maxValue = 1)
+        self.newInput(VectorizedSocket("Boolean", "useLightsList",
+            ("Use Lights", "useLights"), ("Use Lights", "useLights")), value = False, hide = True)
         self.newInput(VectorizedSocket("Color", "useTintColorList",
             ("Tint Color", "tintColors"), ("Tint Colors", "tintColors")), hide = True)
         self.newInput(VectorizedSocket("Float", "useTintFactorList",
@@ -45,8 +48,8 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             value = False, hide = True)
 
         self.newOutput(VectorizedSocket("GPLayer",
-            ["useLayerList", "useNameList", "useBlendModeList", "useOpacityList", "useTintColorList",
-            "useTintFactorList", "useLineChangeList", "usePassIndexList"],
+            ["useLayerList", "useNameList", "useBlendModeList", "useOpacityList", "useLightsList",
+            "useTintColorList", "useTintFactorList", "useLineChangeList", "usePassIndexList"],
             ("Layer", "outLayer"), ("Layers", "outLayers")))
 
         for socket in self.inputs[1:]:
@@ -58,19 +61,21 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         isName = s[1].isUsed
         isBlendMode = s[2].isUsed
         isOpacity = s[3].isUsed
-        isTintColor = s[4].isUsed
-        isTintFactor = s[5].isUsed
-        isLineChange = s[6].isUsed
-        isPassIndex = s[7].isUsed
-        isMaskLayer = s[8].isUsed
-        isInvertMaskLayer = s[9].isUsed
-        if any([self.useLayerList, self.useNameList, self.useBlendModeList, self.useOpacityList, self.useTintColorList,
-                self.useTintFactorList, self.useLineChangeList, self.usePassIndexList]):
-            if any([isName, isBlendMode, isOpacity, isTintColor, isTintFactor, isLineChange, isPassIndex,
+        isUseLights = s[4].isUsed
+        isTintColor = s[5].isUsed
+        isTintFactor = s[6].isUsed
+        isLineChange = s[7].isUsed
+        isPassIndex = s[8].isUsed
+        isMaskLayer = s[9].isUsed
+        isInvertMaskLayer = s[10].isUsed
+        if any([self.useLayerList, self.useNameList, self.useBlendModeList, self.useOpacityList, self.useLightsList,
+                self.useTintColorList, self.useTintFactorList, self.useLineChangeList, self.usePassIndexList]):
+            if any([isName, isBlendMode, isOpacity, isUseLights, isTintColor, isTintFactor, isLineChange, isPassIndex,
                     isMaskLayer, isInvertMaskLayer]):
                 if isName:            yield "_layerNames = VirtualPyList.create(layerNames, 'AN-Layer')"
                 if isBlendMode:       yield "_blendModes = VirtualPyList.create(blendModes, 'REGULAR')"
                 if isOpacity:         yield "_opacities = VirtualDoubleList.create(opacities, 1)"
+                if isUseLights:       yield "_useLights = VirtualBooleanList.create(useLights, False)"
                 if isTintColor:       yield "_tintColors = VirtualColorList.create(tintColors, Color((0, 0, 0, 0)))"
                 if isTintFactor:      yield "_tintFactors = VirtualDoubleList.create(tintFactors, 0)"
                 if isLineChange:      yield "_lineChanges = VirtualDoubleList.create(lineChanges, 0)"
@@ -81,6 +86,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
                 if isName:            yield "         , _layerNames"
                 if isBlendMode:       yield "         , _blendModes"
                 if isOpacity:         yield "         , _opacities"
+                if isUseLights:       yield "         , _useLights"
                 if isTintColor:       yield "         , _tintColors"
                 if isTintFactor:      yield "         , _tintFactors"
                 if isLineChange:      yield "         , _lineChanges"
@@ -93,6 +99,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
                 if isName:            yield "    layerNew.layerName = _layerNames[i]"
                 if isBlendMode:       yield "    self.setBlendMode(layerNew, _blendModes[i])"
                 if isOpacity:         yield "    layerNew.opacity = _opacities[i]"
+                if isUseLights:       yield "    layerNew.useLights = _useLights[i]"
                 if isTintColor:       yield "    layerNew.tintColor = _tintColors[i]"
                 if isTintFactor:      yield "    layerNew.tintFactor = _tintFactors[i]"
                 if isLineChange:      yield "    layerNew.lineChange = _lineChanges[i]"
@@ -107,6 +114,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             if isName:            yield "outLayer.layerName = layerNames"
             if isBlendMode:       yield "self.setBlendMode(outLayer, blendModes)"
             if isOpacity:         yield "outLayer.opacity = opacities"
+            if isUseLights:       yield "outLayer.useLights = useLights"
             if isTintColor:       yield "outLayer.tintColor = tintColors"
             if isTintFactor:      yield "outLayer.tintFactor = tintFactors"
             if isLineChange:      yield "outLayer.lineChange = lineChanges"

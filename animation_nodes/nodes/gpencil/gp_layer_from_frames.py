@@ -19,6 +19,7 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newInput("Text", "Name", "layerName", value = 'AN-Layer')
         self.newInput("Text", "Blend Mode", "blendMode", value = 'REGULAR')
         self.newInput("Float", "Opacity", "opacity", value = 1, minValue = 0, maxValue = 1)
+        self.newInput("Boolean", "Use Lights", "useLights", value = True, hide = True)
         self.newInput("Color", "Tint Color", "tintColor", hide = True)
         self.newInput("Float", "Tint Factor", "tintFactor", value = 0, minValue = 0, maxValue = 1, hide = True)
         self.newInput("Float", "Stroke Thickness", "lineChange", hide = True)
@@ -31,8 +32,8 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("GPLayer", "Layer", "layer")
 
-    def execute(self, frames, layerName, blendMode, opacity, tintColor, tintFactor, lineChange, passIndex,
-                maskLayersIn, invertMaskLayers):
+    def execute(self, frames, layerName, blendMode, opacity, useLights, tintColor, tintFactor, lineChange,
+                passIndex, maskLayersIn, invertMaskLayers):
         if not self.useFrameList:
             frames = [frames]
         if not self.useMaskLayerList:
@@ -54,5 +55,5 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
                 if maskLayerName != "" and maskLayerName != layerName:
                     maskLayer.invertAsMask = invertMaskLayers[i]
                     maskLayers.append(maskLayer)
-        return GPLayer(layerName, frames, blendMode, opacity, tintColor, tintFactor, lineChange, passIndex,
-                       False, maskLayers)
+        return GPLayer(layerName, frames, blendMode, opacity, useLights, tintColor, tintFactor, lineChange,
+                       passIndex, False, maskLayers)
