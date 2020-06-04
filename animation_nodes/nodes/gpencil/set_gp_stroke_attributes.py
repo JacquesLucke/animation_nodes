@@ -80,7 +80,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
                 yield                     "for i in range(amount):"
                 yield                     "    strokeNew = _strokes[i].copy()"
                 if isLineWidth:     yield "    strokeNew.lineWidth = _lineWidths[i]"
-                if isHardness:     yield "    strokeNew.hardness = _hardnesses[i]"
+                if isHardness:      yield "    strokeNew.hardness = _hardnesses[i]"
                 if isCylic:         yield "    strokeNew.drawCyclic = _cyclics[i]"
                 if isStartCapMode:  yield "    self.setStartCapMode(strokeNew, _startCapModes[i])"
                 if isEndCapMode:    yield "    self.setEndCapMode(strokeNew, _endCapModes[i])"
@@ -93,7 +93,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
         else:
             yield                     "outStroke = strokes"
             if isLineWidth:     yield "outStroke.lineWidth = lineWidths"
-            if isHardness:     yield "outStroke.hardness = hardness"
+            if isHardness:      yield "outStroke.hardness = hardnesses"
             if isCylic:         yield "outStroke.drawCyclic = cyclics"
             if isStartCapMode:  yield "self.setStartCapMode(outStroke, startCapModes)"
             if isEndCapMode:    yield "self.setEndCapMode(outStroke, endCapModes)"
