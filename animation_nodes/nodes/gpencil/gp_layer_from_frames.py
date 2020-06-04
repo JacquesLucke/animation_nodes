@@ -51,9 +51,21 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         if len(maskLayersIn) > 0:
             invertMaskLayers = VirtualBooleanList.create(invertMaskLayers, False)
             for i, maskLayer in enumerate(maskLayersIn):
+                if self.isEmptyLayer(maskLayer): continue
                 maskLayerName = maskLayer.layerName
                 if maskLayerName != "" and maskLayerName != layerName:
                     maskLayer.invertAsMask = invertMaskLayers[i]
                     maskLayers.append(maskLayer)
+
         return GPLayer(layerName, frames, blendMode, opacity, useLights, tintColor, tintFactor, lineChange,
                        passIndex, False, maskLayers)
+
+    def isEmptyLayer(self, layer):
+        count = 0
+        for frame in layer.frames:
+            count += len(frame.strokes)
+
+        if count == 0:
+            return True
+        else:
+            return False
