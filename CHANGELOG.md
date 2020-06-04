@@ -28,6 +28,7 @@
 - Fixed the None material issue of the Material Output node.
 - Fixed the Cycles Material Output node.
 - Fixed incompatible declaration in getTrimmedCopy_LowLevel method.
+- Fixed Grease Pencil nodes for latest Blender API changes.
 
 ### Changed
 
