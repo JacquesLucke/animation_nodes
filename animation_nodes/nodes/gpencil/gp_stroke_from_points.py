@@ -38,7 +38,7 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
         strengths = FloatList.fromValues(VirtualDoubleList.create(strengths, 1).materialize(amount))
         pressures = FloatList.fromValues(VirtualDoubleList.create(pressures, 1).materialize(amount))
         uvRotations = FloatList.fromValues(VirtualDoubleList.create(uvRotations, 0).materialize(amount))
-        vertexColors = ColorList.fromValues(VirtualColorList.create(vertexColors, Color((0, 0, 0, 0))).materialize(amount))
+        vertexColors = VirtualColorList.create(vertexColors, Color((0, 0, 0, 0))).materialize(amount)
 
         if startCapMode not in ['ROUND', 'FLAT']:
             self.raiseErrorMessage("The Start Cap Mode is invalid. \n\nPossible values for 'Start Cap Mode' are: 'ROUND', 'FLAT'")

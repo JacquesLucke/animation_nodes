@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... events import propertyChanged
-from ... data_structures import VirtualBooleanList
+from ... data_structures import GPLayer, VirtualBooleanList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
@@ -135,23 +135,13 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
         maskLayers = []
         if len(maskLayersIn) > 0:
             for maskLayer in maskLayersIn:
-                if self.isEmptyLayer(maskLayer): continue
+                if GPLayer.isEmptyLayer(maskLayer): continue
                 maskLayerName = maskLayer.layerName
                 if maskLayerName != "" and maskLayer != layer.layerName:
                     maskLayers.append(maskLayer)
 
         layer.maskLayers = maskLayers
         return layer
-
-    def isEmptyLayer(self, layer):
-        count = 0
-        for frame in layer.frames:
-            count += len(frame.strokes)
-
-        if count == 0:
-            return True
-        else:
-            return False
 
     def setInvertMaskLayers(self, layer, invertMaskLayers):
         invertMaskLayers = VirtualBooleanList.create(invertMaskLayers, False)

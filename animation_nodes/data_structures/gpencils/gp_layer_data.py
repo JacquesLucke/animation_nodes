@@ -57,3 +57,10 @@ class GPLayer:
                        self.blendMode, self.opacity, self.useLights, self.tintColor,
                        self.tintFactor, self.lineChange, self.passIndex, self.invertAsMask,
                        self.maskLayers)
+
+    @classmethod
+    def isEmptyLayer(cls, layer):
+        for frame in layer.frames:
+            if len(frame.strokes) > 0:
+                return False
+        return True
