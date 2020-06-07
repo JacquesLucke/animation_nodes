@@ -32,6 +32,10 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
                        "it will be exported as animation by exporters (mainly Alembic)"),
         update = propertyChanged)
 
+    calculateLooseEdges: BoolProperty(name = "Calculate Loose Edges", default = False,
+        description = "Make sure Blender will draw edges that are not part of a polygon",
+        update = propertyChanged)
+
     def create(self):
         socket = self.newInput("Object", "Object", "object")
         socket.defaultDrawType = "PROPERTY_ONLY"
@@ -70,6 +74,8 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         subcol = col.column(align = True)
         subcol.active = self.validateMesh
         subcol.prop(self, "validateMeshVerbose", text = "Print Validation Info")
+
+        layout.prop(self, "calculateLooseEdges")
 
     def getExecutionCode(self, required):
         yield "if self.isValidObject(object):"
@@ -134,6 +140,9 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
         if self.validateMesh:
             outMesh.validate(verbose = self.validateMeshVerbose)
+
+        if self.calculateLooseEdges:
+            outMesh.update(calc_edges_loose = True)
 
     def setBMesh(self, mesh, bm):
         bm.to_mesh(mesh)
