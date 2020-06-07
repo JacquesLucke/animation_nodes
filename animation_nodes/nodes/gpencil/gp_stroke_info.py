@@ -13,7 +13,9 @@ class GPStrokeInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float List", "Strengths", "strengths")
         self.newOutput("Float List", "Pressures", "pressures")
         self.newOutput("Float List", "UV-Rotations", "uvRotations", hide = True)
+        self.newOutput("Color List", "Vertex Colors", "vertexColors")
         self.newOutput("Float", "Line Width", "lineWidth")
+        self.newOutput("Float", "Hardness", "hardness")
         self.newOutput("Boolean", "Cyclic", "drawCyclic", hide = True)
         self.newOutput("Text", "Start Cap Mode", "startCapMode", hide = True)
         self.newOutput("Text", "End Cap Mode", "endCapMode", hide = True)
@@ -24,6 +26,6 @@ class GPStrokeInfoNode(bpy.types.Node, AnimationNode):
         strengths = DoubleList.fromValues(stroke.strengths)
         pressures = DoubleList.fromValues(stroke.pressures)
         uvRotations = DoubleList.fromValues(stroke.uvRotations)
-        return (stroke.vertices, strengths, pressures, uvRotations, stroke.lineWidth,
-                stroke.drawCyclic, stroke.startCapMode, stroke.endCapMode, stroke.materialIndex,
-                stroke.displayMode)
+        return (stroke.vertices, strengths, pressures, uvRotations, stroke.vertexColors,
+                stroke.lineWidth, stroke.hardness, stroke.drawCyclic, stroke.startCapMode,
+                stroke.endCapMode, stroke.materialIndex, stroke.displayMode)

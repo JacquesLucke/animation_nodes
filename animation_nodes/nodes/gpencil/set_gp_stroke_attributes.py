@@ -10,6 +10,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
 
     useStrokeList: VectorizedSocket.newProperty()
     useLineWidthList: VectorizedSocket.newProperty()
+    useHardnessList: VectorizedSocket.newProperty()
     useCyclicList: VectorizedSocket.newProperty()
     useStartCapModeList: VectorizedSocket.newProperty()
     useEndCapModeList: VectorizedSocket.newProperty()
@@ -21,6 +22,8 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
             ("Stroke", "strokes"), ("Strokes", "strokes")), dataIsModified = True)
         self.newInput(VectorizedSocket("Float", "useLineWidthList",
             ("Line Width", "lineWidths"), ("Line Widths", "lineWidths")), value = 250, minValue = 0)
+        self.newInput(VectorizedSocket("Float", "useHardnessList",
+            ("Hardness", "hardnesses"), ("Hardnesses", "hardnesses")), value = 1, minValue = 0, maxValue = 1)
         self.newInput(VectorizedSocket("Boolean", "useCyclicList",
             ("Cyclic", "cyclics"), ("Cyclics", "cyclics")), value = False, hide = True)
         self.newInput(VectorizedSocket("Text", "useStartCapModeList",
@@ -44,15 +47,18 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self, required):
         s = self.inputs
         isLineWidth = s[1].isUsed
-        isCylic = s[2].isUsed
-        isStartCapMode = s[3].isUsed
-        isEndCapMode = s[4].isUsed
-        isMaterialIndex = s[5].isUsed
-        isDisplayMode = s[6].isUsed
-        if any([self.useStrokeList, self.useLineWidthList, self.useCyclicList, self.useStartCapModeList,
-                self.useEndCapModeList, self.useMaterialIndexList, self.useDisplayModeList]):
-            if any([isLineWidth, isCylic, isStartCapMode, isEndCapMode, isMaterialIndex, isDisplayMode]):
+        isHardness = s[2].isUsed
+        isCylic = s[3].isUsed
+        isStartCapMode = s[4].isUsed
+        isEndCapMode = s[5].isUsed
+        isMaterialIndex = s[6].isUsed
+        isDisplayMode = s[7].isUsed
+
+        if any([self.useStrokeList, self.useLineWidthList, self.useHardnessList, self.useCyclicList,
+                self.useStartCapModeList, self.useEndCapModeList, self.useMaterialIndexList, self.useDisplayModeList]):
+            if any([isLineWidth, isHardness, isCylic, isStartCapMode, isEndCapMode, isMaterialIndex, isDisplayMode]):
                 if isLineWidth:     yield "_lineWidths = VirtualDoubleList.create(lineWidths, 0)"
+                if isHardness:     yield "_hardnesses = VirtualDoubleList.create(hardnesses, 0)"
                 if isCylic:         yield "_cyclics = VirtualBooleanList.create(cyclics, False)"
                 if isStartCapMode:  yield "_startCapModes = VirtualPyList.create(startCapModes, 'ROUND')"
                 if isEndCapMode:    yield "_endCapModes = VirtualPyList.create(endCapModes, 'ROUND')"
@@ -62,6 +68,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
                 yield                     "_strokes = VirtualPyList.create(strokes, GPStroke())"
                 yield                     "amount = VirtualPyList.getMaxRealLength(_strokes"
                 if isLineWidth:     yield "         , _lineWidths"
+                if isHardness:     yield "         , _hardnesses"
                 if isCylic:         yield "         , _cyclics"
                 if isStartCapMode:  yield "         , _startCapModes"
                 if isEndCapMode:    yield "         , _endCapModes"
@@ -73,6 +80,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
                 yield                     "for i in range(amount):"
                 yield                     "    strokeNew = _strokes[i].copy()"
                 if isLineWidth:     yield "    strokeNew.lineWidth = _lineWidths[i]"
+                if isHardness:      yield "    strokeNew.hardness = _hardnesses[i]"
                 if isCylic:         yield "    strokeNew.drawCyclic = _cyclics[i]"
                 if isStartCapMode:  yield "    self.setStartCapMode(strokeNew, _startCapModes[i])"
                 if isEndCapMode:    yield "    self.setEndCapMode(strokeNew, _endCapModes[i])"
@@ -85,6 +93,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
         else:
             yield                     "outStroke = strokes"
             if isLineWidth:     yield "outStroke.lineWidth = lineWidths"
+            if isHardness:      yield "outStroke.hardness = hardnesses"
             if isCylic:         yield "outStroke.drawCyclic = cyclics"
             if isStartCapMode:  yield "self.setStartCapMode(outStroke, startCapModes)"
             if isEndCapMode:    yield "self.setEndCapMode(outStroke, endCapModes)"
