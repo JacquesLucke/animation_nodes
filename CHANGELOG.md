@@ -15,6 +15,7 @@
 - Added Object Material Input node.
 - Added Vector Noise node to the node menu.
 - Added *Use Spline Radius* option in *Spline Falloff* node.
+- Added *Calculate Loose Edges* option in *Mesh Object Output* node.
 
 ### Fixed
 
@@ -29,6 +30,7 @@
 - Fixed the Cycles Material Output node.
 - Fixed incompatible declaration in getTrimmedCopy_LowLevel method.
 - Fixed Grease Pencil nodes for latest Blender API changes.
+- Fixed Project Point On Line distance output.
 
 ### Changed
 

@@ -426,7 +426,7 @@ cdef project_PointOnLine(Vector3 *lineStart, Vector3 *lineEnd, Vector3 *point,
     addVec3(&projection, lineStart, &projVector)
     length = lengthVec3(&direction1)
     parameter = factor / length if length != 0 else 0
-    distance = distanceVec3(&projVector, point)
+    distance = distanceVec3(&projection, point)
 
     outProjection[0] = projection
     outParameter[0] = parameter
