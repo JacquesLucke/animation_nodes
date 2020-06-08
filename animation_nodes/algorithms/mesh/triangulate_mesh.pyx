@@ -2,7 +2,7 @@ import cython
 from libc.stdlib cimport qsort
 from libc.math cimport sin, cos, pi
 from ... data_structures cimport (
-    LongList, Vector3DList, PolygonIndicesList)
+    LongList, FloatList, Vector3DList, PolygonIndicesList)
 from ... math cimport (
     Vector3, crossVec3, subVec3, dotVec3, toVector3, lengthVec3,
     angleNormalizedVec3, normalizeVec3_InPlace
@@ -72,8 +72,9 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
     cdef unsigned int *newPolyLengths = newPolygons.polyLengths.data
 
     cdef LongList neighbors, angles, sortAngles, mask, earNeighbors, earNextNeighbors
-    cdef Vector3 preVertex, earVertex, nexVertex, v1, v2, v3
+    cdef Vector3 preVertex, earVertex, nexVertex, v0, v1, v2, v3, v4
     cdef Vector3DList polyVertices
+    cdef FloatList convexity
     cdef Py_ssize_t polyStart, triIndex, polyIndex, triCount
     cdef Py_ssize_t j, k, index, preIndex, earIndex, nexIndex, prePreIndex, nexNexIndex
 
@@ -94,13 +95,15 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
             neighbors = neighbors.reversed()
             polyVertices = polyVertices.reversed()
 
-        # Calculate inner-angle for all vertices of polygon.
+        # Calculate inner-angle and convexity for all vertices of polygon.
         angles = LongList(length = polyLength)
+        convexity = FloatList(length = polyLength)
         for j in range(polyLength):
             preVertex = polyVertices.data[(polyLength + j - 1) % polyLength]
             earVertex = polyVertices.data[j]
             nexVertex = polyVertices.data[(j + 1) % polyLength]
             angles.data[j] = calculateAngle(preVertex, earVertex, nexVertex)
+            convexity.data[j] = convexVertex(preVertex, earVertex, nexVertex)
 
         # Calculate the triangle polygon indices.
         triCount = 0
@@ -117,41 +120,46 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
                         index += 1
                         if index == 3: break
                 polyIndex += 3
-
                 break
 
             sortAngles = angles.copy()
             qsort(sortAngles.data, sortAngles.length, sizeof(long), &compare)
 
-            # Removing an ear which has smallest inner-angle
+            # Removing an ear which has smallest inner-angle.
             for k in range(polyLength):
                 earIndex = angles.index(sortAngles.data[k])
-                if mask.data[earIndex] < 1:
-                    earNeighbors = earNeighborIndices(earIndex, polyLength, mask)
-                    preIndex = earNeighbors.data[0]
-                    nexIndex = earNeighbors.data[1]
+                if mask.data[earIndex] == 1 or convexity.data[earIndex] < 0.0: continue
 
-                    v1 = polyVertices.data[preIndex]
-                    v2 = polyVertices.data[earIndex]
-                    v3 = polyVertices.data[nexIndex]
-                    if convexVertex(v1, v2, v3) and not pointsInTriangle(polyVertices, v1, v2, v3, preIndex, earIndex, nexIndex):
-                        earNextNeighbors = earNextNeighborIndices(earIndex, preIndex, nexIndex, polyLength, mask)
-                        triCount += 1
-                        mask.data[earIndex] = 1
-                        angles.data[earIndex] = 361
-                        angles.data[preIndex] = calculateAngle(polyVertices.data[earNextNeighbors.data[0]], v1, v3)
-                        angles.data[nexIndex] = calculateAngle(v1, v3, polyVertices.data[earNextNeighbors.data[1]])
+                earNeighbors = earNeighborIndices(earIndex, polyLength, mask)
+                preIndex = earNeighbors.data[0]
+                nexIndex = earNeighbors.data[1]
 
-                        newPolyStarts[triIndex] = polyIndex
-                        newPolyLengths[triIndex] = 3
-                        triIndex += 1
+                v1 = polyVertices.data[preIndex]
+                v2 = polyVertices.data[earIndex]
+                v3 = polyVertices.data[nexIndex]
+                if not pointsInTriangle(polyVertices, v1, v2, v3, preIndex, earIndex, nexIndex):
+                    earNextNeighbors = earNextNeighborIndices(earIndex, preIndex, nexIndex, polyLength, mask)
+                    triCount += 1
+                    mask.data[earIndex] = 1
+                    angles.data[earIndex] = 361
 
-                        newIndices[polyIndex] = neighbors.data[preIndex]
-                        newIndices[polyIndex + 1] = neighbors.data[earIndex]
-                        newIndices[polyIndex + 2] = neighbors.data[nexIndex]
-                        polyIndex += 3
+                    v0 = polyVertices.data[earNextNeighbors.data[0]]
+                    angles.data[preIndex] = calculateAngle(v0, v1, v3)
+                    convexity.data[preIndex] = convexVertex(v0, v1, v3)
 
-                        break
+                    v4 = polyVertices.data[earNextNeighbors.data[1]]
+                    angles.data[nexIndex] = calculateAngle(v1, v3, v4)
+                    convexity.data[nexIndex] = convexVertex(v1, v3, v4)
+
+                    newPolyStarts[triIndex] = polyIndex
+                    newPolyLengths[triIndex] = 3
+                    triIndex += 1
+
+                    newIndices[polyIndex] = neighbors.data[preIndex]
+                    newIndices[polyIndex + 1] = neighbors.data[earIndex]
+                    newIndices[polyIndex + 2] = neighbors.data[nexIndex]
+                    polyIndex += 3
+                    break
 
     return newPolygons
 
@@ -228,11 +236,10 @@ cdef LongList earNextNeighborIndices(Py_ssize_t earIndex, Py_ssize_t preIndex, P
 
     return indices
 
-# Make sure normal (+z) is correct, and the polygon is counter clockwise.
-cdef bint convexVertex(Vector3 v1, Vector3 v2, Vector3 v3):
+# Make sure normal (+z) is correct, and the polygon is counter clockwise. Convex vertex has sign >= 0.
+cdef float convexVertex(Vector3 v1, Vector3 v2, Vector3 v3):
     cdef float sign = (v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x)
-    if sign >= 0: return True
-    return False
+    return sign
 
 # Checking points (reflex type) lies in the new triangle.
 cdef bint pointsInTriangle(Vector3DList vertices, Vector3 v1, Vector3 v2, Vector3 v3,
