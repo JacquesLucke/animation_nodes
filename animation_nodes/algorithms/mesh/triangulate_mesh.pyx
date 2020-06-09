@@ -71,10 +71,10 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
     cdef unsigned int *newPolyStarts = newPolygons.polyStarts.data
     cdef unsigned int *newPolyLengths = newPolygons.polyLengths.data
 
-    cdef LongList neighbors, angles, sortAngles, mask, earNeighbors, earNextNeighbors
+    cdef LongList neighbors, mask, earNeighbors, earNextNeighbors
     cdef Vector3 preVertex, earVertex, nexVertex, v0, v1, v2, v3, v4
+    cdef FloatList angles, sortAngles, convexity
     cdef Vector3DList polyVertices
-    cdef FloatList convexity
     cdef Py_ssize_t polyStart, triIndex, polyIndex, triCount
     cdef Py_ssize_t j, k, index, preIndex, earIndex, nexIndex, prePreIndex, nexNexIndex
 
@@ -96,7 +96,7 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
             polyVertices = polyVertices.reversed()
 
         # Calculate inner-angle and convexity for all vertices of polygon.
-        angles = LongList(length = polyLength)
+        angles = FloatList(length = polyLength)
         convexity = FloatList(length = polyLength)
         for j in range(polyLength):
             preVertex = polyVertices.data[(polyLength + j - 1) % polyLength]
@@ -123,7 +123,7 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
                 break
 
             sortAngles = angles.copy()
-            qsort(sortAngles.data, sortAngles.length, sizeof(long), &compare)
+            qsort(sortAngles.data, sortAngles.length, sizeof(float), &compare)
 
             # Removing an ear which has smallest inner-angle.
             for k in range(polyLength):
@@ -182,8 +182,8 @@ cdef bint polyCounterClockwise(Vector3DList vertices):
     if area > 0.0: return False
     return True
 
-# Calculate Inner angle (degree).
-cdef int calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVertex):
+# Calculate Inner angle.
+cdef float calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVertex):
     cdef Vector3 ab, bc
     cdef float angle
 
@@ -194,7 +194,7 @@ cdef int calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVertex)
     normalizeVec3_InPlace(&bc)
 
     angle = angleNormalizedVec3(&ab, &bc)
-    return int((angle - angle % 0.001) * 180.0 / pi)
+    return (angle - angle % 0.001)
 
 @cython.cdivision(True)
 cdef LongList earNeighborIndices(Py_ssize_t earIndex, Py_ssize_t polyLength, LongList mask):
