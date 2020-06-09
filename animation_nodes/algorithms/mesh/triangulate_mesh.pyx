@@ -16,10 +16,7 @@ def triangulatePolygonsUsingFanSpanMethod(PolygonIndicesList polygons):
     triAmount = 0
     for i in range(polygonAmount):
         polyLength = oldPolyLengths[i]
-        if polyLength > 3:
-            triAmount += polyLength - 2
-        else:
-            triAmount += 1
+        triAmount += polyLength - 2
 
     cdef unsigned int *oldIndices = polygons.indices.data
     cdef unsigned int *oldPolyStarts = polygons.polyStarts.data
