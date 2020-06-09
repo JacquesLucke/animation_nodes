@@ -1,0 +1,55 @@
+name: Build And Deploy
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install Cython --install-option="--no-cython-compile"
+      - name: Setup Development Enviroment
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build
+        run: python setup.py build --export
+      - name: Upload Builds
+        uses: actions/upload-artifact@v2
+        with:
+          name: Builds
+          path: animation_nodes*.zip
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Download Builds
+        uses: actions/download-artifact@v2
+        with:
+          name: Builds
+      - name: Upload Release Assets
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: daily
+          file: animation_nodes*.zip
+          overwrite: true
+          file_glob: true
