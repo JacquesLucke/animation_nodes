@@ -3,10 +3,10 @@ name: Build And Deploy
 on:
   push:
     branches:
-      - master
+      - extranodes
   pull_request:
     branches:
-      - master
+      - extranodes
 
 jobs:
   build:
