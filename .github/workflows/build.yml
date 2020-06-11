@@ -49,7 +49,7 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: daily
+          tag: daily_extranodes
           file: animation_nodes*.zip
           overwrite: true
           file_glob: true
