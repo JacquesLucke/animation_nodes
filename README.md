@@ -1,7 +1,7 @@
 Animation Nodes
 ===============
 
-[![Build Status](https://dev.azure.com/JacquesLucke/animation_nodes/_apis/build/status/JacquesLucke.animation_nodes?branchName=master)](https://dev.azure.com/JacquesLucke/animation_nodes/_build/latest?definitionId=4&branchName=master)
+![Build And Deploy](https://github.com/JacquesLucke/animation_nodes/workflows/Build%20And%20Deploy/badge.svg)
 
 Animation Nodes is a node based visual scripting system designed for motion graphics in [Blender](http://blender.org).
 
