@@ -1,7 +1,3 @@
-from . random_number_generators.random_number_generator cimport (
-    RandomNumberGenerator
-)
-
 from . random_number_generators.splitmix64 cimport (
     SplitMix64
 )

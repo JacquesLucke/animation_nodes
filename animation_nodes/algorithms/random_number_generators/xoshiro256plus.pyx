@@ -1,11 +1,10 @@
 from . utils cimport rotl
 from . cimport SplitMix64
 from libc.stdint cimport uint64_t
-from . cimport RandomNumberGenerator
 
 # Based on http://prng.di.unimi.it/xoshiro256plus.c
 
-cdef class XoShiRo256Plus(RandomNumberGenerator):
+cdef class XoShiRo256Plus:
     def __cinit__(self, uint64_t seed):
         cdef SplitMix64 rng = SplitMix64(seed)
         self.s0 = rng.nextUInt64()
@@ -28,3 +27,10 @@ cdef class XoShiRo256Plus(RandomNumberGenerator):
         self.s3 = rotl(self.s3, <uint64_t>45)
 
         return result
+
+    cdef double nextDouble(self):
+        return (self.nextUInt64() >> <uint64_t>11) * <double>1.1102230246251565e-16
+
+    cdef float nextFloat(self):
+        return (self.nextUInt64() >> <uint64_t>40) * <float>5.960464477539063e-08
+
