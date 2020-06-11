@@ -42,34 +42,34 @@ cdef class XoShiRo256StarStar:
         return self.nextUInt64() < <uint64_t>0
 
     @cython.cdivision(True)
-    cdef uint64_t nextUInt64UpperBound(self, uint64_t n):
+    cdef uint64_t nextUInt64WithMax(self, uint64_t maximum):
         cdef uint64_t t = self.nextUInt64()
-        cdef uint64_t nMinus1 = n - <uint64_t>1
+        cdef uint64_t n = maximum - <uint64_t>1
         cdef uint64_t u = t >> <uint64_t>1
         while True:
-            t = u % n
-            if (u + nMinus1 - t) >= <uint64_t>0:
+            t = u % maximum
+            if (u + n - t) >= <uint64_t>0:
                 return t
             u = self.nextUInt64() >> <uint64_t>1
 
-    cdef long long nextLongLongUpperBound(self, uint64_t n):
-        return <long long>self.nextUInt64UpperBound(n)
+    cdef long long nextLongLongWithMax(self, uint64_t maximum):
+        return <long long>self.nextUInt64WithMax(maximum)
 
-    cdef long nextLongUpperBound(self, uint64_t n):
-        return <long>self.nextUInt64UpperBound(n)
+    cdef long nextLongWithMax(self, uint64_t maximum):
+        return <long>self.nextUInt64WithMax(maximum)
 
-    cdef int nextIntUpperBound(self, uint64_t n):
-        return <int>self.nextUInt64UpperBound(n)
+    cdef int nextIntWithMax(self, uint64_t maximum):
+        return <int>self.nextUInt64WithMax(maximum)
 
-    cdef uint64_t nextUInt64DoubleBound(self, uint64_t start, uint64_t end):
-        return start + self.nextUInt64UpperBound(end - start)
+    cdef uint64_t nextUInt64InRange(self, uint64_t start, uint64_t end):
+        return start + self.nextUInt64WithMax(end - start)
 
-    cdef long long nextLongLongDoubleBound(self, uint64_t start, uint64_t end):
-        return <long long>self.nextUInt64DoubleBound(start, end)
+    cdef long long nextLongLongInRange(self, uint64_t start, uint64_t end):
+        return <long long>self.nextUInt64InRange(start, end)
 
-    cdef long nextLongDoubleBound(self, uint64_t start, uint64_t end):
-        return <long>self.nextUInt64DoubleBound(start, end)
+    cdef long nextLongInRange(self, uint64_t start, uint64_t end):
+        return <long>self.nextUInt64InRange(start, end)
 
-    cdef int nextIntDoubleBound(self, uint64_t start, uint64_t end):
-        return <int>self.nextUInt64DoubleBound(start, end)
+    cdef int nextIntInRange(self, uint64_t start, uint64_t end):
+        return <int>self.nextUInt64InRange(start, end)
 

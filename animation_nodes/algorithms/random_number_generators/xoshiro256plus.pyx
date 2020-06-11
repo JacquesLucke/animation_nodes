@@ -32,6 +32,12 @@ cdef class XoShiRo256Plus:
         cdef uint64_t x = (<uint64_t>0x3FF << <uint64_t>52) | (self.nextUInt64() >> <uint64_t>12)
         return (<double *>(&x))[0] - <double>1.0
 
+    cdef double nextDoubleInRange(self, double start, double end):
+        return start + self.nextDouble() * (end - start)
+
     cdef float nextFloat(self):
         cdef uint64_t x = <uint64_t>0x3F800000 | (<uint64_t>0x007FFFFF & self.nextUInt64())
         return (<float *>(&x))[0] - <float>1.0
+
+    cdef float nextFloatInRange(self, float start, float end):
+        return start + self.nextFloat() * (end - start)
