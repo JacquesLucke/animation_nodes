@@ -31,6 +31,7 @@
 - Fixed incompatible declaration in getTrimmedCopy_LowLevel method.
 - Fixed Grease Pencil nodes for latest Blender API changes.
 - Fixed Project Point On Line distance output.
+- Fixed missing UV and vertex colors in the Transform Mesh node.
 
 ### Changed
 
