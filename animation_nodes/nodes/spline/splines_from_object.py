@@ -43,13 +43,13 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
         if object.type != "CURVE":
             self.raiseErrorMessage("Not a curve object")
 
-        bSplines = object.data.splines
+        evaluatedObject = getEvaluatedID(object)
+        bSplines = evaluatedObject.data.splines
         if 0 <= index < len(bSplines):
             bSpline = bSplines[index]
             if bSpline.type in ("POLY", "BEZIER"):
                 spline = createSplineFromBlenderSpline(bSpline)
                 if useWorldSpace:
-                    evaluatedObject = getEvaluatedID(object)
                     spline.transform(evaluatedObject.matrix_world)
                 return spline
             else:
@@ -62,9 +62,9 @@ class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
         if object.type != "CURVE":
             self.raiseErrorMessage("Not a curve object.")
 
-        splines = createSplinesFromBlenderObject(object)
+        evaluatedObject = getEvaluatedID(object)
+        splines = createSplinesFromBlenderObject(evaluatedObject)
         if useWorldSpace:
-            evaluatedObject = getEvaluatedID(object)
             for spline in splines:
                 spline.transform(evaluatedObject.matrix_world)
         return splines
