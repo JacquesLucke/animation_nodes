@@ -58,6 +58,12 @@ cdef class Mesh:
         self.uvMaps = OrderedDict()
         self.vertexColorLayers = OrderedDict()
 
+    def getMeshProperties(self):
+        return (
+            (self.uvMaps, Vector2DList),
+            (self.vertexColorLayers, ColorList),
+        )
+
     def verticesTransformed(self):
         self.derivedMeshDataCache.pop("Vertex Normals", None)
         self.derivedMeshDataCache.pop("Polygon Centers", None)
@@ -166,9 +172,14 @@ cdef class Mesh:
 
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
-        mesh.transferMeshProperties(self,
-            calcNewLoopProperty = lambda x: x.copy())
+        mesh.copyMeshProperties(self)
         return mesh
+
+    def copyMeshProperties(self, Mesh source):
+        for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
+                self.getMeshProperties(), source.getMeshProperties()):
+            for name, value in sourceMeshProperty.items():
+                meshProperty[name] = value.copy()
 
     def transform(self, transformation):
         self.vertices.transform(transformation)
@@ -197,13 +208,28 @@ cdef class Mesh:
         UV Maps: {self.getUVMapNames()}
         Vertex Colors: {self.getVertexColorLayerNames()}""")
 
-    def transferMeshProperties(self, Mesh source, *, calcNewLoopProperty = None):
-        if calcNewLoopProperty is not None:
-            for name, uvMap in source.uvMaps.items():
-                self.uvMaps[name] = calcNewLoopProperty(uvMap)
+    def replicateMeshProperties(self, Mesh source, long amount):
+        for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
+                self.getMeshProperties(), source.getMeshProperties()):
+            for name, value in sourceMeshProperty.items():
+                meshProperty[name] = value.repeated(amount = amount)
 
-            for name, vertexColorLayer in source.vertexColorLayers.items():
-                self.vertexColorLayers[name] = calcNewLoopProperty(vertexColorLayer)
+    def appendMeshProperties(self, Mesh source):
+        for ((meshProperty, meshPropertyType), (sourceMeshProperty, _)) in zip(
+                self.getMeshProperties(), source.getMeshProperties()):
+            for name in meshProperty.keys():
+                if name in sourceMeshProperty:
+                    meshProperty[name].extend(sourceMeshProperty[name])
+                else:
+                    extension = meshPropertyType(length = source.polygons.indices.length)
+                    extension.fill(0)
+                    meshProperty[name].extend(extension)
+
+            for name in sourceMeshProperty.keys():
+                if name not in meshProperty:
+                    extension = meshPropertyType(length = self.polygons.indices.length)
+                    extension.fill(0)
+                    meshProperty[name] = extension + sourceMeshProperty[name]
 
     @classmethod
     def join(cls, *meshes):
@@ -218,6 +244,8 @@ cdef class Mesh:
         cdef long polygonIndicesOffset = self.polygons.indices.length
         cdef long i
 
+        self.appendMeshProperties(meshData)
+
         self.vertices.extend(meshData.vertices)
 
         self.edges.extend(meshData.edges)
@@ -228,7 +256,6 @@ cdef class Mesh:
         self.polygons.extend(meshData.polygons)
         for i in range(meshData.polygons.indices.length):
             self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
-
 
 def calculatePolygonNormals(Vector3DList vertices, PolygonIndicesList polygons):
     cdef Vector3DList normals = Vector3DList(length = polygons.getLength())
