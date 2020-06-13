@@ -16,6 +16,7 @@
 - Added Vector Noise node to the node menu.
 - Added *Use Spline Radius* option in *Spline Falloff* node.
 - Added *Calculate Loose Edges* option in *Mesh Object Output* node.
+- Added XoShiRo256 random number generators.
 
 ### Fixed
 
