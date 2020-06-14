@@ -1,6 +1,5 @@
 import cython
-from libc.stdlib cimport qsort
-from libc.math cimport sin, cos, pi
+from libc.math cimport sin, cos
 from ... data_structures cimport (
     LongList, FloatList, Vector3DList, PolygonIndicesList)
 from ... math cimport (
@@ -68,9 +67,9 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
     cdef unsigned int *newPolyStarts = newPolygons.polyStarts.data
     cdef unsigned int *newPolyLengths = newPolygons.polyLengths.data
 
-    cdef LongList neighbors, mask, earNeighbors, earNextNeighbors
+    cdef LongList neighbors, preMask, mask, earNeighbors, earNextNeighbors
     cdef Vector3 preVertex, earVertex, nexVertex, v0, v1, v2, v3, v4
-    cdef FloatList angles, sortAngles, convexity
+    cdef FloatList angles, convexity
     cdef Vector3DList polyVertices
     cdef Py_ssize_t polyStart, triIndex, polyIndex, triCount
     cdef Py_ssize_t j, k, index, preIndex, earIndex, nexIndex, prePreIndex, nexNexIndex
@@ -119,13 +118,11 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
                 polyIndex += 3
                 break
 
-            sortAngles = angles.copy()
-            qsort(sortAngles.data, sortAngles.length, sizeof(float), &compare)
-
             # Removing an ear which has smallest inner-angle.
+            preMask = mask.copy()
             for k in range(polyLength):
-                earIndex = angles.index(sortAngles.data[k])
-                if mask.data[earIndex] == 1 or convexity.data[earIndex] < 0.0: continue
+                earIndex = findAngleMinIndex(polyLength, angles, preMask, convexity)
+                preMask.data[earIndex] = 1
 
                 earNeighbors = earNeighborIndices(earIndex, polyLength, mask)
                 preIndex = earNeighbors.data[0]
@@ -138,7 +135,7 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
                     earNextNeighbors = earNextNeighborIndices(earIndex, preIndex, nexIndex, polyLength, mask)
                     triCount += 1
                     mask.data[earIndex] = 1
-                    angles.data[earIndex] = 361
+                    angles.data[earIndex] = 3.14
 
                     v0 = polyVertices.data[earNextNeighbors.data[0]]
                     angles.data[preIndex] = calculateAngle(v0, v1, v3)
@@ -179,7 +176,7 @@ cdef bint polyCounterClockwise(Vector3DList vertices):
     if area > 0.0: return False
     return True
 
-# Calculate Inner angle.
+# Calculate inner angle.
 cdef float calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVertex):
     cdef Vector3 ab, bc
     cdef float angle
@@ -192,6 +189,21 @@ cdef float calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVerte
 
     angle = angleNormalizedVec3(&ab, &bc)
     return (angle - angle % 0.001)
+
+# Find the index of minimum angle.
+cdef int findAngleMinIndex(Py_ssize_t polyLength, FloatList angles,
+                           LongList preMask, FloatList convexity):
+    cdef float angleMin = 3.14
+    cdef float angle
+    cdef Py_ssize_t i, angleMinIndex
+    for i in range(polyLength):
+        if preMask.data[i] == 1 or convexity.data[i] < 0.0: continue
+        angle = angles.data[i]
+        if angleMin > angle:
+            angleMin = angle
+            angleMinIndex = i
+
+    return angleMinIndex
 
 @cython.cdivision(True)
 cdef LongList earNeighborIndices(Py_ssize_t earIndex, Py_ssize_t polyLength, LongList mask):
@@ -323,6 +335,3 @@ cdef Vector3DList projectPolygonVertices(Vector3DList vertices, LongList polygon
         rotPolyVertices.data[i].z = 0.0
 
     return rotPolyVertices
-
-cdef int compare(const void * a, const void * b) nogil:
-   return (<int*>a)[0] - (<int*>b)[0]
