@@ -1,7 +1,7 @@
 import cython
 from libc.math cimport sqrt
 from ... math cimport Vector3
-from ... algorithms.random cimport randomDouble_Range
+from ... algorithms.random_number_generators cimport XoShiRo256Plus
 from ... data_structures cimport (
     LongList,
     FloatList,
@@ -25,9 +25,10 @@ def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, Virt
 
     cdef LongList totalTriPoints
     cdef Py_ssize_t newPointAmount
-    totalTriPoints, newPointAmount = totalPointsOnTriangles(distribution, distLength, triWeights, useWeightForDensity,
+    cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
+    totalTriPoints, newPointAmount = totalPointsOnTriangles(rng, distribution, distLength, triWeights, useWeightForDensity,
                                                             seed, polyAmount, pointAmount)
-    return sampleRandomPoints(vertices, polygons, totalTriPoints, distLength, seed, polyAmount, newPointAmount)
+    return sampleRandomPoints(rng, vertices, polygons, totalTriPoints, distLength, seed, polyAmount, newPointAmount)
 
 @cython.cdivision(True)
 cdef calculateTriangleWeightsAreas(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
@@ -97,13 +98,12 @@ cdef LongList trianglesDistribution(Py_ssize_t polyAmount, FloatList triAreas, F
         for j in range(int(triAreas.data[i] * triWeights.data[i] * resolution / triAreaMin)): distribution.append(i)
     return distribution
 
-cdef totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, FloatList triWeights,
-                            bint useWeightForDensity, Py_ssize_t seed, Py_ssize_t polyAmount,
-                            Py_ssize_t pointAmount):
+cdef totalPointsOnTriangles(XoShiRo256Plus rng, LongList distribution, Py_ssize_t distLength, FloatList triWeights,
+                            bint useWeightForDensity, Py_ssize_t seed, Py_ssize_t polyAmount, Py_ssize_t pointAmount):
     cdef LongList totalTriPoints = LongList.fromValue(0, length = polyAmount)
     cdef Py_ssize_t i
     for i in range(pointAmount):
-        totalTriPoints.data[distribution.data[int(randomDouble_Range(i + seed, 0, distLength))]] += 1
+        totalTriPoints.data[distribution.data[int(rng.nextDoubleInRange(0, distLength))]] += 1
 
     cdef Py_ssize_t newPointAmount = pointAmount
     cdef Py_ssize_t amount
@@ -115,12 +115,12 @@ cdef totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, FloatL
             newPointAmount += amount
     return totalTriPoints, newPointAmount
 
-cdef Vector3DList sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongList totalTriPoints,
+cdef Vector3DList sampleRandomPoints(XoShiRo256Plus rng, Vector3DList vertices, PolygonIndicesList polygons, LongList totalTriPoints,
                                      Py_ssize_t distLength, Py_ssize_t seed, Py_ssize_t polyAmount, Py_ssize_t newPointAmount):
     cdef DoubleList randomPoints = DoubleList(length = newPointAmount)
     cdef Py_ssize_t i
     for i in range(newPointAmount):
-        randomPoints.data[i] = randomDouble_Range(i + seed, 0.0, 1.0)
+        randomPoints.data[i] = rng.nextDoubleInRange(0.0, 1.0)
 
     cdef Vector3DList points = Vector3DList(length = newPointAmount)
     cdef UIntegerList polyLengths = polygons.polyLengths
