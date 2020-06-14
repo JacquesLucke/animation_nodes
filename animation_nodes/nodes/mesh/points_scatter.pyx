@@ -103,7 +103,7 @@ cdef totalPointsOnTriangles(LongList distribution, Py_ssize_t distLength, FloatL
     cdef Py_ssize_t i
     cdef XoShiRo256StarStar rng = XoShiRo256StarStar(seed)
     for i in range(pointAmount):
-        totalTriPoints.data[distribution.data[rng.nextIntInRange(0, distLength)]] += 1
+        totalTriPoints.data[distribution.data[rng.nextIntWithMax(distLength)]] += 1
 
     cdef Py_ssize_t newPointAmount = pointAmount
     cdef Py_ssize_t amount
@@ -121,7 +121,7 @@ cdef Vector3DList sampleRandomPoints(Vector3DList vertices, PolygonIndicesList p
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef Py_ssize_t i
     for i in range(newPointAmount):
-        randomPoints.data[i] = rng.nextDoubleInRange(0.0, 1.0)
+        randomPoints.data[i] = rng.nextDouble()
 
     cdef Vector3DList points = Vector3DList(length = newPointAmount)
     cdef UIntegerList polyLengths = polygons.polyLengths
