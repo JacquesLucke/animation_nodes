@@ -1,5 +1,5 @@
 import cython
-from libc.math cimport sqrt
+from libc.math cimport sqrt, ceil
 from ... math cimport Vector3
 from ... algorithms.random_number_generators cimport XoShiRo256Plus, XoShiRo256StarStar
 from ... data_structures cimport (
@@ -87,12 +87,12 @@ cdef distributionOfPoints(Py_ssize_t polyAmount, FloatList triAreas, FloatList t
     currentAmount = 0
     if useWeightForDensity:
         for i in range(polyAmount):
-            triPointAmount = int(triAreas.data[i] * triAreaTotal)
+            triPointAmount = int(ceil(triAreas.data[i] * triAreaTotal))
             distribution.data[i] = triPointAmount
             currentAmount += triPointAmount
     else:
         for i in range(polyAmount):
-            triPointAmount = int(triAreas.data[i] * triAreaTotal * max(triWeights.data[i], 0))
+            triPointAmount = int(ceil(triAreas.data[i] * triAreaTotal * max(triWeights.data[i], 0)))
             distribution.data[i] = triPointAmount
             currentAmount += triPointAmount
 
@@ -122,7 +122,7 @@ cdef distributionOfPoints(Py_ssize_t polyAmount, FloatList triAreas, FloatList t
     if useWeightForDensity:
         expectedAmount = 0
         for i in range(polyAmount):
-            triPointAmount = int(distribution.data[i] * max(triWeights.data[i], 0))
+            triPointAmount = int(ceil(distribution.data[i] * max(triWeights.data[i], 0)))
             distribution.data[i] = triPointAmount
             expectedAmount += triPointAmount
     return distribution, expectedAmount
