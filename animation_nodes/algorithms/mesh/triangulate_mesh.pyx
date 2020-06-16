@@ -129,30 +129,32 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
                 break
 
             # Removing an ear which has smallest inner-angle.
-            earIndex = findAngleMinIndex(polyLength, verticesData)
-            previousIndex = verticesData[earIndex].previous
-            nextIndex = verticesData[earIndex].next
-
-            removeEarVertex(verticesData, polyVertices, previousIndex, earIndex, nextIndex)
+            earIndex = findEarHasMinAngle(polyLength, verticesData)
 
             newPolyStarts[triangleIndex] = polyIndex
             newPolyLengths[triangleIndex] = 3
             triangleIndex += 1
 
-            newIndices[polyIndex] = neighbors.data[previousIndex]
+            newIndices[polyIndex] = neighbors.data[verticesData[earIndex].previous]
             newIndices[polyIndex + 1] = neighbors.data[earIndex]
-            newIndices[polyIndex + 2] = neighbors.data[nextIndex]
+            newIndices[polyIndex + 2] = neighbors.data[verticesData[earIndex].next]
             polyIndex += 3
+
+            removeEarVertex(verticesData, polyVertices, earIndex)
 
         PyMem_Free(verticesData)
 
     return newPolygons
 
 # Remove ear-vertex and update the neighbor-vertices.
-cdef Vertex* removeEarVertex(Vertex* verticesData, Vector3DList polyVertices, Py_ssize_t previousIndex, Py_ssize_t earIndex, Py_ssize_t nextIndex):
+cdef Vertex* removeEarVertex(Vertex* verticesData, Vector3DList polyVertices, Py_ssize_t earIndex):
     cdef Py_ssize_t previousPreviousIndex, nextNextIndex
     cdef Vector3 v0, v1, v2, v3, v4
+    cdef Py_ssize_t previousIndex, nextIndex
     cdef float angle
+
+    previousIndex = verticesData[earIndex].previous
+    nextIndex = verticesData[earIndex].next
 
     v1 = polyVertices.data[previousIndex]
     v2 = polyVertices.data[earIndex]
@@ -162,7 +164,8 @@ cdef Vertex* removeEarVertex(Vertex* verticesData, Vector3DList polyVertices, Py
     v0 = polyVertices.data[previousPreviousIndex]
     angle = calculateAngleWithSign(v0, v1, v3)
     verticesData[previousIndex].angle = angle
-    if angle >= 0.0 and not pointsInTriangle(polyVertices, v0, v1, v3, previousPreviousIndex, previousIndex, nextIndex):
+    if angle >= 0.0 and not pointsInTriangle(polyVertices, v0, v1, v3, previousPreviousIndex,
+                                             previousIndex, nextIndex):
         verticesData[previousIndex].isEar = True
     else:
         verticesData[previousIndex].isEar = False
@@ -171,7 +174,8 @@ cdef Vertex* removeEarVertex(Vertex* verticesData, Vector3DList polyVertices, Py
     v4 = polyVertices.data[nextNextIndex]
     angle = calculateAngleWithSign(v1, v3, v4)
     verticesData[nextIndex].angle = angle
-    if angle >= 0.0 and not pointsInTriangle(polyVertices, v1, v3, v4, previousIndex, nextIndex, nextNextIndex):
+    if angle >= 0.0 and not pointsInTriangle(polyVertices, v1, v3, v4, previousIndex, nextIndex,
+                                             nextNextIndex):
         verticesData[nextIndex].isEar = True
     else:
         verticesData[nextIndex].isEar = False
@@ -225,7 +229,7 @@ cdef float calculateAngleWithSign(Vector3 v1, Vector3 v2, Vector3 v3):
     return (angle - angle % 0.001)
 
 # Find the index of minimum angle.
-cdef int findAngleMinIndex(Py_ssize_t polyLength, Vertex* verticesData):
+cdef int findEarHasMinAngle(Py_ssize_t polyLength, Vertex* verticesData):
     cdef float angleMin = 3.14
     cdef float angle
     cdef Py_ssize_t i, angleMinIndex
