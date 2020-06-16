@@ -1,5 +1,6 @@
 import cython
 from libc.math cimport sin, cos
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from ... data_structures cimport (
     LongList, FloatList, Vector3DList, PolygonIndicesList)
 from ... math cimport (
@@ -67,12 +68,13 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
     cdef unsigned int *newPolyStarts = newPolygons.polyStarts.data
     cdef unsigned int *newPolyLengths = newPolygons.polyLengths.data
 
-    cdef LongList neighbors, preMask, mask, earNeighbors, earNextNeighbors
-    cdef Vector3 preVertex, earVertex, nexVertex, v0, v1, v2, v3, v4
-    cdef FloatList angles, convexity
+    cdef LongList neighbors
     cdef Vector3DList polyVertices
-    cdef Py_ssize_t polyStart, triIndex, polyIndex, triCount
-    cdef Py_ssize_t j, k, index, preIndex, earIndex, nexIndex, prePreIndex, nexNexIndex
+    cdef Vector3 v1, v2, v3
+    cdef Py_ssize_t polyStart, triIndex, polyIndex
+    cdef Py_ssize_t j, index, preIndex, earIndex, nexIndex
+    cdef float angle
+    cdef Vertex* ver
 
     triIndex = 0
     polyIndex = 0
@@ -81,81 +83,109 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
         polyStart = oldPolyStarts[i]
 
         neighbors = LongList(length = polyLength)
-        mask = LongList(length = polyLength)
         for j in range(polyLength):
             neighbors.data[j] = oldIndices[polyStart + j]
-            mask.data[j] = 0
 
         polyVertices = projectPolygonVertices(vertices, neighbors)
         if not polyCounterClockwise(polyVertices):
             neighbors = neighbors.reversed()
             polyVertices = polyVertices.reversed()
 
-        # Calculate inner-angle and convexity for all vertices of polygon.
-        angles = FloatList(length = polyLength)
-        convexity = FloatList(length = polyLength)
+        # Initialization of polygon's vertices.
+        ver = <Vertex*>PyMem_Malloc(polyLength * sizeof(Vertex))
         for j in range(polyLength):
-            preVertex = polyVertices.data[(polyLength + j - 1) % polyLength]
-            earVertex = polyVertices.data[j]
-            nexVertex = polyVertices.data[(j + 1) % polyLength]
-            angles.data[j] = calculateAngle(preVertex, earVertex, nexVertex)
-            convexity.data[j] = convexVertex(preVertex, earVertex, nexVertex)
+            preIndex = (polyLength + j - 1) % polyLength
+            earIndex = j
+            nexIndex = (j + 1) % polyLength
+
+            v1 = polyVertices.data[preIndex]
+            v2 = polyVertices.data[earIndex]
+            v3 = polyVertices.data[nexIndex]
+
+            ver[j].index = neighbors.data[earIndex]
+            angle = calculateAngleWithSign(v1, v2, v3)
+            ver[j].angle = angle
+            if angle >= 0.0 and not pointsInTriangle(polyVertices, v1, v2, v3, preIndex, earIndex, nexIndex):
+                ver[j].isEar = True
+            else:
+                ver[j].isEar = False
+            ver[j].previous = preIndex
+            ver[j].next = nexIndex
 
         # Calculate the triangle polygon indices.
-        triCount = 0
         for j in range(polyLength - 2):
-            if polyLength - 2 - triCount == 1:
+            if polyLength - 2 - j == 1:
                 newPolyStarts[triIndex] = polyIndex
                 newPolyLengths[triIndex] = 3
                 triIndex += 1
 
                 index = 0
                 for k in range(polyLength):
-                    if mask.data[k] < 1:
-                        newIndices[polyIndex + index] = neighbors.data[k]
+                    if ver[k].isEar:
+                        newIndices[polyIndex + index] = ver[k].index
                         index += 1
                         if index == 3: break
                 polyIndex += 3
                 break
 
             # Removing an ear which has smallest inner-angle.
-            preMask = mask.copy()
-            for k in range(polyLength):
-                earIndex = findAngleMinIndex(polyLength, angles, preMask, convexity)
-                preMask.data[earIndex] = 1
+            earIndex = findAngleMinIndex(polyLength, ver)
+            preIndex = ver[earIndex].previous
+            nexIndex = ver[earIndex].next
 
-                earNeighbors = earNeighborIndices(earIndex, polyLength, mask)
-                preIndex = earNeighbors.data[0]
-                nexIndex = earNeighbors.data[1]
+            removeEarVertex(ver, polyVertices, preIndex, earIndex, nexIndex)
 
-                v1 = polyVertices.data[preIndex]
-                v2 = polyVertices.data[earIndex]
-                v3 = polyVertices.data[nexIndex]
-                if not pointsInTriangle(polyVertices, v1, v2, v3, preIndex, earIndex, nexIndex):
-                    earNextNeighbors = earNextNeighborIndices(earIndex, preIndex, nexIndex, polyLength, mask)
-                    triCount += 1
-                    mask.data[earIndex] = 1
-                    angles.data[earIndex] = 3.14
+            newPolyStarts[triIndex] = polyIndex
+            newPolyLengths[triIndex] = 3
+            triIndex += 1
 
-                    v0 = polyVertices.data[earNextNeighbors.data[0]]
-                    angles.data[preIndex] = calculateAngle(v0, v1, v3)
-                    convexity.data[preIndex] = convexVertex(v0, v1, v3)
+            newIndices[polyIndex] = neighbors.data[preIndex]
+            newIndices[polyIndex + 1] = neighbors.data[earIndex]
+            newIndices[polyIndex + 2] = neighbors.data[nexIndex]
+            polyIndex += 3
 
-                    v4 = polyVertices.data[earNextNeighbors.data[1]]
-                    angles.data[nexIndex] = calculateAngle(v1, v3, v4)
-                    convexity.data[nexIndex] = convexVertex(v1, v3, v4)
-
-                    newPolyStarts[triIndex] = polyIndex
-                    newPolyLengths[triIndex] = 3
-                    triIndex += 1
-
-                    newIndices[polyIndex] = neighbors.data[preIndex]
-                    newIndices[polyIndex + 1] = neighbors.data[earIndex]
-                    newIndices[polyIndex + 2] = neighbors.data[nexIndex]
-                    polyIndex += 3
-                    break
+        PyMem_Free(ver)
 
     return newPolygons
+
+# Remove ear-vertex and update the neighbor-vertices.
+cdef Vertex* removeEarVertex(Vertex* ver, Vector3DList polyVertices, Py_ssize_t preIndex, Py_ssize_t earIndex, Py_ssize_t nexIndex):
+    cdef Py_ssize_t prePreIndex, nexNexIndex
+    cdef Vector3 v0, v1, v2, v3, v4
+    cdef float angle
+
+    v1 = polyVertices.data[preIndex]
+    v2 = polyVertices.data[earIndex]
+    v3 = polyVertices.data[nexIndex]
+
+    prePreIndex = ver[preIndex].previous
+    v0 = polyVertices.data[prePreIndex]
+    angle = calculateAngleWithSign(v0, v1, v3)
+    ver[preIndex].angle = angle
+    if angle >= 0.0 and not pointsInTriangle(polyVertices, v0, v1, v3, prePreIndex, preIndex, nexIndex):
+        ver[preIndex].isEar = True
+    else:
+        ver[preIndex].isEar = False
+
+    nexNexIndex = ver[nexIndex].next
+    v4 = polyVertices.data[nexNexIndex]
+    angle = calculateAngleWithSign(v1, v3, v4)
+    ver[nexIndex].angle = angle
+    if angle >= 0.0 and not pointsInTriangle(polyVertices, v1, v3, v4, preIndex, nexIndex, nexNexIndex):
+        ver[nexIndex].isEar = True
+    else:
+        ver[nexIndex].isEar = False
+
+    ver[earIndex].isEar = False
+    ver[nexIndex].previous = preIndex
+    ver[preIndex].next = nexIndex
+
+cdef struct Vertex:
+    Py_ssize_t index
+    float angle
+    bint isEar
+    Py_ssize_t previous
+    Py_ssize_t next
 
 # Make sure normal (+z) is correct.
 @cython.cdivision(True)
@@ -177,78 +207,38 @@ cdef bint polyCounterClockwise(Vector3DList vertices):
     return True
 
 # Calculate inner angle.
-cdef float calculateAngle(Vector3 preVertex, Vector3 earVertex, Vector3 nexVertex):
+cdef float calculateAngleWithSign(Vector3 v1, Vector3 v2, Vector3 v3):
     cdef Vector3 ab, bc
     cdef float angle
 
-    subVec3(&ab, &earVertex, &preVertex)
-    subVec3(&bc, &earVertex, &nexVertex)
+    subVec3(&ab, &v2, &v1)
+    subVec3(&bc, &v2, &v3)
 
     normalizeVec3_InPlace(&ab)
     normalizeVec3_InPlace(&bc)
 
     angle = angleNormalizedVec3(&ab, &bc)
+
+    # Make sure normal (+z) is correct, and the polygon is counter clockwise. Convex vertex has sign >= 0.
+    cdef float sign = (v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x)
+    if sign < 0.0: return -(angle - angle % 0.001)
     return (angle - angle % 0.001)
 
 # Find the index of minimum angle.
-cdef int findAngleMinIndex(Py_ssize_t polyLength, FloatList angles,
-                           LongList preMask, FloatList convexity):
+cdef int findAngleMinIndex(Py_ssize_t polyLength, Vertex* ver):
     cdef float angleMin = 3.14
     cdef float angle
     cdef Py_ssize_t i, angleMinIndex
+
+    angleMinIndex = 0
     for i in range(polyLength):
-        if preMask.data[i] == 1 or convexity.data[i] < 0.0: continue
-        angle = angles.data[i]
-        if angleMin > angle:
-            angleMin = angle
-            angleMinIndex = i
+        if ver[i].isEar:
+            angle = abs(ver[i].angle)
+            if angleMin > angle:
+                angleMin = angle
+                angleMinIndex = i
 
     return angleMinIndex
-
-@cython.cdivision(True)
-cdef LongList earNeighborIndices(Py_ssize_t earIndex, Py_ssize_t polyLength, LongList mask):
-    cdef LongList indices = LongList(length = 2)
-    cdef Py_ssize_t i, index
-    for i in range(polyLength - 1):
-        index = earIndex - 1 - i
-        if index < 0: index += polyLength
-        if mask.data[index] < 1:
-            indices.data[0] = index
-            break
-
-    for i in range(polyLength - 1):
-        index = (earIndex + 1 + i) % polyLength
-        if mask.data[index] < 1:
-            indices.data[1] = index
-            break
-
-    return indices
-
-@cython.cdivision(True)
-cdef LongList earNextNeighborIndices(Py_ssize_t earIndex, Py_ssize_t preIndex, Py_ssize_t nexIndex,
-                                     Py_ssize_t polyLength, LongList mask):
-    cdef LongList indices = LongList(length = 2)
-    cdef Py_ssize_t i, index
-
-    for i in range(polyLength - 1):
-        index = earIndex - 2 - i
-        if index < 0: index += polyLength
-        if mask.data[index] < 1 and index != earIndex and index != preIndex and index != nexIndex:
-            indices.data[0] = index
-            break
-
-    for i in range(polyLength - 1):
-        index = (earIndex + 2 + i) % polyLength
-        if mask.data[index] < 1 and index != earIndex and index != preIndex and index != nexIndex:
-            indices.data[1] = index
-            break
-
-    return indices
-
-# Make sure normal (+z) is correct, and the polygon is counter clockwise. Convex vertex has sign >= 0.
-cdef float convexVertex(Vector3 v1, Vector3 v2, Vector3 v3):
-    cdef float sign = (v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x)
-    return sign
 
 # Checking points (reflex type) lies in the new triangle.
 cdef bint pointsInTriangle(Vector3DList vertices, Vector3 v1, Vector3 v2, Vector3 v3,
