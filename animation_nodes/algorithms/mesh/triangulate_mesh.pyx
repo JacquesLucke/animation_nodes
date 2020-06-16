@@ -28,16 +28,16 @@ def triangulatePolygonsUsingFanSpanMethod(PolygonIndicesList polygons):
     cdef unsigned int *newPolyStarts = newPolygons.polyStarts.data
     cdef unsigned int *newPolyLengths = newPolygons.polyLengths.data
 
-    cdef Py_ssize_t j, index, triIndex, start
+    cdef Py_ssize_t j, index, triangleIndex, start
 
     index = 0
-    triIndex = 0
+    triangleIndex = 0
     for i in range(polygonAmount):
         start = oldPolyStarts[i]
         for j in range(oldPolyLengths[i] - 2):
-            newPolyStarts[triIndex] = index
-            newPolyLengths[triIndex] = 3
-            triIndex += 1
+            newPolyStarts[triangleIndex] = index
+            newPolyLengths[triangleIndex] = 3
+            triangleIndex += 1
 
             newIndices[index] = oldIndices[start]
             newIndices[index + 1] = oldIndices[start + 1 + j]
@@ -71,16 +71,16 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
     cdef LongList neighbors
     cdef Vector3DList polyVertices
     cdef Vector3 v1, v2, v3
-    cdef Py_ssize_t polyStart, triIndex, polyIndex
-    cdef Py_ssize_t j, index, preIndex, earIndex, nexIndex
+    cdef Py_ssize_t polyStart, triangleIndex, polyIndex
+    cdef Py_ssize_t j, index, previousIndex, earIndex, nextIndex
     cdef float angle
-    cdef Vertex* ver
+    cdef Vertex* verticesData
 
-    triIndex = 0
     polyIndex = 0
+    triangleIndex = 0
     for i in range(polygonAmount):
-        polyLength = oldPolyLengths[i]
         polyStart = oldPolyStarts[i]
+        polyLength = oldPolyLengths[i]
 
         neighbors = LongList(length = polyLength)
         for j in range(polyLength):
@@ -92,93 +92,93 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
             polyVertices = polyVertices.reversed()
 
         # Initialization of polygon's vertices.
-        ver = <Vertex*>PyMem_Malloc(polyLength * sizeof(Vertex))
+        verticesData = <Vertex*>PyMem_Malloc(polyLength * sizeof(Vertex))
         for j in range(polyLength):
-            preIndex = (polyLength + j - 1) % polyLength
+            previousIndex = (polyLength + j - 1) % polyLength
             earIndex = j
-            nexIndex = (j + 1) % polyLength
+            nextIndex = (j + 1) % polyLength
 
-            v1 = polyVertices.data[preIndex]
+            v1 = polyVertices.data[previousIndex]
             v2 = polyVertices.data[earIndex]
-            v3 = polyVertices.data[nexIndex]
+            v3 = polyVertices.data[nextIndex]
 
-            ver[j].index = neighbors.data[earIndex]
+            verticesData[j].index = neighbors.data[earIndex]
             angle = calculateAngleWithSign(v1, v2, v3)
-            ver[j].angle = angle
-            if angle >= 0.0 and not pointsInTriangle(polyVertices, v1, v2, v3, preIndex, earIndex, nexIndex):
-                ver[j].isEar = True
+            verticesData[j].angle = angle
+            if angle >= 0.0 and not pointsInTriangle(polyVertices, v1, v2, v3, previousIndex, earIndex, nextIndex):
+                verticesData[j].isEar = True
             else:
-                ver[j].isEar = False
-            ver[j].previous = preIndex
-            ver[j].next = nexIndex
+                verticesData[j].isEar = False
+            verticesData[j].previous = previousIndex
+            verticesData[j].next = nextIndex
 
         # Calculate the triangle polygon indices.
         for j in range(polyLength - 2):
             if polyLength - 2 - j == 1:
-                newPolyStarts[triIndex] = polyIndex
-                newPolyLengths[triIndex] = 3
-                triIndex += 1
+                newPolyStarts[triangleIndex] = polyIndex
+                newPolyLengths[triangleIndex] = 3
+                triangleIndex += 1
 
                 index = 0
                 for k in range(polyLength):
-                    if ver[k].isEar:
-                        newIndices[polyIndex + index] = ver[k].index
+                    if verticesData[k].isEar:
+                        newIndices[polyIndex + index] = verticesData[k].index
                         index += 1
                         if index == 3: break
                 polyIndex += 3
                 break
 
             # Removing an ear which has smallest inner-angle.
-            earIndex = findAngleMinIndex(polyLength, ver)
-            preIndex = ver[earIndex].previous
-            nexIndex = ver[earIndex].next
+            earIndex = findAngleMinIndex(polyLength, verticesData)
+            previousIndex = verticesData[earIndex].previous
+            nextIndex = verticesData[earIndex].next
 
-            removeEarVertex(ver, polyVertices, preIndex, earIndex, nexIndex)
+            removeEarVertex(verticesData, polyVertices, previousIndex, earIndex, nextIndex)
 
-            newPolyStarts[triIndex] = polyIndex
-            newPolyLengths[triIndex] = 3
-            triIndex += 1
+            newPolyStarts[triangleIndex] = polyIndex
+            newPolyLengths[triangleIndex] = 3
+            triangleIndex += 1
 
-            newIndices[polyIndex] = neighbors.data[preIndex]
+            newIndices[polyIndex] = neighbors.data[previousIndex]
             newIndices[polyIndex + 1] = neighbors.data[earIndex]
-            newIndices[polyIndex + 2] = neighbors.data[nexIndex]
+            newIndices[polyIndex + 2] = neighbors.data[nextIndex]
             polyIndex += 3
 
-        PyMem_Free(ver)
+        PyMem_Free(verticesData)
 
     return newPolygons
 
 # Remove ear-vertex and update the neighbor-vertices.
-cdef Vertex* removeEarVertex(Vertex* ver, Vector3DList polyVertices, Py_ssize_t preIndex, Py_ssize_t earIndex, Py_ssize_t nexIndex):
-    cdef Py_ssize_t prePreIndex, nexNexIndex
+cdef Vertex* removeEarVertex(Vertex* verticesData, Vector3DList polyVertices, Py_ssize_t previousIndex, Py_ssize_t earIndex, Py_ssize_t nextIndex):
+    cdef Py_ssize_t previousPreviousIndex, nextNextIndex
     cdef Vector3 v0, v1, v2, v3, v4
     cdef float angle
 
-    v1 = polyVertices.data[preIndex]
+    v1 = polyVertices.data[previousIndex]
     v2 = polyVertices.data[earIndex]
-    v3 = polyVertices.data[nexIndex]
+    v3 = polyVertices.data[nextIndex]
 
-    prePreIndex = ver[preIndex].previous
-    v0 = polyVertices.data[prePreIndex]
+    previousPreviousIndex = verticesData[previousIndex].previous
+    v0 = polyVertices.data[previousPreviousIndex]
     angle = calculateAngleWithSign(v0, v1, v3)
-    ver[preIndex].angle = angle
-    if angle >= 0.0 and not pointsInTriangle(polyVertices, v0, v1, v3, prePreIndex, preIndex, nexIndex):
-        ver[preIndex].isEar = True
+    verticesData[previousIndex].angle = angle
+    if angle >= 0.0 and not pointsInTriangle(polyVertices, v0, v1, v3, previousPreviousIndex, previousIndex, nextIndex):
+        verticesData[previousIndex].isEar = True
     else:
-        ver[preIndex].isEar = False
+        verticesData[previousIndex].isEar = False
 
-    nexNexIndex = ver[nexIndex].next
-    v4 = polyVertices.data[nexNexIndex]
+    nextNextIndex = verticesData[nextIndex].next
+    v4 = polyVertices.data[nextNextIndex]
     angle = calculateAngleWithSign(v1, v3, v4)
-    ver[nexIndex].angle = angle
-    if angle >= 0.0 and not pointsInTriangle(polyVertices, v1, v3, v4, preIndex, nexIndex, nexNexIndex):
-        ver[nexIndex].isEar = True
+    verticesData[nextIndex].angle = angle
+    if angle >= 0.0 and not pointsInTriangle(polyVertices, v1, v3, v4, previousIndex, nextIndex, nextNextIndex):
+        verticesData[nextIndex].isEar = True
     else:
-        ver[nexIndex].isEar = False
+        verticesData[nextIndex].isEar = False
 
-    ver[earIndex].isEar = False
-    ver[nexIndex].previous = preIndex
-    ver[preIndex].next = nexIndex
+    verticesData[earIndex].isEar = False
+    verticesData[nextIndex].previous = previousIndex
+    verticesData[previousIndex].next = nextIndex
 
 cdef struct Vertex:
     Py_ssize_t index
@@ -225,15 +225,15 @@ cdef float calculateAngleWithSign(Vector3 v1, Vector3 v2, Vector3 v3):
     return (angle - angle % 0.001)
 
 # Find the index of minimum angle.
-cdef int findAngleMinIndex(Py_ssize_t polyLength, Vertex* ver):
+cdef int findAngleMinIndex(Py_ssize_t polyLength, Vertex* verticesData):
     cdef float angleMin = 3.14
     cdef float angle
     cdef Py_ssize_t i, angleMinIndex
 
     angleMinIndex = 0
     for i in range(polyLength):
-        if ver[i].isEar:
-            angle = abs(ver[i].angle)
+        if verticesData[i].isEar:
+            angle = abs(verticesData[i].angle)
             if angleMin > angle:
                 angleMin = angle
                 angleMinIndex = i
@@ -242,10 +242,10 @@ cdef int findAngleMinIndex(Py_ssize_t polyLength, Vertex* ver):
 
 # Checking points (reflex type) lies in the new triangle.
 cdef bint pointsInTriangle(Vector3DList vertices, Vector3 v1, Vector3 v2, Vector3 v3,
-                      Py_ssize_t preIndex, Py_ssize_t earIndex, Py_ssize_t nexIndex):
+                      Py_ssize_t previousIndex, Py_ssize_t earIndex, Py_ssize_t nextIndex):
     cdef Py_ssize_t i
     for i in range(vertices.length):
-        if i != preIndex and i != earIndex and i != nexIndex and pointInsideTriangle(v1, v2, v3, vertices.data[i]):
+        if i != previousIndex and i != earIndex and i != nextIndex and pointInsideTriangle(v1, v2, v3, vertices.data[i]):
             return True
     return False
 
