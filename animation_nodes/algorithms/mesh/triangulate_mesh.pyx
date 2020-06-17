@@ -2,7 +2,7 @@ import cython
 from libc.math cimport sin, cos
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from ... data_structures cimport (
-    LongList, FloatList, Vector3DList, PolygonIndicesList)
+    Vector3DList, PolygonIndicesList)
 from ... math cimport (
     Vector3, crossVec3, subVec3, dotVec3, toVector3, lengthVec3,
     angleNormalizedVec3, normalizeVec3_InPlace
