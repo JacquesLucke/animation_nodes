@@ -68,11 +68,11 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
     cdef unsigned int *newPolyStarts = newPolygons.polyStarts.data
     cdef unsigned int *newPolyLengths = newPolygons.polyLengths.data
 
+    cdef float angle
     cdef Vector3 v1, v2, v3
+    cdef Vertex* verticesData
     cdef Py_ssize_t polyStart, triangleIndex, polyIndex
     cdef Py_ssize_t j, index, previousIndex, earIndex, nextIndex
-    cdef float angle
-    cdef Vertex* verticesData
 
     polyIndex = 0
     triangleIndex = 0
@@ -84,6 +84,7 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
         verticesData = <Vertex*>PyMem_Malloc(polyLength * sizeof(Vertex))
         projectPolygonVertices(vertices, polyStart, polyLength, oldIndices, verticesData)
 
+        # Check polygon polarity.
         if not polyCounterClockwise(verticesData):
             for j in range(polyLength):
                 previousIndex = verticesData[j].previous
@@ -91,23 +92,16 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
                 verticesData[j].previous = nextIndex
                 verticesData[j].next = previousIndex
 
+        # Calculate angle and status of vertices.
         for j in range(polyLength):
-            earIndex = j
-            previousIndex = verticesData[earIndex].previous
-            nextIndex = verticesData[earIndex].next
-
-            v1 = verticesData[previousIndex].location
-            v2 = verticesData[earIndex].location
-            v3 = verticesData[nextIndex].location
-
-            angle = calculateAngleWithSign(verticesData, earIndex)
+            angle = calculateAngleWithSign(verticesData, j)
             verticesData[j].angle = angle
-            if angle >= 0.0 and not pointsInTriangle(polyLength, verticesData, earIndex):
+            if angle >= 0.0 and not pointsInTriangle(polyLength, verticesData, j):
                 verticesData[j].isEar = True
             else:
                 verticesData[j].isEar = False
 
-        # Calculate the triangle polygon indices.
+        # Calculate triangle polygon indices.
         for j in range(polyLength - 2):
             if polyLength - 2 - j == 1:
                 newPolyStarts[triangleIndex] = polyIndex
@@ -141,7 +135,7 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
 
     return newPolygons
 
-# Remove ear-vertex and update the neighbor-vertices.
+# Remove ear-vertex and update neighbor-vertices.
 cdef void removeEarVertex(Py_ssize_t polyLength, Vertex* verticesData, Py_ssize_t earIndex):
     cdef Py_ssize_t previousIndex, nextIndex
     previousIndex = verticesData[earIndex].previous
@@ -230,7 +224,7 @@ cdef int findEarHasMinAngle(Py_ssize_t polyLength, Vertex* verticesData):
 
     return angleMinIndex
 
-# Checking points (reflex type) lies in the new triangle.
+# Checking points (reflex type) lies inside the new triangle.
 cdef bint pointsInTriangle(Py_ssize_t polyLength, Vertex* verticesData, Py_ssize_t earIndex):
     cdef Py_ssize_t previousIndex = verticesData[earIndex].previous
     cdef Py_ssize_t nextIndex = verticesData[earIndex].next
