@@ -166,7 +166,8 @@ cdef int findEarHasMinAngle(Vertices verticesData):
     cdef Vertex* vertexData = verticesData.data
     cdef Py_ssize_t currentIndex
 
-    cdef float angleMin = 3.14
+    # The angleMin is set to 3.15 because a head-vertex may not be an ear but can have small angle.
+    cdef float angleMin = 3.15
     cdef float angle
     cdef Py_ssize_t angleMinIndex = 0
 
