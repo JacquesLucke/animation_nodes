@@ -8,6 +8,18 @@ from ... math cimport (
     angleNormalizedVec3, normalizeVec3_InPlace
 )
 
+cdef struct Vertex:
+    Py_ssize_t index
+    Vector3 location
+    float angle
+    bint isEar
+    Py_ssize_t previous
+    Py_ssize_t next
+
+cdef struct Vertices:
+    Py_ssize_t head
+    Vertex *data
+
 def triangulatePolygonsUsingFanSpanMethod(PolygonIndicesList polygons):
     cdef unsigned int *oldPolyLengths = polygons.polyLengths.data
     cdef Py_ssize_t polygonAmount = polygons.getLength()
@@ -68,11 +80,10 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
     cdef unsigned int *newPolyStarts = newPolygons.polyStarts.data
     cdef unsigned int *newPolyLengths = newPolygons.polyLengths.data
 
-    cdef float angle
-    cdef Vector3 v1, v2, v3
-    cdef Vertex* verticesData
+    cdef Vertex* vertexData
+    cdef Vertices verticesData
     cdef Py_ssize_t polyStart, triangleIndex, polyIndex
-    cdef Py_ssize_t j, index, previousIndex, earIndex, nextIndex
+    cdef Py_ssize_t j, index, earIndex, headIndex, currentIndex
 
     polyIndex = 0
     triangleIndex = 0
@@ -81,117 +92,144 @@ def triangulatePolygonsUsingEarClipMethod(Vector3DList vertices, PolygonIndicesL
         polyLength = oldPolyLengths[i]
 
         # Initialization of polygon's vertices.
-        verticesData = <Vertex*>PyMem_Malloc(polyLength * sizeof(Vertex))
-        projectPolygonVertices(vertices, polyStart, polyLength, oldIndices, verticesData)
+        verticesData.head = 0
+        verticesData.data = <Vertex*>PyMem_Malloc(polyLength * sizeof(Vertex))
+
+        vertexData = verticesData.data
+        for j in range(1, polyLength - 1):
+            vertexData[j].index = oldIndices[polyStart + j]
+            vertexData[j].location = vertices.data[oldIndices[polyStart + j]]
+            vertexData[j].previous = j - 1
+            vertexData[j].next = j + 1
+
+        index = 0
+        vertexData[index].index = oldIndices[polyStart + index]
+        vertexData[index].location = vertices.data[oldIndices[polyStart + index]]
+        vertexData[index].previous = polyLength - 1
+        vertexData[index].next = 1
+
+        index = polyLength - 1
+        vertexData[index].index = oldIndices[polyStart + index]
+        vertexData[index].location = vertices.data[oldIndices[polyStart + index]]
+        vertexData[index].previous = polyLength - 2
+        vertexData[index].next = 0
+
+        # Project vertices in xy-plane.
+        projectPolygonVertices(verticesData)
 
         # Check polygon polarity.
-        if not polyCounterClockwise(verticesData):
-            for j in range(polyLength):
-                previousIndex = verticesData[j].previous
-                nextIndex = verticesData[j].next
-                verticesData[j].previous = nextIndex
-                verticesData[j].next = previousIndex
+        makeSurePolygonIsCounterClockwise(verticesData)
 
         # Calculate angle and status of vertices.
         for j in range(polyLength):
-            angle = calculateAngleWithSign(verticesData, j)
-            verticesData[j].angle = angle
-            if angle >= 0.0 and not pointsInTriangle(polyLength, verticesData, j):
-                verticesData[j].isEar = True
-            else:
-                verticesData[j].isEar = False
+            vertexData[j].angle = calculateAngleWithSign(vertexData, j)
+            setVertexEarStatus(verticesData, j)
 
         # Calculate triangle polygon indices.
-        for j in range(polyLength - 2):
-            if polyLength - 2 - j == 1:
-                newPolyStarts[triangleIndex] = polyIndex
-                newPolyLengths[triangleIndex] = 3
-                triangleIndex += 1
-
-                index = 0
-                for k in range(polyLength):
-                    if verticesData[k].isEar:
-                        newIndices[polyIndex + index] = verticesData[k].index
-                        index += 1
-                        if index == 3: break
-                polyIndex += 3
-                break
-
+        for j in range(polyLength - 3):
             # Removing an ear which has smallest inner-angle.
-            earIndex = findEarHasMinAngle(polyLength, verticesData)
+            earIndex = findEarHasMinAngle(verticesData)
 
             newPolyStarts[triangleIndex] = polyIndex
             newPolyLengths[triangleIndex] = 3
             triangleIndex += 1
 
-            newIndices[polyIndex] = verticesData[verticesData[earIndex].previous].index
-            newIndices[polyIndex + 1] = verticesData[earIndex].index
-            newIndices[polyIndex + 2] = verticesData[verticesData[earIndex].next].index
+            newIndices[polyIndex] = vertexData[vertexData[earIndex].previous].index
+            newIndices[polyIndex + 1] = vertexData[earIndex].index
+            newIndices[polyIndex + 2] = vertexData[vertexData[earIndex].next].index
             polyIndex += 3
 
-            removeEarVertex(polyLength, verticesData, earIndex)
+            if earIndex == verticesData.head: verticesData.head = vertexData[earIndex].next
+            removeEarVertex(verticesData, earIndex)
 
-        PyMem_Free(verticesData)
+        newPolyStarts[triangleIndex] = polyIndex
+        newPolyLengths[triangleIndex] = 3
+        triangleIndex += 1
+
+        index = 0
+        headIndex = verticesData.head
+        currentIndex = headIndex
+        while True:
+            newIndices[polyIndex + index] = vertexData[currentIndex].index
+            currentIndex = vertexData[currentIndex].next
+            index += 1
+            if currentIndex == headIndex: break
+        polyIndex += 3
+
+        PyMem_Free(vertexData)
 
     return newPolygons
 
-# Remove ear-vertex and update neighbor-vertices.
-cdef void removeEarVertex(Py_ssize_t polyLength, Vertex* verticesData, Py_ssize_t earIndex):
-    cdef Py_ssize_t previousIndex, nextIndex
-    previousIndex = verticesData[earIndex].previous
-    nextIndex = verticesData[earIndex].next
-
-    verticesData[earIndex].isEar = False
-    verticesData[nextIndex].previous = previousIndex
-    verticesData[previousIndex].next = nextIndex
-
-    cdef float angle
-    angle = calculateAngleWithSign(verticesData, previousIndex)
-    verticesData[previousIndex].angle = angle
-    if angle >= 0.0 and not pointsInTriangle(polyLength, verticesData, previousIndex):
-        verticesData[previousIndex].isEar = True
-    else:
-        verticesData[previousIndex].isEar = False
-
-    angle = calculateAngleWithSign(verticesData, nextIndex)
-    verticesData[nextIndex].angle = angle
-    if angle >= 0.0 and not pointsInTriangle(polyLength, verticesData, nextIndex):
-        verticesData[nextIndex].isEar = True
-    else:
-        verticesData[nextIndex].isEar = False
-
-cdef struct Vertex:
-    Py_ssize_t index
-    Vector3 location
-    float angle
-    bint isEar
-    Py_ssize_t previous
-    Py_ssize_t next
-
-# Make sure normal (+z) is correct.
-@cython.cdivision(True)
-cdef bint polyCounterClockwise(Vertex* verticesData):
-    cdef Vector3 v1, v2
-    cdef float area = 0.0
-    cdef Py_ssize_t headIndex = 0
+# Find the index of minimum angle.
+cdef int findEarHasMinAngle(Vertices verticesData):
+    cdef Py_ssize_t headIndex = verticesData.head
+    cdef Vertex* vertexData = verticesData.data
     cdef Py_ssize_t currentIndex
 
+    cdef float angleMin = 3.14
+    cdef float angle
+    cdef Py_ssize_t angleMinIndex = 0
+
+    currentIndex = headIndex
+    while True:
+        if vertexData[currentIndex].isEar:
+            angle = abs(vertexData[currentIndex].angle)
+            if angleMin > angle:
+                angleMin = angle
+                angleMinIndex = currentIndex
+        currentIndex = vertexData[currentIndex].next
+        if currentIndex == headIndex: break
+
+    return angleMinIndex
+
+# Remove ear-vertex and update neighbor-vertices.
+cdef void removeEarVertex(Vertices verticesData, Py_ssize_t earIndex):
+    cdef Vertex* vertexData = verticesData.data
+
+    cdef Py_ssize_t previousIndex, nextIndex
+    previousIndex = vertexData[earIndex].previous
+    nextIndex = vertexData[earIndex].next
+
+    vertexData[nextIndex].previous = previousIndex
+    vertexData[previousIndex].next = nextIndex
+
+    vertexData[previousIndex].angle = calculateAngleWithSign(vertexData, previousIndex)
+    setVertexEarStatus(verticesData, previousIndex)
+    vertexData[nextIndex].angle = calculateAngleWithSign(vertexData, nextIndex)
+    setVertexEarStatus(verticesData, nextIndex)
+
+# Make sure normal (+z) is correct. For counter-clockwise polygon has area <= 0.
+@cython.cdivision(True)
+cdef void makeSurePolygonIsCounterClockwise(Vertices verticesData):
+    cdef Py_ssize_t headIndex = verticesData.head
+    cdef Vertex* vertexData = verticesData.data
+    cdef Py_ssize_t currentIndex
+
+    cdef Vector3 v1, v2
+    cdef float area = 0.0
     currentIndex = headIndex
     while(True):
-        v1 = verticesData[currentIndex].location
-        currentIndex = verticesData[currentIndex].next
-        v2 = verticesData[currentIndex].location
+        v1 = vertexData[currentIndex].location
+        currentIndex = vertexData[currentIndex].next
+        v2 = vertexData[currentIndex].location
         area += (v2.x - v1.x) * (v2.y + v1.y)
         if currentIndex == headIndex: break
 
-    if area > 0.0: return False
-    return True
+    if area > 0.0:
+        currentIndex = headIndex
+        while(True):
+            previousIndex = vertexData[currentIndex].previous
+            nextIndex = vertexData[currentIndex].next
+            vertexData[currentIndex].previous = nextIndex
+            vertexData[currentIndex].next = previousIndex
+            currentIndex = nextIndex
+            if currentIndex == headIndex: break
 
 # Calculate inner angle.
-cdef float calculateAngleWithSign(Vertex* verticesData, Py_ssize_t index):
-    cdef Vector3 v1 = verticesData[verticesData[index].previous].location
-    cdef Vector3 v2 = verticesData[index].location
-    cdef Vector3 v3 = verticesData[verticesData[index].next].location
+cdef float calculateAngleWithSign(Vertex* vertexData, Py_ssize_t index):
+    cdef Vector3 v1 = vertexData[vertexData[index].previous].location
+    cdef Vector3 v2 = vertexData[index].location
+    cdef Vector3 v3 = vertexData[vertexData[index].next].location
     cdef Vector3 ab, bc
     cdef float angle
 
@@ -208,35 +246,31 @@ cdef float calculateAngleWithSign(Vertex* verticesData, Py_ssize_t index):
     if sign < 0.0: return -(angle - angle % 0.001)
     return (angle - angle % 0.001)
 
-# Find the index of minimum angle.
-cdef int findEarHasMinAngle(Py_ssize_t polyLength, Vertex* verticesData):
-    cdef float angleMin = 3.14
-    cdef float angle
-    cdef Py_ssize_t i, angleMinIndex
-
-    angleMinIndex = 0
-    for i in range(polyLength):
-        if verticesData[i].isEar:
-            angle = abs(verticesData[i].angle)
-            if angleMin > angle:
-                angleMin = angle
-                angleMinIndex = i
-
-    return angleMinIndex
+# Set the status of a vertex whether it is ear or not.
+cdef void setVertexEarStatus(Vertices verticesData, Py_ssize_t index):
+    cdef Py_ssize_t headIndex = verticesData.head
+    cdef Vertex* vertexData = verticesData.data
+    if vertexData[index].angle >= 0.0 and not isAnyPointInsideTriangle(headIndex, vertexData, index):
+        vertexData[index].isEar = True
+    else:
+        vertexData[index].isEar = False
 
 # Checking points (reflex type) lies inside the new triangle.
-cdef bint pointsInTriangle(Py_ssize_t polyLength, Vertex* verticesData, Py_ssize_t earIndex):
-    cdef Py_ssize_t previousIndex = verticesData[earIndex].previous
-    cdef Py_ssize_t nextIndex = verticesData[earIndex].next
+cdef bint isAnyPointInsideTriangle(Py_ssize_t headIndex, Vertex* vertexData, Py_ssize_t earIndex):
+    cdef Py_ssize_t previousIndex = vertexData[earIndex].previous
+    cdef Py_ssize_t nextIndex = vertexData[earIndex].next
 
-    cdef Vector3 v1 = verticesData[previousIndex].location
-    cdef Vector3 v2 = verticesData[earIndex].location
-    cdef Vector3 v3 = verticesData[nextIndex].location
+    cdef Vector3 v1 = vertexData[previousIndex].location
+    cdef Vector3 v2 = vertexData[earIndex].location
+    cdef Vector3 v3 = vertexData[nextIndex].location
 
-    cdef Py_ssize_t i
-    for i in range(polyLength):
-        if i != previousIndex and i != earIndex and i != nextIndex and pointInsideTriangle(v1, v2, v3, verticesData[i].location):
-            return True
+    cdef Py_ssize_t currentIndex = headIndex
+    while True:
+        if (currentIndex != previousIndex and currentIndex != earIndex and currentIndex != nextIndex and
+            pointInsideTriangle(v1, v2, v3, vertexData[currentIndex].location)): return True
+
+        currentIndex = vertexData[currentIndex].next
+        if currentIndex == headIndex: break
     return False
 
 @cython.cdivision(True)
@@ -269,23 +303,23 @@ cdef bint pointInsideTriangle(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 p):
 
 # Transformation of vertices of polygon into xy-plane.
 @cython.cdivision(True)
-cdef void projectPolygonVertices(Vector3DList vertices, Py_ssize_t polyStart, Py_ssize_t polyLength,
-                                 unsigned int* oldIndices, Vertex* verticesData):
+cdef void projectPolygonVertices(Vertices verticesData):
+    cdef Py_ssize_t headIndex = verticesData.head
+    cdef Vertex* vertexData = verticesData.data
+    cdef Py_ssize_t currentIndex
+
     # Compute polygon normal with Nowell's method.
     cdef Vector3 polyNormal = toVector3((0, 0, 0))
-    cdef Py_ssize_t i
-    for i in range(polyLength):
-        v1 = vertices.data[oldIndices[polyStart + i]]
-        v2 = vertices.data[oldIndices[polyStart + (i + 1) % polyLength]]
+    currentIndex = headIndex
+    while True:
+        v1 = vertexData[currentIndex].location
+        currentIndex = vertexData[currentIndex].next
+        v2 = vertexData[currentIndex].location
 
         polyNormal.x += (v1.y - v2.y) * (v1.z + v2.z)
         polyNormal.y += (v1.z - v2.z) * (v1.x + v2.x)
         polyNormal.z += (v1.x - v2.x) * (v1.y + v2.y)
-
-        verticesData[i].index = oldIndices[polyStart + i]
-        verticesData[i].location = v1
-        verticesData[i].previous = (polyLength + i - 1) % polyLength
-        verticesData[i].next = (i + 1) % polyLength
+        if currentIndex == headIndex: break
 
     normalizeVec3_InPlace(&polyNormal)
 
@@ -303,8 +337,9 @@ cdef void projectPolygonVertices(Vector3DList vertices, Py_ssize_t polyStart, Py
     # Rotating vertices of polygon, and droping the z-comp.
     cdef Vector3 vertex, cross, rotPolyVertex
     cdef float dot
-    for i in range(polyLength):
-        vertex = verticesData[i].location
+    currentIndex = headIndex
+    while True:
+        vertex = vertexData[currentIndex].location
 
         crossVec3(&cross, &rotAxis, &vertex)
         dot = dotVec3(&rotAxis, &vertex)
@@ -313,4 +348,6 @@ cdef void projectPolygonVertices(Vector3DList vertices, Py_ssize_t polyStart, Py
         rotPolyVertex.y = cost * vertex.y + sint * cross.y + dot * fact * rotAxis.y
         rotPolyVertex.z = 0.0
 
-        verticesData[i].location = rotPolyVertex
+        vertexData[currentIndex].location = rotPolyVertex
+        currentIndex = vertexData[currentIndex].next
+        if currentIndex == headIndex: break
