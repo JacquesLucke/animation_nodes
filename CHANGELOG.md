@@ -17,6 +17,7 @@
 - Added *Use Spline Radius* option in *Spline Falloff* node.
 - Added *Calculate Loose Edges* option in *Mesh Object Output* node.
 - Added XoShiRo256 random number generators.
+- Added mesh *Triangulation* methods and *Triangulate Mesh* node.
 - Added Mesh Points Scatter node.
 
 ### Fixed
@@ -35,6 +36,7 @@
 - Fixed Project Point On Line distance output.
 - Fixed missing UV and vertex colors in the Transform Mesh node.
 - Fixed bad splines during rendering and baking.
+- Fixed the spiral method in the Distribute Matrices node for negative amounts.
 
 ### Changed
 

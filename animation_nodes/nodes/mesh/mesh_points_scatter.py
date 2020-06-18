@@ -42,8 +42,12 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
             return Vector3DList()
 
         if polygons.polyLengths.getMaxValue() > 3:
-            if self.methodType: polygons = mesh.getTrianglePolygons(method = "EAR")
-            else: polygons = mesh.getTrianglePolygons(method = "FAN")
+            if self.methodType:
+                mesh.triangulateMesh(method = "EAR")
+                polygons = mesh.polygons
+            else:
+                mesh.triangulateMesh(method = "FAN")
+                polygons = mesh.polygons
 
         weights = VirtualDoubleList.create(weights, 1)
         seed  = (seed * 674523 + self.nodeSeed * 3465284) % 0x7fffffff
