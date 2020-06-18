@@ -217,11 +217,12 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
         return matrices
 
-    def execute_Spiral(self, Py_ssize_t amount, float startRadius, float endRadius,
+    def execute_Spiral(self, Py_ssize_t _amount, float startRadius, float endRadius,
                              float startSize, float endSize, float startAngle, float endAngle):
         cdef Py_ssize_t i
         cdef Vector3 position
         cdef float iCos, iSin, stepCos, stepSin, f, size
+        cdef int amount = limitAmount(_amount)
         cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
         cdef float factor = 1 / <float>(amount - 1) if amount > 1 else 0
         cdef float angleStep = (endAngle - startAngle) / (amount - 1) if amount > 1 else 0
