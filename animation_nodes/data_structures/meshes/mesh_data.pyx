@@ -2,9 +2,14 @@
 import textwrap
 import functools
 from collections import OrderedDict
+from . validate import createValidEdgesList
 from . validate import checkMeshData, calculateLoopEdges
+from ... algorithms.mesh.triangulate_mesh import (
+    triangulatePolygonsUsingFanSpanMethod, triangulatePolygonsUsingEarClipMethod
+)
 from .. lists.base_lists cimport (
-    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList)
+    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList
+)
 from ... math cimport (
     Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
     Matrix4, toMatrix4
@@ -183,6 +188,16 @@ cdef class Mesh:
     def move(self, translation):
         self.vertices.move(translation)
         self.verticesMoved()
+
+    def triangulateMesh(self, str method = "FAN"):
+        cdef PolygonIndicesList polygons = self.polygons
+        cdef PolygonIndicesList newPolygons
+        if method == "FAN":
+            newPolygons = triangulatePolygonsUsingFanSpanMethod(polygons)
+        elif method == "EAR":
+            newPolygons = triangulatePolygonsUsingEarClipMethod(self.vertices, polygons)
+        self.edges = createValidEdgesList(polygons = newPolygons)
+        self.polygons = newPolygons
 
     def __repr__(self):
         return textwrap.dedent(
