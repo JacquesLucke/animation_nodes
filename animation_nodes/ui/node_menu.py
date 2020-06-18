@@ -397,6 +397,7 @@ class MeshMenu(bpy.types.Menu):
         insertNode(layout, "an_ExtractPolygonTransformsNode", "Extract Polygon Transforms")
         insertNode(layout, "an_OffsetVerticesNode", "Offset Vertices")
         insertNode(layout, "an_TransformMeshNode", "Transform Mesh")
+        insertNode(layout, "an_TriangulateMeshNode", "Triangulate Mesh")
         layout.menu("AN_MT_mesh_generators_menu", text = "Generators")
         layout.menu("AN_MT_mesh_operators_menu", text = "Operators")
         layout.separator()

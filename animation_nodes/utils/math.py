@@ -38,3 +38,6 @@ def mixEulers(a, b, factor):
     y = a.y * (1 - factor) + b.y * factor
     z = a.z * (1 - factor) + b.z * factor
     return Euler((x, y, z), a.order)
+
+def cantorPair(a, b):
+    return (a + b) * (a + b + 1) / 2 + b
