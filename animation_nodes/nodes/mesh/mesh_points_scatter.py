@@ -1,9 +1,10 @@
 import bpy
 import random
 from bpy.props import *
+from ... utils.math import cantorPair
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from . points_scatter import randomPointsScatter
+from ... algorithms.mesh.points_scatter import randomPointsScatter
 from ... data_structures import Vector3DList, VirtualDoubleList
 
 class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
@@ -23,7 +24,7 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Seed", "seed")
         self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
         self.newInput("Float List", "Weights", "weights", hide = True)
-        self.newInput("Boolean", "Use For Density", "useWeightForDensity", value = False, hide = True)
+        self.newInput("Boolean", "Use As Density", "useWeightAsDensity", value = False, hide = True)
 
         self.newOutput("Vector List", "Points", "points")
 
@@ -34,7 +35,7 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "methodType", text = "Use Advanced Method for Mesh sampling")
 
-    def execute(self, mesh, seed, amount, weights, useWeightForDensity):
+    def execute(self, mesh, seed, amount, weights, useWeightAsDensity):
         vertices = mesh.vertices
         polygons = mesh.polygons
 
@@ -50,8 +51,8 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
                 polygons = mesh.polygons
 
         weights = VirtualDoubleList.create(weights, 1)
-        seed  = (seed * 674523 + self.nodeSeed * 3465284) % 0x7fffffff
-        return randomPointsScatter(vertices, polygons, weights, useWeightForDensity, seed, amount)
+        seed = int(cantorPair(seed, self.nodeSeed))
+        return randomPointsScatter(vertices, polygons, weights, useWeightAsDensity, seed, amount)
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
