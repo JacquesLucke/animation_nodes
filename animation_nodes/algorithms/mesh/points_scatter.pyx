@@ -108,7 +108,7 @@ cdef LongList computeDistribution(DoubleList triangleAreas, DoubleList triangleW
 
     return distribution
 
-cdef getMaxValue(DoubleList values):
+cdef double getMaxValue(DoubleList values):
     cdef double valueMax = values.data[0]
     cdef double value
     cdef Py_ssize_t i
