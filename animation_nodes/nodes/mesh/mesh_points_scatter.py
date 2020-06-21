@@ -4,8 +4,12 @@ from bpy.props import *
 from ... utils.math import cantorPair
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... algorithms.mesh.points_scatter import randomPointsScatter
 from ... data_structures import Vector3DList, VirtualDoubleList
+from ... algorithms.mesh.points_scatter import randomPointsScatter
+from ... algorithms.mesh.triangulate_mesh import (
+    triangulatePolygonsUsingFanSpanMethod,
+    triangulatePolygonsUsingEarClipMethod
+)
 
 class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshPointsScatterNode"
@@ -21,7 +25,7 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
-        self.newInput("Integer", "Seed", "seed")
+        self.newInput("Integer", "Seed", "seed", minValue = 0)
         self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
         self.newInput("Float List", "Weights", "weights", hide = True)
 
@@ -43,14 +47,12 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
 
         if polygons.polyLengths.getMaxValue() > 3:
             if self.methodType:
-                mesh.triangulateMesh(method = "EAR")
-                polygons = mesh.polygons
+                polygons = triangulatePolygonsUsingEarClipMethod(vertices, polygons)
             else:
-                mesh.triangulateMesh(method = "FAN")
-                polygons = mesh.polygons
+                polygons = triangulatePolygonsUsingFanSpanMethod(polygons)
 
         weights = VirtualDoubleList.create(weights, 1)
-        seed = int(cantorPair(seed, self.nodeSeed))
+        seed = cantorPair(int(max(seed, 0)), self.nodeSeed)
         return randomPointsScatter(vertices, polygons, weights, seed, max(amount, 0))
 
     def duplicate(self, sourceNode):
