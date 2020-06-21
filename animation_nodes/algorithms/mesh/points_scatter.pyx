@@ -13,20 +13,17 @@ from ... data_structures cimport (
 )
 
 def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights,
-                        bint useWeightsAsDensity, long seed, long numberOfPoints):
-    cdef DoubleList triangleAreas, triangleWeights
-    triangleAreas, triangleWeights = calculateTriangleWeights(vertices, polygons, weights)
+                        long seed, long numberOfPoints):
+    cdef DoubleList triangleWeights = calculateTriangleWeights(vertices, polygons, weights)
 
     cdef LongList distribution
     cdef long computedNumberOfPoints
-    distribution = computeDistribution(triangleAreas, triangleWeights, numberOfPoints, useWeightsAsDensity,
-                                       seed, &computedNumberOfPoints)
+    distribution = computeDistribution(triangleWeights, numberOfPoints, seed, &computedNumberOfPoints)
 
     return sampleRandomPoints(vertices, polygons, distribution, computedNumberOfPoints, seed)
 
 @cython.cdivision(True)
-cdef calculateTriangleWeights(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
-    cdef DoubleList triangleAreas = DoubleList(length = polygons.getLength())
+cdef DoubleList calculateTriangleWeights(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
     cdef DoubleList triangleWeights = DoubleList(length = polygons.getLength())
     cdef Py_ssize_t i, j, i1, i2, i3
     for i in range (polygons.getLength()):
@@ -35,9 +32,9 @@ cdef calculateTriangleWeights(Vector3DList vertices, PolygonIndicesList polygons
         i2 = polygons.indices.data[j + 1]
         i3 = polygons.indices.data[j + 2]
 
-        triangleAreas.data[i] = triangleArea(vertices.data + i1, vertices.data + i2, vertices.data + i3)
-        triangleWeights.data[i] = max((weights.get(i1) + weights.get(i2) + weights.get(i3)) / 3.0, 0)
-    return triangleAreas, triangleWeights
+        triangleWeights.data[i] = triangleArea(vertices.data + i1, vertices.data + i2, vertices.data + i3)
+        triangleWeights.data[i] *= max((weights.get(i1) + weights.get(i2) + weights.get(i3)) / 3.0, 0)
+    return triangleWeights
 
 @cython.cdivision(True)
 cdef double triangleArea(Vector3 *v1, Vector3 *v2, Vector3 *v3):
@@ -56,27 +53,22 @@ cdef double triangleArea(Vector3 *v1, Vector3 *v2, Vector3 *v3):
     return sqrt(vc.x * vc.x + vc.y * vc.y + vc.z * vc.z) / 2.0
 
 @cython.cdivision(True)
-cdef LongList computeDistribution(DoubleList triangleAreas, DoubleList triangleWeights, long numberOfPoints,
-                                  bint useWeightsAsDensity, long seed, long *outputNumberOfPoints):
-    cdef long numberOfTriangles = triangleAreas.length
+cdef LongList computeDistribution(DoubleList triangleWeights, long numberOfPoints, long seed,
+                                  long *outputNumberOfPoints):
+    cdef long numberOfTriangles = triangleWeights.length
     cdef LongList distribution = LongList(length = numberOfTriangles)
     cdef long computedNumberOfPoints, triangleNumberOfPoints
-    cdef double area
     cdef Py_ssize_t i
 
-    if not useWeightsAsDensity:
-        for i in range(numberOfTriangles):
-            triangleAreas.data[i] = triangleAreas.data[i] * triangleWeights.data[i]
-
-    cdef double sumOfAreas = 0.0
+    cdef double sumOfWeights = 0.0
     for i in range(numberOfTriangles):
-        sumOfAreas += triangleAreas.data[i]
+        sumOfWeights += triangleWeights.data[i]
 
-    if sumOfAreas == 0: sumOfAreas = 1
-    cdef double numberOfPointsPerUnit = numberOfPoints / sumOfAreas
+    if sumOfWeights == 0: sumOfWeights = 1
+    cdef double numberOfPointsPerUnitWeight = numberOfPoints / sumOfWeights
     computedNumberOfPoints = 0
     for i in range(numberOfTriangles):
-        triangleNumberOfPoints = <long>ceil(numberOfPointsPerUnit * triangleAreas.data[i])
+        triangleNumberOfPoints = <long>ceil(numberOfPointsPerUnitWeight * triangleWeights.data[i])
         distribution.data[i] = triangleNumberOfPoints
         computedNumberOfPoints += triangleNumberOfPoints
 
@@ -94,28 +86,8 @@ cdef LongList computeDistribution(DoubleList triangleAreas, DoubleList triangleW
                 distribution.data[randomIndex] -= 1
                 break
 
-    cdef double triangleWeightMax
-    if useWeightsAsDensity:
-        triangleWeightMax = getMaxValue(triangleWeights)
-        computedNumberOfPoints = 0
-        for i in range(numberOfTriangles):
-            triangleNumberOfPoints = <long>ceil(distribution.data[i] * triangleWeights.data[i] / triangleWeightMax)
-            distribution.data[i] = triangleNumberOfPoints
-            computedNumberOfPoints += triangleNumberOfPoints
-        outputNumberOfPoints[0] = computedNumberOfPoints
-    else:
-        outputNumberOfPoints[0] = numberOfPoints
-
+    outputNumberOfPoints[0] = numberOfPoints
     return distribution
-
-cdef double getMaxValue(DoubleList values):
-    cdef double valueMax = values.data[0]
-    cdef double value
-    cdef Py_ssize_t i
-    for i in range(1, values.length):
-        value = values.data[i]
-        if value > valueMax: valueMax = value
-    return valueMax
 
 cdef Vector3DList sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongList distribution,
                                      long numberOfPoints, long seed):
