@@ -1,26 +1,32 @@
 import cython
-from ... math cimport Vector3
 from libc.math cimport sqrt, ceil
 from ... algorithms.random_number_generators cimport XoShiRo256Plus, XoShiRo256StarStar
+from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... data_structures cimport (
     LongList,
     FloatList,
     DoubleList,
     UIntegerList,
     Vector3DList,
+    Matrix4x4List,
     VirtualDoubleList,
     PolygonIndicesList
 )
+from ... math cimport (
+    Vector3,
+    toVector3,
+    setMatrixTranslation,
+    )
 
-def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights,
-                        long seed, long numberOfPoints):
+def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
+                        VirtualDoubleList weights, long seed, long numberOfPoints):
     cdef DoubleList triangleWeights = calculateTriangleWeights(vertices, polygons, weights)
 
     cdef LongList distribution
     cdef long computedNumberOfPoints
     distribution = computeDistribution(triangleWeights, numberOfPoints, seed, &computedNumberOfPoints)
 
-    return sampleRandomPoints(vertices, polygons, distribution, computedNumberOfPoints, seed)
+    return sampleRandomPoints(vertices, polygons, polyNormals, distribution, computedNumberOfPoints, seed)
 
 @cython.cdivision(True)
 cdef DoubleList calculateTriangleWeights(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
@@ -89,12 +95,13 @@ cdef LongList computeDistribution(DoubleList triangleWeights, long numberOfPoint
     outputNumberOfPoints[0] = numberOfPoints
     return distribution
 
-cdef Vector3DList sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, LongList distribution,
-                                     long numberOfPoints, long seed):
+cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
+                                     LongList distribution, long numberOfPoints, long seed):
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
-    cdef Vector3DList points = Vector3DList(length = numberOfPoints)
+    cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
     cdef Py_ssize_t i, j, k, index
-    cdef Vector3 v1, v2, v3, v
+    cdef Vector3 v1, v2, v3, v, polyNormal
+    cdef Vector3 guide = toVector3((0, 0, 1))
     cdef double p1, p2, p3
     index = 0
     for i in range(polygons.getLength()):
@@ -102,6 +109,7 @@ cdef Vector3DList sampleRandomPoints(Vector3DList vertices, PolygonIndicesList p
         v1 = vertices.data[polygons.indices.data[j]]
         v2 = vertices.data[polygons.indices.data[j + 1]]
         v3 = vertices.data[polygons.indices.data[j + 2]]
+        polyNormal = polyNormals.data[i]
         for k in range(distribution.data[i]):
             p1 = rng.nextDouble()
             p2 = rng.nextDouble()
@@ -113,7 +121,9 @@ cdef Vector3DList sampleRandomPoints(Vector3DList vertices, PolygonIndicesList p
             v.x = p1 * v1.x + p2 * v2.x + p3 * v3.x
             v.y = p1 * v1.y + p2 * v2.y + p3 * v3.y
             v.z = p1 * v1.z + p2 * v2.z + p3 * v3.z
-            points.data[index] = v
+
+            directionToMatrix_LowLevel(matrices.data + index, &polyNormal, &guide, 2, 0)
+            setMatrixTranslation(matrices.data + index, &v)
             index += 1
 
-    return points
+    return matrices

@@ -6,6 +6,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures import Vector3DList, VirtualDoubleList
 from ... algorithms.mesh.points_scatter import randomPointsScatter
+from ... data_structures.meshes.mesh_data import calculatePolygonNormals
 from ... algorithms.mesh.triangulate_mesh import (
     triangulatePolygonsUsingFanSpanMethod,
     triangulatePolygonsUsingEarClipMethod
@@ -29,7 +30,8 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
         self.newInput("Float List", "Weights", "weights", hide = True)
 
-        self.newOutput("Vector List", "Points", "points")
+        self.newOutput("Matrix List", "Matrices", "matrices")
+        self.newOutput("Vector List", "Vectors", "vectors")
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -38,7 +40,13 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
     def drawAdvanced(self, layout):
         layout.prop(self, "methodType", text = "Use Advanced Method for Mesh sampling")
 
-    def execute(self, mesh, seed, amount, weights):
+    def getExecutionCode(self, required):
+        yield "matrices = self.execute_RandomPointsScatter(mesh, seed, amount, weights)"
+
+        if "vectors" in required:
+            yield "AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
+
+    def execute_RandomPointsScatter(self, mesh, seed, amount, weights):
         vertices = mesh.vertices
         polygons = mesh.polygons
 
@@ -50,10 +58,10 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
                 polygons = triangulatePolygonsUsingEarClipMethod(vertices, polygons)
             else:
                 polygons = triangulatePolygonsUsingFanSpanMethod(polygons)
-
+        polyNormals = calculatePolygonNormals(vertices, polygons)
         weights = VirtualDoubleList.create(weights, 1)
         seed = cantorPair(int(max(seed, 0)), self.nodeSeed)
-        return randomPointsScatter(vertices, polygons, weights, seed, max(amount, 0))
+        return randomPointsScatter(vertices, polygons, polyNormals, weights, seed, max(amount, 0))
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
