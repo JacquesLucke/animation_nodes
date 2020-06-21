@@ -18,13 +18,13 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
     methodType: BoolProperty(name = "Use Advanced Method for Mesh sampling", default = False,
                              update = propertyChanged)
 
-    nodeSeed: IntProperty(update = propertyChanged)
+    nodeSeed: IntProperty(update = propertyChanged, min = 0)
 
     def setup(self):
         self.randomizeNodeSeed()
 
     def create(self):
-        self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
+        self.newInput("Mesh", "Mesh", "mesh")
         self.newInput("Integer", "Seed", "seed", minValue = 0)
         self.newInput("Integer", "Amount", "amount", value = 10, minValue = 0)
         self.newInput("Float List", "Weights", "weights", hide = True)
