@@ -14,7 +14,7 @@ class TriangulateMeshNode(bpy.types.Node, AnimationNode):
                              update = propertyChanged)
 
     def create(self):
-        self.newInput("Mesh", "Mesh", "mesh")
+        self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
 
         self.newOutput("Mesh", "Mesh", "meshOut")
 
@@ -22,14 +22,13 @@ class TriangulateMeshNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "methodType", text = "Use Advanced Method")
 
     def execute(self, mesh):
-        meshOut = mesh.copy()
         if self.methodType:
-            meshOut.triangulateMesh(method = "EAR")
+            mesh.triangulateMesh(method = "EAR")
         else:
-            meshOut.triangulateMesh(method = "FAN")
+            mesh.triangulateMesh(method = "FAN")
 
         try:
-            checkMeshData(meshOut.vertices, meshOut.edges, meshOut.polygons)
-            return meshOut
+            checkMeshData(mesh.vertices, mesh.edges, mesh.polygons)
+            return mesh
         except Exception as e:
             self.raiseErrorMessage(str(e))

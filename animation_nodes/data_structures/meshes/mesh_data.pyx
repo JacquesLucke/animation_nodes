@@ -198,6 +198,7 @@ cdef class Mesh:
             newPolygons = triangulatePolygonsUsingEarClipMethod(self.vertices, polygons)
         self.edges = createValidEdgesList(polygons = newPolygons)
         self.polygons = newPolygons
+        self.derivedMeshDataCache.clear()
 
     def __repr__(self):
         return textwrap.dedent(
