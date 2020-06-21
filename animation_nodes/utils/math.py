@@ -40,4 +40,4 @@ def mixEulers(a, b, factor):
     return Euler((x, y, z), a.order)
 
 def cantorPair(a, b):
-    return (a + b) * (a + b + 1) / 2 + b
+    return int((a + b) * (a + b + 1) / 2 + b)
