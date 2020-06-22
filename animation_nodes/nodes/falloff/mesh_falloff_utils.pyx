@@ -34,7 +34,20 @@ cdef class calculateMeshSurfaceFalloff(BaseFalloff):
         self.clamped = True
 
     cdef float evaluate(self, void *value, Py_ssize_t index):
-        return calcDistance(self, <Vector3*>value)
+        cdef float distance
+        cdef float strength
+        cdef Vector3* v
+        if self.useVolume:
+            v = <Vector3*>value
+            strength = hitsPerLocation(self.bvhTree, Vector((v.x, v.y, v.z)))
+            distance = calculateDistance(self, v)
+            strength = max(distance, strength)
+            if self.invert: strength = 1 - strength
+            return strength
+        else:
+            strength = calculateDistance(self, <Vector3*>value)
+            if self.invert: strength = 1 - strength
+            return strength
 
     cdef void evaluateList(self, void *values, Py_ssize_t startIndex, Py_ssize_t amount, float *target):
         cdef float distance
@@ -46,17 +59,17 @@ cdef class calculateMeshSurfaceFalloff(BaseFalloff):
             for i in range(amount):
                 v = <Vector3*>values + i
                 strength = hitsPerLocation(self.bvhTree, Vector((v.x, v.y, v.z)))
-                distance = calcDistance(self, v)
-                distance = max(distance, strength)
-                if self.invert: distance = 1 - distance
-                target[i] = distance
+                distance = calculateDistance(self, v)
+                strength = max(distance, strength)
+                if self.invert: strength = 1 - strength
+                target[i] = strength
         else:
             for i in range(amount):
-                distance = calcDistance(self, <Vector3*>values + i)
-                if self.invert: distance = 1 - distance
-                target[i] = distance
+                strength = calculateDistance(self, <Vector3*>values + i)
+                if self.invert: strength = 1 - strength
+                target[i] = strength
 
-cdef inline float calcDistance(calculateMeshSurfaceFalloff self, Vector3 *v):
+cdef inline float calculateDistance(calculateMeshSurfaceFalloff self, Vector3 *v):
     cdef float distance = self.bvhTree.find_nearest(Vector((v.x, v.y, v.z)), self.bvhMaxDistance)[3]
     if distance <= self.minDistance: return 1
     if distance <= self.maxDistance: return 1 - (distance - self.minDistance) * self.factor
@@ -76,14 +89,14 @@ cdef class calculateMeshVolumeFalloff(BaseFalloff):
         self.clamped = True
 
     cdef float evaluate(self, void *value, Py_ssize_t index):
-        return calcStrength(self, <Vector3*>value)
+        return calculateStrength(self, <Vector3*>value)
 
     cdef void evaluateList(self, void *values, Py_ssize_t startIndex, Py_ssize_t amount, float *target):
         cdef Py_ssize_t i
         for i in range(amount):
-            target[i] = calcStrength(self, <Vector3*>values + i)
+            target[i] = calculateStrength(self, <Vector3*>values + i)
 
-cdef inline float calcStrength(calculateMeshVolumeFalloff self, Vector3 *v):
+cdef inline float calculateStrength(calculateMeshVolumeFalloff self, Vector3 *v):
     cdef float strength = hitsPerLocation(self.bvhTree, Vector((v.x, v.y, v.z)))
     if self.invert:
         return 1 - strength
