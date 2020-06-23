@@ -43,8 +43,8 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         row = layout.row(align = True)
-        layout.prop(self, "mode", text = "")
         row.prop(self, "nodeSeed", text = "Node Seed")
+        layout.prop(self, "mode", text = "")
 
     def drawAdvanced(self, layout):
         layout.prop(self, "methodType", text = "Use Advanced Method for Mesh sampling")
