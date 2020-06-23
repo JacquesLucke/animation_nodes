@@ -9,13 +9,16 @@ from ... data_structures cimport (
     UIntegerList,
     Vector3DList,
     Matrix4x4List,
+    EdgeIndicesList,
     VirtualDoubleList,
     PolygonIndicesList
 )
 from ... math cimport (
     Vector3,
     toVector3,
+    distanceVec3,
     setMatrixTranslation,
+    setTranslationScaleMatrix,
     )
 
 def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
@@ -96,7 +99,7 @@ cdef LongList computeDistribution(DoubleList triangleWeights, long numberOfPoint
     return distribution
 
 cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
-                                     LongList distribution, long numberOfPoints, long seed):
+                                      LongList distribution, long numberOfPoints, long seed):
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
     cdef Py_ssize_t i, j, k, index
@@ -124,6 +127,57 @@ cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList 
 
             directionToMatrix_LowLevel(matrices.data + index, &polyNormal, &guide, 2, 0)
             setMatrixTranslation(matrices.data + index, &v)
+            index += 1
+
+    return matrices
+
+
+def randomPointsScatterForEdges(Vector3DList vertices, EdgeIndicesList edges,
+                                VirtualDoubleList weights, long seed, long numberOfPoints):
+    cdef DoubleList edgeWeights = calculateEdgeWeights(vertices, edges, weights)
+
+    cdef LongList distribution
+    cdef long computedNumberOfPoints
+    distribution = computeDistribution(edgeWeights, numberOfPoints, seed, &computedNumberOfPoints)
+
+    return sampleRandomPointsOnEdges(vertices, edges, distribution, computedNumberOfPoints, seed)
+
+@cython.cdivision(True)
+cdef DoubleList calculateEdgeWeights(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList weights):
+    cdef edgeAmount = edges.getLength()
+    cdef DoubleList edgeWeights = DoubleList(length = edgeAmount)
+    cdef Py_ssize_t i, i1, i2
+    for i in range (edgeAmount):
+        i1 = edges.data[i].v1
+        i2 = edges.data[i].v2
+
+        edgeWeights.data[i] = distanceVec3(vertices.data + i1, vertices.data + i2)
+        edgeWeights.data[i] *= max((weights.get(i1) + weights.get(i2)) / 2.0, 0)
+    return edgeWeights
+
+cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges,
+                                             LongList distribution, long numberOfPoints, long seed):
+    cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
+    cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
+    cdef Vector3 v
+    cdef Vector3 scale = toVector3((1, 1, 1))
+    cdef Vector3 *v1
+    cdef Vector3 *v2
+    cdef Py_ssize_t i, j, index
+    cdef double p1, p2
+    index = 0
+    for i in range(edges.getLength()):
+        v1 = vertices.data + edges.data[i].v1
+        v2 = vertices.data + edges.data[i].v2
+        for j in range(distribution.data[i]):
+            p1 = rng.nextDouble()
+            p2 = 1.0 - p1
+
+            v.x = p1 * v1[0].x + p2 * v2[0].x
+            v.y = p1 * v1[0].y + p2 * v2[0].y
+            v.z = p1 * v1[0].z + p2 * v2[0].z
+
+            setTranslationScaleMatrix(matrices.data + index, &v, &scale)
             index += 1
 
     return matrices
