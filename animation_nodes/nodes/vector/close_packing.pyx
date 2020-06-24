@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
-from ... algorithms.mesh_generation.close_packing import(
+from ... algorithms.mesh.close_packing import(
     neighbourRadiusSpherePacking,
     dynamicRadiusSpherePacking,
     fixedRadiusSpherePacking,
@@ -55,46 +55,55 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
         default = 1, update = propertyChanged)
 
     __annotations__["useRadiusList"] = VectorizedSocket.newProperty()
+    __annotations__["useObjectRadiusList"] = VectorizedSocket.newProperty()
 
     def create(self):
         if self.mode == "POINTS":
             self.newInput("Vector List", "Points", "points", dataIsModified = True)
-            self.newInput("Float", "Margin", "margin", value = 0.01, minValue = 0)
+            self.newInput("Float", "Margin", "margin", value = 0.0, minValue = 0, hide = True)
             if self.methodTypeForPoints == "FIXEDRADIUS":
                 self.newInput(VectorizedSocket("Float", "useRadiusList",
-                           ("Radius", "radii", dict(value = 0.1, minValue = 0)), ("Radii", "radii")))
+                             ("Radius", "Radius", dict(value = 1.0, minValue = 0)), ("Radii", "Radius")))
             else:
-                self.newInput("Float", "Radius Max", "radiusMax", value = 0.1, minValue = 0)
+                self.newInput("Float", "Radius Max", "radiusMax", value = 1.0, minValue = 0)
             if self.methodTypeForPoints in ["DYNAMICRADIUS", "NEIGHBOURRADIUS"]:
                 self.newInput("Float", "Radius Step", "radiusStep", value = 0.005, minValue = 0.00001)
             self.newInput("Falloff", "Falloff", "falloff")
             self.newInput("Boolean", "Mask", "mask", value = False, hide = True)
+            self.newInput(VectorizedSocket("Float", "useObjectRadiusList",
+                         ("Object Radius", "objectRadii", dict(value = 1.0, minValue = 0)),
+                         ("Object Radii", "objectRadii")), hide = True)
         elif self.mode == "RELAX":
             self.newInput("Vector List", "Points", "points", dataIsModified = True)
             if self.pointsOnMesh:
                 self.newInput("Mesh", "Mesh", "mesh")
-            self.newInput("Float", "Margin", "margin", value = 0.01, minValue = 0)
+            self.newInput("Float", "Margin", "margin", value = 0.0, minValue = 0, hide = True)
             self.newInput(VectorizedSocket("Float", "useRadiusList",
-                           ("Radius", "radii", dict(value = 0.1, minValue = 0)), ("Radii", "radii")))
-            self.newInput("Float", "Repulsion Factor", "repulsionFactor", value = 0.5, minValue = 0, maxValue = 1)
-            self.newInput("Float", "Error Max(%)", "errorMax", value = 2, minValue = 0.001, maxValue = 100, hide = True)
-            if self.pointsOnMesh:
-                self.newInput("Integer", "Iterations Max", "iterations", value = 50, minValue = 0, hide = True)
-            else:
-                self.newInput("Integer", "Iterations Max", "iterations", value = 100, minValue = 0, hide = True)
+                         ("Radius", "radii", dict(value = 1.0, minValue = 0)), ("Radii", "radii")))
+            self.newInput("Float", "Force Magnitude", "forceMagnitude", value = 0.25, minValue = 0, maxValue = 1)
+            self.newInput("Float", "Error Max(%)", "errorMax", value = 1, minValue = 0.001, maxValue = 100, hide = True)
+            self.newInput("Integer", "Iterations Max", "iterations", value = 200, minValue = 0, hide = True)
             self.newInput("Falloff", "Falloff", "falloff")
             self.newInput("Boolean", "Mask", "mask", value = False, hide = True)
             if self.pointsOnMesh:
+                self.newInput("Boolean", "Align To Normal", "alignToNormal", value = False)
+            self.newInput(VectorizedSocket("Float", "useObjectRadiusList",
+                         ("Object Radius", "objectRadii", dict(value = 1.0, minValue = 0)),
+                         ("Object Radii", "objectRadii")), hide = True)
+            if self.pointsOnMesh:
                 self.newInput("Float", "Epsilon", "epsilon", value = 0, hide = True)
                 self.newInput("Float", "Max Distance", "maxDistance", value = 1e6, hide = True)
-                self.newInput("Boolean", "Align To Normal", "alignToNormal", value = False)
 
         elif self.mode == "POLYGONS":
             self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
             self.newInput("Falloff", "Falloff", "falloff")
             self.newInput("Boolean", "Align To Normal", "alignToNormal", value = False)
+            self.newInput(VectorizedSocket("Float", "useObjectRadiusList",
+                         ("Object Radius", "objectRadii", dict(value = 1.0, minValue = 0)),
+                         ("Object Radii", "objectRadii")), hide = True)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
+        self.newOutput("Vector List", "Vectors", "vectors", hide = True)
         self.newOutput("Float List", "Radii", "radii", hide = True)
         if self.mode == "RELAX" and self.pointsOnMesh:
             self.newOutput("Vector List", "Normals", "normals", hide = True)
@@ -108,92 +117,108 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
             col.prop(self, "pointsOnMesh")
 
     def drawAdvanced(self, layout):
-        col = layout.column()
         if self.mode == "RELAX":
+            col = layout.column()
             col.prop(self, "neighbourAmount")
+        box = layout.box()
+        col = box.column(align = True)
+        col.label(text = "Info", icon = "INFO")
+        col.label(text = "Object Radius: It is a reference radius that allows to determine the correct scale for matrices from Radius (Radii) input.")
 
-    def getExecutionFunctionName(self):
+    def getExecutionCode(self, required):
         if self.mode == "POINTS":
             if self.methodTypeForPoints == "DYNAMICRADIUS":
-                return "execute_DynamicRadiusSpherePacking"
+                yield "matrices, radii = self.execute_DynamicRadiusSpherePacking(points, margin, radiusMax, radiusStep, falloff, mask, objectRadii)"
             elif self.methodTypeForPoints == "NEIGHBOURRADIUS":
-                return "execute_NeighbourRadiusSpherePacking"
+                yield "matrices, radii = self.execute_NeighbourRadiusSpherePacking(points, margin, radiusMax, radiusStep, falloff, mask, objectRadii)"
             elif self.methodTypeForPoints == "FIXEDRADIUS":
-                return "execute_FixedSpherePacking"
+                yield "matrices, radii = self.execute_FixedSpherePacking(points, margin, Radius, falloff, mask, objectRadii)"
         elif self.mode == "RELAX":
             if self.pointsOnMesh:
-                return "execute_RelaxSpherePackingOnMesh"
+                yield "matrices, radii, normals = self.execute_RelaxSpherePackingOnMesh(points, mesh, margin, radii, forceMagnitude, errorMax, iterations,\
+                                                                                        falloff, mask, alignToNormal, objectRadii, epsilon, maxDistance)"
             else:
-                return "execute_RelaxSpherePacking"
+                yield "matrices, radii = self.execute_RelaxSpherePacking(points, margin, radii, forceMagnitude, errorMax, iterations, falloff, mask,\
+                                                                         objectRadii)"
         elif self.mode == "POLYGONS":
-            return "execute_SpherePackingForMesh"
+            yield "matrices, radii = self.execute_SpherePackingOnMesh(mesh, falloff, alignToNormal, objectRadii)"
+
+        if "vectors" in required:
+            yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
 
     def execute_DynamicRadiusSpherePacking(self, Vector3DList points, float margin, float radiusMax,
-                                           float radiusStep, Falloff falloff, bint mask):
-        if points.length == 0: return Matrix4x4List(), DoubleList()
+                                           float radiusStep, Falloff falloff, bint mask, objectRadii):
+        cdef Py_ssize_t totalPoints = points.length
+        if totalPoints == 0: return Matrix4x4List(), DoubleList()
 
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
         cdef FloatList influences = evaluator.evaluateList(points)
-        return dynamicRadiusSpherePacking(points, margin, radiusMax, radiusStep, influences, mask)
+        cdef DoubleList _objectRadii = VirtualDoubleList.create(objectRadii, 1).materialize(totalPoints)
+        return dynamicRadiusSpherePacking(points, margin, radiusMax, radiusStep, influences, mask, _objectRadii)
 
     def execute_NeighbourRadiusSpherePacking(self, Vector3DList points, float margin, float radiusMax,
-                                             float radiusStep, Falloff falloff, bint mask):
-        if points.length == 0: return Matrix4x4List(), DoubleList()
+                                             float radiusStep, Falloff falloff, bint mask, objectRadii):
+        cdef Py_ssize_t totalPoints = points.length
+        if totalPoints == 0: return Matrix4x4List(), DoubleList()
 
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
         cdef FloatList influences = evaluator.evaluateList(points)
-        return neighbourRadiusSpherePacking(points, margin, radiusMax, radiusStep, influences, mask)
+        cdef DoubleList _objectRadii = VirtualDoubleList.create(objectRadii, 1).materialize(totalPoints)
+        return neighbourRadiusSpherePacking(points, margin, radiusMax, radiusStep, influences, mask, _objectRadii)
 
     def execute_FixedSpherePacking(self, Vector3DList points, float margin, radii, Falloff falloff,
-                                   bint mask):
+                                   bint mask, objectRadii):
+        cdef Py_ssize_t totalPoints = points.length
+        if totalPoints == 0: return Matrix4x4List(), DoubleList()
+
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
+        cdef FloatList influences = evaluator.evaluateList(points)
+        cdef DoubleList _objectRadii = VirtualDoubleList.create(objectRadii, 1).materialize(totalPoints)
+        cdef DoubleList _radii = VirtualDoubleList.create(radii, 0).materialize(totalPoints)
+
+        return fixedRadiusSpherePacking(points, max(margin, 0), _radii, influences, mask, _objectRadii)
+
+    def execute_RelaxSpherePacking(self, Vector3DList points, float margin, radii, float forceMagnitude,
+                                   float errorMax, Py_ssize_t iterations, Falloff falloff, bint mask, objectRadii):
         cdef Py_ssize_t totalPoints = points.length
         if totalPoints == 0: return Matrix4x4List(), DoubleList()
 
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
         cdef FloatList influences = evaluator.evaluateList(points)
         cdef DoubleList _radii = VirtualDoubleList.create(radii, 0).materialize(totalPoints)
+        cdef DoubleList _objectRadii = VirtualDoubleList.create(objectRadii, 1).materialize(totalPoints)
 
-        return fixedRadiusSpherePacking(points, max(margin, 0), _radii, influences, mask)
+        if forceMagnitude > 1: forceMagnitude = 1.0
+        elif forceMagnitude < 0: forceMagnitude = 0.0
 
-    def execute_RelaxSpherePacking(self, Vector3DList points, float margin, radii, float repulsionFactor,
-                                   float errorMax, Py_ssize_t iterations, Falloff falloff, bint mask):
-        cdef Py_ssize_t totalPoints = points.length
-        if totalPoints == 0: return Matrix4x4List(), DoubleList()
-
-        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
-        cdef FloatList influences = evaluator.evaluateList(points)
-        cdef DoubleList _radii = VirtualDoubleList.create(radii, 0).materialize(totalPoints)
-
-        if repulsionFactor > 1: repulsionFactor = 1.0
-        elif repulsionFactor < 0: repulsionFactor = 0.0
-
-        return relaxSpherePacking(points, max(0, margin), _radii, repulsionFactor, iterations, errorMax,
-                                  self.neighbourAmount, influences, mask)
+        return relaxSpherePacking(points, max(0, margin), _radii, forceMagnitude, iterations, errorMax,
+                                  self.neighbourAmount, influences, mask, _objectRadii)
 
     def execute_RelaxSpherePackingOnMesh(self, Vector3DList points, Mesh mesh, float margin, radii,
-                                         float repulsionFactor, float errorMax, Py_ssize_t iterations,
-                                         Falloff falloff, bint mask, float epsilon, float maxDistance,
-                                         bint alignToNormal):
+                                         float forceMagnitude, float errorMax, Py_ssize_t iterations,
+                                         Falloff falloff, bint mask, bint alignToNormal, objectRadii,
+                                         float epsilon, float maxDistance):
         cdef Py_ssize_t totalPoints = points.length
         if totalPoints == 0: return Matrix4x4List(), DoubleList(), Vector3DList()
 
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
         cdef FloatList influences = evaluator.evaluateList(points)
         cdef DoubleList _radii = VirtualDoubleList.create(radii, 0).materialize(totalPoints)
+        cdef DoubleList _objectRadii = VirtualDoubleList.create(objectRadii, 1).materialize(totalPoints)
         cdef Vector3DList vertices = mesh.vertices
         cdef PolygonIndicesList polygons = mesh.polygons
 
-        if repulsionFactor > 1: repulsionFactor = 1.0
-        elif repulsionFactor < 0: repulsionFactor = 0.0
+        if forceMagnitude > 1: forceMagnitude = 1.0
+        elif forceMagnitude < 0: forceMagnitude = 0.0
         if vertices.length == 0 or polygons.getLength() == 0:
             return Matrix4x4List(), DoubleList(), Vector3DList()
 
         if 0 <= polygons.getMinIndex() <= polygons.getMaxIndex() < len(vertices):
-            return relaxSpherePackingOnMesh(points, max(0, margin), _radii, repulsionFactor, iterations,
-                                            errorMax, self.neighbourAmount, influences, mask, vertices,
-                                            polygons, maxDistance, epsilon, alignToNormal)
+            return relaxSpherePackingOnMesh(points, max(0, margin), _radii, forceMagnitude, iterations,
+                                            errorMax, self.neighbourAmount, influences, mask, _objectRadii,
+                                            vertices, polygons, maxDistance, epsilon, alignToNormal)
 
-    def execute_SpherePackingForMesh(self, Mesh mesh, Falloff falloff, bint alignToNormal):
+    def execute_SpherePackingOnMesh(self, Mesh mesh, Falloff falloff, bint alignToNormal, objectRadii):
         cdef Vector3DList vertices = mesh.vertices
         cdef PolygonIndicesList polygons = mesh.polygons
         cdef Vector3DList polyNormals = mesh.getPolygonNormals()
@@ -204,9 +229,10 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
         if polygons.polyLengths.getMaxValue() > 3:
             self.raiseErrorMessage("Mesh has non-triangular polygons.")
 
+        cdef DoubleList _objectRadii = VirtualDoubleList.create(objectRadii, 1).materialize(polygons.getLength())
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
         cdef FloatList influences = evaluator.evaluateList(mesh.getPolygonCenters())
-        return spherePackingOnMesh(vertices, polygons, alignToNormal, polyNormals, influences)
+        return spherePackingOnMesh(vertices, polygons, alignToNormal, polyNormals, influences, _objectRadii)
 
     def getFalloffEvaluator(self, falloff):
         try: return falloff.getEvaluator("LOCATION", True)
