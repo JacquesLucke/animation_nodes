@@ -3,7 +3,6 @@ from libc.math cimport sqrt
 from mathutils import Vector
 from mathutils.kdtree import KDTree
 from mathutils.bvhtree import BVHTree
-from ... math cimport Vector3, distanceVec3
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... data_structures cimport (
     Mesh,
@@ -16,7 +15,9 @@ from ... data_structures cimport (
     PolygonIndicesList,
 )
 from ... math cimport (
+    Vector3,
     toVector3,
+    distanceVec3,
     scaleMatrix3x3Part,
     setTranslationMatrix,
     setMatrixTranslation,
@@ -71,32 +72,42 @@ def neighbourRadiusSpherePacking(Vector3DList points, float margin, float radius
             nextRadius = radii.data[i] + radiusStep
             indices, distances = calculateDistancesByRange(kdTree, points.data[i], 2 * (margin + nextRadius))
             influence = influences.data[i]
-            if comapareRadiusDistance(margin + nextRadius * influence, radii, indices, distances):
+            if comapareRadiusDistanceOfKDTree(margin + nextRadius * influence, radii, indices, distances):
                 radii.data[i] = nextRadius * influence
             if radii.data[i] > 0: numberOfNonZeroRadius += 1
 
     return calculateMatricesRadii(numberOfPoints, numberOfNonZeroRadius, points, radii, objectRadii, mask)
 
 @cython.cdivision(True)
-def fixedRadiusSpherePacking(Vector3DList points, float margin, DoubleList radii, FloatList influences, bint mask, DoubleList objectRadii):
+def fixedRadiusSpherePacking(Vector3DList points, float margin, DoubleList radii, FloatList influences, bint mask,
+                             DoubleList objectRadii, bint onlyCompareNewPoints = False):
     cdef Py_ssize_t numberOfPoints = points.length
-    kdTree = buildKDTree(numberOfPoints, points)
-
-    cdef float radius, searchRadius
-    cdef DoubleList distances
-    cdef LongList indices
     cdef Py_ssize_t i, numberOfNonZeroRadius
+    cdef float radius
 
+    if not onlyCompareNewPoints:
+        numberOfNonZeroRadius = 0
+        for i in range(numberOfPoints):
+            radius = radii.data[i] * influences.data[i]
+            if comapareRadiusDistanceOfPoints(i, margin + radius, points, radii):
+                radii.data[i] = radius
+                numberOfNonZeroRadius += 1
+            else:
+                radii.data[i] = 0
+
+        return calculateMatricesRadii(numberOfPoints, numberOfNonZeroRadius, points, radii, objectRadii, mask)
+
+    cdef LongList indicesOfVisited = LongList(length = numberOfPoints)
+    indicesOfVisited.fill(0)
     numberOfNonZeroRadius = 0
     for i in range(numberOfPoints):
         radius = radii.data[i] * influences.data[i]
-        searchRadius = max(2 * (radius + margin), 0)
-        indices, distances = calculateDistancesByRange(kdTree, points.data[i], searchRadius)
-        if comapareRadiusDistance(margin + radius, radii, indices, distances):
+        if comapareRadiusDistanceIndexOfPoints(i, margin + radius, points, radii, indicesOfVisited):
             radii.data[i] = radius
             numberOfNonZeroRadius += 1
         else:
             radii.data[i] = 0
+        indicesOfVisited.data[i] = 1
 
     return calculateMatricesRadii(numberOfPoints, numberOfNonZeroRadius, points, radii, objectRadii, mask)
 
@@ -246,8 +257,8 @@ def relaxSpherePackingOnMesh(Vector3DList points, float margin, DoubleList radii
         for i in range(numberOfPoints):
             radius = radii.data[i]
             if radius > 0:
-                radius = mapping(radius, 0, objectRadii.data[i], 0, 1)
                 newRadii.data[index] = radius
+                radius = mapping(radius, 0, objectRadii.data[i], 0, 1)
                 point = relaxPoints.data[i]
                 bvhNormal = bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1]
                 if bvhNormal is not None: normal = toVector3(bvhNormal)
@@ -261,8 +272,8 @@ def relaxSpherePackingOnMesh(Vector3DList points, float margin, DoubleList radii
         for i in range(numberOfPoints):
             radius = radii.data[i]
             if radius > 0:
-                radius = mapping(radius, 0, objectRadii.data[i], 0, 1)
                 newRadii.data[index] = radius
+                radius = mapping(radius, 0, objectRadii.data[i], 0, 1)
                 bvhNormal = bvhTree.find_nearest(Vector((point.x, point.y, point.z)), maxDistance)[1]
                 if bvhNormal is not None: normal = toVector3(bvhNormal)
                 normals.data[i] = normal
@@ -291,8 +302,8 @@ cdef calculateMatricesRadii(Py_ssize_t numberOfPoints, Py_ssize_t numberOfNonZer
     for i in range(numberOfPoints):
         radius = radii.data[i]
         if radius > 0:
-            radius = mapping(radius, 0, objectRadii.data[i], 0, 1)
             newRadii.data[index] = radius
+            radius = mapping(radius, 0, objectRadii.data[i], 0, 1)
             setTranslationMatrix(matrices.data + index, &points.data[i])
             scaleMatrix3x3Part(matrices.data + index, radius)
             index += 1
@@ -309,11 +320,11 @@ cdef float calulateMaxRadius(Py_ssize_t iterations, float margin, float radiusSt
     cdef float newRadius = 0
     cdef Py_ssize_t i
     for i in range(iterations):
-        if not comapareRadiusDistance(newRadius + margin, radii, indices, distances): break
+        if not comapareRadiusDistanceOfKDTree(newRadius + margin, radii, indices, distances): break
         newRadius += radiusStep
     return newRadius
 
-cdef bint comapareRadiusDistance(float newRadius, DoubleList radii, LongList indices, DoubleList distances):
+cdef bint comapareRadiusDistanceOfKDTree(float newRadius, DoubleList radii, LongList indices, DoubleList distances):
     cdef bint newRadiusCheck = True
     cdef Py_ssize_t i
     for i in range(1, distances.length):
@@ -321,6 +332,25 @@ cdef bint comapareRadiusDistance(float newRadius, DoubleList radii, LongList ind
             newRadiusCheck = False
             break
     return newRadiusCheck
+
+cdef bint comapareRadiusDistanceOfPoints(Py_ssize_t index, float newRadius, Vector3DList points, DoubleList radii):
+    cdef bint newRadiusCheck = True
+    cdef Vector3 point = points.data[index]
+    cdef Py_ssize_t i
+    for i in range(points.length):
+        if i == index: continue
+        if newRadius + radii.data[i] > distanceVec3(&point, &points.data[i]): return False
+    return True
+
+cdef bint comapareRadiusDistanceIndexOfPoints(Py_ssize_t index, float newRadius, Vector3DList points, DoubleList radii,
+                                              LongList indicesOfVisited):
+    cdef bint newRadiusCheck = True
+    cdef Vector3 point = points.data[index]
+    cdef Py_ssize_t i
+    for i in range(points.length):
+        if indicesOfVisited.data[i] == 0 or i == index: continue
+        if newRadius + radii.data[i] > distanceVec3(&point, &points.data[i]): return False
+    return True
 
 cdef calculateDistancesByRange(kdTree, Vector3 searchVector, float searchRadius):
     cdef list results = kdTree.find_range(Vector((searchVector.x, searchVector.y, searchVector.z)), searchRadius)

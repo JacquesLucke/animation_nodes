@@ -48,6 +48,9 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
     __annotations__["methodTypeForPoints"] = EnumProperty(name = "Method Type", default = "DYNAMICRADIUS",
         items = methodTypeForPointsItems, update = AnimationNode.refresh)
 
+    __annotations__["onlyCompareNewPoints"] = BoolProperty(name = "Only compare new Points", default = False,
+        description = "Only compare newly formed points for filtering", update = AnimationNode.refresh)
+
     __annotations__["pointsOnMesh"] = BoolProperty(name = "Points on Mesh", default = False,
         description = "Keep relaxed points on mesh surface", update = AnimationNode.refresh)
 
@@ -67,7 +70,7 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
             else:
                 self.newInput("Float", "Radius Max", "radiusMax", value = 1.0, minValue = 0)
             if self.methodTypeForPoints in ["DYNAMICRADIUS", "NEIGHBOURRADIUS"]:
-                self.newInput("Float", "Radius Step", "radiusStep", value = 0.005, minValue = 0.00001)
+                self.newInput("Float", "Radius Step", "radiusStep", value = 0.01, minValue = 0.00001)
             self.newInput("Falloff", "Falloff", "falloff")
             self.newInput("Boolean", "Mask", "mask", value = False, hide = True)
             self.newInput(VectorizedSocket("Float", "useObjectRadiusList",
@@ -113,6 +116,8 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
         col.prop(self, "mode", text = "")
         if self.mode == "POINTS":
             col.prop(self, "methodTypeForPoints", text = "")
+            if self.methodTypeForPoints == "FIXEDRADIUS":
+                col.prop(self, "onlyCompareNewPoints")
         if self.mode == "RELAX":
             col.prop(self, "pointsOnMesh")
 
@@ -176,7 +181,8 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
         cdef DoubleList _objectRadii = VirtualDoubleList.create(objectRadii, 1).materialize(totalPoints)
         cdef DoubleList _radii = VirtualDoubleList.create(radii, 0).materialize(totalPoints)
 
-        return fixedRadiusSpherePacking(points, max(margin, 0), _radii, influences, mask, _objectRadii)
+        return fixedRadiusSpherePacking(points, max(margin, 0), _radii, influences, mask, _objectRadii,
+                                        self.onlyCompareNewPoints)
 
     def execute_RelaxSpherePacking(self, Vector3DList points, float margin, radii, float forceMagnitude,
                                    float errorMax, Py_ssize_t iterations, Falloff falloff, bint mask, objectRadii):
