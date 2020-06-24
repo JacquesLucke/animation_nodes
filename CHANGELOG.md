@@ -18,7 +18,10 @@
 - Added *Calculate Loose Edges* option in *Mesh Object Output* node.
 - Added XoShiRo256 random number generators.
 - Added mesh *Triangulation* methods and *Triangulate Mesh* node.
-- Added Mesh Points Scatter node.
+- Added *Mesh Points Scatter* node.
+- Added matrices output in *Mesh Points Scatter* node.
+- Added edges mode in *Mesh Points Scatter* node.
+
 
 ### Fixed
 
