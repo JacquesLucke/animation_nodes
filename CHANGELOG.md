@@ -40,6 +40,7 @@
 - Fixed missing UV and vertex colors in the Transform Mesh node.
 - Fixed bad splines during rendering and baking.
 - Fixed the spiral method in the Distribute Matrices node for negative amounts.
+- Fixed the output of Set GP Stroke Attributes node for hardness-list input.
 
 ### Changed
 
