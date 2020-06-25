@@ -36,7 +36,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
             ("Display Mode", "displayModes"), ("Display Modes", "displayModes")), value = '3DSPACE', hide = True)
 
         self.newOutput(VectorizedSocket("GPStroke",
-            ["useStrokeList", "useLineWidthList", "useCyclicList",
+            ["useStrokeList", "useLineWidthList", "useHardnessList", "useCyclicList",
             "useStartCapModeList", "useEndCapModeList", "useMaterialIndexList", "useDisplayModeList"],
             ("Stroke", "outStroke"), ("Strokes", "outStrokes")))
 
