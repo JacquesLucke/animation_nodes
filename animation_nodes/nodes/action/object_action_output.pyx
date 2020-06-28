@@ -23,6 +23,7 @@ modeItems = [
 class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectActionOutputNode"
     bl_label = "Object Action Output"
+    errorHandlingType = "MESSAGE"
 
     __annotations__ = {}
     __annotations__["mode"] = EnumProperty(name = "Mode", default = "GENERIC",
@@ -133,7 +134,6 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
         cdef FloatList values = FloatList(length = len(channels))
         setAttributes = getMultiAttibuteSetter(paths)
 
-        # TODO: error handling (when the attributes don't exist)
         cdef Py_ssize_t i, j
         for i in range(len(objects)):
             object = objects[i]
@@ -141,7 +141,9 @@ class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
                 continue
 
             evaluator.evaluate(frame, startIndex + i, values.data)
-            setAttributes(object, values)
+            try: setAttributes(object, values)
+            except: self.setErrorMessage("Action contains channels with paths that doesn't exist"
+                    " or evalutes to values that doesn't match.")
 
     def getKnownChannels(self, list allChannels):
         cdef list channels = []

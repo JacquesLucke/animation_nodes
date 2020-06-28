@@ -10,7 +10,9 @@ class ProblemsPanel(bpy.types.Panel):
     bl_idname = "AN_PT_problems_panel"
     bl_label = "Problems"
     bl_space_type = "NODE_EDITOR"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
+    bl_category = "Node Tree"
+    bl_order = 4
 
     @classmethod
     def poll(cls, context):
