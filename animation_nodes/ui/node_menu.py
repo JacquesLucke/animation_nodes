@@ -609,6 +609,7 @@ class FalloffMenu(bpy.types.Menu):
         insertNode(layout, "an_MixFalloffsNode", "Mix")
         layout.separator()
         insertNode(layout, "an_EvaluateFalloffNode", "Evaluate")
+        insertNode(layout, "an_FalloffTracerNode", "Falloff Tracer")
 
 class MaterialMenu(bpy.types.Menu):
     bl_idname = "AN_MT_material_menu"
