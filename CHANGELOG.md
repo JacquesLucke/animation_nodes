@@ -38,6 +38,7 @@
 - Fixed bad splines during rendering and baking.
 - Fixed the spiral method in the Distribute Matrices node for negative amounts.
 - Fixed the output of Set GP Stroke Attributes node for hardness-list input.
+- Fixed *Object Action Output* node when action contain bad channels.
 
 ### Changed
 
