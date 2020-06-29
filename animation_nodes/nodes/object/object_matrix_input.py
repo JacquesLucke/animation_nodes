@@ -1,16 +1,32 @@
 import bpy
-from ... base_types import AnimationNode
+from ... base_types import AnimationNode, VectorizedSocket
 
 class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectMatrixInputNode"
     bl_label = "Object Matrix Input"
+    codeEffects = [VectorizedSocket.CodeEffect]
+
+    useObjectList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Object", "Object", "object").defaultDrawType = "PROPERTY_ONLY"
-        self.newOutput("Matrix", "World", "world")
-        self.newOutput("Matrix", "Basis", "basis", hide = True)
-        self.newOutput("Matrix", "Local", "local", hide = True)
-        self.newOutput("Matrix", "Parent Inverse", "parentInverse", hide = True)
+        self.newInput(VectorizedSocket("Object", "useObjectList",
+            ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
+            ("Objects", "objects")))
+
+        self.newOutput(VectorizedSocket("Matrix", "useObjectList",
+            ("World", "world"), ("Worlds", "worlds")))
+
+        self.newOutput(VectorizedSocket("Matrix", "useObjectList",
+            ("Basis", "basis", dict(hide = True)),
+            ("Bases", "bases", dict(hide = True))))
+
+        self.newOutput(VectorizedSocket("Matrix", "useObjectList",
+            ("Local", "local", dict(hide = True)),
+            ("Locals", "locals", dict(hide = True))))
+
+        self.newOutput(VectorizedSocket("Matrix", "useObjectList",
+            ("Parent Inverse", "parentInverse", dict(hide = True)), 
+            ("Parent Inverses", "parentInverses", dict(hide = True))))
 
     def getExecutionCode(self, required):
         if len(required) == 0:
