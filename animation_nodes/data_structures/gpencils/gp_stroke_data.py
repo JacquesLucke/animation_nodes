@@ -1,11 +1,13 @@
 import textwrap
 from .. lists.base_lists import FloatList, Vector3DList, ColorList
+from ... data_structures.color import Color
 
 class GPStroke:
     def __init__(self, vertices = None, strengths = None, pressures = None,
                  uvRotations = None, vertexColors = None, lineWidth = None,
                  hardness = None, drawCyclic = None, startCapMode = None,
-                 endCapMode = None, materialIndex = None, displayMode = None):
+                 endCapMode = None, vertexColorFill = None, materialIndex = None,
+                 displayMode = None):
 
         if vertices is None: vertices = Vector3DList()
         if strengths is None: strengths = FloatList()
@@ -17,6 +19,7 @@ class GPStroke:
         if drawCyclic is None: drawCyclic = False
         if startCapMode is None: startCapMode = "ROUND"
         if endCapMode is None: endCapMode = "ROUND"
+        if vertexColorFill is None: vertexColorFill = Color((0, 0, 0, 0))
         if materialIndex is None: materialIndex = 0
         if displayMode is None: displayMode = "3DSPACE"
 
@@ -30,6 +33,7 @@ class GPStroke:
         self.drawCyclic = drawCyclic
         self.startCapMode = startCapMode
         self.endCapMode = endCapMode
+        self.vertexColorFill = vertexColorFill
         self.materialIndex = materialIndex
         self.displayMode = displayMode
 
@@ -42,6 +46,7 @@ class GPStroke:
             Cyclic: {self.drawCyclic}
             Start Cap Mode: {self.startCapMode}
             End Cap Mode: {self.endCapMode}
+            Vertex Color Fill: {self.vertexColorFill}
             Material Index: {self.materialIndex}
             Display Mode: {self.displayMode}""")
 
@@ -49,4 +54,4 @@ class GPStroke:
         return GPStroke(self.vertices.copy(), self.strengths.copy(), self.pressures.copy(),
                         self.uvRotations.copy(), self.vertexColors.copy(), self.lineWidth,
                         self.hardness, self.drawCyclic, self.startCapMode, self.endCapMode,
-                        self.materialIndex, self.displayMode)
+                        self.vertexColorFill, self.materialIndex, self.displayMode)
