@@ -106,7 +106,7 @@ class ClosePackingNode(bpy.types.Node, AnimationNode):
                          ("Object Radii", "objectRadii")), hide = True)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
-        self.newOutput("Vector List", "Vectors", "vectors", hide = True)
+        self.newOutput("Vector List", "Vectors", "vectors")
         self.newOutput("Float List", "Radii", "radii", hide = True)
         if self.mode == "RELAX" and self.pointsOnMesh:
             self.newOutput("Vector List", "Normals", "normals", hide = True)
