@@ -19,6 +19,7 @@
 - Added XoShiRo256 random number generators.
 - Added mesh *Triangulation* methods and *Triangulate Mesh* node.
 - Added Mesh Points Scatter node.
+- Added *Vertex Color Fill* in *GP Stroke Info*, *GP Stroke From Points*, and *Set GP Stroke Attributes* nodes.
 
 ### Fixed
 
