@@ -9,6 +9,7 @@ from . falloff_tracer_utils import (
     gradientOfFalloff3D,
     getCurvesFromVectors,
     curlOfFalloff3DOnMesh,
+    gradientOfFalloff3DOnMesh,
 )
 from ... data_structures cimport(
     Mesh,
@@ -55,12 +56,14 @@ class FalloffTracerNode(bpy.types.Node, AnimationNode):
 
         self.newInput("Integer", "Iterations", "iterations", value = 50, minValue = 0)
         self.newInput("Float", "Step", "step", value = 0.1, minValue = 0.00001)
-        if self.tracerMode == "CURL3D" and self.vectorsOnMesh:
-            self.newInput("Mesh", "Mesh", "mesh")
-        elif self.tracerMode == "CURL2D":
+        if self.tracerMode == "CURL2D":
             self.newInput("Integer", "Style", "style", value = 1, minValue = 1, maxValue = 4)
+        elif self.tracerMode in ["CURL3D", "GRADIENT3D"] and self.vectorsOnMesh:
+            self.newInput("Mesh", "Mesh", "mesh")
+        elif self.tracerMode == "GRADIENT3D" and not self.vectorsOnMesh:
+            self.newInput("Vector", "Axis Scale", "axisScale", value = (1, 1, 1), hide = True)
         self.newInput("Falloff", "Falloff", "falloff")
-        if self.tracerMode == "CURL3D" and self.vectorsOnMesh:
+        if self.tracerMode in ["CURL3D", "GRADIENT3D"] and self.vectorsOnMesh:
             self.newInput("Float", "Epsilon", "epsilon", value = 0, minValue = 0, hide = True)
             self.newInput("Float", "Max Distance", "maxDistance", value = 1e+6, minValue = 0, hide = True)
 
@@ -78,7 +81,7 @@ class FalloffTracerNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         layout.prop(self, "tracerMode", text = "")
         layout.prop(self, "dataType", text = "")
-        if self.tracerMode == "CURL3D":
+        if self.tracerMode in ["CURL3D", "GRADIENT3D"]:
             layout.prop(self, "vectorsOnMesh")
         if self.dataType == "MESH":
             layout.prop(self, "joinMeshes")
@@ -91,8 +94,11 @@ class FalloffTracerNode(bpy.types.Node, AnimationNode):
                 return "execute_curlOfFalloff3DOnMesh"
             else:
                 return "execute_curlOfFalloff3D"
-        else:
-            return "execute_gradientOfFalloff3D"
+        elif self.tracerMode == "GRADIENT3D":
+            if self.vectorsOnMesh:
+                return "execute_gradientOfFalloff3DOnMesh"
+            else:
+                return "execute_gradientOfFalloff3D"
 
     def execute_curlOfFalloff2D(self, vectors, *settings):
         newSettings = [*settings]
@@ -135,13 +141,30 @@ class FalloffTracerNode(bpy.types.Node, AnimationNode):
 
     def execute_gradientOfFalloff3D(self, vectors, *settings):
         newSettings = [*settings]
-        cdef Falloff falloff = newSettings[2]
+        cdef Falloff falloff = newSettings[3]
         cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
 
-        curlNoiseSettings = newSettings[:2]
+        curlNoiseSettings = newSettings[:3]
         if curlNoiseSettings[0] <= 0: return self.emptyOutput()
 
         vectorsOut = gradientOfFalloff3D(vectors, *curlNoiseSettings, "", None, evaluator)
+        return self.outputData(len(vectors), curlNoiseSettings[0], vectorsOut)
+
+    def execute_gradientOfFalloff3DOnMesh(self, vectors, *settings):
+        newSettings = [*settings]
+        cdef Falloff falloff = newSettings[3]
+        cdef FalloffEvaluator evaluator = self.getFalloffEvaluator(falloff)
+
+        curlNoiseSettings = newSettings[:3]
+        if curlNoiseSettings[0] <= 0: return self.emptyOutput()
+
+        bvhTree = self.buildBVHTree(curlNoiseSettings[2], newSettings[-2])
+        if bvhTree is None: return self.emptyOutput()
+
+        curlNoiseSettings[2] = bvhTree
+        curlNoiseSettings.append(newSettings[-1])
+
+        vectorsOut = gradientOfFalloff3DOnMesh(vectors, *curlNoiseSettings, "", None, evaluator)
         return self.outputData(len(vectors), curlNoiseSettings[0], vectorsOut)
 
     def getFalloffEvaluator(self, falloff):
