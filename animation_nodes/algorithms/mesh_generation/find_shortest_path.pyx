@@ -2,6 +2,7 @@ from ... data_structures import GPStroke
 from ... data_structures cimport (
     Mesh,
     LongList,
+    ColorList,
     FloatList,
     PolySpline,
     DoubleList,
@@ -104,9 +105,11 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType, bint changeDirect
             strengths = FloatList(length = amount)
             pressures = FloatList(length = amount)
             uvRotations = FloatList(length = amount)
+            vertexColors = ColorList(length = amount)
             strengths.fill(1)
             pressures.fill(1)
             uvRotations.fill(0)
-            strokes.append(GPStroke(sortLocations, strengths, pressures, uvRotations, 10))
+            vertexColors.fill((0, 0, 0, 0))
+            strokes.append(GPStroke(sortLocations, strengths, pressures, uvRotations, vertexColors, 10))
 
         return strokes
