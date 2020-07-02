@@ -5,6 +5,7 @@ from ... math cimport Vector3, toVector3
 from ... algorithms.mesh_generation.line import getLinesMesh
 from ... data_structures cimport(
     Mesh,
+    ColorList,
     FloatList,
     PolySpline,
     Vector3DList,
@@ -446,12 +447,14 @@ def getCurvesFromVectors(Py_ssize_t amount, Py_ssize_t iterations, Vector3DList 
             vectors = Vector3DList(length = iterations)
             for j in range(iterations):
                 vectors.data[j] = vectorsIn.data[i + j * amount]
-            strengths = FloatList(length = amount)
-            pressures = FloatList(length = amount)
-            uvRotations = FloatList(length = amount)
+            strengths = FloatList(length = iterations)
+            pressures = FloatList(length = iterations)
+            uvRotations = FloatList(length = iterations)
+            vertexColors = ColorList(length = iterations)
             strengths.fill(1)
             pressures.fill(1)
             uvRotations.fill(0)
-            strokes.append(GPStroke(vectors, strengths, pressures, uvRotations, 10))
+            vertexColors.fill((0, 0, 0, 0))
+            strokes.append(GPStroke(vectors, strengths, pressures, uvRotations, vertexColors, 10))
 
         return strokes
