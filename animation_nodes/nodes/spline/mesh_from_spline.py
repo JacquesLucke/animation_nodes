@@ -82,5 +82,8 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         if capEnds and not spline.cyclic and len(shape) > 2:
             allPolygons.append(tuple(range(len(shape))))
             allPolygons.append(tuple(reversed(range((amount - 1) * len(shape), amount * len(shape)))))
+            if not closedShape:
+                allEdges.append((0, len(shape) - 1))
+                allEdges.append(((amount - 1) * len(shape), amount * len(shape) - 1))
 
         return Mesh(allVertices, allEdges, allPolygons, skipValidation = True)
