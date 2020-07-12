@@ -76,7 +76,7 @@ class FalloffTracerNode(bpy.types.Node, AnimationNode):
             self.newOutput("Spline List", "Splines", "splines")
         elif self.dataType == "STROKE":
             self.newOutput("GPStroke List", "Strokes", "strokes")
-        self.newOutput("Vector List", "Vectors", "vectorsOut")
+        self.newOutput("Vector List", "Vectors", "vectorsOut", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "tracerMode", text = "")
