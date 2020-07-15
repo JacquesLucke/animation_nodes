@@ -12,6 +12,7 @@ from ... data_structures cimport(
     FalloffEvaluator,
 )
 
+# Reference https://blender.stackexchange.com/questions/94991/trace-visualisation-in-3d-how-to-wrap-curves-onto-a-3d-mesh/95577#95577
 @cython.cdivision(True)
 def curlOfFalloff2D(Vector3DList vectorsIn, Py_ssize_t iterations, float step, Py_ssize_t style, str noiseMode,
                     baseNoise, FalloffEvaluator evaluator):
@@ -416,10 +417,10 @@ def gradientOfFalloff3DOnMesh(Vector3DList vectorsIn, Py_ssize_t iterations, flo
     return gradientVectors
 
 
-def getCurvesFromVectors(Py_ssize_t amount, Py_ssize_t iterations, Vector3DList vectorsIn,
-                         str curveType = "MESH"):
-    cdef Vector3DList vectors
+def getCurvesPerVectors(Py_ssize_t amount, Py_ssize_t iterations, Vector3DList vectorsIn,
+                        str curveType = "MESH"):
     cdef list meshes, splines, strokes
+    cdef Vector3DList vectors
     cdef Py_ssize_t i, j
 
     if curveType == "MESH":
@@ -456,5 +457,53 @@ def getCurvesFromVectors(Py_ssize_t amount, Py_ssize_t iterations, Vector3DList 
             uvRotations.fill(0)
             vertexColors.fill((0, 0, 0, 0))
             strokes.append(GPStroke(vectors, strengths, pressures, uvRotations, vertexColors, 10))
+
+        return strokes
+
+def getCurvesPerIterations(Py_ssize_t amount, Py_ssize_t iterations, Vector3DList vectorsIn,
+                           str curveType = "MESH", bint cyclic = False):
+    cdef list meshes, splines, strokes
+    cdef Vector3DList vectors
+    cdef PolySpline spline
+    cdef Py_ssize_t i, j
+
+    if curveType == "MESH":
+        meshes = []
+        for i in range(iterations):
+            vectors = Vector3DList(length = amount)
+            for j in range(amount):
+                vectors.data[j] = vectorsIn.data[i * amount + j]
+            meshes.append(getLinesMesh(vectors, cyclic))
+
+        return meshes
+
+    elif curveType == "SPLINE":
+        splines = []
+        for i in range(iterations):
+            vectors = Vector3DList(length = amount)
+            for j in range(amount):
+                vectors.data[j] = vectorsIn.data[i * amount + j]
+            spline = PolySpline.__new__(PolySpline, vectors)
+            spline.cyclic = cyclic
+            splines.append(spline)
+        return splines
+
+    elif curveType == "STROKE":
+        strokes = []
+        for i in range(iterations):
+            vectors = Vector3DList(length = amount)
+            for j in range(amount):
+                vectors.data[j] = vectorsIn.data[i * amount + j]
+            strengths = FloatList(length = amount)
+            pressures = FloatList(length = amount)
+            uvRotations = FloatList(length = amount)
+            vertexColors = ColorList(length = amount)
+            strengths.fill(1)
+            pressures.fill(1)
+            uvRotations.fill(0)
+            vertexColors.fill((0, 0, 0, 0))
+            stroke = GPStroke(vectors, strengths, pressures, uvRotations, vertexColors, 10)
+            stroke.drawCyclic = cyclic
+            strokes.append(stroke)
 
         return strokes
