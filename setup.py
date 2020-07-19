@@ -82,7 +82,7 @@ def setupConfigFile():
         print(textwrap.dedent('''\
         Copied the conf.default.json file to conf.json.
         Please change it manually if needed.
-        Note: git ignorers it, so depending on the settings of your editor
+        Note: git ignores it, so depending on the settings of your editor
               it might not be shows inside it.
         '''))
     return readJsonFile(configPath)
