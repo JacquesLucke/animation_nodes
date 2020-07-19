@@ -206,7 +206,7 @@ class FalloffTracerNode(bpy.types.Node, AnimationNode):
             (len(polygons) > 0 and polygons.getMaxIndex() >= vertices.length)): return None
         return BVHTree.FromPolygons(vertices, polygons, epsilon = max(epsilon, 0))
 
-    def outputData(self, Py_ssize_t amount, Py_ssize_t iterations, Vector3DList vectorsOut, bint cyclic):
+    def outputData(self, long amount, long iterations, Vector3DList vectorsOut, bint cyclic):
         if self.dataStyle == "PERVECTOR":
             curves = getCurvesPerVectors(amount, iterations, vectorsOut, self.dataType)
         else:

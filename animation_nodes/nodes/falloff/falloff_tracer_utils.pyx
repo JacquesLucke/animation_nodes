@@ -14,18 +14,19 @@ from ... data_structures cimport(
 
 # Reference https://blender.stackexchange.com/questions/94991/trace-visualisation-in-3d-how-to-wrap-curves-onto-a-3d-mesh/95577#95577
 @cython.cdivision(True)
-def curlOfFalloff2D(Vector3DList vectorsIn, Py_ssize_t iterations, float step, Py_ssize_t style, str noiseMode,
+def curlOfFalloff2D(Vector3DList vectorsIn, long iterations, float step, long style, str noiseMode,
                     baseNoise, FalloffEvaluator evaluator):
-    cdef Py_ssize_t amount = vectorsIn.length
-    cdef Py_ssize_t twiAmount = 2 * amount
+    cdef long amount = vectorsIn.length
+    cdef long twiAmount = 2 * amount
     cdef Vector3DList vectors = Vector3DList(length = amount)
     cdef FloatList values = FloatList(length = 4 * twiAmount)
     cdef Vector3DList vectorsForFalloff = Vector3DList(length = 4 * twiAmount)
     cdef Vector3DList curlVectors = Vector3DList(length = amount * iterations)
     cdef Vector3 vector
-    cdef float dr = 1.0 / (2.0 * max(step, 0.00001))
     cdef float dFxdx, dFydy
-    cdef Py_ssize_t i, j, index, amountX1, amountX2, amountX3, amountX4
+    cdef float dr = 1.0 / (2.0 * max(step, 0.00001))
+    cdef long amountX1, amountX2, amountX3, amountX4
+    cdef Py_ssize_t i, j, index
 
     amountX1 = amount
     amountX2 = 2 * amount
@@ -86,10 +87,10 @@ def curlOfFalloff2D(Vector3DList vectorsIn, Py_ssize_t iterations, float step, P
 
 
 @cython.cdivision(True)
-def curlOfFalloff3D(Vector3DList vectorsIn, Py_ssize_t iterations, float step, str noiseMode, baseNoise,
+def curlOfFalloff3D(Vector3DList vectorsIn, long iterations, float step, str noiseMode, baseNoise,
                     FalloffEvaluator evaluator):
-    cdef Py_ssize_t amount = vectorsIn.length
-    cdef Py_ssize_t triAmount = 3 * amount
+    cdef long amount = vectorsIn.length
+    cdef long triAmount = 3 * amount
     cdef Vector3DList vectors = Vector3DList(length = amount)
     cdef Vector3DList normals = Vector3DList(length = amount)
     cdef Vector3DList vectorsOffset = Vector3DList(length = triAmount)
@@ -102,8 +103,7 @@ def curlOfFalloff3D(Vector3DList vectorsIn, Py_ssize_t iterations, float step, s
     cdef Vector3 vector, vectorNew
     cdef float dr = 1.0 / (2.0 * max(step, 0.00001))
     cdef float dFydx, dFzdx, dFxdy, dFzdy, dFxdz, dFydz
-    cdef Py_ssize_t triAmountX1, triAmountX2, triAmountX3, triAmountX4, triAmountX5, triAmountX6
-    cdef Py_ssize_t amountX1, amountX2
+    cdef long amountX1, amountX2, triAmountX1, triAmountX2, triAmountX3, triAmountX4, triAmountX5, triAmountX6
     cdef Py_ssize_t i, j, index
 
     amountX1 = amount
@@ -194,9 +194,9 @@ def curlOfFalloff3D(Vector3DList vectorsIn, Py_ssize_t iterations, float step, s
     return curlVectors
 
 @cython.cdivision(True)
-def curlOfFalloff3DOnMesh(Vector3DList vectorsIn, Py_ssize_t iterations, float step, bvhTree,
+def curlOfFalloff3DOnMesh(Vector3DList vectorsIn, long iterations, float step, bvhTree,
                           float maxDistance, str noiseMode, baseNoise, FalloffEvaluator evaluator):
-    cdef Py_ssize_t amount = vectorsIn.length
+    cdef long amount = vectorsIn.length
     cdef Vector3DList vectors = Vector3DList(length = amount)
     cdef Vector3DList normals = Vector3DList(length = amount)
     cdef FloatList values = FloatList(length = 6 * amount)
@@ -205,7 +205,7 @@ def curlOfFalloff3DOnMesh(Vector3DList vectorsIn, Py_ssize_t iterations, float s
     cdef Vector3 vector, normal
     cdef float dr = 1.0 / (2.0 * max(step, 0.00001))
     cdef float dFdx, dFdy, dFdz
-    cdef Py_ssize_t amountX1, amountX2, amountX3, amountX4, amountX5, amountX6
+    cdef long amountX1, amountX2, amountX3, amountX4, amountX5, amountX6
     cdef Py_ssize_t i, j, index
 
     amountX1 = amount
@@ -271,9 +271,9 @@ def curlOfFalloff3DOnMesh(Vector3DList vectorsIn, Py_ssize_t iterations, float s
     return curlVectors
 
 @cython.cdivision(True)
-def gradientOfFalloff3D(Vector3DList vectorsIn, Py_ssize_t iterations, float step, axisScale,
+def gradientOfFalloff3D(Vector3DList vectorsIn, long iterations, float step, axisScale,
                         str noiseMode, baseNoise, FalloffEvaluator evaluator):
-    cdef Py_ssize_t amount = vectorsIn.length
+    cdef long amount = vectorsIn.length
     cdef Vector3DList vectors = Vector3DList(length = amount)
     cdef FloatList values = FloatList(length = 6 * amount)
     cdef Vector3DList vectorsForFalloff = Vector3DList(length = 6 * amount)
@@ -282,7 +282,7 @@ def gradientOfFalloff3D(Vector3DList vectorsIn, Py_ssize_t iterations, float ste
     cdef Vector3 newAxisScale = toVector3(axisScale)
     cdef float dr = 1.0 / (2.0 * max(step, 0.00001))
     cdef float dFdx, dFdy, dFdz
-    cdef Py_ssize_t amountX1, amountX2, amountX3, amountX4, amountX5, amountX6
+    cdef long amountX1, amountX2, amountX3, amountX4, amountX5, amountX6
     cdef Py_ssize_t i, j, index
 
     amountX1 = amount
@@ -343,9 +343,9 @@ def gradientOfFalloff3D(Vector3DList vectorsIn, Py_ssize_t iterations, float ste
     return gradientVectors
 
 @cython.cdivision(True)
-def gradientOfFalloff3DOnMesh(Vector3DList vectorsIn, Py_ssize_t iterations, float step, bvhTree,
+def gradientOfFalloff3DOnMesh(Vector3DList vectorsIn, long iterations, float step, bvhTree,
                               float maxDistance, str noiseMode, baseNoise, FalloffEvaluator evaluator):
-    cdef Py_ssize_t amount = vectorsIn.length
+    cdef long amount = vectorsIn.length
     cdef Vector3DList vectors = Vector3DList(length = amount)
     cdef FloatList values = FloatList(length = 6 * amount)
     cdef Vector3DList vectorsForFalloff = Vector3DList(length = 6 * amount)
@@ -353,7 +353,7 @@ def gradientOfFalloff3DOnMesh(Vector3DList vectorsIn, Py_ssize_t iterations, flo
     cdef Vector3 vector
     cdef float dr = 1.0 / (2.0 * max(step, 0.00001))
     cdef float dFdx, dFdy, dFdz
-    cdef Py_ssize_t amountX1, amountX2, amountX3, amountX4, amountX5, amountX6
+    cdef long amountX1, amountX2, amountX3, amountX4, amountX5, amountX6
     cdef Py_ssize_t i, j, index
 
     amountX1 = amount
@@ -417,7 +417,7 @@ def gradientOfFalloff3DOnMesh(Vector3DList vectorsIn, Py_ssize_t iterations, flo
     return gradientVectors
 
 
-def getCurvesPerVectors(Py_ssize_t amount, Py_ssize_t iterations, Vector3DList vectorsIn,
+def getCurvesPerVectors(long amount, long iterations, Vector3DList vectorsIn,
                         str curveType = "MESH"):
     cdef list meshes, splines, strokes
     cdef Vector3DList vectors
@@ -460,7 +460,7 @@ def getCurvesPerVectors(Py_ssize_t amount, Py_ssize_t iterations, Vector3DList v
 
         return strokes
 
-def getCurvesPerIterations(Py_ssize_t amount, Py_ssize_t iterations, Vector3DList vectorsIn,
+def getCurvesPerIterations(long amount, long iterations, Vector3DList vectorsIn,
                            str curveType = "MESH", bint cyclic = False):
     cdef list meshes, splines, strokes
     cdef Vector3DList vectors
