@@ -76,7 +76,8 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
             return randomPointsScatter(vertices, polygons, polyNormals, weights, seed, max(amount, 0))
         else:
             if len(edges) == 0: return Matrix4x4List()
-            return randomPointsScatterForEdges(vertices, edges, weights, seed, max(amount, 0))
+            normals = mesh.getVertexNormals()
+            return randomPointsScatterForEdges(vertices, edges, normals, weights, seed, max(amount, 0))
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()

@@ -15,10 +15,13 @@ from ... data_structures cimport (
 )
 from ... math cimport (
     Vector3,
+    addVec3,
+    subVec3,
+    Matrix4,
     toVector3,
     distanceVec3,
     setMatrixTranslation,
-    setTranslationScaleMatrix,
+    normalizeVec3_InPlace,
     )
 
 def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
@@ -102,9 +105,9 @@ cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList 
                                       LongList distribution, long numberOfPoints, long seed):
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
-    cdef Py_ssize_t i, j, k, index
-    cdef Vector3 v1, v2, v3, v, polyNormal
     cdef Vector3 guide = toVector3((0, 0, 1))
+    cdef Vector3 v1, v2, v3, v, direction
+    cdef Py_ssize_t i, j, k, index
     cdef double p1, p2, p3
     index = 0
     for i in range(polygons.getLength()):
@@ -112,7 +115,12 @@ cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList 
         v1 = vertices.data[polygons.indices.data[j]]
         v2 = vertices.data[polygons.indices.data[j + 1]]
         v3 = vertices.data[polygons.indices.data[j + 2]]
-        polyNormal = polyNormals.data[i]
+
+        direction = polyNormals.data[i]
+
+        subVec3(&guide, &v1, &v2)
+        normalizeVec3_InPlace(&guide)
+
         for k in range(distribution.data[i]):
             p1 = rng.nextDouble()
             p2 = rng.nextDouble()
@@ -125,14 +133,14 @@ cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList 
             v.y = p1 * v1.y + p2 * v2.y + p3 * v3.y
             v.z = p1 * v1.z + p2 * v2.z + p3 * v3.z
 
-            directionToMatrix_LowLevel(matrices.data + index, &polyNormal, &guide, 2, 0)
+            directionToMatrix_LowLevel(matrices.data + index, &direction, &guide, 2, 0)
             setMatrixTranslation(matrices.data + index, &v)
             index += 1
 
     return matrices
 
 
-def randomPointsScatterForEdges(Vector3DList vertices, EdgeIndicesList edges,
+def randomPointsScatterForEdges(Vector3DList vertices, EdgeIndicesList edges, Vector3DList normals,
                                 VirtualDoubleList weights, long seed, long numberOfPoints):
     cdef DoubleList edgeWeights = calculateEdgeWeights(vertices, edges, weights)
 
@@ -140,7 +148,7 @@ def randomPointsScatterForEdges(Vector3DList vertices, EdgeIndicesList edges,
     cdef long computedNumberOfPoints
     distribution = computeDistribution(edgeWeights, numberOfPoints, seed, &computedNumberOfPoints)
 
-    return sampleRandomPointsOnEdges(vertices, edges, distribution, computedNumberOfPoints, seed)
+    return sampleRandomPointsOnEdges(vertices, edges, normals, distribution, computedNumberOfPoints, seed)
 
 @cython.cdivision(True)
 cdef DoubleList calculateEdgeWeights(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList weights):
@@ -155,20 +163,32 @@ cdef DoubleList calculateEdgeWeights(Vector3DList vertices, EdgeIndicesList edge
         edgeWeights.data[i] *= max((weights.get(i1) + weights.get(i2)) / 2.0, 0)
     return edgeWeights
 
-cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges,
+cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges, Vector3DList normals,
                                              LongList distribution, long numberOfPoints, long seed):
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
+    cdef Vector3 direction = toVector3((0, 0, 1))
+    cdef Vector3 guide = toVector3((0, 0, 1))
     cdef Vector3 v
-    cdef Vector3 scale = toVector3((1, 1, 1))
     cdef Vector3 *v1
     cdef Vector3 *v2
+    cdef Vector3 *n1
+    cdef Vector3 *n2
     cdef Py_ssize_t i, j, index
     cdef double p1, p2
     index = 0
     for i in range(edges.getLength()):
         v1 = vertices.data + edges.data[i].v1
         v2 = vertices.data + edges.data[i].v2
+
+        n1 = normals.data + edges.data[i].v1
+        n2 = normals.data + edges.data[i].v2
+        addVec3(&guide, n1, n2)
+        normalizeVec3_InPlace(&guide)
+
+        subVec3(&direction, v1, v2)
+        normalizeVec3_InPlace(&direction)
+
         for j in range(distribution.data[i]):
             p1 = rng.nextDouble()
             p2 = 1.0 - p1
@@ -177,7 +197,8 @@ cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesL
             v.y = p1 * v1[0].y + p2 * v2[0].y
             v.z = p1 * v1[0].z + p2 * v2[0].z
 
-            setTranslationScaleMatrix(matrices.data + index, &v, &scale)
+            directionToMatrix_LowLevel(matrices.data + index, &direction, &guide, 0, 2)
+            setMatrixTranslation(matrices.data + index, &v)
             index += 1
 
     return matrices
