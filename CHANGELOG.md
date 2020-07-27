@@ -19,6 +19,7 @@
 - Added XoShiRo256 random number generators.
 - Added mesh *Triangulation* methods and *Triangulate Mesh* node.
 - Added Mesh Points Scatter node.
+- Added support for 2D vectors in 3D viewer node.
 
 ### Fixed
 

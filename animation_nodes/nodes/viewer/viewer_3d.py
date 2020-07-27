@@ -7,7 +7,8 @@ from ... tree_info import getNodesByType
 from ... utils.blender_ui import redrawAll
 
 from mathutils import Vector, Matrix
-from ... data_structures import Vector3DList, Matrix4x4List
+from ... data_structures import Vector3DList, Vector2DList, Matrix4x4List
+from ... nodes.vector.c_utils import convert_Vector2DList_to_Vector3DList
 
 import gpu
 from bgl import *
@@ -22,7 +23,7 @@ class DrawData:
         self.data = data
         self.drawFunction = drawFunction
 
-drawableDataTypes = (Vector3DList, Matrix4x4List, Vector, Matrix)
+drawableDataTypes = (Vector3DList, Vector2DList, Matrix4x4List, Vector, Matrix)
 
 class Viewer3DNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_Viewer3DNode"
@@ -71,8 +72,12 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
             return
         if isinstance(data, Vector3DList):
             dataByIdentifier[self.identifier] = DrawData(data, self.drawVectors)
-        elif isinstance(data, Vector):
-            dataByIdentifier[self.identifier] = DrawData(Vector3DList.fromValues([data]), self.drawVectors)
+        if isinstance(data, Vector2DList):
+            vectors = convert_Vector2DList_to_Vector3DList(data)
+            dataByIdentifier[self.identifier] = DrawData(vectors, self.drawVectors)
+        elif isinstance(data, Vector) and len(data) in (2, 3):
+            vector = data.to_3d()
+            dataByIdentifier[self.identifier] = DrawData(Vector3DList.fromValues([vector]), self.drawVectors)
         elif isinstance(data, Matrix4x4List):
             dataByIdentifier[self.identifier] = DrawData(data, self.drawMatrices)
         elif isinstance(data, Matrix):
