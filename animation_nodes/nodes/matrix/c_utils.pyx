@@ -15,7 +15,9 @@ from ... math cimport (
     setRotationMatrix, setTranslationMatrix, setIdentityMatrix,
     setScaleMatrix,
     setMatrixTranslation,
-    transposeMatrix_Inplace)
+    transposeMatrix_Inplace,
+    getMatrix3x3PartDeterminant,
+)
 
 from ... math import matrix4x4ListToEulerList
 
@@ -130,7 +132,10 @@ cdef void scaleFromMatrix(Vector3 *scale, Matrix4 *m):
     scale.x = <float>sqrt(m.a11 * m.a11 + m.a21 * m.a21 + m.a31 * m.a31)
     scale.y = <float>sqrt(m.a12 * m.a12 + m.a22 * m.a22 + m.a32 * m.a32)
     scale.z = <float>sqrt(m.a13 * m.a13 + m.a23 * m.a23 + m.a33 * m.a33)
-
+    if getMatrix3x3PartDeterminant(m) < 0.0:
+        scale.x *= -1.0
+        scale.y *= -1.0
+        scale.z *= -1.0
 
 # Replicate Matrix
 ###############################################
