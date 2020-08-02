@@ -42,6 +42,7 @@
 - Fixed *Object Action Output* node when action contain bad channels.
 - Fixed *Mesh From Spline* node when *Closed Shape* and *Cap Ends* are enabled.
 - Fixed wrong sign in scale for matrix list in *Decomposed Matrix* node.
+- Fixed bad link conversions between Object and Shape Key sockets.
 
 ### Changed
 
