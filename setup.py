@@ -83,7 +83,7 @@ def setupConfigFile():
         Copied the conf.default.json file to conf.json.
         Please change it manually if needed.
         Note: git ignores it, so depending on the settings of your editor
-              it might not be shows inside it.
+              it might not be shown inside it.
         '''))
     return readJsonFile(configPath)
 
