@@ -2,6 +2,19 @@
 
 ### Added
 
+
+### Fixed
+
+
+### Changed
+
+
+# 2.1
+
+## 2.1.8 (08 August 2020)
+
+### Added
+
 - Added GP Stroke From Spline node.
 - Added Spline From GP Stroke node.
 - Added Offset GP Stroke node.
