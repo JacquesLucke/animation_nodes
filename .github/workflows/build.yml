@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - extranodes
+      - en-v2.1-for-blender-v2.83
   pull_request:
     branches:
       - extranodes

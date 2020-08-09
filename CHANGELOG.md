@@ -2,6 +2,19 @@
 
 ### Added
 
+
+### Fixed
+
+
+### Changed
+
+
+# 2.1
+
+## 2.1.8 (08 August 2020)
+
+### Added
+
 - Added GP Stroke From Spline node.
 - Added Spline From GP Stroke node.
 - Added Offset GP Stroke node.
@@ -53,6 +66,7 @@
 - Migrate CI/CD pipeline to Github Workflows.
 - Moved Problems panel to UI region.
 - Add CI/CD build for Python 3.8 on Linux.
+- Rename the *Sort* node as *Sort Numbers* node.
 
 ## 2.1.7 (22 February 2020)
 
