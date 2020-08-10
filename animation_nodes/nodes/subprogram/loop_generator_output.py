@@ -16,6 +16,8 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
         self.refresh()
         subprogramInterfaceChanged()
 
+    hideByDefault: BoolProperty(name = "Hide By Default", default = False,
+        description = "Hide the socket by default")
     outputName: StringProperty(name = "Generator Name", update = settingChanged)
     loopInputIdentifier: StringProperty(update = settingChanged)
     sortIndex: IntProperty(default = 0)
@@ -47,6 +49,7 @@ class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
 
     def drawAdvanced(self, layout):
         layout.prop(self, "outputName", text = "Name")
+        layout.prop(self, "hideByDefault")
         self.invokeSelector(layout, "DATA_TYPE", "setListDataType",
             dataTypes = "LIST", text = "Change Type", icon = "TRIA_RIGHT")
 
