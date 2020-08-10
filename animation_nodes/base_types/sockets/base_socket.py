@@ -23,6 +23,12 @@ class SocketDisplayProperties(bpy.types.PropertyGroup):
     moveOperators: BoolProperty(default = False)
     removeOperator: BoolProperty(default = False)
 
+
+class SocketSubprogramProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_SocketSubprogramProperties"
+    hideByDefault: BoolProperty(name = "Hide By Default", default = False,
+        description = "Hide the socket by default")
+
 class SocketLoopProperties(bpy.types.PropertyGroup):
     bl_idname = "an_SocketLoopProperties"
 
@@ -60,6 +66,7 @@ class AnimationNodeSocket:
 
     display: PointerProperty(type = SocketDisplayProperties)
     textProps: PointerProperty(type = SocketTextProperties)
+    subprogram: PointerProperty(type = SocketSubprogramProperties)
     loop: PointerProperty(type = SocketLoopProperties)
     execution: PointerProperty(type = SocketExecutionProperties)
 

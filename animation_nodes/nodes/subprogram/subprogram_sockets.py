@@ -30,12 +30,12 @@ class SubprogramData:
         self.inputs = []
         self.outputs = []
 
-    def newInput(self, idName, identifier, text, defaultValue):
-        data = SocketData(idName, identifier, text, defaultValue)
+    def newInput(self, idName, identifier, text, hideByDefault, defaultValue):
+        data = SocketData(idName, identifier, text, hideByDefault, defaultValue)
         self.inputs.append(data)
 
-    def newOutput(self, idName, identifier, text, defaultValue = None):
-        data = SocketData(idName, identifier, text, defaultValue)
+    def newOutput(self, idName, identifier, text, hideByDefault, defaultValue = None):
+        data = SocketData(idName, identifier, text, hideByDefault, defaultValue)
         self.outputs.append(data)
 
     def newInputFromSocket(self, socket):
@@ -70,16 +70,18 @@ class SubprogramData:
 
         if newSocket.isInput and not data.defaultValue == NoDefaultValue:
             newSocket.setProperty(data.defaultValue)
+        newSocket.hide = data.hideByDefault
         newSocket.text = data.text
         newSocket.display.text = True
         newSocket.dataIsModified = True
         return newSocket
 
 class SocketData:
-    def __init__(self, idName, identifier, text, defaultValue):
+    def __init__(self, idName, identifier, text, hideByDefault, defaultValue):
         self.idName = idName
         self.identifier = identifier
         self.text = text
+        self.hideByDefault = hideByDefault
         self.defaultValue = defaultValue
 
     @staticmethod
@@ -87,6 +89,7 @@ class SocketData:
         return SocketData(socket.bl_idname,
                           socket.identifier,
                           socket.text,
+                          socket.subprogram.hideByDefault,
                           socket.getProperty())
 
 
