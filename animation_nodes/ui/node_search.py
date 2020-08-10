@@ -3,6 +3,7 @@ import itertools
 from bpy.props import *
 from .. utils.enum_items import cacheEnumItems
 from .. tree_info import getSubprogramNetworks
+from .. utils.attributes import setattrRecursive
 from .. utils.nodes import iterAnimationNodeClasses, newNodeAtCursor, invokeTranslation
 
 itemsByIdentifier = {}
@@ -84,5 +85,5 @@ class SingleNodeInsertionItem:
     def insert(self):
         node = newNodeAtCursor(self.idName)
         for key, value in self.settings.items():
-            setattr(node, key, eval(value))
+            setattrRecursive(node, key, eval(value))
         invokeTranslation()

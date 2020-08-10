@@ -6,6 +6,7 @@
 - Added default values for Script subprogram inputs.
 - Added subtract method to the *Mix Falloff* node.
 - Added order weight option for Viewport Input node.
+- Added regular polygons mesh generators menu and search entries.
 
 ### Fixed
 
