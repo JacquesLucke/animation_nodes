@@ -8,13 +8,17 @@ mixTypeItems = [
     ("ADD", "Add", "", "NONE", 0),
     ("MULTIPLY", "Multiply", "", "NONE", 1),
     ("MAX", "Max", "", "NONE", 2),
-    ("MIN", "Min", "", "NONE", 3)]
+    ("MIN", "Min", "", "NONE", 3),
+    ("SUBTRACT", "Subtract", "", "NONE", 4),
+]
 
-useFactorTypes = {"ADD"}
+# Types that don't support list mixing.
+onlyTwoTypes = ["SUBTRACT"]
 
 class MixFalloffsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixFalloffsNode"
     bl_label = "Mix Falloffs"
+    errorHandlingType = "EXCEPTION"
 
     __annotations__ = {}
 
@@ -44,6 +48,8 @@ class MixFalloffsNode(bpy.types.Node, AnimationNode):
             return "execute_Two"
 
     def execute_List(self, falloffs):
+        if self.mixType in onlyTwoTypes:
+            self.raiseErrorMessage("The chosen mix type doesn't support list mixing.")
         return MixFalloffs(falloffs, self.mixType, default = 1)
 
     def execute_Two(self, a, b):
@@ -61,6 +67,7 @@ class MixFalloffs:
             elif method == "MULTIPLY": return MultiplyTwoFalloffs(*falloffs)
             elif method == "MAX": return MaxTwoFalloffs(*falloffs)
             elif method == "MIN": return MinTwoFalloffs(*falloffs)
+            elif method == "SUBTRACT": return SubtractTwoFalloffs(*falloffs)
             raise Exception("invalid method")
         else:
             if method == "ADD": return AddFalloffs(falloffs)
@@ -124,6 +131,17 @@ cdef class MaxTwoFalloffs(MixTwoFalloffsBase):
         cdef float *b = dependencyResults[1]
         for i in range(amount):
             target[i] = max(a[i], b[i])
+
+cdef class SubtractTwoFalloffs(MixTwoFalloffsBase):
+    cdef float evaluate(self, float *dependencyResults):
+        return dependencyResults[0] - dependencyResults[1]
+
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        cdef float *a = dependencyResults[0]
+        cdef float *b = dependencyResults[1]
+        for i in range(amount):
+            target[i] = a[i] - b[i]
 
 
 cdef class MixFalloffsBase(CompoundFalloff):

@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from operator import attrgetter
 from .. utils.layout import writeText
 from .. tree_info import getNodesByType, getNodeByIdentifier
 
@@ -17,7 +18,7 @@ class ViewportInputPanel(bpy.types.Panel):
             layout.label(text="No Viewport Input node.", icon="INFO")
             return
         
-        for node in nodes:
+        for node in sorted(nodes, key = attrgetter("orderWeight")):
             box = layout.box()
 
             row = box.row()

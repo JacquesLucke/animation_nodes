@@ -106,6 +106,23 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col.prop(self, "initializeMissingOutputs")
         col.prop(self, "correctOutputTypes")
 
+        col = layout.column()
+        col.label(text = "Input Defaults:")
+        box = col.box()
+        for socket in list(self.inputs)[:-1]:
+            subBox = box.box()
+            subBox.label(text = repr(socket.text))
+            socket.drawSocket(subBox, "Default", node = self, drawType = "PROPERTY_ONLY")
+            subBox.prop(socket.subprogram, "hideByDefault", text = "Hide")
+
+        col = layout.column()
+        col.label(text = "Output Defaults:")
+        box = col.box()
+        for socket in list(self.outputs)[:-1]:
+            subBox = box.box()
+            subBox.label(text = repr(socket.text))
+            subBox.prop(socket.subprogram, "hideByDefault", text = "Hide")
+
     def drawControlSocket(self, layout, socket):
         if socket in list(self.inputs):
             self.invokeSelector(layout, "DATA_TYPE", "newInputSocket",

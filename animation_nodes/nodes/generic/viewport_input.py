@@ -8,6 +8,8 @@ class ViewportInputNode(bpy.types.Node, AnimationNode):
     bl_label = "Viewport Input"
 
     hidden: BoolProperty(default = False)
+    orderWeight: IntProperty(name = "Order Weight", default = 0,
+        description = "The weight to use for ordering. Lower weights puts the node at the top")
 
     def setup(self):
         self.label = "Viewport Input"
@@ -17,6 +19,9 @@ class ViewportInputNode(bpy.types.Node, AnimationNode):
         self.invokeSelector(layout, "DATA_TYPE", "newOutputSocket", text = "New Output",
             description = "Create a new output socket", icon = "ADD", emboss = False,
             dataTypes = "DRAWABLE")
+
+    def drawAdvanced(self, layout):
+        layout.prop(self, "orderWeight")
 
     def getExecutionCode(self, required):
         for i, output in enumerate(self.outputs[:-1]):
