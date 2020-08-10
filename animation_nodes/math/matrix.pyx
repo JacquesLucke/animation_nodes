@@ -306,3 +306,13 @@ cdef void scaleMatrix3x3Part(Matrix3_or_Matrix4 *m, float s):
     m.a13 *= s
     m.a23 *= s
     m.a33 *= s
+
+cdef float getMatrix3x3PartDeterminant(Matrix3_or_Matrix4 *m):
+    return (
+        m.a11 * m.a22 * m.a33 +
+        m.a12 * m.a23 * m.a31 +
+        m.a13 * m.a21 * m.a32 +
+        m.a13 * m.a22 * m.a31 -
+        m.a12 * m.a21 * m.a33 -
+        m.a11 * m.a23 * m.a32
+    )

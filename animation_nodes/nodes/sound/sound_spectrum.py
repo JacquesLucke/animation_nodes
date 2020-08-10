@@ -52,7 +52,7 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
             self.newInput("Integer", "Count", "count", value = 20, minValue = 1)
             self.newInput("Float", "Low", "low", value = 0, minValue = 0, maxValue = 1, hide = True)
             self.newInput("Float", "High", "high", value = 1, minValue = 0, maxValue = 1, hide = True)
-            self.newInput("Float", "K", "k", value = 5, minValue = 0.00001)
+            self.newInput("Float", "Exponential Rate", "exponentialRate", value = 5, minValue = 0.00001)
         elif self.samplingMethod == "CUSTOM":
             self.newInput("Float List", "Pins", "pins")
         elif self.samplingMethod == "SINGLE":
@@ -81,7 +81,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         elif self.samplingMethod == "SINGLE": return "executeSingle"
         elif self.samplingMethod == "FULL": return "executeFull"
 
-    def executeExponential(self, sound, frame, attack, release, amplitude, count, low, high, k, scene):
+    def executeExponential(self, sound, frame, attack, release, amplitude, count,
+            low, high, exponentialRate, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
         if count < 1: self.raiseErrorMessage("Invalid count!")
@@ -91,8 +92,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
             attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
-        scale = expm1(k) / (high - low)
-        pins = [low + expm1(k * i / count) / scale for i in range(count + 1)]
+        scale = expm1(exponentialRate) / (high - low)
+        pins = [low + expm1(exponentialRate * i / count) / scale for i in range(count + 1)]
 
         bins = DoubleList(count)
         reductionFunction = reductionFunctions[self.reductionFunction]

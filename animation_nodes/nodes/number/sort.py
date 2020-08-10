@@ -1,9 +1,9 @@
 import bpy
 from ... base_types import AnimationNode
 
-class SortNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_SortNode"
-    bl_label = "Sort"
+class SortNumbersNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SortNumbersNode"
+    bl_label = "Sort Numbers"
 
     def create(self):
         self.newInput("Float List", "Numbers", "numbers")

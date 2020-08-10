@@ -59,3 +59,5 @@ cdef void transposeMatrix(Matrix3_or_Matrix4* t, Matrix3_or_Matrix4 *m)
 
 cdef void invertOrthogonalTransformation(Matrix4* t, Matrix4* m)
 cdef void scaleMatrix3x3Part(Matrix3_or_Matrix4 *m, float s)
+
+cdef float getMatrix3x3PartDeterminant(Matrix3_or_Matrix4 *m)

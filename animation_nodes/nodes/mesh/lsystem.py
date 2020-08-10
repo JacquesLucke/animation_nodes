@@ -111,7 +111,7 @@ presets = {
     "Tree" : LSystemPreset(
         axiom = "FFFA",
         rules = ["A = \"! [&FFFA] //// [&FFFA] //// [&FFFA]"],
-        angle = 3,
+        angle = 30,
         generations = 4
     ),
     "Cracy Cubes" : LSystemPreset(
