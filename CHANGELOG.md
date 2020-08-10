@@ -5,6 +5,7 @@
 - Added an option to hide subprogram sockets by default.
 - Added default values for Script subprogram inputs.
 - Added subtract method to the *Mix Falloff* node.
+- Added order weight option for Viewport Input node.
 
 ### Fixed
 
