@@ -429,6 +429,23 @@ class MeshDataMenu(bpy.types.Menu):
         insertNode(layout, "an_SetUVMapNode", "Set UV Map")
         insertNode(layout, "an_SetPolygonMaterialIndexNode", "Set Polygon Material Index")
 
+
+regularPolygons = [
+    ("Regular Pentagon", 5),
+    ("Regular Hexagon", 6),
+    ("Regular Heptagon", 7),
+    ("Regular Octagon", 8),
+]
+
+class RegularPolygonMeshGeneratorsMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_regular_polygon_mesh_generators_menu"
+    bl_label = "Regular Polygon Mesh Generators Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        for name, n in regularPolygons:
+            insertNode(layout, "an_CircleMeshNode", name, {'inputs["Radial Loops"].value' : repr(n)})
+
 class MeshGeneratorsMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_generators_menu"
     bl_label = "Mesh Generators Menu"
@@ -440,6 +457,7 @@ class MeshGeneratorsMenu(bpy.types.Menu):
         insertNode(layout, "an_CircleMeshNode", "Circle")
         insertNode(layout, "an_CylinderMeshNode", "Cylinder")
         insertNode(layout, "an_UnityTriangleMeshNode", "Unity Triangle")
+        layout.menu("AN_MT_regular_polygon_mesh_generators_menu", text = "Regular Polygons")
 
 class MeshOperatorsMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_operators_menu"

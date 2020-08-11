@@ -5,10 +5,19 @@ from .... base_types import AnimationNode, VectorizedSocket
 from .... data_structures import VirtualDoubleList, VirtualLongList
 from .... algorithms.mesh_generation.circle import getCircleMesh, getCircleMeshList
 
+regularPolygons = [
+    ("Regular Pentagon", 5),
+    ("Regular Hexagon", 6),
+    ("Regular Heptagon", 7),
+    ("Regular Octagon", 8),
+]
+
 class CircleMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CircleMeshNode"
     bl_label = "Circle Mesh"
     bl_width_default = 160
+
+    searchTags = [(name, {'inputs["Radial Loops"].value' : repr(n)}) for name, n in regularPolygons]
 
     def checkedPropertiesChanged(self, context):
         self.updateSocketVisibility()
