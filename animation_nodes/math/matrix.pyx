@@ -317,8 +317,8 @@ cdef float getMatrix3x3PartDeterminant(Matrix3_or_Matrix4 *m):
         m.a11 * m.a23 * m.a32
     )
 
-cdef void createMatrix(Matrix4 *m, Vector3 *center, Vector3 *tangent,
-                              Vector3 *bitangent, Vector3 *normal):
+cdef void matrixFromNormalizedAxisData(Matrix4 *m, Vector3 *center, Vector3 *tangent,
+                                       Vector3 *bitangent, Vector3 *normal):
     m.a11, m.a12, m.a13, m.a14 = tangent.x, bitangent.x, normal.x, center.x
     m.a21, m.a22, m.a23, m.a24 = tangent.y, bitangent.y, normal.y, center.y
     m.a31, m.a32, m.a33, m.a34 = tangent.z, bitangent.z, normal.z, center.z

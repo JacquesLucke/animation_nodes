@@ -19,8 +19,8 @@ from ... math cimport (
     Matrix4,
     crossVec3,
     distanceVec3,
-    createMatrix,
     normalizeVec3_InPlace,
+    matrixFromNormalizedAxisData,
 )
 
 def scatterPointsOnPolygons(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
@@ -136,7 +136,7 @@ cdef Matrix4x4List sampleRandomPointsOnPolygons(Vector3DList vertices, PolygonIn
             v.y = p1 * v1.y + p2 * v2.y + p3 * v3.y
             v.z = p1 * v1.z + p2 * v2.z + p3 * v3.z
 
-            createMatrix(matrices.data + index, &v, &bitangent, &tangent, &normal)
+            matrixFromNormalizedAxisData(matrices.data + index, &v, &bitangent, &tangent, &normal)
             index += 1
 
     return matrices
@@ -200,7 +200,7 @@ cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesL
             v.y = p1 * v1[0].y + p2 * v2[0].y
             v.z = p1 * v1[0].z + p2 * v2[0].z
 
-            createMatrix(matrices.data + index, &v, &bitangent, &tangent, &normal)
+            matrixFromNormalizedAxisData(matrices.data + index, &v, &bitangent, &tangent, &normal)
             index += 1
 
     return matrices
