@@ -1,7 +1,6 @@
 import cython
 from libc.math cimport sqrt, ceil
 from ... algorithms.random_number_generators cimport XoShiRo256Plus, XoShiRo256StarStar
-from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... data_structures cimport (
     LongList,
     FloatList,
@@ -19,9 +18,7 @@ from ... math cimport (
     subVec3,
     Matrix4,
     crossVec3,
-    toVector3,
     distanceVec3,
-    setMatrixTranslation,
     normalizeVec3_InPlace,
 )
 
