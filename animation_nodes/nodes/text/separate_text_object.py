@@ -15,6 +15,11 @@ outputTypeItems = [
     ("CURVE", "Curve", "", "CURVE_DATA", 1),
     ("MESH", "Mesh", "", "MESH_DATA", 2) ]
 
+curveDimensionsItems = [
+    ("2D", "2D", "", "NONE", 0),
+    ("3D", "3D", "", "NONE", 1),
+]
+
 originTypeItems = [
     ("DEFAULT", "Default", "", "NONE", 0),
     ("ORIGIN_GEOMETRY", "Origin to Geometry", "", "NONE", 1),
@@ -33,6 +38,8 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
     outputType: EnumProperty(name = "Output Type", default = "MESH",
         items = outputTypeItems)
+    curveDimensions: EnumProperty(name = "Curve Dimensions", default = "2D",
+        items = curveDimensionsItems)
     originType: EnumProperty(name = "Origin Type", default = "ORIGIN_CENTER_OF_MASS",
         items = originTypeItems)
 
@@ -52,6 +59,8 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
         layout.prop_search(self, "materialName", bpy.data, "materials", text = "Material", icon = "MATERIAL_DATA")
         layout.prop(self, "originType", text = "Origin")
         layout.prop(self, "outputType", expand = True)
+        if self.outputType == "CURVE":
+            layout.prop(self, "curveDimensions", expand = True)
 
         self.invokeFunction(layout, "updateSeparation",
             text = "Update",
@@ -106,6 +115,9 @@ class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
 
         bpy.ops.an.update_id_keys_list()
         self.objectCount = len(objects)
+
+        if self.outputType == "CURVE":
+            setCurveObjectsProperties(objects, self.curveDimensions)
 
         material = bpy.data.materials.get(self.materialName)
         if material:
@@ -226,3 +238,7 @@ def removeObject(object):
 def setMaterialOnObjects(objects, material):
     for object in objects:
         object.active_material = material
+
+def setCurveObjectsProperties(objects, curveDimensions):
+    for obj in objects:
+        obj.data.dimensions = curveDimensions
