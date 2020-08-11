@@ -6,7 +6,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures import Matrix4x4List, VirtualDoubleList
 from ... data_structures.meshes.mesh_data import calculatePolygonNormals
-from ... algorithms.mesh.points_scatter import randomPointsScatter, randomPointsScatterForEdges
+from ... algorithms.mesh.points_scatter import scatterPointsOnPolygons, scatterPointsOnEdges
 from ... algorithms.mesh.triangulate_mesh import (
     triangulatePolygonsUsingFanSpanMethod,
     triangulatePolygonsUsingEarClipMethod
@@ -24,8 +24,8 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
     mode: EnumProperty(name = "Mode", default = "POLYGONS",
         items = modeItems, update = AnimationNode.refresh)
 
-    methodType: BoolProperty(name = "Use Advanced Method for Mesh sampling", default = False,
-                             update = propertyChanged)
+    useAdvancedTriangulationMethod: BoolProperty(name = "Use Ear Clip Triangulation Method",
+                                    default = False, update = propertyChanged)
 
     nodeSeed: IntProperty(update = propertyChanged, min = 0)
 
@@ -47,7 +47,7 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "mode", text = "")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "methodType", text = "Use Advanced Method for Mesh sampling")
+        layout.prop(self, "useAdvancedTriangulationMethod")
 
     def getExecutionCode(self, required):
         yield "matrices = self.execute_RandomPointsScatter(mesh, seed, amount, weights)"
@@ -68,16 +68,16 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         if self.mode == "POLYGONS":
             if len(polygons) == 0: return Matrix4x4List()
             if polygons.polyLengths.getMaxValue() > 3:
-                if self.methodType:
+                if self.useAdvancedTriangulationMethod:
                     polygons = triangulatePolygonsUsingEarClipMethod(vertices, polygons)
                 else:
                     polygons = triangulatePolygonsUsingFanSpanMethod(polygons)
             polyNormals = calculatePolygonNormals(vertices, polygons)
-            return randomPointsScatter(vertices, polygons, polyNormals, weights, seed, max(amount, 0))
+            return scatterPointsOnPolygons(vertices, polygons, polyNormals, weights, seed, max(amount, 0))
         else:
             if len(edges) == 0: return Matrix4x4List()
             normals = mesh.getVertexNormals()
-            return randomPointsScatterForEdges(vertices, edges, normals, weights, seed, max(amount, 0))
+            return scatterPointsOnEdges(vertices, edges, normals, weights, seed, max(amount, 0))
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()

@@ -6,6 +6,8 @@
 - Added default values for Script subprogram inputs.
 - Added subtract method to the *Mix Falloff* node.
 - Added order weight option for Viewport Input node.
+- Added matrices output in *Mesh Points Scatter* node.
+- Added edges mode in *Mesh Points Scatter* node.
 
 ### Fixed
 
@@ -37,8 +39,6 @@
 - Added mesh *Triangulation* methods and *Triangulate Mesh* node.
 - Added Mesh Points Scatter node.
 - Added support for 2D vectors in 3D viewer node.
-- Added matrices output in *Mesh Points Scatter* node.
-- Added edges mode in *Mesh Points Scatter* node.
 
 ### Fixed
 

@@ -18,13 +18,14 @@ from ... math cimport (
     addVec3,
     subVec3,
     Matrix4,
+    crossVec3,
     toVector3,
     distanceVec3,
     setMatrixTranslation,
     normalizeVec3_InPlace,
-    )
+)
 
-def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
+def scatterPointsOnPolygons(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
                         VirtualDoubleList weights, long seed, long numberOfPoints):
     cdef DoubleList triangleWeights = calculateTriangleWeights(vertices, polygons, weights)
 
@@ -32,7 +33,7 @@ def randomPointsScatter(Vector3DList vertices, PolygonIndicesList polygons, Vect
     cdef long computedNumberOfPoints
     distribution = computeDistribution(triangleWeights, numberOfPoints, seed, &computedNumberOfPoints)
 
-    return sampleRandomPoints(vertices, polygons, polyNormals, distribution, computedNumberOfPoints, seed)
+    return sampleRandomPointsOnPolygons(vertices, polygons, polyNormals, distribution, computedNumberOfPoints, seed)
 
 @cython.cdivision(True)
 cdef DoubleList calculateTriangleWeights(Vector3DList vertices, PolygonIndicesList polygons, VirtualDoubleList weights):
@@ -101,12 +102,12 @@ cdef LongList computeDistribution(DoubleList triangleWeights, long numberOfPoint
     outputNumberOfPoints[0] = numberOfPoints
     return distribution
 
-cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList polygons, Vector3DList polyNormals,
-                                      LongList distribution, long numberOfPoints, long seed):
+cdef Matrix4x4List sampleRandomPointsOnPolygons(Vector3DList vertices, PolygonIndicesList polygons,
+                                                Vector3DList polyNormals, LongList distribution,
+                                                long numberOfPoints, long seed):
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
-    cdef Vector3 guide = toVector3((0, 0, 1))
-    cdef Vector3 v1, v2, v3, v, direction
+    cdef Vector3 v1, v2, v3, v, normal, tangent, bitangent
     cdef Py_ssize_t i, j, k, index
     cdef double p1, p2, p3
     index = 0
@@ -116,10 +117,14 @@ cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList 
         v2 = vertices.data[polygons.indices.data[j + 1]]
         v3 = vertices.data[polygons.indices.data[j + 2]]
 
-        direction = polyNormals.data[i]
+        normal = polyNormals.data[i]
+        normalizeVec3_InPlace(&normal)
 
-        subVec3(&guide, &v1, &v2)
-        normalizeVec3_InPlace(&guide)
+        subVec3(&tangent, &v1, &v2)
+        normalizeVec3_InPlace(&tangent)
+
+        crossVec3(&bitangent, &tangent, &normal)
+        normalizeVec3_InPlace(&bitangent)
 
         for k in range(distribution.data[i]):
             p1 = rng.nextDouble()
@@ -133,25 +138,26 @@ cdef Matrix4x4List sampleRandomPoints(Vector3DList vertices, PolygonIndicesList 
             v.y = p1 * v1.y + p2 * v2.y + p3 * v3.y
             v.z = p1 * v1.z + p2 * v2.z + p3 * v3.z
 
-            directionToMatrix_LowLevel(matrices.data + index, &direction, &guide, 2, 0)
-            setMatrixTranslation(matrices.data + index, &v)
+            createMatrix(matrices.data + index, &v, &bitangent, &tangent, &normal)
             index += 1
 
     return matrices
 
 
-def randomPointsScatterForEdges(Vector3DList vertices, EdgeIndicesList edges, Vector3DList normals,
-                                VirtualDoubleList weights, long seed, long numberOfPoints):
+def scatterPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges, Vector3DList vertexNormals,
+                         VirtualDoubleList weights, long seed, long numberOfPoints):
     cdef DoubleList edgeWeights = calculateEdgeWeights(vertices, edges, weights)
 
     cdef LongList distribution
     cdef long computedNumberOfPoints
     distribution = computeDistribution(edgeWeights, numberOfPoints, seed, &computedNumberOfPoints)
 
-    return sampleRandomPointsOnEdges(vertices, edges, normals, distribution, computedNumberOfPoints, seed)
+    return sampleRandomPointsOnEdges(vertices, edges, vertexNormals, distribution,
+                                     computedNumberOfPoints, seed)
 
 @cython.cdivision(True)
-cdef DoubleList calculateEdgeWeights(Vector3DList vertices, EdgeIndicesList edges, VirtualDoubleList weights):
+cdef DoubleList calculateEdgeWeights(Vector3DList vertices, EdgeIndicesList edges,
+                                     VirtualDoubleList weights):
     cdef edgeAmount = edges.getLength()
     cdef DoubleList edgeWeights = DoubleList(length = edgeAmount)
     cdef Py_ssize_t i, i1, i2
@@ -163,17 +169,13 @@ cdef DoubleList calculateEdgeWeights(Vector3DList vertices, EdgeIndicesList edge
         edgeWeights.data[i] *= max((weights.get(i1) + weights.get(i2)) / 2.0, 0)
     return edgeWeights
 
-cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges, Vector3DList normals,
-                                             LongList distribution, long numberOfPoints, long seed):
+cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges,
+                                             Vector3DList vertexNormals, LongList distribution,
+                                             long numberOfPoints, long seed):
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
-    cdef Vector3 direction = toVector3((0, 0, 1))
-    cdef Vector3 guide = toVector3((0, 0, 1))
-    cdef Vector3 v
-    cdef Vector3 *v1
-    cdef Vector3 *v2
-    cdef Vector3 *n1
-    cdef Vector3 *n2
+    cdef Vector3 v, normal, tangent, bitangent
+    cdef Vector3 *v1, *v2, *n1, *n2
     cdef Py_ssize_t i, j, index
     cdef double p1, p2
     index = 0
@@ -181,13 +183,16 @@ cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesL
         v1 = vertices.data + edges.data[i].v1
         v2 = vertices.data + edges.data[i].v2
 
-        n1 = normals.data + edges.data[i].v1
-        n2 = normals.data + edges.data[i].v2
-        addVec3(&guide, n1, n2)
-        normalizeVec3_InPlace(&guide)
+        n1 = vertexNormals.data + edges.data[i].v1
+        n2 = vertexNormals.data + edges.data[i].v2
+        addVec3(&normal, n1, n2)
+        normalizeVec3_InPlace(&normal)
 
-        subVec3(&direction, v1, v2)
-        normalizeVec3_InPlace(&direction)
+        subVec3(&tangent, v1, v2)
+        normalizeVec3_InPlace(&tangent)
+
+        crossVec3(&bitangent, &tangent, &normal)
+        normalizeVec3_InPlace(&bitangent)
 
         for j in range(distribution.data[i]):
             p1 = rng.nextDouble()
@@ -197,8 +202,14 @@ cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesL
             v.y = p1 * v1[0].y + p2 * v2[0].y
             v.z = p1 * v1[0].z + p2 * v2[0].z
 
-            directionToMatrix_LowLevel(matrices.data + index, &direction, &guide, 0, 2)
-            setMatrixTranslation(matrices.data + index, &v)
+            createMatrix(matrices.data + index, &v, &bitangent, &tangent, &normal)
             index += 1
 
     return matrices
+
+cdef inline void createMatrix(Matrix4 *m, Vector3 *center, Vector3 *tangent,
+                              Vector3 *bitangent, Vector3 *normal):
+    m.a11, m.a12, m.a13, m.a14 = tangent.x, bitangent.x, normal.x, center.x
+    m.a21, m.a22, m.a23, m.a24 = tangent.y, bitangent.y, normal.y, center.y
+    m.a31, m.a32, m.a33, m.a34 = tangent.z, bitangent.z, normal.z, center.z
+    m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
