@@ -7,6 +7,7 @@
 - Added subtract method to the *Mix Falloff* node.
 - Added order weight option for Viewport Input node.
 - Added regular polygons mesh generators menu and search entries.
+- Added curve dimensions option to the Separate Text node.
 
 ### Fixed
 
