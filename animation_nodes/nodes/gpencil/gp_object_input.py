@@ -122,4 +122,4 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
 
     def getVertexColorFill(self, stroke):
         color = stroke.vertex_color_fill
-        return Color((color[0], color[1], color[2], color[3]))
+        return Color(tuple(color))

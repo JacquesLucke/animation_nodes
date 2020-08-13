@@ -1,6 +1,6 @@
 import textwrap
-from .. lists.base_lists import FloatList, Vector3DList, ColorList
 from ... data_structures.color import Color
+from .. lists.base_lists import FloatList, Vector3DList, ColorList
 
 class GPStroke:
     def __init__(self, vertices = None, strengths = None, pressures = None,
