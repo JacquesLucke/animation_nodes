@@ -624,6 +624,7 @@ class FalloffMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_DirectionalFalloffNode", "Directional")
         insertNode(layout, "an_PointDistanceFalloffNode", "Point Distance")
+        insertNode(layout, "an_RadialFalloffNode", "Radial")
         layout.separator()
         insertNode(layout, "an_InterpolateFalloffNode", "Interpolate")
         insertNode(layout, "an_RemapFalloffNode", "Remap")
