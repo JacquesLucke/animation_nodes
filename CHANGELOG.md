@@ -10,6 +10,7 @@
 - Added curve dimensions option to the Separate Text node.
 - Added matrices output in *Mesh Points Scatter* node.
 - Added edges mode in *Mesh Points Scatter* node.
+- Added *Vertex Color Fill* attribute to GP strokes.
 
 ### Fixed
 
