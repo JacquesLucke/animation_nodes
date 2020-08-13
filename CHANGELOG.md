@@ -2,6 +2,29 @@
 
 ### Added
 
+- Added an option to hide subprogram sockets by default.
+- Added default values for Script subprogram inputs.
+- Added subtract method to the *Mix Falloff* node.
+- Added order weight option for Viewport Input node.
+- Added regular polygons mesh generators menu and search entries.
+- Added curve dimensions option to the Separate Text node.
+- Added matrices output in *Mesh Points Scatter* node.
+- Added edges mode in *Mesh Points Scatter* node.
+- Added *Vertex Color Fill* in *GP Stroke Info*, *GP Stroke From Points*,
+  and *Set GP Stroke Attributes* nodes.
+
+### Fixed
+
+
+### Changed
+
+
+# 2.1
+
+## 2.1.8 (08 August 2020)
+
+### Added
+
 - Added GP Stroke From Spline node.
 - Added Spline From GP Stroke node.
 - Added Offset GP Stroke node.
@@ -19,7 +42,7 @@
 - Added XoShiRo256 random number generators.
 - Added mesh *Triangulation* methods and *Triangulate Mesh* node.
 - Added Mesh Points Scatter node.
-- Added *Vertex Color Fill* in *GP Stroke Info*, *GP Stroke From Points*, and *Set GP Stroke Attributes* nodes.
+- Added support for 2D vectors in 3D viewer node.
 
 ### Fixed
 
@@ -41,6 +64,8 @@
 - Fixed the output of Set GP Stroke Attributes node for hardness-list input.
 - Fixed *Object Action Output* node when action contain bad channels.
 - Fixed *Mesh From Spline* node when *Closed Shape* and *Cap Ends* are enabled.
+- Fixed wrong sign in scale for matrix list in *Decomposed Matrix* node.
+- Fixed bad link conversions between Object and Shape Key sockets.
 
 ### Changed
 
@@ -50,6 +75,7 @@
 - Migrate CI/CD pipeline to Github Workflows.
 - Moved Problems panel to UI region.
 - Add CI/CD build for Python 3.8 on Linux.
+- Rename the *Sort* node as *Sort Numbers* node.
 
 ## 2.1.7 (22 February 2020)
 

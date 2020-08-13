@@ -36,6 +36,15 @@ class GroupOutputNode(bpy.types.Node, AnimationNode):
         else: self.invokeFunction(layout, "createGroupInputNode", text = "Input Node", icon = "PLUS")
         layout.separator()
 
+
+    def drawAdvanced(self, layout):
+        layout.label(text = "Output Defaults:")
+        box = layout.box()
+        for socket in list(self.inputs)[:-1]:
+            subBox = box.box()
+            subBox.label(text = repr(socket.text))
+            subBox.prop(socket.subprogram, "hideByDefault", text = "Hide")
+
     def drawControlSocket(self, layout, socket):
         left, right = splitAlignment(layout)
         left.label(text = socket.name)

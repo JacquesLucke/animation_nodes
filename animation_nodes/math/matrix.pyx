@@ -306,3 +306,20 @@ cdef void scaleMatrix3x3Part(Matrix3_or_Matrix4 *m, float s):
     m.a13 *= s
     m.a23 *= s
     m.a33 *= s
+
+cdef float getMatrix3x3PartDeterminant(Matrix3_or_Matrix4 *m):
+    return (
+        m.a11 * m.a22 * m.a33 +
+        m.a12 * m.a23 * m.a31 +
+        m.a13 * m.a21 * m.a32 +
+        m.a13 * m.a22 * m.a31 -
+        m.a12 * m.a21 * m.a33 -
+        m.a11 * m.a23 * m.a32
+    )
+
+cdef void matrixFromNormalizedAxisData(Matrix4 *m, Vector3 *center, Vector3 *tangent,
+                                       Vector3 *bitangent, Vector3 *normal):
+    m.a11, m.a12, m.a13, m.a14 = tangent.x, bitangent.x, normal.x, center.x
+    m.a21, m.a22, m.a23, m.a24 = tangent.y, bitangent.y, normal.y, center.y
+    m.a31, m.a32, m.a33, m.a34 = tangent.z, bitangent.z, normal.z, center.z
+    m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
