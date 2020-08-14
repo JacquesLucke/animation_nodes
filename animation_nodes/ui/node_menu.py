@@ -171,6 +171,7 @@ class MatrixMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_ShearMatrixNode", "Shear")
         insertNode(layout, "an_AxisRotationMatrixNode", "Axis Rotation")
+        insertNode(layout, "an_ExtractMatrixBasisNode", "Extract Matrix Basis")
         layout.separator()
         insertNode(layout, "an_MatrixMathNode", "Math")
         insertNode(layout, "an_MatrixCombineNode", "Combine")
