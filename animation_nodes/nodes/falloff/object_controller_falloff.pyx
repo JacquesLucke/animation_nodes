@@ -69,6 +69,9 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
         if self.useObjectList:
             col.prop(self, "mixListType", text = "")
 
+    def drawAdvanced(self, layout):
+        self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
+
     def getExecutionFunctionName(self):
         if self.useObjectList:
             if self.falloffType == "SPHERE":
@@ -173,3 +176,20 @@ class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
         falloff = InterpolateFalloff(falloff, interpolation)
         if invert: falloff = InvertFalloff(falloff)
         return falloff
+
+    def createAutoExecutionTrigger(self):
+        if self.useObjectList or self.inputs["Object"].object is None:
+            return
+
+        customTriggers = self.nodeTree.autoExecution.customTriggers
+
+        attrs = []
+        if self.falloffType in ("DIRECTIONAL", "SPHERE"): attrs.append("scale")
+        if self.falloffType in ("DIRECTIONAL", "RADIAL"): attrs.append("rotation_euler")
+        attrs.append("location")
+        
+        if attrs:
+            item = self.nodeTree.autoExecution.customTriggers.new("MONITOR_PROPERTY")
+            item.idType = "OBJECT"
+            item.dataPaths = ",".join(attrs)
+            item.object = self.inputs["Object"].object
