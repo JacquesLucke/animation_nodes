@@ -12,6 +12,7 @@
 - Added edges mode in *Mesh Points Scatter* node.
 - Added *Vertex Color Fill* attribute to GP strokes.
 - Added *Radial Falloff* node.
+- Added *Radial* mode to *Object Controller Falloff* node.
 
 ### Fixed
 
