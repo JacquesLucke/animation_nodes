@@ -40,6 +40,7 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Vector List", "Vectors", "vectors")
+        self.newOutput("Vector List", "Normals", "normalsOut", hide = True)
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -50,7 +51,7 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "useAdvancedTriangulationMethod")
 
     def getExecutionCode(self, required):
-        yield "matrices = self.execute_RandomPointsScatter(mesh, seed, amount, weights)"
+        yield "matrices, normalsOut = self.execute_RandomPointsScatter(mesh, seed, amount, weights)"
 
         if "vectors" in required:
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
