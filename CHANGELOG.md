@@ -13,6 +13,7 @@
 - Added *Vertex Color Fill* attribute to GP strokes.
 - Added *Radial Falloff* node.
 - Added *Radial* mode to *Object Controller Falloff* node.
+- Added *Create Trigger* operator to *Object Controller Falloff* node.
 
 ### Fixed
 
