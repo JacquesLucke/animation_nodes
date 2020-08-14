@@ -12,6 +12,7 @@
 - Added edges mode in *Mesh Points Scatter* node.
 - Added *Vertex Color Fill* attribute to GP strokes.
 - Added *Radial Falloff* node.
+- Added *Axis Scale* option in *Viewer 3D* node.
 
 ### Fixed
 

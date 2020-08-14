@@ -42,6 +42,8 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
 
     matrixScale: FloatProperty(name = "Scale", default = 1, update = drawPropertyChanged)
 
+    useAxisScale: BoolVectorProperty(default = (True, True, True), update = drawPropertyChanged)
+
     drawColor: FloatVectorProperty(name = "Draw Color",
         default = [0.9, 0.9, 0.9], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0,
@@ -64,6 +66,10 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
         if isinstance(data, (Vector, Vector3DList)):
             col.prop(self, "drawColor", text = "")
         elif isinstance(data, (Matrix, Matrix4x4List)):
+            row = col.row(align = True)
+            row.prop(self, "useAxisScale", index = 0, text = "X", toggle = True)
+            row.prop(self, "useAxisScale", index = 1, text = "Y", toggle = True)
+            row.prop(self, "useAxisScale", index = 2, text = "Z", toggle = True)
             col.prop(self, "matrixScale", text = "Scale")
 
     def execute(self, data):
@@ -95,7 +101,14 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
 
     def drawMatrices(self, matrices):
         shader = getShader(os.path.join(os.path.dirname(__file__), "matrix_shader.glsl"))
-        vbo, ibo = getMatricesVBOandIBO(matrices, self.matrixScale)
+        x = 0
+        if self.useAxisScale[0]: x = 1
+        y = 0
+        if self.useAxisScale[1]: y = 1
+        z = 0
+        if self.useAxisScale[2]: z = 1
+
+        vbo, ibo = getMatricesVBOandIBO(matrices, self.matrixScale * x, self.matrixScale * y, self.matrixScale * z)
         batch = batch_for_shader(shader, 'LINES',
             {"pos": vbo.asNumpyArray().reshape(-1, 3)},
             indices = ibo.asNumpyArray().reshape(-1, 2))
