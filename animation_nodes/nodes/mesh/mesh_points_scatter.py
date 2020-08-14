@@ -40,6 +40,7 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
 
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Vector List", "Vectors", "vectors")
+        self.newOutput("Vector List", "Normals", "normals", hide = True)
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -54,6 +55,9 @@ class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
 
         if "vectors" in required:
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
+
+        if "normals" in required:
+            yield "normals = AN.nodes.matrix.c_utils.extractMatricesZBasis(matrices)"
 
     def execute_RandomPointsScatter(self, mesh, seed, amount, weights):
         vertices = mesh.vertices
