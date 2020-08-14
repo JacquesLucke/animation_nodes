@@ -16,7 +16,7 @@ class ExtractMatrixBasisNode(bpy.types.Node, AnimationNode):
     bl_label = "Extract Matrix Basis"
 
     basisAxis: EnumProperty(name = "Axis", default = "X",
-        items = basisAxisItems, update = AnimationNode.refresh)
+        items = basisAxisItems, update = propertyChanged)
 
     useMatrixList: VectorizedSocket.newProperty()
 
