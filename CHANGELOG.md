@@ -14,6 +14,7 @@
 - Added *Radial Falloff* node.
 - Added *Radial* mode to *Object Controller Falloff* node.
 - Added *Create Trigger* operator to *Object Controller Falloff* node.
+- Added *Extract Matrix Basis* node.
 - Added *Axis Scale* option in *Viewer 3D* node.
 
 ### Fixed
