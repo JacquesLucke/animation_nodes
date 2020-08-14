@@ -100,12 +100,11 @@ cdef LongList computeDistribution(DoubleList triangleWeights, long numberOfPoint
     outputNumberOfPoints[0] = numberOfPoints
     return distribution
 
-cdef sampleRandomPointsOnPolygons(Vector3DList vertices, PolygonIndicesList polygons,
+cdef Matrix4x4List sampleRandomPointsOnPolygons(Vector3DList vertices, PolygonIndicesList polygons,
                                                 Vector3DList polyNormals, LongList distribution,
                                                 long numberOfPoints, long seed):
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
-    cdef Vector3DList normals = Vector3DList(length = numberOfPoints)
     cdef Vector3 v1, v2, v3, v, normal, tangent, bitangent
     cdef Py_ssize_t i, j, k, index
     cdef double p1, p2, p3
@@ -138,10 +137,9 @@ cdef sampleRandomPointsOnPolygons(Vector3DList vertices, PolygonIndicesList poly
             v.z = p1 * v1.z + p2 * v2.z + p3 * v3.z
 
             matrixFromNormalizedAxisData(matrices.data + index, &v, &bitangent, &tangent, &normal)
-            normals.data[index] = normal
             index += 1
 
-    return matrices, normals
+    return matrices
 
 
 def scatterPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges, Vector3DList vertexNormals,
@@ -169,12 +167,11 @@ cdef DoubleList calculateEdgeWeights(Vector3DList vertices, EdgeIndicesList edge
         edgeWeights.data[i] *= max((weights.get(i1) + weights.get(i2)) / 2.0, 0)
     return edgeWeights
 
-cdef sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges,
+cdef Matrix4x4List sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges,
                                              Vector3DList vertexNormals, LongList distribution,
                                              long numberOfPoints, long seed):
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef Matrix4x4List matrices = Matrix4x4List(length = numberOfPoints)
-    cdef Vector3DList normals = Vector3DList(length = numberOfPoints)
     cdef Vector3 v, normal, tangent, bitangent
     cdef Vector3 *v1, *v2, *n1, *n2
     cdef Py_ssize_t i, j, index
@@ -204,7 +201,6 @@ cdef sampleRandomPointsOnEdges(Vector3DList vertices, EdgeIndicesList edges,
             v.z = p1 * v1[0].z + p2 * v2[0].z
 
             matrixFromNormalizedAxisData(matrices.data + index, &v, &bitangent, &tangent, &normal)
-            normals.data[index] = normal
             index += 1
 
-    return matrices, normals
+    return matrices

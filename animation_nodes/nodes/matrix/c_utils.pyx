@@ -137,6 +137,19 @@ cdef void scaleFromMatrix(Vector3 *scale, Matrix4 *m):
         scale.y *= -1.0
         scale.z *= -1.0
 
+def extractMatrixNormals(Matrix4x4List matrices):
+    cdef Vector3DList normals = Vector3DList(length = len(matrices))
+    cdef Matrix4 *_matrices = matrices.data
+    cdef Vector3 *_normals = normals.data
+    cdef Py_ssize_t i
+
+    for i in range(len(normals)):
+        _normals[i].x = _matrices[i].a13
+        _normals[i].y = _matrices[i].a23
+        _normals[i].z = _matrices[i].a33
+
+    return normals
+
 # Replicate Matrix
 ###############################################
 
