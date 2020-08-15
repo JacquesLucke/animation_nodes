@@ -1,5 +1,6 @@
 cimport cython
 from libc.string cimport memcpy
+from ... data_structures cimport LongList
 
 @cython.freelist(10)
 cdef class CList:
@@ -62,6 +63,24 @@ cdef class CList:
                 todo = 0
                 done = length
 
+        return newList
+
+    def repeatedPerElement(self, LongList amounts):
+        cdef:
+            void *oldData = self.getPointer()
+            int elementSize = self.getElementSize()
+
+            CList newList = type(self)(amounts.getSumOfElements())
+            void *newData = newList.getPointer()
+            Py_ssize_t i, j, index
+
+        index = 0
+        for i in range(self.getLength()):
+            for j in range(amounts.data[i]):
+                memcpy(<char*>newData + index * elementSize,
+                       <char*>oldData + i * elementSize,
+                       elementSize)
+                index += 1
         return newList
 
     def reversed(self):

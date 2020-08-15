@@ -281,6 +281,15 @@ cdef class PolygonIndicesList:
         cdef LongList newOrder = preNewOrder.repeated(length = length, amount = amount)
         return self.copyWithNewOrder(newOrder, checkIndices = False)
 
+    def repeatedPerElement(self, LongList amounts):
+        cdef long i, j
+        cdef LongList newOrder = LongList(length = amounts.getSumOfElements())
+        cdef Py_ssize_t index = 0
+        for i in range(self.getLength()):
+            for j in range(amounts.data[i]):
+                newOrder.data[index] = i
+                index += 1
+        return self.copyWithNewOrder(newOrder, checkIndices = False)
 
     # Helper functions
     ###############################################
