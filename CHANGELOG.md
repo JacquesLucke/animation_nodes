@@ -17,6 +17,7 @@
 - Added *Extract Matrix Basis* node.
 - Added *Normals* output in *Mesh Points Scatter* node.
 - Added Interpolation input to *Remap Falloff* node.
+- Added *Decompose Text* node to menu.
 
 ### Fixed
 
