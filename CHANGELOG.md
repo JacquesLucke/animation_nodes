@@ -16,6 +16,7 @@
 - Added *Create Trigger* operator to *Object Controller Falloff* node.
 - Added *Extract Matrix Basis* node.
 - Added *Normals* output in *Mesh Points Scatter* node.
+- Added Interpolation input to *Remap Falloff* node.
 
 ### Fixed
 
