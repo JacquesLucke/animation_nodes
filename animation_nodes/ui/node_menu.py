@@ -203,6 +203,7 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_TextLengthNode", "Length")
         layout.separator()
         insertNode(layout, "an_LSystemNode", "LSystem")
+        insertNode(layout, "an_DecomposeTextNode", "Decompose Text")
         layout.separator()
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
