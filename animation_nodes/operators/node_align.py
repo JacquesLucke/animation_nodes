@@ -17,15 +17,13 @@ class AlignDependentNodes(bpy.types.Operator, NodeOperator):
     def execute(self, context):
         offset = 20
         activeNode = context.active_node
-        activeNodeWidth = activeNode.width
-        activeNodeHeight = activeNode.height
-        activeNodeCenter = activeNode.location
-        xOffset = activeNodeWidth / 2
-        yOffset = activeNodeHeight / 2
+        activeLocation = activeNode.location
+        xOffset = activeNode.width / 2
+        yOffset = activeNode.height / 2
         for node in getNodesWhenFollowingLinks(activeNode, followOutputs = True):
             widthOffset = node.width / 2
             xOffset += widthOffset + offset
-            node.location = activeNodeCenter + Vector((xOffset, yOffset - node.height / 2))
+            node.location = activeLocation + Vector((xOffset, yOffset - node.height / 2))
             xOffset += widthOffset
         return {"FINISHED"}
 
@@ -36,15 +34,13 @@ class AlignDependenciesNodes(bpy.types.Operator, NodeOperator):
     def execute(self, context):
         offset = 20
         activeNode = context.active_node
-        activeNodeWidth = activeNode.width
-        activeNodeHeight = activeNode.height
-        activeNodeCenter = activeNode.location
-        xOffset = activeNodeWidth / 2
-        yOffset = activeNodeHeight / 2
+        activeLocation = activeNode.location
+        xOffset = activeNode.width / 2
+        yOffset = activeNode.height / 2
         for node in getNodesWhenFollowingLinks(context.active_node, followInputs = True):
             widthOffset = node.width / 2
             xOffset += widthOffset + offset
-            node.location = activeNodeCenter + Vector((- xOffset, yOffset - node.height / 2))
+            node.location = activeLocation + Vector((- xOffset, yOffset - node.height / 2))
             xOffset += widthOffset
         return {"FINISHED"}
 
@@ -54,23 +50,75 @@ class AlignTopSelectionNodes(bpy.types.Operator, NodeOperator):
 
     def execute(self, context):
         activeNode = context.active_node
-        activeNodeCenter = activeNode.location
+        activeLocation = activeNode.location
         yOffset = activeNode.height / 2
         for node in context.selected_nodes:
             if node != activeNode:
                 location = node.location
-                node.location = Vector((location.x, activeNodeCenter.y + yOffset - node.height / 2))
+                node.location = Vector((location.x, activeLocation.y + yOffset - node.height / 2))
         return {"FINISHED"}
 
-class AlignDownSelectionNodes(bpy.types.Operator, NodeOperator):
-    bl_idname = "an.align_down_selection_nodes"
-    bl_label = "Align Down Selection Nodes"
+class AlignLeftSideSelectionNodes(bpy.types.Operator, NodeOperator):
+    bl_idname = "an.align_left_side_selection_nodes"
+    bl_label = "Align Left Side Selection Nodes"
 
     def execute(self, context):
         offset = 20
         activeNode = context.active_node
-        location = activeNode.location.copy()
+        activeLocation = activeNode.location
+        xOffset = activeNode.width / 2
+        for node in context.selected_nodes:
+            if node != activeNode:
+                widthOffset = node.width / 2
+                xOffset += widthOffset + offset
+                node.location.x = activeLocation.x - xOffset
+                xOffset += widthOffset
+        return {"FINISHED"}
+
+class AlignRightSideSelectionNodes(bpy.types.Operator, NodeOperator):
+    bl_idname = "an.align_right_side_selection_nodes"
+    bl_label = "Align Right Side Selection Nodes"
+
+    def execute(self, context):
+        offset = 20
+        activeNode = context.active_node
+        activeLocation = activeNode.location
+        xOffset = activeNode.width / 2
+        for node in context.selected_nodes:
+            if node != activeNode:
+                widthOffset = node.width / 2
+                xOffset += widthOffset + offset
+                node.location.x = activeLocation.x + xOffset
+                xOffset += widthOffset
+        return {"FINISHED"}
+
+class StakeUpSelectionNodes(bpy.types.Operator, NodeOperator):
+    bl_idname = "an.stake_up_selection_nodes"
+    bl_label = "Stake Up Selection Nodes"
+
+    def execute(self, context):
+        offset = 20
+        activeNode = context.active_node
+        activeLocation = activeNode.location
         yOffset = activeNode.dimensions.y
+        location = activeLocation.copy()
+        for node in context.selected_nodes:
+            if node != activeNode:
+                yOffset = node.dimensions.y
+                location.y += (yOffset + offset)
+                node.location = location
+        return {"FINISHED"}
+
+class StakeDownSelectionNodes(bpy.types.Operator, NodeOperator):
+    bl_idname = "an.stake_down_selection_nodes"
+    bl_label = "Stake Down Selection Nodes"
+
+    def execute(self, context):
+        offset = 20
+        activeNode = context.active_node
+        activeLocation = activeNode.location
+        yOffset = activeNode.dimensions.y
+        location = activeLocation.copy()
         for node in context.selected_nodes:
             if node != activeNode:
                 location.y += -(yOffset + offset)
