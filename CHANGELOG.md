@@ -22,6 +22,7 @@
 
 ### Fixed
 
+- Fixed the *Make ELement Copies* option in the *Repeat List* node.
 
 ### Changed
 

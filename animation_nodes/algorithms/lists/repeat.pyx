@@ -3,8 +3,8 @@ from itertools import islice, cycle
 from ... data_structures cimport CList, PolygonIndicesList
 from ... sockets.info import getSocketClass, isCopyable, toBaseDataType, getCopyFunction
 
-def repeat(str dataType, myList, length):
-    function = getRepeatFunction(dataType)
+def repeat(str dataType, myList, length, bint makeElementCopies):
+    function = getRepeatFunction(dataType, makeElementCopies)
     return function(myList, length)
 
 def getRepeatFunction(str dataType, bint makeElementCopies = True):
