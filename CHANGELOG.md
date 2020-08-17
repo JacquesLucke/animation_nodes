@@ -19,6 +19,7 @@
 - Added Interpolation input to *Remap Falloff* node.
 - Added *Decompose Text* node to menu.
 - Added *Repeat List Elements* node.
+- Added *Align Pie* menu for nodes alignment.
 
 ### Fixed
 
