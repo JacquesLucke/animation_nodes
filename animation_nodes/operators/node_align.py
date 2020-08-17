@@ -17,7 +17,7 @@ class AlignDependentNodes(bpy.types.Operator, NodeOperator):
     def execute(self, context):
         offset = 20
         activeNode = context.active_node
-        alignDependent(offset, getNodesWhenFollowingLinksBranched(activeNode, followOutputs = True))
+        alignDependent(offset, getNodesWhenFollowingBranchedLinks(activeNode, followOutputs = True))
         return {"FINISHED"}
 
 def alignDependent(offset, nodes):
@@ -145,14 +145,13 @@ def getNodesWhenFollowingLinks(startNode, followInputs = False, followOutputs = 
         if followOutputs: sockets.extend(node.outputs)
         for socket in sockets:
             linkedSockets = getDirectlyLinkedSockets(socket)
-            if len(linkedSockets) > 1: break
             for linkedSocket in linkedSockets:
                 node = linkedSocket.node
                 if node not in nodes: nodesToCheck.add(node)
     nodes.remove(startNode)
     return nodes
 
-def getNodesWhenFollowingLinksBranched(startNode, followInputs = False, followOutputs = False):
+def getNodesWhenFollowingBranchedLinks(startNode, followInputs = False, followOutputs = False):
     nodes = []
     nodesToCheck = {startNode}
     while nodesToCheck:
@@ -166,7 +165,7 @@ def getNodesWhenFollowingLinksBranched(startNode, followInputs = False, followOu
             if len(linkedSockets) > 1:
                 for linkedSocket in linkedSockets:
                     node = linkedSocket.node
-                    nodes.append(getNodesWhenFollowingLinksBranched(node, followInputs, followOutputs))
+                    nodes.append(getNodesWhenFollowingBranchedLinks(node, followInputs, followOutputs))
             else:
                 for linkedSocket in linkedSockets:
                     node = linkedSocket.node
