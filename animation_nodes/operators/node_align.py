@@ -17,15 +17,23 @@ class AlignDependentNodes(bpy.types.Operator, NodeOperator):
     def execute(self, context):
         offset = 20
         activeNode = context.active_node
+        alignDependent(offset, getNodesWhenFollowingLinksBranched(activeNode, followOutputs = True))
+        return {"FINISHED"}
+
+def alignDependent(offset, nodes):
+        activeNode = nodes[0]
         activeLocation = activeNode.location
         xOffset = activeNode.width / 2
         yOffset = activeNode.height / 2
-        for node in getNodesWhenFollowingLinks(activeNode, followOutputs = True):
-            widthOffset = node.width / 2
-            xOffset += widthOffset + offset
-            node.location = activeLocation + Vector((xOffset, yOffset - node.height / 2))
-            xOffset += widthOffset
-        return {"FINISHED"}
+        for i, node in enumerate(nodes):
+            if i == 0: continue
+            if type(node) == list:
+                alignDependent(offset, node)
+            else:
+                widthOffset = node.width / 2
+                xOffset += widthOffset + offset
+                node.location = activeLocation + Vector((xOffset, yOffset - node.height / 2))
+                xOffset += widthOffset
 
 class AlignDependenciesNodes(bpy.types.Operator, NodeOperator):
     bl_idname = "an.align_dependencies"
@@ -136,8 +144,31 @@ def getNodesWhenFollowingLinks(startNode, followInputs = False, followOutputs = 
         if followInputs: sockets.extend(node.inputs)
         if followOutputs: sockets.extend(node.outputs)
         for socket in sockets:
-            for linkedSocket in getDirectlyLinkedSockets(socket):
+            linkedSockets = getDirectlyLinkedSockets(socket)
+            if len(linkedSockets) > 1: break
+            for linkedSocket in linkedSockets:
                 node = linkedSocket.node
                 if node not in nodes: nodesToCheck.add(node)
     nodes.remove(startNode)
+    return nodes
+
+def getNodesWhenFollowingLinksBranched(startNode, followInputs = False, followOutputs = False):
+    nodes = []
+    nodesToCheck = {startNode}
+    while nodesToCheck:
+        node = nodesToCheck.pop()
+        nodes.append(node)
+        sockets = []
+        if followInputs: sockets.extend(node.inputs)
+        if followOutputs: sockets.extend(node.outputs)
+        for socket in sockets:
+            linkedSockets = getDirectlyLinkedSockets(socket)
+            if len(linkedSockets) > 1:
+                for linkedSocket in linkedSockets:
+                    node = linkedSocket.node
+                    nodes.append(getNodesWhenFollowingLinksBranched(node, followInputs, followOutputs))
+            else:
+                for linkedSocket in linkedSockets:
+                    node = linkedSocket.node
+                    if node not in nodes: nodesToCheck.add(node)
     return nodes

@@ -22,8 +22,8 @@ def register():
     kmi = km.keymap_items.new("wm.call_menu_pie", type = "E", value = "PRESS")
     kmi.properties.name = "AN_MT_selection_pie"
 
-    # Selection Pie Menu
-    kmi = km.keymap_items.new("wm.call_menu_pie", type = "F", value = "PRESS")
+    # Align Pie Menu
+    kmi = km.keymap_items.new("wm.call_menu_pie", type = "E", value = "PRESS", ctrl = True)
     kmi.properties.name = "AN_MT_align_pie"
 
     # Floating Node Settings
