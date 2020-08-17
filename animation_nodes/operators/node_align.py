@@ -25,8 +25,7 @@ def alignDependent(offset, nodes):
         activeLocation = activeNode.location
         xOffset = activeNode.width / 2
         yOffset = activeNode.height / 2
-        for i, node in enumerate(nodes):
-            if i == 0: continue
+        for node in nodes[1:]:
             if type(node) == list:
                 alignDependent(offset, node)
             else:
