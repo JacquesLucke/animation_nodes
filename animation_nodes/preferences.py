@@ -152,6 +152,13 @@ class DrawHandlerProperties(bpy.types.PropertyGroup):
     bl_idname = "an_DrawHandlerProperties"
     meshIndices: PointerProperty(type = DrawMeshIndicesProperties)
 
+class PieMenuProperties(bpy.types.PropertyGroup):
+    bl_idname = "an_PieMenuProperties"
+
+    offset: FloatProperty(name = "Offset for Align Pie Menu",
+        description = "Offset between nodes for Align Pi Menu",
+        default = 30, soft_min = 0.0, soft_max = 100.0)
+
 class AnimationNodesPreferences(bpy.types.AddonPreferences):
     bl_idname = addonName
 
@@ -159,6 +166,7 @@ class AnimationNodesPreferences(bpy.types.AddonPreferences):
     developer: PointerProperty(type = DeveloperProperties)
     executionCode: PointerProperty(type = ExecutionCodeProperties)
     drawHandlers: PointerProperty(type = DrawHandlerProperties)
+    pieMenuProp: PointerProperty(type = PieMenuProperties)
 
     showUninstallInfo: BoolProperty(name = "Show Deinstall Info", default = False,
         options = {"SKIP_SAVE"})
@@ -179,6 +187,8 @@ class AnimationNodesPreferences(bpy.types.AddonPreferences):
         col = row.column(align = True)
         col.prop(self.developer, "debug")
         col.prop(self.developer, "runTests")
+
+        col.prop(self.pieMenuProp, "offset")
 
         col = layout.column(align = True)
         col.split(factor = 0.25).prop(self, "showUninstallInfo", text = "How to Uninstall?",
@@ -204,6 +214,9 @@ def getColorSettings():
 
 def getMeshIndicesSettings():
     return getPreferences().drawHandlers.meshIndices
+
+def getPieMenuSettings():
+    return getPreferences().pieMenuProp
 
 def debuggingIsEnabled():
     return getPreferences().developer.debug

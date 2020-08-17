@@ -1,5 +1,6 @@
 import bpy
 from mathutils import Vector
+from .. preferences import getPieMenuSettings
 from .. tree_info import getDirectlyLinkedSockets
 
 class NodeOperator:
@@ -15,7 +16,7 @@ class AlignDependentNodes(bpy.types.Operator, NodeOperator):
     bl_label = "Align Dependent Nodes"
 
     def execute(self, context):
-        offset = 20
+        offset = getPieMenuSettings().offset
         activeNode = context.active_node
         alignDependent(offset, getNodesWhenFollowingBranchedLinks(activeNode, followOutputs = True))
         return {"FINISHED"}
@@ -39,7 +40,7 @@ class AlignDependenciesNodes(bpy.types.Operator, NodeOperator):
     bl_label = "Align Dependencies"
 
     def execute(self, context):
-        offset = 20
+        offset = getPieMenuSettings().offset
         activeNode = context.active_node
         alignDependencies(offset, getNodesWhenFollowingBranchedLinks(activeNode, followInputs = True))
         return {"FINISHED"}
@@ -77,7 +78,7 @@ class AlignLeftSideSelectionNodes(bpy.types.Operator, NodeOperator):
     bl_label = "Align Left Side Selection Nodes"
 
     def execute(self, context):
-        offset = 20
+        offset = getPieMenuSettings().offset
         activeNode = context.active_node
         activeLocation = activeNode.location
         xOffset = activeNode.width / 2
@@ -94,7 +95,7 @@ class AlignRightSideSelectionNodes(bpy.types.Operator, NodeOperator):
     bl_label = "Align Right Side Selection Nodes"
 
     def execute(self, context):
-        offset = 20
+        offset = getPieMenuSettings().offset
         activeNode = context.active_node
         activeLocation = activeNode.location
         xOffset = activeNode.width / 2
@@ -111,7 +112,7 @@ class StakeUpSelectionNodes(bpy.types.Operator, NodeOperator):
     bl_label = "Stake Up Selection Nodes"
 
     def execute(self, context):
-        offset = 20
+        offset = getPieMenuSettings().offset
         activeNode = context.active_node
         activeLocation = activeNode.location
         yOffset = activeNode.dimensions.y
@@ -128,7 +129,7 @@ class StakeDownSelectionNodes(bpy.types.Operator, NodeOperator):
     bl_label = "Stake Down Selection Nodes"
 
     def execute(self, context):
-        offset = 20
+        offset = getPieMenuSettings().offset
         activeNode = context.active_node
         activeLocation = activeNode.location
         yOffset = activeNode.dimensions.y
