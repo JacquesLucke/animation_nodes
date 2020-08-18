@@ -19,6 +19,9 @@
 - Added Interpolation input to *Remap Falloff* node.
 - Added *Decompose Text* node to menu.
 - Added *Repeat List Elements* node.
+- Added Material Indices to Mesh structure.
+- Added Material Indices output to *Bmesh Mesh Data* node.
+- Added Material Indices input to *Combine Mesh* node.
 
 ### Fixed
 
@@ -26,6 +29,7 @@
 
 ### Changed
 
+- Removed Material Indices input from *Mesh Object Output* node.
 
 # 2.1
 

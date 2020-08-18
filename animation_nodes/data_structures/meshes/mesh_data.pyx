@@ -41,18 +41,21 @@ cdef class Mesh:
     def __cinit__(self, Vector3DList vertices = None,
                         EdgeIndicesList edges = None,
                         PolygonIndicesList polygons = None,
+                        LongList materialIndices = None,
                         bint skipValidation = False):
 
         if vertices is None: vertices = Vector3DList()
         if edges is None: edges = EdgeIndicesList()
         if polygons is None: polygons = PolygonIndicesList()
+        if materialIndices is None: materialIndices = LongList()
 
         if not skipValidation:
-            checkMeshData(vertices, edges, polygons)
+            checkMeshData(vertices, edges, polygons, materialIndices)
 
         self.vertices = vertices
         self.edges = edges
         self.polygons = polygons
+        self.materialIndices = materialIndices
 
         self.derivedMeshDataCache = {}
         self.uvMaps = OrderedDict()
@@ -171,7 +174,8 @@ cdef class Mesh:
         return neighbours[start:end], neighbourEdges[start:end], amount
 
     def copy(self):
-        mesh = Mesh(self.vertices.copy(), self.edges.copy(), self.polygons.copy())
+        mesh = Mesh(self.vertices.copy(), self.edges.copy(),
+                    self.polygons.copy(), self.materialIndices.copy())
         mesh.copyMeshProperties(self)
         return mesh
 
@@ -257,6 +261,9 @@ cdef class Mesh:
         self.polygons.extend(meshData.polygons)
         for i in range(meshData.polygons.indices.length):
             self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
+
+        self.materialIndices.extend(meshData.materialIndices)
+
 
 def calculatePolygonNormals(Vector3DList vertices, PolygonIndicesList polygons):
     cdef Vector3DList normals = Vector3DList(length = polygons.getLength())
