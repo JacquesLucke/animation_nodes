@@ -26,14 +26,22 @@ def alignDependent(offset, nodes):
         activeLocation = activeNode.location
         xOffset = activeNode.width / 2
         yOffset = activeNode.height / 2
+        lastNode = activeNode
         for node in nodes[1:]:
             if type(node) == list:
                 alignDependent(offset, node)
             else:
                 widthOffset = node.width / 2
                 xOffset += widthOffset + offset
-                node.location = activeLocation + Vector((xOffset, yOffset - node.height / 2))
-                xOffset += widthOffset
+                if node.type != 'REROUTE':
+                    if lastNode.type == 'REROUTE':
+                        activeLocation = node.location
+                        xOffset = node.width / 2
+                        yOffset = node.height / 2
+                    else:
+                        node.location = activeLocation + Vector((xOffset, yOffset - node.height / 2))
+                        xOffset += widthOffset
+                lastNode = node
 
 class AlignDependenciesNodes(bpy.types.Operator, NodeOperator):
     bl_idname = "an.align_dependencies"
@@ -50,14 +58,22 @@ def alignDependencies(offset, nodes):
         activeLocation = activeNode.location
         xOffset = activeNode.width / 2
         yOffset = activeNode.height / 2
+        lastNode = activeNode
         for node in nodes[1:]:
             if type(node) == list:
                 alignDependencies(offset, node)
             else:
                 widthOffset = node.width / 2
                 xOffset += widthOffset + offset
-                node.location = activeLocation + Vector((- xOffset, yOffset - node.height / 2))
-                xOffset += widthOffset
+                if node.type != 'REROUTE':
+                    if lastNode.type == 'REROUTE':
+                        activeLocation = node.location
+                        xOffset = node.width / 2
+                        yOffset = node.height / 2
+                    else:
+                        node.location = activeLocation + Vector((- xOffset, yOffset - node.height / 2))
+                        xOffset += widthOffset
+                lastNode = node
 
 class AlignTopSelectionNodes(bpy.types.Operator, NodeOperator):
     bl_idname = "an.align_top_selection_nodes"
