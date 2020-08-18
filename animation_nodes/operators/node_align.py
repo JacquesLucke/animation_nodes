@@ -81,12 +81,12 @@ class AlignTopSelectionNodes(bpy.types.Operator, NodeOperator):
 
     def execute(self, context):
         activeNode = context.active_node
-        activeLocation = activeNode.location
-        yOffset = activeNode.height / 2
+        previousNode = activeNode
+
         for node in context.selected_nodes:
             if node != activeNode:
-                location = node.location
-                node.location = Vector((location.x, activeLocation.y + yOffset - node.height / 2))
+                node.location.y = previousNode.location.y
+                previousNode = node
         return {"FINISHED"}
 
 class AlignLeftSideSelectionNodes(bpy.types.Operator, NodeOperator):
@@ -96,15 +96,18 @@ class AlignLeftSideSelectionNodes(bpy.types.Operator, NodeOperator):
     def execute(self, context):
         offset = getPieMenuSettings().offset
         activeNode = context.active_node
-        activeLocation = activeNode.location
-        xOffset = activeNode.width / 2
+        previousNode = activeNode
+
         for node in context.selected_nodes:
             if node != activeNode:
-                widthOffset = node.width / 2
-                xOffset += widthOffset + offset
-                node.location.x = activeLocation.x - xOffset
-                xOffset += widthOffset
+                node.location.x = getNodeLeftOffset(previousNode, node, offset)
+                previousNode = node
         return {"FINISHED"}
+
+def getNodeLeftOffset(previousNode, node, offset):
+    if node.type == "REROUTE":
+        return previousNode.location.x - offset
+    return previousNode.location.x - (node.width + offset)
 
 class AlignRightSideSelectionNodes(bpy.types.Operator, NodeOperator):
     bl_idname = "an.align_right_side_selection_nodes"
@@ -113,15 +116,18 @@ class AlignRightSideSelectionNodes(bpy.types.Operator, NodeOperator):
     def execute(self, context):
         offset = getPieMenuSettings().offset
         activeNode = context.active_node
-        activeLocation = activeNode.location
-        xOffset = activeNode.width / 2
+        previousNode = activeNode
+
         for node in context.selected_nodes:
             if node != activeNode:
-                widthOffset = node.width / 2
-                xOffset += widthOffset + offset
-                node.location.x = activeLocation.x + xOffset
-                xOffset += widthOffset
+                node.location.x = getNodeRightOffset(previousNode, offset)
+                previousNode = node
         return {"FINISHED"}
+
+def getNodeRightOffset(previousNode, offset):
+    if previousNode.type == "REROUTE":
+        return previousNode.location.x + offset
+    return previousNode.location.x + previousNode.width + offset
 
 class StakeUpSelectionNodes(bpy.types.Operator, NodeOperator):
     bl_idname = "an.stake_up_selection_nodes"
@@ -130,15 +136,21 @@ class StakeUpSelectionNodes(bpy.types.Operator, NodeOperator):
     def execute(self, context):
         offset = getPieMenuSettings().offset
         activeNode = context.active_node
-        activeLocation = activeNode.location
-        yOffset = activeNode.dimensions.y
-        location = activeLocation.copy()
+        previousNode = activeNode
+
         for node in context.selected_nodes:
             if node != activeNode:
-                yOffset = node.dimensions.y
-                location.y += (yOffset + offset)
-                node.location = location
+                node.location = getNodeStakeUpLocation(previousNode, node, offset)
+                previousNode = node
         return {"FINISHED"}
+
+def getNodeStakeUpLocation(previousNode, node, offset):
+    location = previousNode.location.copy()
+    if node.type == "REROUTE":
+        location.y += offset
+        return location
+    location.y += node.dimensions.y + offset
+    return location
 
 class StakeDownSelectionNodes(bpy.types.Operator, NodeOperator):
     bl_idname = "an.stake_down_selection_nodes"
@@ -147,15 +159,21 @@ class StakeDownSelectionNodes(bpy.types.Operator, NodeOperator):
     def execute(self, context):
         offset = getPieMenuSettings().offset
         activeNode = context.active_node
-        activeLocation = activeNode.location
-        yOffset = activeNode.dimensions.y
-        location = activeLocation.copy()
+        previousNode = activeNode
+
         for node in context.selected_nodes:
             if node != activeNode:
-                location.y += -(yOffset + offset)
-                node.location = location
-                yOffset = node.dimensions.y
+                node.location = getNodeStakeDownLocation(previousNode, offset)
+                previousNode = node
         return {"FINISHED"}
+
+def getNodeStakeDownLocation(previousNode, offset):
+    location = previousNode.location.copy()
+    if previousNode.type == "REROUTE":
+        location.y -= offset
+        return location
+    location.y -= previousNode.dimensions.y + offset
+    return location
 
 def getNodesWhenFollowingBranchedLinks(startNode, followInputs = False, followOutputs = False):
     nodes = []
