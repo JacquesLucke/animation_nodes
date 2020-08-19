@@ -248,6 +248,7 @@ class ListMenu(bpy.types.Menu):
         layout.menu("AN_MT_create_list_menu", text = "Create")
         layout.menu("AN_MT_combine_list_menu", text = "Combine")
         insertNode(layout, "an_AppendListNode", "Append")
+        insertNode(layout, "an_InsertListElementNode", "Insert")
         layout.separator()
         insertNode(layout, "an_GetListElementNode", "Get Element")
         insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")

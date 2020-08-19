@@ -23,6 +23,7 @@
 - Added Material Indices output to *Bmesh Mesh Data* node.
 - Added Material Indices input to *Combine Mesh* node.
 - Added implicit conversion from Polygon Indices List to Integer List.
+- Added *Insert List Element* node.
 
 ### Fixed
 
