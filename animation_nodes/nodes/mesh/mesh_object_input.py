@@ -88,7 +88,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             yield "polygonCenters = self.getPolygonCenters(sourceMesh, evaluatedObject, useWorldSpace)"
         if "localPolygonAreas" in required:
             yield "localPolygonAreas = DoubleList.fromValues(sourceMesh.an.getPolygonAreas())"
-        if "materialIndices" in required:
+        if "materialIndices" in required or meshRequired:
             yield "materialIndices = LongList.fromValues(sourceMesh.an.getPolygonMaterialIndices())"
         if "verticesSelectionMask" in required:
             yield "verticesSelectionMask = self.getVerticesSelectionMask(evaluatedObject)"
@@ -98,7 +98,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             yield "polygonsSelectionMask = self.getPolygonsSelectionMask(evaluatedObject)"
 
         if meshRequired:
-            yield "mesh = Mesh(vertexLocations, edgeIndices, polygonIndices)"
+            yield "mesh = Mesh(vertexLocations, edgeIndices, polygonIndices, materialIndices)"
             yield "mesh.setVertexNormals(vertexNormals)"
             yield "mesh.setPolygonNormals(polygonNormals)"
             yield "mesh.setLoopEdges(sourceMesh.an.getLoopEdges())"

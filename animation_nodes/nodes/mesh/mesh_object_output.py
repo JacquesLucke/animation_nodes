@@ -48,8 +48,6 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         elif self.meshDataType == "VERTICES":
             self.newInput("Vector List", "Vertices", "vertices")
 
-        self.newInput("Integer List", "Material Indices", "materialIndices")
-
         for socket in self.inputs[1:]:
             socket.useIsUsedProperty = True
             socket.isUsed = False
@@ -93,8 +91,6 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         yield "    if self.ensureAnimationData:"
         yield "        self.ensureThatMeshHasAnimationData(mesh)"
 
-        if s["Material Indices"].isUsed: yield "    self.setMaterialIndices(mesh, materialIndices)"
-
     def isValidObject(self, object):
         if object is None: return False
         if object.type != "MESH":
@@ -128,6 +124,10 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         outMesh.loops.foreach_set("vertex_index", mesh.polygons.indices.asMemoryView())
         outMesh.loops.foreach_set("edge_index", mesh.getLoopEdges().asMemoryView())
 
+        # Material Indices
+        materialIndices = UShortList.fromValues(mesh.materialIndices)
+        outMesh.polygons.foreach_set("material_index", materialIndices.asMemoryView())
+
         # UV Maps
         for name, data in mesh.getUVMaps():
             outMesh.uv_layers.new(name = name)
@@ -154,20 +154,6 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
         mesh.vertices.foreach_set("co", vertices.asMemoryView())
         mesh.update()
-
-    def setMaterialIndices(self, mesh, materialIndices):
-        if len(materialIndices) == 0: return
-        if len(mesh.polygons) == 0: return
-        if materialIndices.containsValueLowerThan(0):
-            self.setErrorMessage("Material indices have to be greater or equal to zero.")
-            return
-
-        allMaterialIndices = UShortList.fromValues(materialIndices)
-        if len(materialIndices) != len(mesh.polygons):
-            allMaterialIndices = allMaterialIndices.repeated(length = len(mesh.polygons))
-
-        mesh.polygons.foreach_set("material_index", allMaterialIndices.asMemoryView())
-        mesh.polygons[0].material_index = materialIndices[0]
 
     def ensureThatMeshHasAnimationData(self, mesh):
         if not isAnimated(mesh):

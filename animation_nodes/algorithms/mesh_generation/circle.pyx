@@ -3,7 +3,7 @@ from libc.math cimport M_PI as PI
 from ... data_structures.meshes.validate import createValidEdgesList
 from ... data_structures cimport (
     Vector3DList, EdgeIndicesList, PolygonIndicesList,
-    Mesh, VirtualDoubleList, VirtualLongList
+    Mesh, VirtualDoubleList, VirtualLongList, LongList,
 )
 
 
@@ -14,11 +14,13 @@ def getCircleMesh(Py_ssize_t radialLoops, Py_ssize_t innerLoops,
 
     cdef PolygonIndicesList polygonsIndices = polygons(radialLoops, innerLoops,
                                                        mergeStartEnd, mergeCenter)
+    cdef LongList materialIndices = LongList(length = polygonsIndices.getLength())
+    materialIndices.fill(0)
 
     return Mesh(vertices(radialLoops, innerLoops, outerRadius, innerRadius,
                          startAngle, endAngle, mergeStartEnd, mergeCenter),
                          createValidEdgesList(polygons = polygonsIndices), polygonsIndices,
-                         skipValidation = True)
+                         materialIndices, skipValidation = True)
 
 def getCircleMeshList(Py_ssize_t amount,
                       VirtualLongList radialLoops,
@@ -33,16 +35,20 @@ def getCircleMeshList(Py_ssize_t amount,
     cdef list meshes = []
     cdef Py_ssize_t i
     cdef PolygonIndicesList polygonsIndices
+    cdef LongList materialIndices
     for i in range(amount):
         polygonsIndices = polygons(radialLoops.get(i), innerLoops.get(i),
                                    mergeStartEnd, mergeCenter)
+        materialIndices = LongList(length = polygonsIndices.getLength())
+        materialIndices.fill(0)
 
         meshes.append(Mesh(vertices(radialLoops.get(i),  innerLoops.get(i),
                                     outerRadius.get(i), innerRadius.get(i),
                                     startAngle.get(i), endAngle.get(i),
                                     mergeStartEnd, mergeCenter),
                                     createValidEdgesList(polygons = polygonsIndices),
-                                    polygonsIndices, skipValidation = True))
+                                    polygonsIndices, materialIndices,
+                                    skipValidation = True))
 
     return meshes
 
