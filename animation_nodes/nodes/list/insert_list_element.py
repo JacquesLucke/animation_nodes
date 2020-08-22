@@ -11,10 +11,10 @@ class InsertListElementNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         prop = ("assignedType", "BASE")
-        print(self.assignedType)
         self.newInput(ListTypeSelectorSocket(
             "List", "list", "LIST", prop, dataIsModified = True))
-        self.newInput(VectorizedSocket(str(self.assignedType), "useList", ("Element", "element"), ("Elements", "elements")))
+        self.newInput(VectorizedSocket(self.assignedType, "useList",
+            ("Element", "element"), ("Elements", "elements")), dataIsModified = True)
         self.newInput("Integer", "Index", "index")
         self.newOutput(ListTypeSelectorSocket(
             "List", "list", "LIST", prop))
@@ -27,10 +27,7 @@ class InsertListElementNode(bpy.types.Node, AnimationNode):
         if not self.useList:
             yield "list.insert(index, element)"
         else:
-            yield "temp = list"
-            yield "list = list[:index]"
-            yield "list.extend(elements)"
-            yield "list.extend(temp[index:])"
+            yield "list = list[:index] + elements + list[index:]"
 
     def assignListDataType(self, listDataType):
         self.assignType(toBaseDataType(listDataType))
