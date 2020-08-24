@@ -25,9 +25,11 @@ class ActionChannelProperty(bpy.types.PropertyGroup):
     __annotations__["channelPath"] = StringProperty(name = "Channel Path")
     __annotations__["channelIndex"] = IntProperty(name = "Channel Index", min = 0)
 
-    def draw(self, layout):
+    def draw(self, layout, node, index):
         col = layout.column(align = True)
-        col.prop(self, "channelType", text = "")
+        row = col.row(align = True)
+        row.prop(self, "channelType", text = "")
+        node.invokeFunction(row, "removeChannel", icon = "X", data = index)
         row = col.row(align = True)
         row.prop(self, "channelPath", text = "")
         if self.channelType == "PATH_INDEX":
@@ -44,14 +46,16 @@ class ActionChannelsNodeBase:
     __annotations__["channels"] = CollectionProperty(type = ActionChannelProperty)
 
     def drawChannels(self, layout):
-        col = layout.column()
-        for channel in self.channels:
-            channel.draw(layout)
+        for i, channel in enumerate(self.channels):
+            channel.draw(layout, self, i)
 
         self.invokeFunction(layout, "addChannel", text = "Add", icon = "PLUS")
 
     def addChannel(self):
         self.channels.add()
+
+    def removeChannel(self, strIndex):
+        self.channels.remove(int(strIndex))
 
     def getChannels(self):
         return [item.getChannel() for item in self.channels]

@@ -24,6 +24,7 @@
 - Added Material Indices input to *Combine Mesh* node.
 - Added implicit conversion from Polygon Indices List to Integer List.
 - Added *Insert List Element* node.
+- Added option to remove Channel in *Wiggle Action* node.
 
 ### Fixed
 
@@ -33,6 +34,7 @@
 
 - Removed Material Indices input from *Mesh Object Output* node.
 - Vectorized *Separate Color* node.
+- Vectorized *Separate Quaternion* node.
 
 # 2.1
 
