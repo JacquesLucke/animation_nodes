@@ -69,6 +69,18 @@ def getAxisListOfEulerList(EulerList eulers, str axis, bint useDegree):
             output.data[i] = eulers.data[i].z * factor
     return output
 
+def combineQuaternionList(Py_ssize_t amount,
+                          VirtualDoubleList w, VirtualDoubleList x,
+                          VirtualDoubleList y, VirtualDoubleList z):
+    cdef QuaternionList output = QuaternionList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        output.data[i].w = <float>w.get(i)
+        output.data[i].x = <float>x.get(i)
+        output.data[i].y = <float>y.get(i)
+        output.data[i].z = <float>z.get(i)
+    return output
+
 def getAxisListOfQuaternionList(QuaternionList quaternions, str axis):
     assert axis in "wxyz"
     cdef DoubleList output = DoubleList(length = quaternions.length)
