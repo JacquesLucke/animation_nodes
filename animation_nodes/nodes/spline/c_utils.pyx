@@ -41,23 +41,33 @@ def tiltSplinePoints(Spline spline, VirtualFloatList tilts, bint accumulate):
 
     spline.markChanged()
 
-def getSplineAdaptiveParameters(Spline spline, float start, float end, float tolerance):
-    cdef Vector3 startPoint, endPoint
-    spline.evaluatePoint_LowLevel(start, &startPoint)
-    spline.evaluatePoint_LowLevel(end, &endPoint)
+@cython.cdivision(True)
+def getSplineAdaptiveParameters(Spline spline, float tolerance):
     cdef FloatList parameters = FloatList()
     cdef XoShiRo256Plus rng = XoShiRo256Plus(0)
-    adaptiveSample(spline, start, end, &startPoint, &endPoint, tolerance, rng, parameters)
-    parameters.append_LowLevel(end)
+    cdef Py_ssize_t amount = len(spline.points) - 1
+    cdef float step = 1.0 / amount
+    cdef float startParameter = 0
+    cdef float endParameter = step
+    cdef Vector3 startPoint, endPoint
+    cdef Py_ssize_t i
+    for i in range(amount):
+        spline.evaluatePoint_LowLevel(startParameter, &startPoint)
+        spline.evaluatePoint_LowLevel(endParameter, &endPoint)
+        adaptiveSample(spline, startParameter, endParameter,
+                &startPoint, &endPoint, tolerance, rng, parameters)
+        startParameter += step
+        endParameter += step
+    parameters.append_LowLevel(1)
     return parameters
 
 @cython.cdivision(True)
 cdef void adaptiveSample(Spline spline, float startParameter, float endParameter,
         Vector3 *startPoint, Vector3 *endPoint, float tolerance, XoShiRo256Plus rng,
         FloatList output):
-    cdef center = (startParameter + endParameter) / 2
-    cdef length = endParameter - startParameter
-    cdef midParameter = rng.nextFloatInRange(center - length * 0.05, center + length * 0.05)
+    cdef float center = (startParameter + endParameter) / 2
+    cdef float length = endParameter - startParameter
+    cdef float midParameter = rng.nextFloatInRange(center - length * 0.05, center + length * 0.05)
     cdef Vector3 midPoint
     spline.evaluatePoint_LowLevel(midParameter, &midPoint)
 
