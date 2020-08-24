@@ -2,7 +2,7 @@ from libc.math cimport M_PI as PI
 
 from ... data_structures cimport (
     Vector3DList, EulerList, DoubleList,
-    VirtualDoubleList
+    VirtualDoubleList, QuaternionList
 )
 
 cdef float degreeToRadianFactor = <float>(PI / 180)
@@ -67,4 +67,22 @@ def getAxisListOfEulerList(EulerList eulers, str axis, bint useDegree):
     elif axis == "z":
         for i in range(output.length):
             output.data[i] = eulers.data[i].z * factor
+    return output
+
+def getAxisListOfQuaternionList(QuaternionList quaternions, str axis):
+    assert axis in "wxyz"
+    cdef DoubleList output = DoubleList(length = quaternions.length)
+    cdef Py_ssize_t i
+    if axis == "w":
+        for i in range(output.length):
+            output.data[i] = quaternions.data[i].w
+    elif axis == "x":
+        for i in range(output.length):
+            output.data[i] = quaternions.data[i].x
+    elif axis == "y":
+        for i in range(output.length):
+            output.data[i] = quaternions.data[i].y
+    elif axis == "z":
+        for i in range(output.length):
+            output.data[i] = quaternions.data[i].z
     return output

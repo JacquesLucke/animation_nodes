@@ -34,6 +34,7 @@
 
 - Removed Material Indices input from *Mesh Object Output* node.
 - Vectorized *Separate Color* node.
+- Vectorized *Separate Quaternion* node.
 
 # 2.1
 
