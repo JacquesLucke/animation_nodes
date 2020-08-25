@@ -56,5 +56,3 @@ cdef void quaternionNormalize_InPlace(Quaternion *q):
         q.x /= length
         q.y /= length
         q.z /= length
-    else:
-        q.w = q.x = q.y = q.z = 0
