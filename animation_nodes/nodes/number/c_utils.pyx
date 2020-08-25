@@ -61,7 +61,7 @@ def mapRange_DoubleList(DoubleList values, bint clamped,
 
     for i in range(len(newValues)):
         x = values.data[i]
-        if clamped: x = clamp(x, inMin, inMax)
+        if clamped: x = clamp(x, inMin, inMax) if inMin < inMax else clamp(x, inMax, inMin)
         newValues.data[i] = outMin + (x - inMin) * factor
 
     return newValues
@@ -80,7 +80,7 @@ def mapRange_DoubleList_Interpolated(DoubleList values, Interpolation interpolat
          long i
 
      for i in range(len(newValues)):
-         x = clamp(values.data[i], inMin, inMax)
+         x = clamp(values.data[i], inMin, inMax) if inMin < inMax else clamp(values.data[i], inMax, inMin)
          newValues.data[i] = outMin + interpolation.evaluate((x - inMin) * factor1) * factor2
 
      return newValues
