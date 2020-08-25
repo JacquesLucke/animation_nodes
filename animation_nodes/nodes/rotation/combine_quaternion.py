@@ -15,7 +15,7 @@ class CombineQuaternionNode(bpy.types.Node, AnimationNode):
     useListZ: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("Float", "useListW", ("W", "w", dict(value = 1)), ("W", "w")))
+        self.newInput(VectorizedSocket("Float", "useListW", ("W", "w"), ("W", "w")))
         self.newInput(VectorizedSocket("Float", "useListX", ("X", "x"), ("X", "x")))
         self.newInput(VectorizedSocket("Float", "useListY", ("Y", "y"), ("Y", "y")))
         self.newInput(VectorizedSocket("Float", "useListZ", ("Z", "z"), ("Z", "z")))
@@ -28,7 +28,7 @@ class CombineQuaternionNode(bpy.types.Node, AnimationNode):
         if self.generatesList:
             yield "quaternions = self.createQuaternionList(w, x, y, z)"
         else:
-            yield "quaternion = Quaternion((w, x, y, z))"
+            yield "quaternion = Quaternion((w, x, y, z)).normalized()"
 
     def createQuaternionList(self, w, x, y, z):
         w, x, y, z = VirtualDoubleList.createMultiple((w, 0), (x, 0), (y, 0), (z, 0))
