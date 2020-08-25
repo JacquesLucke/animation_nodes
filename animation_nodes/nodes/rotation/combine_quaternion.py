@@ -15,7 +15,7 @@ class CombineQuaternionNode(bpy.types.Node, AnimationNode):
     useListZ: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("Float", "useListW", ("W", "w"), ("W", "w")))
+        self.newInput(VectorizedSocket("Float", "useListW", ("W", "w", dict(value = 1)), ("W", "w")))
         self.newInput(VectorizedSocket("Float", "useListX", ("X", "x"), ("X", "x")))
         self.newInput(VectorizedSocket("Float", "useListY", ("Y", "y"), ("Y", "y")))
         self.newInput(VectorizedSocket("Float", "useListZ", ("Z", "z"), ("Z", "z")))
