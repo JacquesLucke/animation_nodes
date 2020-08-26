@@ -25,6 +25,7 @@
 - Added implicit conversion from Polygon Indices List to Integer List.
 - Added *Insert List Element* node.
 - Added option to remove Channel in *Wiggle Action* node.
+- Added Curvature output to Evaluate Spline node.
 
 ### Fixed
 

@@ -47,6 +47,7 @@ cdef class Spline:
     cdef void evaluateTangent_LowLevel(self, float t, Vector3 *result)
     cdef void evaluateNormal_LowLevel(self, float t, Vector3 *result)
     cdef void evaluateNormal_Approximated(self, float t, Vector3 *result)
+    cdef float evaluateCurvature_LowLevel(self, float t)
     cdef float evaluateRadius_LowLevel(self, float t)
     cdef float evaluateTilt_LowLevel(self, float t)
 
@@ -61,6 +62,9 @@ cdef class Spline:
         float start = ?, float end = ?,
         str distributionType = ?)
     cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+    cdef calcDistributedCurvatures_LowLevel(self, Py_ssize_t amount, float *result,
         float start = ?, float end = ?,
         str distributionType = ?)
     cdef calcDistributedRadii_LowLevel(self, Py_ssize_t amount, float *result,
