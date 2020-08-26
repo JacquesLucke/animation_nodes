@@ -2,6 +2,7 @@ import bpy
 import numpy
 from math import expm1
 from bpy.props import *
+from ... utils.scene import getFPS
 from ... base_types import AnimationNode
 from ... data_structures import DoubleList
 
@@ -87,8 +88,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
         if count < 1: self.raiseErrorMessage("Invalid count!")
 
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
-            frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / getFPS(scene),
+            frame / getFPS(scene) + max(1 / getFPS(scene), self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
@@ -107,8 +108,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
 
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
-            frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / getFPS(scene),
+            frame / getFPS(scene) + max(1 / getFPS(scene), self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
@@ -119,8 +120,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
         if not isValidCustomList(pins): self.raiseErrorMessage("Invalid pins list!")
 
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
-            frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / getFPS(scene),
+            frame / getFPS(scene) + max(1 / getFPS(scene), self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
@@ -134,8 +135,8 @@ class SoundSpectrumNode(bpy.types.Node, AnimationNode):
     def executeFull(self, sound, frame, attack, release, amplitude, scene):
         if len(sound.soundSequences) == 0: self.raiseErrorMessage("Empty sound!")
 
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
-            frame / scene.render.fps + max(1 / scene.render.fps, self.minDuration),
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / getFPS(scene),
+            frame / getFPS(scene) + max(1 / getFPS(scene), self.minDuration),
             attack, release, self.smoothingSamples, self.kaiserBeta)
         return DoubleList.fromNumpyArray(spectrum * amplitude)
 

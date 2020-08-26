@@ -30,6 +30,7 @@
 
 - Fixed the *Make ELement Copies* option in the *Repeat List* node.
 - Fixed the *Map Range* node when the input max is less than input min.
+- Fixed Sound nodes when scene fps base is not one.
 
 ### Changed
 
