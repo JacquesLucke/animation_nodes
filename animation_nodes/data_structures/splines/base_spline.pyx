@@ -114,6 +114,12 @@ cdef class Spline:
         evaluateDistributed(self, amount, self.evaluateNormal_LowLevel,
             start, end, distributionType, result)
 
+    cdef calcDistributedCurvatures_LowLevel(self, Py_ssize_t amount, float *result,
+                                            float start = 0, float end = 1,
+                                            str distributionType = "RESOLUTION"):
+        evaluateDistributed(self, amount, self.evaluateCurvature_LowLevel,
+            start, end, distributionType, result)
+
     cdef calcDistributedRadii_LowLevel(self, Py_ssize_t amount, float *result,
                                        float start = 0, float end = 1,
                                        str distributionType = "RESOLUTION"):
@@ -146,6 +152,13 @@ cdef class Spline:
                               str distributionType = "RESOLUTION"):
         cdef Vector3DList result = Vector3DList(length = amount)
         self.calcDistributedNormals_LowLevel(amount, result.data, start, end, distributionType)
+        return result
+
+    def getDistributedCurvatures(self, Py_ssize_t amount,
+                                 float start = 0, float end = 1,
+                                 str distributionType = "RESOLUTION"):
+        cdef FloatList result = FloatList(length = amount)
+        self.calcDistributedCurvatures_LowLevel(amount, result.data, start, end, distributionType)
         return result
 
     def getDistributedRadii(self, Py_ssize_t amount,
@@ -188,6 +201,14 @@ cdef class Spline:
             _parameters.data, result.data, _parameters.length)
         return result
 
+    def sampleCurvatures(self, FloatList parameters,
+                         bint checkRange = True, parameterType = "RESOLUTION"):
+        cdef FloatList _parameters = prepareSampleParameters(self, parameters, checkRange, parameterType)
+        cdef FloatList result = FloatList(length = parameters.length)
+        evaluateFunction_Array(self, self.evaluateCurvature_LowLevel,
+            _parameters.data, result.data, _parameters.length)
+        return result
+
     def sampleRadii(self, FloatList parameters,
                     bint checkRange = True, parameterType = "RESOLUTION"):
         cdef FloatList _parameters = prepareSampleParameters(self, parameters, checkRange, parameterType)
@@ -221,6 +242,9 @@ cdef class Spline:
         self.checkNormals()
         return evaluateFunction_PyResult(self, self.evaluateNormal_LowLevel, t)
 
+    def evaluateCurvature(self, float t):
+        return evaluateFunction_PyResult(self, self.evaluateCurvature_LowLevel, t)
+
     def evaluateRadius(self, float t):
         return evaluateFunction_PyResult(self, self.evaluateRadius_LowLevel, t)
 
@@ -245,6 +269,9 @@ cdef class Spline:
         projectOnCenterPlaneVec3(result, &rotated, &tangent)
 
     cdef void evaluateNormal_Approximated(self, float parameter, Vector3 *result):
+        raise NotImplementedError()
+
+    cdef float evaluateCurvature_LowLevel(self, float t):
         raise NotImplementedError()
 
     cdef float evaluateRadius_LowLevel(self, float t):

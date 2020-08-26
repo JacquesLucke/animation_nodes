@@ -1,6 +1,7 @@
 import bpy
 import numpy
 from bpy.props import *
+from ... utils.scene import getFPS
 from ... base_types import AnimationNode
 from ... algorithms.interpolations import Linear
 from ... data_structures cimport DoubleList, FloatList, BaseFalloff
@@ -108,7 +109,7 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
         if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
 
         return Average_Index_SoundFalloff(sound, frame, scale, attack, release, amplitude,
-            low, high, scene.render.fps, self.smoothingSamples, self.kaiserBeta,
+            low, high, getFPS(scene), self.smoothingSamples, self.kaiserBeta,
             reductionFunctions[self.reductionFunction])
 
     def execute_Spectrum_IndexFrequency(self, sound, frame, attack, release, amplitude,
@@ -130,8 +131,8 @@ class SoundFalloffNode(bpy.types.Node, AnimationNode):
         if not isValidRange(low, high): self.raiseErrorMessage("Invalid interval!")
         if count < 1: self.raiseErrorMessage("Invalid count!")
 
-        spectrum = sound.computeTimeSmoothedSpectrum(frame / scene.render.fps,
-            (frame + 1) / scene.render.fps, attack, release, self.smoothingSamples, self.kaiserBeta)
+        spectrum = sound.computeTimeSmoothedSpectrum(frame / getFPS(scene),
+            (frame + 1) / getFPS(scene), attack, release, self.smoothingSamples, self.kaiserBeta)
         maxFrequency = len(spectrum) - 1
 
         pins = interpolation.evaluateList(DoubleList.fromNumpyArray(numpy.linspace(

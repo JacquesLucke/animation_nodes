@@ -1,12 +1,13 @@
 import cython
+from libc.math cimport cos
+from libc.math cimport M_PI as PI
 from ... data_structures.meshes.mesh_data import calculateCrossProducts
 from .. mesh.c_utils import matricesFromNormalizedAxisData
 from ... data_structures cimport (
     Vector3DList, EdgeIndicesList, FloatList,
     Spline, Matrix4x4List, VirtualFloatList
 )
-from ... algorithms.random_number_generators cimport XoShiRo256Plus
-from ... math cimport scaleMatrix3x3Part, Vector3, subVec3, crossVec3, lengthSquaredVec3
+from ... math cimport scaleMatrix3x3Part, Vector3, subVec3, angleVec3
 
 def getMatricesAlongSpline(Spline spline, Py_ssize_t amount, distribution):
     assert spline.isEvaluable()
@@ -41,23 +42,31 @@ def tiltSplinePoints(Spline spline, VirtualFloatList tilts, bint accumulate):
 
     spline.markChanged()
 
-def getSplineAdaptiveParameters(Spline spline, float start, float end, float tolerance):
-    cdef Vector3 startPoint, endPoint
-    spline.evaluatePoint_LowLevel(start, &startPoint)
-    spline.evaluatePoint_LowLevel(end, &endPoint)
+@cython.cdivision(True)
+def getSplineAdaptiveParameters(Spline spline, float toleranceAngle):
     cdef FloatList parameters = FloatList()
-    cdef XoShiRo256Plus rng = XoShiRo256Plus(0)
-    adaptiveSample(spline, start, end, &startPoint, &endPoint, tolerance, rng, parameters)
-    parameters.append_LowLevel(end)
+    cdef Py_ssize_t amount = len(spline.points) - 1
+    cdef float tolerance = PI - toleranceAngle
+    cdef float step = 1.0 / amount
+    cdef float startParameter = 0
+    cdef float endParameter = step
+    cdef Vector3 startPoint, endPoint
+    cdef Py_ssize_t i
+    for i in range(amount):
+        spline.evaluatePoint_LowLevel(startParameter, &startPoint)
+        spline.evaluatePoint_LowLevel(endParameter, &endPoint)
+        adaptiveSample(spline, startParameter, endParameter,
+                &startPoint, &endPoint, tolerance, parameters)
+        startParameter += step
+        endParameter += step
+    parameters.append_LowLevel(1)
     return parameters
 
 @cython.cdivision(True)
 cdef void adaptiveSample(Spline spline, float startParameter, float endParameter,
-        Vector3 *startPoint, Vector3 *endPoint, float tolerance, XoShiRo256Plus rng,
-        FloatList output):
-    cdef center = (startParameter + endParameter) / 2
-    cdef length = endParameter - startParameter
-    cdef midParameter = rng.nextFloatInRange(center - length * 0.05, center + length * 0.05)
+        Vector3 *startPoint, Vector3 *endPoint, float tolerance, FloatList output):
+    cdef float length = endParameter - startParameter
+    cdef float midParameter = (startParameter + endParameter) / 2
     cdef Vector3 midPoint
     spline.evaluatePoint_LowLevel(midParameter, &midPoint)
 
@@ -66,13 +75,12 @@ cdef void adaptiveSample(Spline spline, float startParameter, float endParameter
         return
 
     adaptiveSample(spline, startParameter, midParameter, startPoint, &midPoint,
-        tolerance, rng, output)
+        tolerance, output)
     adaptiveSample(spline, midParameter, endParameter, &midPoint, endPoint,
-        tolerance, rng, output)
+        tolerance, output)
 
 cdef bint isSufficientlyFlat(Vector3 *start, Vector3 *middle, Vector3 *end, float tolerance):
-    cdef Vector3 a, b, cross
+    cdef Vector3 a, b
     subVec3(&a, start, middle)
     subVec3(&b, end, middle)
-    crossVec3(&cross, &a, &b)
-    return lengthSquaredVec3(&cross) < tolerance * tolerance
+    return angleVec3(&a, &b) > tolerance

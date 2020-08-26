@@ -1,4 +1,5 @@
 from libc.math cimport M_PI as PI
+from ... math cimport quaternionNormalize_InPlace
 
 from ... data_structures cimport (
     Vector3DList, EulerList, DoubleList,
@@ -67,6 +68,19 @@ def getAxisListOfEulerList(EulerList eulers, str axis, bint useDegree):
     elif axis == "z":
         for i in range(output.length):
             output.data[i] = eulers.data[i].z * factor
+    return output
+
+def combineQuaternionList(Py_ssize_t amount,
+                          VirtualDoubleList w, VirtualDoubleList x,
+                          VirtualDoubleList y, VirtualDoubleList z):
+    cdef QuaternionList output = QuaternionList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        output.data[i].w = <float>w.get(i)
+        output.data[i].x = <float>x.get(i)
+        output.data[i].y = <float>y.get(i)
+        output.data[i].z = <float>z.get(i)
+        quaternionNormalize_InPlace(&output.data[i])
     return output
 
 def getAxisListOfQuaternionList(QuaternionList quaternions, str axis):

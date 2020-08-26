@@ -25,16 +25,20 @@
 - Added implicit conversion from Polygon Indices List to Integer List.
 - Added *Insert List Element* node.
 - Added option to remove Channel in *Wiggle Action* node.
+- Added Curvature output to Evaluate Spline node.
 
 ### Fixed
 
 - Fixed the *Make ELement Copies* option in the *Repeat List* node.
+- Fixed the *Map Range* node when the input max is less than input min.
+- Fixed Sound nodes when scene fps base is not one.
 
 ### Changed
 
 - Removed Material Indices input from *Mesh Object Output* node.
 - Vectorized *Separate Color* node.
 - Vectorized *Separate Quaternion* node.
+- Vectorized *Combine Quaternion* node.
 
 # 2.1
 

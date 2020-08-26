@@ -194,6 +194,9 @@ cdef class PolySpline(Spline):
         findListSegment_LowLevel(self.points.length, self.cyclic, parameter, indices, &t)
         subVec3(result, _points + indices[1], _points + indices[0])
 
+    cdef float evaluateCurvature_LowLevel(self, float parameter):
+        return 0
+
     cdef float evaluateRadius_LowLevel(self, float parameter):
         cdef long indices[2]
         cdef float t
