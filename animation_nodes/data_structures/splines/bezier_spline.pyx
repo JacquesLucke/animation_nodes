@@ -494,6 +494,7 @@ cdef inline void evaluateBezierSegment_Normal(Vector3 *result, float t, Vector3 
     result.y = 6 * (1 - t) * (w[2].y - 2 * w[1].y + w[0].y) + 6 * t * (w[3].y - 2 * w[2].y + w[1].y)
     result.z = 6 * (1 - t) * (w[2].z - 2 * w[1].z + w[0].z) + 6 * t * (w[3].z - 2 * w[2].z + w[1].z)
 
+@cython.cdivision(True)
 cdef inline float evaluateBezierSegment_Curvature(float t, Vector3 **w):
     cdef Vector3 tangent
     evaluateBezierSegment_Tangent(&tangent, t, w)
@@ -502,5 +503,5 @@ cdef inline float evaluateBezierSegment_Curvature(float t, Vector3 **w):
     cdef Vector3 cross
     crossVec3(&cross, &tangent, &normal)
     cdef float crossLength = lengthVec3(&cross)
-    cdef float tangentLength = lengthVec3(&tangent)
-    return crossLength / (tangentLength * tangentLength * tangentLength)
+    cdef float tangentLengthSquared = lengthSquaredVec3(&tangent)
+    return crossLength / (tangentLengthSquared ** 1.5)
