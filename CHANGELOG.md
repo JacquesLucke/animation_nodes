@@ -26,6 +26,8 @@
 - Added *Insert List Element* node.
 - Added option to remove Channel in *Wiggle Action* node.
 - Added Curvature output to Evaluate Spline node.
+- Added Interpolation input to *Float Range* node.
+- Added *Mesh Falloff* node.
 
 ### Fixed
 

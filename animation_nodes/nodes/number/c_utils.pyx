@@ -25,18 +25,28 @@ def range_DoubleList_StartStep(amount, double start, double step):
     cdef DoubleList newList
     cdef Py_ssize_t i
     if step == 0:
-        newList = DoubleList.fromValues([start]) * max(amount, 0)
+        newList = DoubleList.fromValues([start]) * amount
     else:
-        newList = DoubleList(length = max(amount, 0))
+        newList = DoubleList(length = amount)
         for i in range(len(newList)):
             newList.data[i] = start + i * step
     return newList
 
-def range_DoubleList_StartStop(amount, double start, double stop):
-    if amount == 1:
-        return DoubleList.fromValues([start])
+def range_DoubleList_StartStep_Interpolated(amount, double start,
+        double step, Interpolation interpolation):
+    cdef DoubleList newList
+    cdef double stop
+    cdef double unityStep
+    cdef Py_ssize_t i
+    if start == stop:
+        newList = DoubleList.fromValues([start]) * amount
     else:
-        return range_DoubleList_StartStep(amount, start, (stop - start) / (amount - 1))
+        newList = DoubleList(length = amount)
+        unityStep = 1.0 / (amount - 1)
+        stop = step * (amount - 1)
+        for i in range(amount):
+            newList.data[i] = start + interpolation.evaluate(i * unityStep) * stop
+    return newList
 
 def random_DoubleList(seed, amount, double minValue, double maxValue):
     cdef DoubleList newList = DoubleList(length = max(0, amount))
