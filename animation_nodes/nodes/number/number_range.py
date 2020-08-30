@@ -4,11 +4,12 @@ from ... base_types import AnimationNode
 from ... data_structures import DoubleList
 from ... events import executionCodeChanged
 from ... sockets.info import toListDataType
+from ... algorithms.interpolations import Linear as LinearInterpolation
 
 from . c_utils import (
     range_LongList_StartStep,
     range_DoubleList_StartStep,
-    range_DoubleList_StartStop
+    range_DoubleList_StartStep_Interpolated,
 )
 
 floatStepTypeItems = [
@@ -42,6 +43,8 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
                 self.newInput("Float", "Step", "step", value = 1)
             elif self.floatStepType == "START_STOP":
                 self.newInput("Float", "Stop", "stop", value = 1)
+            self.newInput("Interpolation", "Interpolation", "interpolation",
+                defaultDrawType = "PROPERTY_ONLY", hide = True)
         elif self.dataType == "Integer":
             self.newInput("Integer", "Start", "start")
             self.newInput("Integer", "Step", "step", value = 1)
@@ -64,20 +67,32 @@ class NumberRangeNode(bpy.types.Node, AnimationNode):
             if self.floatStepType == "START_STEP":
                 return "execute_FloatRange_StartStep"
             elif self.floatStepType == "START_STOP":
-                if self.includeEndPoint:
-                    return "execute_FloatRange_StartStop_IncludeEndPoint"
-                else:
-                    return "execute_FloatRange_StartStop"
+                return "execute_FloatRange_StartStop"
 
     def execute_IntegerRange(self, amount, start, step):
         return range_LongList_StartStep(amount, start, step)
 
-    def execute_FloatRange_StartStep(self, amount, start, step):
-        return range_DoubleList_StartStep(amount, start, step)
-
-    def execute_FloatRange_StartStop_IncludeEndPoint(self, amount, start, stop):
-        return range_DoubleList_StartStop(amount, start, stop)
-
-    def execute_FloatRange_StartStop(self, amount, start, stop):
+    def execute_FloatRange_StartStep(self, amount, start, step, interpolation):
         if amount <= 0: return DoubleList()
-        return range_DoubleList_StartStep(amount, start, (stop - start) / amount)
+        if amount == 1: return DoubleList.fromValues([start])
+
+        if isinstance(interpolation, LinearInterpolation):
+            return range_DoubleList_StartStep(amount, start, step)
+        else:
+            return range_DoubleList_StartStep_Interpolated(amount, start,
+                step, interpolation)
+
+    def execute_FloatRange_StartStop(self, amount, start, stop, interpolation):
+        if amount <= 0: return DoubleList()
+        if amount == 1: return DoubleList.fromValues([start])
+
+        if self.includeEndPoint:
+            step = (stop - start) / (amount - 1)
+        else:
+            step = (stop - start) / amount
+
+        if isinstance(interpolation, LinearInterpolation):
+            return range_DoubleList_StartStep(amount, start, step)
+        else:
+            return range_DoubleList_StartStep_Interpolated(amount, start,
+                step, interpolation)
