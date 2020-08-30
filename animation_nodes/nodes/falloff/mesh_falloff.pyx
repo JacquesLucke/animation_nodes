@@ -23,7 +23,7 @@ class MeshFalloffNode(bpy.types.Node, AnimationNode):
     def execute(self, bvhTree, size, falloffWidth, useSurface, useVolume):
         if bvhTree is None: return ConstantFalloff(0)
         if not useSurface and not useVolume: return ConstantFalloff(0)
-        return MeshFalloff(bvhTree, 1e10, size, falloffWidth, useSurface, useVolume)
+        return MeshFalloff(bvhTree, size, falloffWidth, useSurface, useVolume)
 
 cdef class MeshFalloff(BaseFalloff):
     cdef:
@@ -31,14 +31,12 @@ cdef class MeshFalloff(BaseFalloff):
         float factor
         bint useVolume
         bint useSurface
-        double bvhMaxDistance
         float minDistance, maxDistance
 
     @cython.cdivision(True)
-    def __cinit__(self, bvhTree, double bvhMaxDistance, float size, float falloffWidth,
-                  bint useSurface, bint useVolume):
+    def __cinit__(self, bvhTree,float size, float falloffWidth, bint useSurface,
+                  bint useVolume):
         self.bvhTree = bvhTree
-        self.bvhMaxDistance = bvhMaxDistance
         self.useSurface = useSurface
         self.useVolume = useVolume
         if falloffWidth < 0:
@@ -69,7 +67,7 @@ cdef class MeshFalloff(BaseFalloff):
             return <float>isInsideVolume(self.bvhTree, Vector((v.x, v.y, v.z)))
 
 cdef inline float calculateDistance(MeshFalloff self, Vector3 *v):
-    cdef float distance = self.bvhTree.find_nearest(Vector((v.x, v.y, v.z)), self.bvhMaxDistance)[3]
+    cdef float distance = self.bvhTree.find_nearest(Vector((v.x, v.y, v.z)), 1e10)[3]
     if distance <= self.minDistance: return 1
     if distance <= self.maxDistance: return 1 - (distance - self.minDistance) * self.factor
     return 0

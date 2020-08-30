@@ -20,7 +20,4 @@ class IsInsideVolumeBVHTreeNode(bpy.types.Node, AnimationNode):
             ("Is Inside", "isInside"), ("Are Inside", "areInside")))
 
     def getExecutionCode(self, required):
-        return "isInside = self.execute_Single(bvhTree, vector)"
-
-    def execute_Single(self, bvhTree, vector):
-        return isInsideVolume(bvhTree, vector)
+        return "isInside = AN.utils.bvh.isInsideVolume(bvhTree, vector)"
