@@ -38,7 +38,7 @@ def range_DoubleList_StartStep_Interpolated(amount, double start,
     cdef double stop
     cdef double unityStep
     cdef Py_ssize_t i
-    if start == stop:
+    if step == 0:
         newList = DoubleList.fromValues([start]) * amount
     else:
         newList = DoubleList(length = amount)
