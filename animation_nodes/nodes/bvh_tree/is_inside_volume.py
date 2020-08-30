@@ -1,5 +1,4 @@
 import bpy
-from ... utils.bvh import isInsideVolume
 from ... base_types import AnimationNode, VectorizedSocket
 
 class IsInsideVolumeBVHTreeNode(bpy.types.Node, AnimationNode):
