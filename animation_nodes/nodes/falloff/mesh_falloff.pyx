@@ -15,30 +15,25 @@ class MeshFalloffNode(bpy.types.Node, AnimationNode):
         self.newInput("BVHTree", "BVHTree", "bvhTree")
         self.newInput("Float", "Size", "size")
         self.newInput("Float", "Falloff Width", "falloffWidth", value = 1)
-        self.newInput("Boolean", "Use Surface", "useSurface", value = True)
-        self.newInput("Boolean", "Use Volume", "useVolume", value = False)
+        self.newInput("Boolean", "Fill Inside", "fillInside", value = False)
 
         self.newOutput("Falloff", "Falloff", "falloff")
 
-    def execute(self, bvhTree, size, falloffWidth, useSurface, useVolume):
+    def execute(self, bvhTree, size, falloffWidth, fillInside):
         if bvhTree is None: return ConstantFalloff(0)
-        if not useSurface and not useVolume: return ConstantFalloff(0)
-        return MeshFalloff(bvhTree, size, falloffWidth, useSurface, useVolume)
+        return MeshFalloff(bvhTree, size, falloffWidth, fillInside)
 
 cdef class MeshFalloff(BaseFalloff):
     cdef:
         bvhTree
         float factor
-        bint useVolume
-        bint useSurface
+        bint fillInside
         float minDistance, maxDistance
 
     @cython.cdivision(True)
-    def __cinit__(self, bvhTree,float size, float falloffWidth, bint useSurface,
-                  bint useVolume):
+    def __cinit__(self, bvhTree,float size, float falloffWidth, bint fillInside):
         self.bvhTree = bvhTree
-        self.useSurface = useSurface
-        self.useVolume = useVolume
+        self.fillInside = fillInside
         if falloffWidth < 0:
             size += falloffWidth
             falloffWidth = -falloffWidth
@@ -57,14 +52,12 @@ cdef class MeshFalloff(BaseFalloff):
         cdef float strength
         cdef Vector3* v
         v = <Vector3*>value
-        if self.useSurface and self.useVolume:
+        if self.fillInside:
             strength = <float>isInsideVolume(self.bvhTree, Vector((v.x, v.y, v.z)))
             distance = calculateDistance(self, v)
             return max(distance, strength)
-        elif self.useSurface:
+        else:
             return calculateDistance(self, <Vector3*>value)
-        elif self.useVolume:
-            return <float>isInsideVolume(self.bvhTree, Vector((v.x, v.y, v.z)))
 
 cdef inline float calculateDistance(MeshFalloff self, Vector3 *v):
     cdef float distance = self.bvhTree.find_nearest(Vector((v.x, v.y, v.z)), 1e10)[3]
