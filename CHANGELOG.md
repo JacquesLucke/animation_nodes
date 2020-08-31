@@ -41,6 +41,7 @@
 - Vectorized *Separate Color* node.
 - Vectorized *Separate Quaternion* node.
 - Vectorized *Combine Quaternion* node.
+- Replaced the inputs of the mesh *Construct BVH Tree* node with a mesh.
 
 # 2.1
 
