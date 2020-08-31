@@ -56,10 +56,13 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
 
         evaluatedObject = getEvaluatedID(object)
         mesh = evaluatedObject.data
+        polygons = mesh.an.getPolygonIndices()
+        if len(polygons) == 0:
+            return self.getFallbackBVHTree()
         vertices = mesh.an.getVertices()
         vertices.transform(evaluatedObject.matrix_world)
-        polygons = mesh.an.getPolygonIndices()
-        return self.execute_Mesh(vertices, polygons, epsilon)
+
+        return BVHTree.FromPolygons(vertices, polygons, epsilon = max(epsilon, 0))
 
     def getFallbackBVHTree(self):
         return self.outputs[0].getDefaultValue()

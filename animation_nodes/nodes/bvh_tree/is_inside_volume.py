@@ -9,7 +9,7 @@ class IsInsideVolumeBVHTreeNode(bpy.types.Node, AnimationNode):
     useVectorList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("BVHTree", "BVHTree", "bvhTree")
+        self.newInput("BVHTree", "BVHTree", "bvhTree", defaultDrawType = "PROPERTY_ONLY")
 
         self.newInput(VectorizedSocket("Vector", "useVectorList",
             ("Vector", "vector", dict(defaultDrawType = "PROPERTY_ONLY")),

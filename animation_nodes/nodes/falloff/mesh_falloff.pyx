@@ -12,7 +12,7 @@ class MeshFalloffNode(bpy.types.Node, AnimationNode):
     bl_label = "Mesh Falloff"
 
     def create(self):
-        self.newInput("BVHTree", "BVHTree", "bvhTree")
+        self.newInput("BVHTree", "BVHTree", "bvhTree", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Float", "Size", "size")
         self.newInput("Float", "Falloff Width", "falloffWidth", value = 1)
         self.newInput("Boolean", "Fill Inside", "fillInside", value = False)
