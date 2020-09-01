@@ -18,7 +18,7 @@ class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
         update = executionCodeChanged)
 
     def create(self):
-        self.newInput("BVHTree", "BVHTree", "bvhTree")
+        self.newInput("BVHTree", "BVHTree", "bvhTree", defaultDrawType = "PROPERTY_ONLY")
 
         self.newInput(VectorizedSocket("Vector", "useStartList",
             ("Ray Start", "start"), ("Ray Starts", "starts")))
