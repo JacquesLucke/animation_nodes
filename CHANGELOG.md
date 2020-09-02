@@ -1,3 +1,7 @@
+## LTS Fixes
+
+- Fixed Sound nodes when scene fps base is not one.
+
 ## 2.1.8
 
 ### Added

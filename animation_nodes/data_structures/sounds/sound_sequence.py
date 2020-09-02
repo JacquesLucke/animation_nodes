@@ -3,6 +3,7 @@ import bpy
 import aud
 from functools import lru_cache
 from . sound_data import SoundData
+from ... utils.scene import getFPS
 from ... utils.depsgraph import getEvaluatedID
 
 # We define a constant sampleRate to avoid expensive resampling during execution.
@@ -28,7 +29,7 @@ class SoundSequence:
             soundData = getCachedSoundDataFromSound(sequence.sound)
 
         sequenceScene = findSceneWithSequence(sequence)
-        fps = sequenceScene.render.fps
+        fps = getFPS(sequenceScene)
         return cls(soundData, sequence.frame_final_start / fps, sequence.frame_offset_start / fps,
             sequence.frame_final_end / fps, sequence.volume, fps)
 
