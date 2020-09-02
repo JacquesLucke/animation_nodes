@@ -322,6 +322,25 @@ cdef class BezierSpline(Spline):
                 mixVec3(w[1], w[0], w[3], 1.0 / 3.0)
                 mixVec3(w[2], w[0], w[3], 2.0 / 3.0)
 
+    @cython.cdivision(True)
+    def getAdaptiveParameters(self, float stepMultiplier, float maxStep):
+        cdef FloatList parameters = FloatList()
+        cdef int amount = getSegmentAmount(self)
+        cdef float step = 1.0 / amount
+        cdef float parameter, radius
+        cdef Vector3* w[4]
+        cdef Py_ssize_t i
+        for i in range(amount):
+            parameter = 0.0
+            getSegmentData_Index(self, i, w)
+            while parameter < 1.0:
+                parameters.append_LowLevel(step * (parameter + i))
+                radius = 1.0 / max(evaluateBezierSegment_Curvature(parameter, w), 1e-5)
+                parameter += min(radius * stepMultiplier, maxStep)
+        parameters.append_LowLevel(1)
+        return parameters
+
+
 cdef smoothPoint(BezierSpline spline, Py_ssize_t index, float strength):
     if 0 < index < spline.points.length - 1:
         calculateSmoothControlPoints(spline.points.data + index,
