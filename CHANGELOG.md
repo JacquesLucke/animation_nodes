@@ -2,7 +2,7 @@
 
 ### Added
 
-
+- Add *Get Spline Adaptive Samples* node.
 
 ### Fixed
 
