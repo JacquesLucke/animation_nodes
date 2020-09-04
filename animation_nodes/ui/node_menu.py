@@ -518,7 +518,6 @@ class SplineMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_SplineInfoNode", "Info")
         insertNode(layout, "an_EvaluateSplineNode", "Evaluate")
-        insertNode(layout, "an_GetSplineAdaptiveSamplesNode", "Get Adaptive Samples")
         insertNode(layout, "an_ProjectOnSplineNode", "Project")
         insertNode(layout, "an_GetSplineLengthNode", "Get Length")
         layout.separator()
