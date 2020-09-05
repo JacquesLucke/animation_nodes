@@ -2,7 +2,7 @@
 
 ### Added
 
-
+- Added *Find Shortest Path* node.
 
 ### Fixed
 
