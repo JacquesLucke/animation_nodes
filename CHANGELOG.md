@@ -2,6 +2,7 @@
 
 ### Added
 
+- Added *Filter Material List By Name* node.
 - Added *Find Shortest Path* node.
 
 ### Fixed
