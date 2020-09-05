@@ -2,7 +2,7 @@
 
 ### Added
 
-
+- Added *Filter Material List By Name* node.
 
 ### Fixed
 
