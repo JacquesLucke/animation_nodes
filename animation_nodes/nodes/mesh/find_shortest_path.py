@@ -5,8 +5,8 @@ from ... base_types import AnimationNode, VectorizedSocket
 from ... algorithms.mesh_generation.find_shortest_path import getShortestPath
 
 modeItems = [
-    ("INDEX", "Index", "Path from source vertex to other vertex", 0),
-    ("ALL", "All", "Paths from source vertex to other vertices", 1)
+    ("PATH", "Path", "Find path from source vertex to other vertex", 0),
+    ("TREE", "Tree", "Find Paths from source vertex(ies) to other vertices", 1)
 ]
 
 pathTypeItems = [
@@ -20,7 +20,7 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
     bl_label = "Find Shortest Path"
     errorHandlingType = "EXCEPTION"
 
-    mode: EnumProperty(name = "Mode Type", default = "ALL",
+    mode: EnumProperty(name = "Mode Type", default = "TREE",
         items = modeItems, update = AnimationNode.refresh)
 
     pathType: EnumProperty(name = "Path Type", default = "MESH",
@@ -33,25 +33,25 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Mesh", "Mesh", "mesh")
-        if self.mode == "INDEX":
+        if self.mode == "PATH":
             self.newInput("Integer", "Source", "source")
-            self.newInput("Integer", "Destiny", "destiny", value = 1)
+            self.newInput("Integer", "Target", "target", value = 1)
         else:
             self.newInput(VectorizedSocket("Integer", "useSourceList",
                     ("Source", "sources"), ("Sources", "sources")))
-        self.newInput("Boolean", "Change Direction", "changeDirection", value = False)
 
-        if self.pathType == "MESH":
-            if not self.joinMeshes:
-                self.newOutput("Mesh List", "Meshes", "outMeshes")
-            else:
-                self.newOutput("Mesh", "Mesh", "outMesh")
-        elif self.pathType == "SPLINE":
-            self.newOutput("Spline List", "Splines", "outSplines")
-        elif self.pathType == "STROKE":
-            self.newOutput("GPStroke List", "Strokes", "outStrokes")
-        if self.mode == "INDEX":
-            self.newOutput("Vector List", "Vectors", "vectors")
+        if self.mode == "PATH":
+            self.newOutput("Integer List", "Indices", "indices")
+        else:
+            if self.pathType == "MESH":
+                if not self.joinMeshes:
+                    self.newOutput("Mesh List", "Meshes", "outMeshes")
+                else:
+                    self.newOutput("Mesh", "Mesh", "outMesh")
+            elif self.pathType == "SPLINE":
+                self.newOutput("Spline List", "Splines", "outSplines")
+            elif self.pathType == "STROKE":
+                self.newOutput("GPStroke List", "Strokes", "outStrokes")
 
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
@@ -60,36 +60,33 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
             layout.prop(self, "joinMeshes")
 
     def getExecutionFunctionName(self):
-        if self.mode == "INDEX":
+        if self.mode == "PATH":
             return "execute_Index"
         else:
             return "execute_All"
 
-    def execute_Index(self, mesh, source, destiny, changeDirection):
+    def execute_Index(self, mesh, source, target):
         if mesh is None:
-            if self.joinMeshes and self.pathType == "MESH":
-                return Mesh(), Vector3DList()
-            else:
-                return [], Vector3DList()
+            return LongList()
 
         if source < 0 or source >= len(mesh.vertices):
             self.raiseErrorMessage("Some indices are out of range.")
-        if destiny < 0 or destiny >= len(mesh.vertices):
+        if target < 0 or target >= len(mesh.vertices):
             self.raiseErrorMessage("Some indices are out of range.")
 
         sources = LongList.fromValue(source)
-        destinies = LongList.fromValue(destiny)
+        targets = LongList.fromValue(target)
         if self.pathType == "MESH":
             if self.joinMeshes:
-                return Mesh.join(*getShortestPath(mesh, sources, destinies, "MESH", "INDEX", changeDirection))
+                return Mesh.join(*getShortestPath(mesh, sources, targets, "MESH", "PATH"))
             else:
-                return getShortestPath(mesh, sources, destinies, "MESH", "INDEX", changeDirection)
+                return getShortestPath(mesh, sources, targets, "MESH", "PATH")
         elif self.pathType == "SPLINE":
-            return getShortestPath(mesh, sources, destinies, "SPLINE", "INDEX", changeDirection)
+            return getShortestPath(mesh, sources, targets, "SPLINE", "PATH")
         elif self.pathType == "STROKE":
-            return getShortestPath(mesh, sources, destinies, "STROKE", "INDEX", changeDirection)
+            return getShortestPath(mesh, sources, targets, "STROKE", "PATH")
 
-    def execute_All(self, mesh, sources, changeDirection):
+    def execute_All(self, mesh, sources):
         if not self.useSourceList: sources = LongList.fromValue(sources)
         if mesh is None or len(sources) == 0:
             if self.joinMeshes and self.pathType == "MESH":
@@ -102,10 +99,10 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
 
         if self.pathType == "MESH":
             if self.joinMeshes:
-                return Mesh.join(*getShortestPath(mesh, sources, LongList(), "MESH", "ALL", changeDirection))
+                return Mesh.join(*getShortestPath(mesh, sources, LongList(), "MESH", "TREE"))
             else:
-                return getShortestPath(mesh, sources, LongList(), "MESH", "ALL", changeDirection)
+                return getShortestPath(mesh, sources, LongList(), "MESH", "TREE")
         elif self.pathType == "SPLINE":
-            return getShortestPath(mesh, sources, LongList(), "SPLINE", "ALL", changeDirection)
+            return getShortestPath(mesh, sources, LongList(), "SPLINE", "TREE")
         elif self.pathType == "STROKE":
-            return getShortestPath(mesh, sources, LongList(), "STROKE", "ALL", changeDirection)
+            return getShortestPath(mesh, sources, LongList(), "STROKE", "TREE")

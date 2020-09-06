@@ -14,8 +14,7 @@ from ... math cimport distanceVec3
 
 # Dijkstra's algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) but is implemented
 # such a way to handle multi-sources and mesh with multiple islands.
-def getShortestPath(Mesh mesh, LongList sources, LongList destinies, str pathType, str mode,
-                    bint changeDirection = False):
+def getShortestPath(Mesh mesh, LongList sources, LongList targets, str pathType, str mode):
     cdef Vector3DList vertices = mesh.vertices
     cdef Py_ssize_t vertexCount = vertices.length
     cdef float maxWeight = 1000000
@@ -55,70 +54,63 @@ def getShortestPath(Mesh mesh, LongList sources, LongList destinies, str pathTyp
                         weights.data[linkedIndex] = weight
                         previousVertices.data[linkedIndex] = currentIndex
 
+    cdef LongList indices
+    cdef Py_ssize_t index, amount
     cdef Vector3DList sortLocations
     cdef list meshes, splines, strokes
-    cdef Py_ssize_t index, amount, destinyCount
 
-    if mode == "INDEX":
-        destinyCount = destinies.length
-    else:
-        destinyCount = vertexCount
+    if mode == "PATH":
+        indices = LongList()
+        index = targets.data[0]
+        if previousVertices.data[index] == -1: return indices
+        for j in range(vertexCount):
+            indices.append(index)
+            index = previousVertices.data[index]
+            if index == -1: break
+
+        return indices.reversed()
 
     if pathType == "MESH":
         meshes = []
-        for i in range(destinyCount):
+        for i in range(vertexCount):
             sortLocations = Vector3DList()
-            if mode == "INDEX":
-                index = destinies.data[i]
-            else:
-                index = i
+            index = i
             if previousVertices.data[index] == -1: continue
             for j in range(vertexCount):
                 sortLocations.append(vertices[index])
                 index = previousVertices.data[index]
                 if index == -1: break
 
-            if not changeDirection: sortLocations = sortLocations.reversed()
-            meshes.append(getLinesMesh(sortLocations, False))
+            meshes.append(getLinesMesh(sortLocations.reversed(), False))
 
-        if mode == "INDEX": return meshes, sortLocations
         return meshes
 
     elif pathType == "SPLINE":
         splines = []
-        for i in range(destinyCount):
+        for i in range(vertexCount):
             sortLocations = Vector3DList()
-            if mode == "INDEX":
-                index = destinies.data[i]
-            else:
-                index = i
+            index = i
             if previousVertices.data[index] == -1: continue
             for j in range(vertexCount):
                 sortLocations.append(vertices[index])
                 index = previousVertices.data[index]
                 if index == -1: break
 
-            if not changeDirection: sortLocations = sortLocations.reversed()
-            splines.append(PolySpline.__new__(PolySpline, sortLocations))
+            splines.append(PolySpline.__new__(PolySpline, sortLocations.reversed()))
 
-        if mode == "INDEX": return splines, sortLocations
         return splines
 
     elif pathType == "STROKE":
         strokes = []
-        for i in range(destinyCount):
+        for i in range(vertexCount):
             sortLocations = Vector3DList()
-            if mode == "INDEX":
-                index = destinies.data[i]
-            else:
-                index = i
+            index = i
             if previousVertices.data[index] == -1: continue
             for j in range(vertexCount):
                 sortLocations.append(vertices[index])
                 index = previousVertices.data[index]
                 if index == -1: break
 
-            if not changeDirection: sortLocations = sortLocations.reversed()
             amount = sortLocations.length
             strengths = FloatList(length = amount)
             pressures = FloatList(length = amount)
@@ -128,7 +120,7 @@ def getShortestPath(Mesh mesh, LongList sources, LongList destinies, str pathTyp
             pressures.fill(1)
             uvRotations.fill(0)
             vertexColors.fill((0, 0, 0, 0))
-            strokes.append(GPStroke(sortLocations, strengths, pressures, uvRotations, vertexColors, 10))
+            strokes.append(GPStroke(sortLocations.reversed(), strengths, pressures,
+                                    uvRotations, vertexColors, 10))
 
-        if mode == "INDEX": return strokes, sortLocations
         return strokes
