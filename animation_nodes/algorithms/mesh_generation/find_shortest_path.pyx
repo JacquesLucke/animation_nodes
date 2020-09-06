@@ -12,8 +12,10 @@ from ... data_structures cimport (
 from . line import getLinesMesh
 from ... math cimport distanceVec3
 
-# Dijkstra's algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) but is implemented such a way to handle multi-sources and mesh with multiple islands.
-def getShortestPath(Mesh mesh, LongList sources, str pathType, bint changeDirection = False):
+# Dijkstra's algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) but is implemented
+# such a way to handle multi-sources and mesh with multiple islands.
+def getShortestPath(Mesh mesh, LongList sources, LongList destinies, str pathType, str mode,
+                    bint changeDirection = False):
     cdef Vector3DList vertices = mesh.vertices
     cdef Py_ssize_t vertexCount = vertices.length
     cdef float maxWeight = 1000000
@@ -53,15 +55,23 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType, bint changeDirect
                         weights.data[linkedIndex] = weight
                         previousVertices.data[linkedIndex] = currentIndex
 
-    cdef Py_ssize_t index, amount
     cdef Vector3DList sortLocations
     cdef list meshes, splines, strokes
+    cdef Py_ssize_t index, amount, destinyCount
+
+    if mode == "INDEX":
+        destinyCount = destinies.length
+    else:
+        destinyCount = vertexCount
 
     if pathType == "MESH":
         meshes = []
-        for i in range(vertexCount):
+        for i in range(destinyCount):
             sortLocations = Vector3DList()
-            index = i
+            if mode == "INDEX":
+                index = destinies.data[i]
+            else:
+                index = i
             if previousVertices.data[index] == -1: continue
             for j in range(vertexCount):
                 sortLocations.append(vertices[index])
@@ -71,13 +81,17 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType, bint changeDirect
             if not changeDirection: sortLocations = sortLocations.reversed()
             meshes.append(getLinesMesh(sortLocations, False))
 
+        if mode == "INDEX": return meshes, sortLocations
         return meshes
 
     elif pathType == "SPLINE":
         splines = []
-        for i in range(vertexCount):
+        for i in range(destinyCount):
             sortLocations = Vector3DList()
-            index = i
+            if mode == "INDEX":
+                index = destinies.data[i]
+            else:
+                index = i
             if previousVertices.data[index] == -1: continue
             for j in range(vertexCount):
                 sortLocations.append(vertices[index])
@@ -87,13 +101,17 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType, bint changeDirect
             if not changeDirection: sortLocations = sortLocations.reversed()
             splines.append(PolySpline.__new__(PolySpline, sortLocations))
 
+        if mode == "INDEX": return splines, sortLocations
         return splines
 
     elif pathType == "STROKE":
         strokes = []
-        for i in range(vertexCount):
+        for i in range(destinyCount):
             sortLocations = Vector3DList()
-            index = i
+            if mode == "INDEX":
+                index = destinies.data[i]
+            else:
+                index = i
             if previousVertices.data[index] == -1: continue
             for j in range(vertexCount):
                 sortLocations.append(vertices[index])
@@ -112,4 +130,5 @@ def getShortestPath(Mesh mesh, LongList sources, str pathType, bint changeDirect
             vertexColors.fill((0, 0, 0, 0))
             strokes.append(GPStroke(sortLocations, strengths, pressures, uvRotations, vertexColors, 10))
 
+        if mode == "INDEX": return strokes, sortLocations
         return strokes
