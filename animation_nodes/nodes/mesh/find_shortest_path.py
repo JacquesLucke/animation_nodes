@@ -6,13 +6,13 @@ from ... algorithms.mesh_generation.find_shortest_path import getShortestPath
 
 modeItems = [
     ("PATH", "Path", "Find path from source vertex to other vertex", 0),
-    ("TREE", "Tree", "Find Paths from source vertex(ies) to other vertices", 1)
+    ("TREE", "Tree", "Find paths from source vertex(ies) to other vertices", 1)
 ]
 
 pathTypeItems = [
-    ("MESH", "Mesh", "Paths as line mesh(es)", 0),
-    ("SPLINE", "Spline", "Paths as poly splines", 1),
-    ("STROKE", "Stroke", "Paths as gp strokes", 2)
+    ("MESH", "Mesh", "Output paths as line mesh(es)", 0),
+    ("SPLINE", "Spline", "Output paths as poly splines", 1),
+    ("STROKE", "Stroke", "Output paths as gp strokes", 2)
 ]
 
 class FindShortestPathNode(bpy.types.Node, AnimationNode):
