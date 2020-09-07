@@ -100,3 +100,12 @@ def getAxisListOfQuaternionList(QuaternionList quaternions, str axis):
         for i in range(output.length):
             output.data[i] = quaternions.data[i].z
     return output
+
+def normalizeQuaternions(QuaternionList q):
+    cdef Py_ssize_t i
+    cdef Py_ssize_t count = len(q)
+
+    for i in range(count):
+        quaternionNormalize_InPlace(&q.data[i])
+
+    return q
