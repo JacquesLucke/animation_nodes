@@ -1,6 +1,5 @@
 import bpy
 import random
-import numpy as np
 from bpy.props import *
 from ... utils.math import cantorPair
 from ... events import propertyChanged
@@ -33,9 +32,10 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         if self.createList:
-            yield "randomQuaternions = self.randomQuaternions(seed + 24523 * self.nodeSeed, count)"
+            yield "randomQuaternions = self.randomQuaternions(seed, count)"
         else:
-            yield "randomQuaternion = Quaternion(algorithms.random.randomNumberTuple(seed + 24523 * self.nodeSeed, 4, math.pi))"
+            yield "seed_ = AN.utils.math.cantorPair(max(seed + self.nodeSeed*23456, 0), self.nodeSeed)"
+            yield "randomQuaternion = Quaternion(algorithms.random.randomNumberTuple(seed_, 4, math.pi))"
             yield "randomQuaternion.normalize()"
 
     def getUsedModules(self):
@@ -48,5 +48,5 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
         self.nodeSeed = int(random.random() * 100)
 
     def randomQuaternions(self, seed, count):
-        seed_ = cantorPair(int(max(seed, 0)), self.nodeSeed)
+        seed_ = cantorPair(max(seed, 0), self.nodeSeed)
         return randomQuaternionList(seed_, count)
