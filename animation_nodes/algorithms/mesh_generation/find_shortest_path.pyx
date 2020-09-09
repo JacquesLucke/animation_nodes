@@ -6,9 +6,11 @@ from ... data_structures cimport (
     FloatList,
     PolySpline,
     DoubleList,
+    BooleanList,
     Vector3DList,
 )
 
+from libc.math cimport INFINITY
 from . line import getLinesMesh
 from ... math cimport distanceVec3
 
@@ -16,52 +18,57 @@ from ... math cimport distanceVec3
 # such a way to handle multi-sources and mesh with multiple islands.
 def getShortestPath(Mesh mesh, LongList sources, LongList targets, str pathType, str mode):
     cdef Vector3DList vertices = mesh.vertices
-    cdef Py_ssize_t vertexCount = vertices.length
-    cdef float maxWeight = 1000000
-    cdef DoubleList weights = DoubleList.fromValue(maxWeight, length = vertexCount)
+    cdef long vertexCount = vertices.length
+    cdef float maxDistance = INFINITY
+    cdef DoubleList distances = DoubleList.fromValue(maxDistance, length = vertexCount)
     cdef LongList previousVertices = LongList.fromValue(-1, length = vertexCount)
-    cdef LongList visitedVertices = LongList.fromValue(0, length = vertexCount)
-    cdef Py_ssize_t i
+    cdef BooleanList visitedVertices = BooleanList.fromValue(False, length = vertexCount)
+    cdef Py_ssize_t i, targetIndex
 
     for i in range (sources.length):
-        weights.data[sources.data[i]] = 0.0
+        distances.data[sources.data[i]] = 0.0
 
-    cdef LongList linkedVertices
-    cdef float weight, minWeight
-    cdef Py_ssize_t k, l, linkedIndex, currentIndex
+    if mode == "PATH":
+        targetIndex = targets.data[0]
+    else:
+        targetIndex = <int>INFINITY
+
+    cdef float distance, minDistance
+    cdef Py_ssize_t k, l, currentIndex, neighboursStart, neighbourIndex
+    cdef LongList neighboursAmounts, neighboursStarts, neighbours
+    neighboursAmounts, neighboursStarts, neighbours = mesh.getLinkedVertices()[:3]
 
     for i in range(vertexCount):
 
-        minWeight = maxWeight
+        minDistance = maxDistance
         for k in range(vertexCount):
-            weight = weights.data[k]
-            if weight < minWeight and visitedVertices.data[k] == 0:
-                minWeight = weight
+            distance = distances.data[k]
+            if distance < minDistance and not visitedVertices.data[k]:
+                minDistance = distance
 
-        if minWeight == maxWeight:
+        if minDistance == maxDistance:
             break
 
         for currentIndex in range(vertexCount):
-            if abs(minWeight - weights.data[currentIndex]) < 1.0e-6:
-                visitedVertices.data[currentIndex] = 1
+            if abs(minDistance - distances.data[currentIndex]) < 1.0e-6:
+                visitedVertices.data[currentIndex] = True
 
-                linkedVertices = mesh.getVertexLinkedVertices(currentIndex)[0]
-
-                for l in range(linkedVertices.length):
-                    linkedIndex = linkedVertices.data[l]
-                    weight = distanceVec3(vertices.data + currentIndex, vertices.data + linkedIndex) + weights.data[currentIndex]
-                    if weight < weights.data[linkedIndex]:
-                        weights.data[linkedIndex] = weight
-                        previousVertices.data[linkedIndex] = currentIndex
+                neighboursStart = neighboursStarts.data[currentIndex]
+                for l in range(neighboursAmounts.data[currentIndex]):
+                    neighbourIndex = neighbours.data[neighboursStart + l]
+                    distance = (distanceVec3(vertices.data + currentIndex, vertices.data + neighbourIndex)
+                                + distances.data[currentIndex])
+                    if distance < distances.data[neighbourIndex]:
+                        distances.data[neighbourIndex] = distance
+                        previousVertices.data[neighbourIndex] = currentIndex
+                        if currentIndex == targetIndex: break
 
     cdef LongList indices
-    cdef Py_ssize_t index, amount
-    cdef Vector3DList sortLocations
-    cdef list meshes, splines, strokes
+    cdef Py_ssize_t index
 
     if mode == "PATH":
         indices = LongList()
-        index = targets.data[0]
+        index = targetIndex
         if previousVertices.data[index] == -1: return indices
         for j in range(vertexCount):
             indices.append(index)
@@ -70,57 +77,36 @@ def getShortestPath(Mesh mesh, LongList sources, LongList targets, str pathType,
 
         return indices.reversed()
 
+    cdef Vector3DList sortLocations
+    cdef list tree = []
+
+    for i in range(vertexCount):
+        sortLocations = Vector3DList()
+        index = i
+        if previousVertices.data[index] == -1: continue
+        for j in range(vertexCount):
+            sortLocations.append(vertices[index])
+            index = previousVertices.data[index]
+            if index == -1: break
+
+        tree.append(outputPath(pathType, sortLocations))
+
+    return tree
+
+def outputPath(str pathType, Vector3DList sortLocations):
+    cdef long amount
     if pathType == "MESH":
-        meshes = []
-        for i in range(vertexCount):
-            sortLocations = Vector3DList()
-            index = i
-            if previousVertices.data[index] == -1: continue
-            for j in range(vertexCount):
-                sortLocations.append(vertices[index])
-                index = previousVertices.data[index]
-                if index == -1: break
-
-            meshes.append(getLinesMesh(sortLocations.reversed(), False))
-
-        return meshes
-
+        return getLinesMesh(sortLocations.reversed(), False)
     elif pathType == "SPLINE":
-        splines = []
-        for i in range(vertexCount):
-            sortLocations = Vector3DList()
-            index = i
-            if previousVertices.data[index] == -1: continue
-            for j in range(vertexCount):
-                sortLocations.append(vertices[index])
-                index = previousVertices.data[index]
-                if index == -1: break
-
-            splines.append(PolySpline.__new__(PolySpline, sortLocations.reversed()))
-
-        return splines
-
+        return PolySpline.__new__(PolySpline, sortLocations.reversed())
     elif pathType == "STROKE":
-        strokes = []
-        for i in range(vertexCount):
-            sortLocations = Vector3DList()
-            index = i
-            if previousVertices.data[index] == -1: continue
-            for j in range(vertexCount):
-                sortLocations.append(vertices[index])
-                index = previousVertices.data[index]
-                if index == -1: break
-
-            amount = sortLocations.length
-            strengths = FloatList(length = amount)
-            pressures = FloatList(length = amount)
-            uvRotations = FloatList(length = amount)
-            vertexColors = ColorList(length = amount)
-            strengths.fill(1)
-            pressures.fill(1)
-            uvRotations.fill(0)
-            vertexColors.fill((0, 0, 0, 0))
-            strokes.append(GPStroke(sortLocations.reversed(), strengths, pressures,
-                                    uvRotations, vertexColors, 10))
-
-        return strokes
+        amount = sortLocations.length
+        strengths = FloatList(length = amount)
+        pressures = FloatList(length = amount)
+        uvRotations = FloatList(length = amount)
+        vertexColors = ColorList(length = amount)
+        strengths.fill(1)
+        pressures.fill(1)
+        uvRotations.fill(0)
+        vertexColors.fill((0, 0, 0, 0))
+        return GPStroke(sortLocations.reversed(), strengths, pressures, uvRotations, vertexColors, 10)

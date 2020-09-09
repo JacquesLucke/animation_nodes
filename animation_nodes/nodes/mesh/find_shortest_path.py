@@ -61,11 +61,11 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
 
     def getExecutionFunctionName(self):
         if self.mode == "PATH":
-            return "execute_Index"
+            return "execute_Path"
         else:
-            return "execute_All"
+            return "execute_Tree"
 
-    def execute_Index(self, mesh, source, target):
+    def execute_Path(self, mesh, source, target):
         if mesh is None:
             return LongList()
 
@@ -76,17 +76,9 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
 
         sources = LongList.fromValue(source)
         targets = LongList.fromValue(target)
-        if self.pathType == "MESH":
-            if self.joinMeshes:
-                return Mesh.join(*getShortestPath(mesh, sources, targets, "MESH", "PATH"))
-            else:
-                return getShortestPath(mesh, sources, targets, "MESH", "PATH")
-        elif self.pathType == "SPLINE":
-            return getShortestPath(mesh, sources, targets, "SPLINE", "PATH")
-        elif self.pathType == "STROKE":
-            return getShortestPath(mesh, sources, targets, "STROKE", "PATH")
+        return getShortestPath(mesh, sources, targets, self.pathType, "PATH")
 
-    def execute_All(self, mesh, sources):
+    def execute_Tree(self, mesh, sources):
         if not self.useSourceList: sources = LongList.fromValue(sources)
         if mesh is None or len(sources) == 0:
             if self.joinMeshes and self.pathType == "MESH":
@@ -97,12 +89,6 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
         if sources.getMinValue() < 0 or sources.getMaxValue() >= len(mesh.vertices):
             self.raiseErrorMessage("Some indices are out of range.")
 
-        if self.pathType == "MESH":
-            if self.joinMeshes:
-                return Mesh.join(*getShortestPath(mesh, sources, LongList(), "MESH", "TREE"))
-            else:
-                return getShortestPath(mesh, sources, LongList(), "MESH", "TREE")
-        elif self.pathType == "SPLINE":
-            return getShortestPath(mesh, sources, LongList(), "SPLINE", "TREE")
-        elif self.pathType == "STROKE":
-            return getShortestPath(mesh, sources, LongList(), "STROKE", "TREE")
+        if self.pathType == "MESH" and self.joinMeshes:
+            return Mesh.join(*getShortestPath(mesh, sources, LongList(), self.pathType, "TREE"))
+        return getShortestPath(mesh, sources, LongList(), self.pathType, "TREE")
