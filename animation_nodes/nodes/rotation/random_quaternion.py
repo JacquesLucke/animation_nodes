@@ -34,7 +34,7 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
         if self.createList:
             yield "randomQuaternions = self.randomQuaternions(seed, count)"
         else:
-            yield "seed_ = AN.utils.math.cantorPair(max(seed + self.nodeSeed*23456, 0), self.nodeSeed)"
+            yield "seed_ = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
             yield "randomQuaternion = Quaternion(algorithms.random.randomNumberTuple(seed_, 4, math.pi))"
             yield "randomQuaternion.normalize()"
 
