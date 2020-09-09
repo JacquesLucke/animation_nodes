@@ -115,10 +115,7 @@ def randomQuaternionList(int seed, int amount):
         y = rng.nextFloat()
         z = rng.nextFloat()
 
-        values[i].w = <float>w
-        values[i].x = <float>x
-        values[i].y = <float>y
-        values[i].z = <float>z
+        values[i] = Quaternion(w,x,y,z)
         
         quaternionNormalize_InPlace(values + i)
 
