@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from ... data_structures import Mesh, LongList, Vector3DList
+from ... data_structures import Mesh, LongList
 from ... base_types import AnimationNode, VectorizedSocket
 from ... algorithms.mesh_generation.find_shortest_path import getShortestPath
 
