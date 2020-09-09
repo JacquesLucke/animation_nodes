@@ -1,4 +1,4 @@
-from libc.math cimport M_PI as PI,sqrt
+from libc.math cimport M_PI as PI
 from ... math cimport quaternionNormalize_InPlace
 from ... algorithms.random_number_generators cimport XoShiRo256Plus
 
@@ -111,19 +111,15 @@ def randomQuaternionList(int seed, int amount):
     cdef Py_ssize_t i
     for i in range(amount):
         w = 1.0
-        x = rng.nextDouble()
-        y = rng.nextDouble()
-        z = rng.nextDouble()
-
-        length = sqrt(x * x + y * y + z * z + w * w)
-        w /= length
-        x /= length
-        y /= length
-        z /= length
+        x = rng.nextFloat()
+        y = rng.nextFloat()
+        z = rng.nextFloat()
 
         values[i].w = <float>w
         values[i].x = <float>x
         values[i].y = <float>y
         values[i].z = <float>z
+        
+        quaternionNormalize_InPlace(values + i)
 
     return result
