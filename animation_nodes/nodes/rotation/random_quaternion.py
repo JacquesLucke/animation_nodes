@@ -2,10 +2,10 @@ import bpy
 import random
 import numpy as np
 from bpy.props import *
+from ... utils.math import cantorPair
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures import QuaternionList
-from . c_utils import normalizeQuaternions
+from . c_utils import randomQuaternionList
 
 class RandomQuaternionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomQuaternionNode"
@@ -33,8 +33,7 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         if self.createList:
-            yield "randomQuaternions = self.randomQuaternionList(seed + 24523 * self.nodeSeed, count)"
-            yield "self.normalizeQuaternionList(randomQuaternions)"
+            yield "randomQuaternions = self.randomQuaternions(seed + 24523 * self.nodeSeed, count)"
         else:
             yield "randomQuaternion = Quaternion(algorithms.random.randomNumberTuple(seed + 24523 * self.nodeSeed, 4, math.pi))"
             yield "randomQuaternion.normalize()"
@@ -44,12 +43,10 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
 
     def duplicate(self, sourceNode):
         self.nodeSeed = int(random.random() * 100)
+        
+    def randomizeNodeSeed(self):
+        self.nodeSeed = int(random.random() * 100)
 
-    def randomQuaternionList(self, seed, count):
-        np.random.seed(seed)
-        qs_array = np.random.random_sample((count,4))
-
-        return QuaternionList.fromNumpyArray(qs_array.astype('f').flatten())
-
-    def normalizeQuaternionList(self,quaternions):
-        return normalizeQuaternions(quaternions)
+    def randomQuaternions(self, seed, count):
+        seed_ = cantorPair(int(max(seed, 0)), self.nodeSeed)
+        return randomQuaternionList(seed_, count)
