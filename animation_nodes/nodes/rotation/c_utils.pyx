@@ -104,19 +104,13 @@ def getAxisListOfQuaternionList(QuaternionList quaternions, str axis):
 
 def randomQuaternionList(int seed, int amount):
     cdef QuaternionList result = QuaternionList(length = amount)
-    cdef Quaternion *values = <Quaternion*>result.data
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
-    cdef double length
-    cdef double w, x, y, z
     cdef Py_ssize_t i
     for i in range(amount):
-        w = 1.0
-        x = rng.nextFloat()
-        y = rng.nextFloat()
-        z = rng.nextFloat()
-
-        values[i] = Quaternion(w,x,y,z)
-        
-        quaternionNormalize_InPlace(values + i)
+        result.data[i].w = 1.0
+        result.data[i].x = rng.nextFloat()
+        result.data[i].y = rng.nextFloat()
+        result.data[i].z = rng.nextFloat()
+        quaternionNormalize_InPlace(&result.data[i])
 
     return result
