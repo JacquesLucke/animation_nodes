@@ -7,7 +7,7 @@
 
 ### Fixed
 
-
+- Fixed nextBoolean method for XoShiRo256StarStar generators.
 
 ### Changed
 
