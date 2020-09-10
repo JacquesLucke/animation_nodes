@@ -1,9 +1,10 @@
-from libc.math cimport M_PI as PI
+from libc.math cimport M_PI as PI, sqrt, sin, cos
 from ... math cimport quaternionNormalize_InPlace
+from ... algorithms.random_number_generators cimport XoShiRo256Plus
 
 from ... data_structures cimport (
     Vector3DList, EulerList, DoubleList,
-    VirtualDoubleList, QuaternionList
+    VirtualDoubleList, Quaternion, QuaternionList
 )
 
 cdef float degreeToRadianFactor = <float>(PI / 180)
@@ -100,3 +101,23 @@ def getAxisListOfQuaternionList(QuaternionList quaternions, str axis):
         for i in range(output.length):
             output.data[i] = quaternions.data[i].z
     return output
+
+#base on the expression from http://planning.cs.uiuc.edu/node198.html
+def randomQuaternionList(int seed, int amount):
+    cdef QuaternionList result = QuaternionList(length = amount)
+    cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
+    cdef double u1, u2, u3, k1, k2
+    cdef Py_ssize_t i
+    for i in range(amount):
+        u1 = rng.nextFloat()
+        u2 = rng.nextFloat() * 2 * PI
+        u3 = rng.nextFloat() * 2 * PI
+        k1 = sqrt(1 - u1)
+        k2 = sqrt(u1)
+        result.data[i].w = k1 * sin(u2)
+        result.data[i].x = k1 * cos(u2)
+        result.data[i].y = k2 * sin(u3)
+        result.data[i].z = k2 * cos(u3)
+        quaternionNormalize_InPlace(result.data + i)
+
+    return result
