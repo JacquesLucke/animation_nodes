@@ -1,4 +1,4 @@
-from libc.math cimport M_PI as PI
+from libc.math cimport M_PI as PI, sqrt, sin, cos
 from ... math cimport quaternionNormalize_InPlace
 from ... algorithms.random_number_generators cimport XoShiRo256Plus
 
@@ -102,15 +102,21 @@ def getAxisListOfQuaternionList(QuaternionList quaternions, str axis):
             output.data[i] = quaternions.data[i].z
     return output
 
+#base on the expression from http://planning.cs.uiuc.edu/node198.html?
 def randomQuaternionList(int seed, int amount):
     cdef QuaternionList result = QuaternionList(length = amount)
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
+    cdef double u1,u2,u3
     cdef Py_ssize_t i
     for i in range(amount):
-        result.data[i].w = rng.nextFloatInRange(-1,1)
-        result.data[i].x = rng.nextFloatInRange(-1,1)
-        result.data[i].y = rng.nextFloatInRange(-1,1)
-        result.data[i].z = rng.nextFloatInRange(-1,1)
+        u1 = rng.nextFloat()
+        u2 = rng.nextFloat()
+        u3 = rng.nextFloat()
+        
+        result.data[i].w = sqrt(1-u1) * sin(2*PI*u2)
+        result.data[i].x = sqrt(1-u1) * cos(2*PI*u2)
+        result.data[i].y = sqrt(u1) * sin(2*PI*u3)
+        result.data[i].z = sqrt(u1) * cos(2*PI*u3)
         quaternionNormalize_InPlace(&result.data[i])
 
     return result
