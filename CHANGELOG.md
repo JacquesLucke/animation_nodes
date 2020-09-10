@@ -3,6 +3,7 @@
 ### Added
 
 - Added *Filter Material List By Name* node.
+- Added *Change GP Stroke Direction* node.
 - Added *Find Shortest Path* node.
 
 ### Fixed
