@@ -24,6 +24,7 @@ class RandomBooleanNode(bpy.types.Node, AnimationNode):
         else:
             self.newInput("Integer", "Seed", "seed")
             self.newOutput("Boolean", "Boolean", "boolean")
+        self.newInput("Float", "Probability", "probability", value = 0.5, minValue = 0, maxValue = 1, hide = True)
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -32,21 +33,20 @@ class RandomBooleanNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         if self.createList:
-            yield "booleans = self.execute_list(seed, count)"
+            yield "booleans = self.execute_list(seed, count, probability)"
         else:
-            yield "boolean = self.execute_single(seed)"
+            yield "boolean = self.execute_single(seed, probability)"
 
-    def execute_list(self, seed, count):
+    def execute_list(self, seed, count, probability):
         seed_ = cantorPair(max(seed, 0), self.nodeSeed)
 
-        return generateRandomBooleans(count, seed_)
+        return generateRandomBooleans(count, seed_, probability)
 
-    def execute_single(self, seed):
+    def execute_single(self, seed, probability):
         seed_ = cantorPair(max(seed, 0), self.nodeSeed)
         random.seed(seed_)
-        intnum = random.randint(0,1)
-
-        return bool(intnum)
+        
+        return random.random() < probability
 
     def duplicate(self, sourceNode):
         self.randomizeNodeSeed()
