@@ -5,7 +5,6 @@ from ... events import propertyChanged
 from ... utils.math import cantorPair
 from ... base_types import AnimationNode
 from . c_utils import generateRandomBooleans
-from ... algorithms.random import uniformRandomDoubleWithTwoSeeds
 
 class RandomBooleanNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomBooleanNode"
