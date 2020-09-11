@@ -35,5 +35,4 @@ def generateRandomBooleans(Py_ssize_t count, Py_ssize_t seed):
     cdef BooleanList bools = BooleanList(length = count)
     for i in range(count):
         bools.data[i] = rng.nextBoolean()
-
     return bools
