@@ -1,6 +1,7 @@
 ## Unreleased
 
 ### Added
+- Added *Random Boolean* node
 - Added create a list option to the *Random Quaternion* node
 - Added *Filter Material List By Name* node.
 
