@@ -48,7 +48,6 @@ class RandomColor(bpy.types.Node, AnimationNode):
         r = random.random()
         g = random.random()
         b = random.random()
-
         return Color((r, g, b, 1.0))
 
     def duplicate(self, sourceNode):
