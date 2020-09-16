@@ -1,4 +1,5 @@
 import cython
+from ... algorithms.random_number_generators cimport XoShiRo256Plus
 from ... math cimport (
     addColor_Inplace,
     scaleColor_Inplace,
