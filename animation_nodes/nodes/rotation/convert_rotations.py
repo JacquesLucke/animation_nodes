@@ -6,8 +6,8 @@ from ... data_structures import Matrix4x4List
 from .. matrix.c_utils import createRotationsFromEulers
 from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import (
-    quaternionsToEulers,eulersToQuaternions,
-    quaternionsToMatrices,axises_AnglesToQuaternions,
+    quaternionsToEulers, eulersToQuaternions,
+    quaternionsToMatrices, axises_AnglesToQuaternions,
     quaternionsToAxises_Angles
 )
 
