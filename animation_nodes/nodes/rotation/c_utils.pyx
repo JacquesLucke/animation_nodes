@@ -1,4 +1,5 @@
 from libc.math cimport M_PI as PI, sqrt, sin, cos
+from ... math cimport abs as absNumber
 from ... math cimport (asin_Save, acos_Save, atan2, copySign,
     quaternionNormalize_InPlace, normalizeVec3_InPlace
 )
