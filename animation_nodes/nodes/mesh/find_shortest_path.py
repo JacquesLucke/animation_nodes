@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... data_structures import Mesh, LongList
 from ... base_types import AnimationNode, VectorizedSocket
-from ... algorithms.mesh_generation.find_shortest_path import getShortestPathTree
+from ... algorithms.mesh_generation.find_shortest_path import getShortestPath, getShortestTree
 
 modeItems = [
     ("PATH", "Path", "Find path from source vertex to other vertex", 0),
@@ -75,7 +75,7 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Some indices are out of range.")
 
         sources = LongList.fromValue(source)
-        return getShortestPathTree(mesh, sources, target, self.pathType, "PATH")
+        return getShortestPath(mesh, sources, target)
 
     def execute_Tree(self, mesh, sources):
         if not self.useSourceList: sources = LongList.fromValue(sources)
@@ -89,5 +89,5 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Some indices are out of range.")
 
         if self.pathType == "MESH" and self.joinMeshes:
-            return Mesh.join(*getShortestPathTree(mesh, sources, -1, self.pathType, "TREE"))
-        return getShortestPathTree(mesh, sources, -1, self.pathType, "TREE")
+            return Mesh.join(*getShortestTree(mesh, sources, self.pathType))
+        return getShortestTree(mesh, sources, self.pathType)

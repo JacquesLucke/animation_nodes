@@ -16,28 +16,29 @@ from ... math cimport distanceVec3
 
 # Dijkstra's algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) but is implemented
 # such a way to handle multi-sources and mesh with multiple islands.
-def getShortestPathTree(Mesh mesh, LongList sources, Py_ssize_t target, str pathType, str mode):
-    cdef Vector3DList vertices = mesh.vertices
-    cdef long vertexCount = vertices.length
-    cdef LongList previousVertices = LongList(length = vertexCount)
-    previousVertices = computeShortestPathTree(mesh, sources, target)
-
+def getShortestPath(Mesh mesh, LongList sources, Py_ssize_t target):
+    cdef LongList previousVertices = computeShortestPathTree(mesh, sources, target)
     cdef LongList indices
     cdef Py_ssize_t index
 
-    if mode == "PATH":
-        indices = LongList()
-        index = target
-        if previousVertices.data[index] == -1: return indices
-        while index != -1:
-            indices.append(index)
-            index = previousVertices.data[index]
+    indices = LongList()
+    index = target
+    if previousVertices.data[index] == -1: return indices
+    while index != -1:
+        indices.append(index)
+        index = previousVertices.data[index]
 
-        return indices.reversed()
+    return indices.reversed()
+
+def getShortestTree(Mesh mesh, LongList sources, str pathType):
+    cdef Vector3DList vertices = mesh.vertices
+    cdef long vertexCount = vertices.length
+    cdef LongList previousVertices = LongList(length = vertexCount)
+    previousVertices = computeShortestPathTree(mesh, sources)
 
     cdef Vector3DList sortLocations
+    cdef Py_ssize_t i, index
     cdef list tree = []
-    cdef Py_ssize_t i
 
     for i in range(vertexCount):
         sortLocations = Vector3DList()
@@ -69,7 +70,7 @@ def constructPath(str pathType, Vector3DList sortLocations):
         vertexColors.fill((0, 0, 0, 0))
         return GPStroke(sortLocations.reversed(), strengths, pressures, uvRotations, vertexColors, 10)
 
-cdef LongList computeShortestPathTree(Mesh mesh, LongList sources, Py_ssize_t target):
+cdef LongList computeShortestPathTree(Mesh mesh, LongList sources, Py_ssize_t target = -1):
     cdef Vector3DList vertices = mesh.vertices
     cdef long vertexCount = vertices.length
     cdef float maxDistance = INFINITY
