@@ -7,7 +7,7 @@ from ... base_types import AnimationNode
 from . c_utils import generateRandomColors
 
 class RandomColor(bpy.types.Node, AnimationNode):
-    bl_idname = "an_RandomColor"
+    bl_idname = "an_RandomColorNode"
     bl_label = "Random Color"
 
     nodeSeed: IntProperty(name = "Node Seed", update = propertyChanged, min = 0)
