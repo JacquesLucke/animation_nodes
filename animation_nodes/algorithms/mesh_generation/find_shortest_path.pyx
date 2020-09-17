@@ -83,7 +83,7 @@ cdef LongList computeShortestPathTree(Mesh mesh, LongList sources, Py_ssize_t ta
 
     cdef float distance, minDistance
     cdef Py_ssize_t numberOfVisitedVertices = 0
-    cdef Py_ssize_t j, k, currentIndex, neighboursStart, neighbourIndex
+    cdef Py_ssize_t j, minDistanceIndex, neighboursStart, neighbourIndex
     cdef LongList neighboursAmounts, neighboursStarts, neighbours
     neighboursAmounts, neighboursStarts, neighbours = mesh.getLinkedVertices()[:3]
 
@@ -94,20 +94,19 @@ cdef LongList computeShortestPathTree(Mesh mesh, LongList sources, Py_ssize_t ta
             distance = distances.data[j]
             if distance < minDistance and not visitedVertices.data[j]:
                 minDistance = distance
+                minDistanceIndex = j
 
-        for currentIndex in range(vertexCount):
-            if abs(minDistance - distances.data[currentIndex]) < 1.0e-6:
-                numberOfVisitedVertices += 1
-                visitedVertices.data[currentIndex] = True
+        numberOfVisitedVertices += 1
+        visitedVertices.data[minDistanceIndex] = True
 
-                neighboursStart = neighboursStarts.data[currentIndex]
-                for k in range(neighboursAmounts.data[currentIndex]):
-                    neighbourIndex = neighbours.data[neighboursStart + k]
-                    distance = (distanceVec3(vertices.data + currentIndex, vertices.data + neighbourIndex)
-                                + distances.data[currentIndex])
-                    if distance < distances.data[neighbourIndex]:
-                        distances.data[neighbourIndex] = distance
-                        previousVertices.data[neighbourIndex] = currentIndex
-                        if currentIndex == target: break
+        neighboursStart = neighboursStarts.data[minDistanceIndex]
+        for j in range(neighboursAmounts.data[minDistanceIndex]):
+            neighbourIndex = neighbours.data[neighboursStart + j]
+            distance = (distanceVec3(vertices.data + minDistanceIndex, vertices.data + neighbourIndex)
+                        + distances.data[minDistanceIndex])
+            if distance < distances.data[neighbourIndex]:
+                distances.data[neighbourIndex] = distance
+                previousVertices.data[neighbourIndex] = minDistanceIndex
+                if minDistanceIndex == target: break
 
     return previousVertices
