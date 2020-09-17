@@ -1,3 +1,4 @@
+import cython
 from libc.math cimport M_PI as PI, sqrt, abs, sin, cos, asin, acos, atan2, copysign
 from ... math cimport quaternionNormalize_InPlace, normalizeVec3_InPlace
 from ... algorithms.random_number_generators cimport XoShiRo256Plus
