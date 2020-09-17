@@ -225,7 +225,7 @@ def axises_AnglesToQuaternions(Vector3DList a, DoubleList angles, bint usedegree
         if usedegree == False:
             angles.data[i] = angles.data[i]
         else:
-            angles.data[i] = angles.data[i] * (PI/180)
+            angles.data[i] = angles.data[i] * degreeToRadianFactor
         q.data[i].x = an.data[i].x * u1
         q.data[i].y = an.data[i].y * u1
         q.data[i].z = an.data[i].z * u1
@@ -248,7 +248,7 @@ def quaternionsToAxises_Angles(QuaternionList qs, bint usedegree=False):
         if usedegree == False:
             angles.data[i] = u
         else:
-            angles.data[i] = u * (180/PI)
+            angles.data[i] = u * radianToDegreeFactor
         a.data[i].x = q.data[i].x / k
         a.data[i].y = q.data[i].y / k
         a.data[i].z = q.data[i].z / k
@@ -264,3 +264,12 @@ def normalizeQuaternions(QuaternionList q):
         quaternionNormalize_InPlace(&q.data[i])
 
     return q
+
+def normalizeVectors(Vector3DList v):
+    cdef Py_ssize_t i
+    cdef Py_ssize_t count = len(v)
+
+    for i in range(count):
+        normalizeVec3_InPlace(&v.data[i])
+
+    return v
