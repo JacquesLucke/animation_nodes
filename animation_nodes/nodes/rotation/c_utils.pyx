@@ -181,6 +181,7 @@ def eulersToQuaternions(EulerList eulers):
 
     return q
 
+@cython.cdivision(True)
 def quaternionsToEulers(QuaternionList q):
     cdef Py_ssize_t i
     cdef int count = q.getLength()
