@@ -5,7 +5,7 @@ from ... math cimport (asin_Save, acos_Save, atan2, copySign,
 from ... algorithms.random_number_generators cimport XoShiRo256Plus
 
 from ... data_structures cimport (
-    Vector3DList, EulerList, DoubleList,
+    Vector3DList, EulerList, DoubleList, Matrix4x4List
     VirtualDoubleList, Quaternion, QuaternionList
 )
 
