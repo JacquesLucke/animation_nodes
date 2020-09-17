@@ -39,7 +39,7 @@ cdef class XoShiRo256StarStar:
         return <int>self.nextUInt64()
 
     cdef bint nextBoolean(self):
-        return self.nextUInt64() < <uint64_t>0
+        return self.nextUInt64() >> <uint64_t>63
 
     @cython.cdivision(True)
     cdef uint64_t nextUInt64WithMax(self, uint64_t maximum):

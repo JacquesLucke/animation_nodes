@@ -3,10 +3,13 @@
 ### Added
 - Added create a list option to the *Random Quaternion* node
 - Added *Filter Material List By Name* node.
+- Added *Change GP Stroke Direction* node.
+- Added create list option to the *Random Quaternion* node.
+- Added *Random Boolean* node.
 
 ### Fixed
 
-
+- Fixed nextBoolean method for XoShiRo256StarStar generators.
 
 ### Changed
 
