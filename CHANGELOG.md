@@ -6,6 +6,8 @@
 - Added *Change GP Stroke Direction* node.
 - Added create list option to the *Random Quaternion* node.
 - Added *Random Boolean* node.
+- Added *Random Color* node.
+- Vectorized  *Convert Rotation* node.
 
 ### Fixed
 
