@@ -11,6 +11,7 @@
 ### Fixed
 
 - Fixed nextBoolean method for XoShiRo256StarStar generators.
+- Fixed wrong order of seed and count inputs in *Random Color* node.
 
 ### Changed
 
