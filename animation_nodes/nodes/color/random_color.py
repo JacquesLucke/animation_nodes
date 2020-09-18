@@ -34,11 +34,11 @@ class RandomColor(bpy.types.Node, AnimationNode):
         row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
     def getExecutionCode(self, required):
-        yield "seed_ = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
+        yield "_seed = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
         if self.createList:
-            yield "colors = self.execute_colorList(seed_, count)"
+            yield "colors = self.execute_colorList(_seed, count)"
         else:
-            yield "color = self.execute_colorSingle(seed_)"
+            yield "color = self.execute_colorSingle(_seed)"
 
     def execute_colorList(self, seed, count):
         return generateRandomColors(seed, count)
