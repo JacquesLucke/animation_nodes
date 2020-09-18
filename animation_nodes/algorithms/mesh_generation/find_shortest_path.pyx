@@ -14,38 +14,32 @@ from libc.math cimport INFINITY
 from . line import getLinesMesh
 from ... math cimport distanceVec3
 
-# Dijkstra's algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) but is implemented
-# such a way to handle multi-sources and mesh with multiple islands.
 def getShortestPath(Mesh mesh, LongList sources, Py_ssize_t target):
     cdef LongList previousVertices = computeShortestPathTree(mesh, sources, target)
-    cdef LongList indices
+    cdef LongList indices = LongList()
     cdef Py_ssize_t index
 
-    indices = LongList()
     index = target
     if previousVertices.data[index] == -1: return indices
     while index != -1:
-        indices.append(index)
+        indices.append_LowLevel(index)
         index = previousVertices.data[index]
 
     return indices.reversed()
 
 def getShortestTree(Mesh mesh, LongList sources, str pathType):
+    cdef LongList previousVertices = computeShortestPathTree(mesh, sources)
     cdef Vector3DList vertices = mesh.vertices
-    cdef long vertexCount = vertices.length
-    cdef LongList previousVertices = LongList(length = vertexCount)
-    previousVertices = computeShortestPathTree(mesh, sources)
-
     cdef Vector3DList sortLocations
     cdef Py_ssize_t i, index
     cdef list tree = []
 
-    for i in range(vertexCount):
+    for i in range(vertices.length):
         sortLocations = Vector3DList()
         index = i
         if previousVertices.data[index] == -1: continue
         while index != -1:
-            sortLocations.append(vertices[index])
+            sortLocations.append_LowLevel(vertices.data[index])
             index = previousVertices.data[index]
 
         tree.append(constructPath(pathType, sortLocations))
@@ -67,9 +61,13 @@ def constructPath(str pathType, Vector3DList sortLocations):
         strengths.fill(1)
         pressures.fill(1)
         uvRotations.fill(0)
-        vertexColors.fill((0, 0, 0, 0))
+        vertexColors.fill(0)
         return GPStroke(sortLocations.reversed(), strengths, pressures, uvRotations, vertexColors, 10)
 
+# Dijkstra's algorithm (https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) but it is implemented
+# to handle multi-sources and mesh with multiple islands. For "target = -1", it calculates shortest
+# paths from all sources to all vertices or shortest path tree. When "target" is specified then it
+# calculates the shortest path from source to target or shortest path.
 cdef LongList computeShortestPathTree(Mesh mesh, LongList sources, Py_ssize_t target = -1):
     cdef Vector3DList vertices = mesh.vertices
     cdef long vertexCount = vertices.length

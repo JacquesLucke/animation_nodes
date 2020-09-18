@@ -55,9 +55,10 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
 
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
-        layout.prop(self, "pathType", text = "")
-        if self.pathType == "MESH":
-            layout.prop(self, "joinMeshes")
+        if self.mode == "TREE":
+            layout.prop(self, "pathType", text = "")
+            if self.pathType == "MESH":
+                layout.prop(self, "joinMeshes")
 
     def getExecutionFunctionName(self):
         if self.mode == "PATH":
@@ -70,9 +71,9 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
             return LongList()
 
         if source < 0 or source >= len(mesh.vertices):
-            self.raiseErrorMessage("Some indices are out of range.")
+            self.raiseErrorMessage(f"Source index is out of range '{str(source)}'")
         if target < 0 or target >= len(mesh.vertices):
-            self.raiseErrorMessage("Some indices are out of range.")
+            self.raiseErrorMessage(f"Target index is out of range '{str(target)}'")
 
         sources = LongList.fromValue(source)
         return getShortestPath(mesh, sources, target)
@@ -85,8 +86,12 @@ class FindShortestPathNode(bpy.types.Node, AnimationNode):
             else:
                 return []
 
-        if sources.getMinValue() < 0 or sources.getMaxValue() >= len(mesh.vertices):
-            self.raiseErrorMessage("Some indices are out of range.")
+        sourceMin = sources.getMinValue()
+        sourceMax = sources.getMaxValue()
+        if sourceMin < 0:
+            self.raiseErrorMessage(f"Source index is out of range '{str(sourceMin)}'")
+        if  sourceMax >= len(mesh.vertices):
+            self.raiseErrorMessage(f"Source index is out of range '{str(sourceMax)}'")
 
         if self.pathType == "MESH" and self.joinMeshes:
             return Mesh.join(*getShortestTree(mesh, sources, self.pathType))
