@@ -1,4 +1,5 @@
 import cython
+from ... algorithms.random_number_generators cimport XoShiRo256Plus
 from ... math cimport (
     addColor_Inplace,
     scaleColor_Inplace,
@@ -209,3 +210,16 @@ def offsetColors(ColorList colors, VirtualColorList offsets, FloatList influence
 
 cdef lerp(float x, float y, float p):
     return (1.0 - p) * x + p * y
+
+def generateRandomColors(Py_ssize_t count, Py_ssize_t seed):
+    cdef Py_ssize_t i
+    cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
+    cdef ColorList colors = ColorList(length = count)
+
+    for i in range(count):
+        colors.data[i].r = rng.nextFloat()
+        colors.data[i].g = rng.nextFloat()
+        colors.data[i].b = rng.nextFloat()
+        colors.data[i].a = 1.0
+
+    return colors
