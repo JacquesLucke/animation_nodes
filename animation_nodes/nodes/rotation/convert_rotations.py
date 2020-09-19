@@ -15,15 +15,15 @@ conversionTypeItems = [
     ("QUATERNION_TO_AXIS_ANGLE", "Quaternion to Axis Angle", "", "NONE", 6),
     ("AXIS_ANGLE_TO_QUATERNION", "Axis Angle to Quaternion", "", "NONE", 7) ]
 
-conversionListItems = [
-    ("QUATERNIONS_TO_EULERS", "Quaternions to Eulers", "", "NONE", 0),
-    ("EULERS_TO_QUATERNIONS", "Eulers to Quaternions", "", "NONE", 1),
-    ("QUATERNIONS_TO_MATRICES", "Quaternions to Matrices", "", "NONE", 2),
-    ("MATRICES_TO_QUATERNIONS", "Matrices to Quaternions", "", "NONE", 3),
-    ("EULERS_TO_MATRICES", "Eulers to Matrices", "", "NONE", 4),
-    ("MATRICES_TO_EULERS", "Matrices to Eulers", "", "NONE", 5),
-    ("QUATERNIONS_TO_AXISES_ANGLES", "Quaternions to Axises Angles", "", "NONE", 6),
-    ("AXISES_ANGLES_TO_QUATERNIONS", "Axises Angles to Quaternions", "", "NONE", 7) ]
+ListTypeItems = {
+    "QUATERNION_TO_EULER": "Quaternions to Eulers",
+    "EULER_TO_QUATERNION": "Eulers to Quaternions",
+    "QUATERNION_TO_MATRIX": "Quaternions to Matrices",
+    "MATRIX_TO_QUATERNION": "Matrices to Quaternions",
+    "EULER_TO_MATRIX": "Eulers to Matrices",
+    "MATRIX_TO_EULER": "Matrices to Eulers",
+    "QUATERNION_TO_AXIS_ANGLE": "Quaternions to Axises Angles",
+    "AXIS_ANGLE_TO_QUATERNION": "Axises Angles to Quaternions"}
 
 class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ConvertRotationsNode"
@@ -37,8 +37,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     conversionType: EnumProperty(name = "Conversion Type", default = "QUATERNION_TO_EULER",
         items = conversionTypeItems, update = AnimationNode.refresh)
         
-    listItems: EnumProperty(name = "List Items", default = "QUATERNIONS_TO_EULERS",
-        items_1 = conversionListItems, update = AnimationNode.refresh)
+    listTypeItems: StringProperty(default = "QUATERNION_TO_EULER", update = AnimationNode.refresh)
 
     useDegree: BoolProperty(name = "Use Degree", default = False, update = executionCodeChanged)
     useList: VectorizedSocket.newProperty()
@@ -102,7 +101,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
         for item in conversionTypeItems:
             if self.conversionType == item[0]:
                 if self.useList:
-                    return item_1[1]
+                    return listTypeItems[item[0]]
                 else:
                     return item[1]
 
