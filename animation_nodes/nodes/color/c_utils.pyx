@@ -211,7 +211,7 @@ def offsetColors(ColorList colors, VirtualColorList offsets, FloatList influence
 cdef lerp(float x, float y, float p):
     return (1.0 - p) * x + p * y
 
-def generateRandomColors(Py_ssize_t count, Py_ssize_t seed):
+def generateRandomColors(Py_ssize_t seed, Py_ssize_t count):
     cdef Py_ssize_t i
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef ColorList colors = ColorList(length = count)
