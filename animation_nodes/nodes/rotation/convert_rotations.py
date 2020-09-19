@@ -170,5 +170,3 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
 
     def matricesToEulers(self, matrices):
         return Matrix4x4List.toEulers(matrices)
-
-    
