@@ -17,31 +17,31 @@ class RandomColor(bpy.types.Node, AnimationNode):
         update = AnimationNode.refresh)
 
     def setup(self):
-        self.randomizeNodeSeed()    
+        self.randomizeNodeSeed()
 
     def create(self):
         if self.createList:
-            self.newInput("Integer", "Count", "count", value = 5, minValue = 0)
             self.newInput("Integer", "Seed", "seed")
+            self.newInput("Integer", "Count", "count", value = 5, minValue = 0)
             self.newOutput("Color List", "Colors", "colors")
         else:
             self.newInput("Integer", "Seed", "seed")
-            self.newOutput("Color", "Color", "color")  
+            self.newOutput("Color", "Color", "color")
 
     def draw(self, layout):
         row = layout.row(align = True)
         row.prop(self, "nodeSeed", text = "Node Seed")
-        row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON") 
+        row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
     def getExecutionCode(self, required):
-        yield "seed_ = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
+        yield "_seed = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
         if self.createList:
-            yield "colors = self.execute_colorList(count, seed_)"
+            yield "colors = self.execute_colorList(_seed, count)"
         else:
-            yield "color = self.execute_colorSingle(seed_)"
+            yield "color = self.execute_colorSingle(_seed)"
 
-    def execute_colorList(self, count, seed):
-        return generateRandomColors(count, seed)
+    def execute_colorList(self, seed, count):
+        return generateRandomColors(seed, count)
 
     def execute_colorSingle(self, seed):
         random.seed(seed)
@@ -54,5 +54,4 @@ class RandomColor(bpy.types.Node, AnimationNode):
         self.randomizeNodeSeed()
 
     def randomizeNodeSeed(self):
-        self.nodeSeed = int(random.random() * 100)       
-        
+        self.nodeSeed = int(random.random() * 100)
