@@ -16,9 +16,9 @@ from . c_utils import (
 )
 
 pivotSourceItems = [
-    ("DEFAULT", "Default", "Use the center as pivot and guess some tangent and bitangent.", "NONE", 0),
-    ("CUSTOM_POINTS", "Custom Points", "Provide custom pivots for every polygon. Tangent and bitangent are guessed.", "NONE", 1),
-    ("CUSTOM_MATRICES", "Custom Matrices", "Provide a transformation matrix for each polygon that represents it. The rotation part of the matrices has to be orthogonal.", "NONE", 2)
+    ("DEFAULT", "Default", "Use the center as pivot and guess some tangent and bitangent", "NONE", 0),
+    ("CUSTOM_POINTS", "Custom Points", "Provide custom pivots for every polygon. Tangent and bitangent are guessed", "NONE", 1),
+    ("CUSTOM_MATRICES", "Custom Matrices", "Provide a transformation matrix for each polygon that represents it. The rotation part of the matrices has to be orthogonal", "NONE", 2)
 ]
 
 class OffsetPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):

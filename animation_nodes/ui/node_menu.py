@@ -85,7 +85,7 @@ class NumberMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_FloatMathNode", "Math")
         insertNode(layout, "an_NumberListMathNode", "List Math")
-        insertNode(layout, "an_SortNode", "Sort")
+        insertNode(layout, "an_SortNumbersNode", "Sort Numbers")
         insertNode(layout, "an_FloatClampNode", "Clamp")
         insertNode(layout, "an_RoundNumberNode", "Round")
         insertNode(layout, "an_ConvertAngleNode", "Convert Angle")
@@ -171,6 +171,7 @@ class MatrixMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_ShearMatrixNode", "Shear")
         insertNode(layout, "an_AxisRotationMatrixNode", "Axis Rotation")
+        insertNode(layout, "an_ExtractMatrixBasisNode", "Extract Matrix Basis")
         layout.separator()
         insertNode(layout, "an_MatrixMathNode", "Math")
         insertNode(layout, "an_MatrixCombineNode", "Combine")
@@ -200,6 +201,7 @@ class TextMenu(bpy.types.Menu):
         insertNode(layout, "an_TextLengthNode", "Length")
         layout.separator()
         insertNode(layout, "an_LSystemNode", "LSystem")
+        insertNode(layout, "an_DecomposeTextNode", "Decompose Text")
         layout.separator()
         insertNode(layout, "an_TextBlockReaderNode", "Block Reader")
         insertNode(layout, "an_TextBlockWriterNode", "Block Writer")
@@ -223,6 +225,7 @@ class BooleanMenu(bpy.types.Menu):
         insertNode(layout, "an_SwitchNode", "Switch")
         insertNode(layout, "an_LogicOperatorsNode", "Logic")
         insertNode(layout, "an_BooleanListLogicNode", "List Logic")
+        insertNode(layout, "an_RandomBooleanNode", "Random Boolean")
 
 class ColorMenu(bpy.types.Menu):
     bl_idname = "AN_MT_color_menu"
@@ -234,6 +237,7 @@ class ColorMenu(bpy.types.Menu):
         insertNode(layout, "an_CombineColorNode", "Combine Color")
         insertNode(layout, "an_SeparateColorNode", "Separate Color")
         insertNode(layout, "an_MixDataNode", "Mix", {"dataType" : repr("Color")})
+        insertNode(layout, "an_RandomColorNode", "Random Color")
         layout.separator()
         insertNode(layout, "an_SetVertexColorNode", "Set Vertex Color")
 
@@ -246,6 +250,7 @@ class ListMenu(bpy.types.Menu):
         layout.menu("AN_MT_create_list_menu", text = "Create")
         layout.menu("AN_MT_combine_list_menu", text = "Combine")
         insertNode(layout, "an_AppendListNode", "Append")
+        insertNode(layout, "an_InsertListElementNode", "Insert")
         layout.separator()
         insertNode(layout, "an_GetListElementNode", "Get Element")
         insertNode(layout, "an_GetRandomListElementsNode", "Get Random Elements")
@@ -263,6 +268,7 @@ class ListMenu(bpy.types.Menu):
         layout.separator()
         insertNode(layout, "an_FillListNode", "Fill")
         insertNode(layout, "an_RepeatListNode", "Repeat")
+        insertNode(layout, "an_RepeatListElementsNode", "Repeat Elements")
         insertNode(layout, "an_RandomListNode", "Random")
         insertNode(layout, "an_ListBooleanOperationsNode", "List Boolean Operations")
         layout.separator()
@@ -427,6 +433,23 @@ class MeshDataMenu(bpy.types.Menu):
         insertNode(layout, "an_SetUVMapNode", "Set UV Map")
         insertNode(layout, "an_SetPolygonMaterialIndexNode", "Set Polygon Material Index")
 
+
+regularPolygons = [
+    ("Regular Pentagon", 5),
+    ("Regular Hexagon", 6),
+    ("Regular Heptagon", 7),
+    ("Regular Octagon", 8),
+]
+
+class RegularPolygonMeshGeneratorsMenu(bpy.types.Menu):
+    bl_idname = "AN_MT_regular_polygon_mesh_generators_menu"
+    bl_label = "Regular Polygon Mesh Generators Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        for name, n in regularPolygons:
+            insertNode(layout, "an_CircleMeshNode", name, {'inputs["Radial Loops"].value' : repr(n)})
+
 class MeshGeneratorsMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_generators_menu"
     bl_label = "Mesh Generators Menu"
@@ -438,6 +461,7 @@ class MeshGeneratorsMenu(bpy.types.Menu):
         insertNode(layout, "an_CircleMeshNode", "Circle")
         insertNode(layout, "an_CylinderMeshNode", "Cylinder")
         insertNode(layout, "an_UnityTriangleMeshNode", "Unity Triangle")
+        layout.menu("AN_MT_regular_polygon_mesh_generators_menu", text = "Regular Polygons")
 
 class MeshOperatorsMenu(bpy.types.Menu):
     bl_idname = "AN_MT_mesh_operators_menu"
@@ -446,6 +470,7 @@ class MeshOperatorsMenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         insertNode(layout, "an_FindClosePointsNode", "Find Close Points")
+        insertNode(layout, "an_FindShortestPathNode", "Find Shortest Path")
         insertNode(layout, "an_EdgeToTubeNode", "Edge to Tube")
         insertNode(layout, "an_MeshPointsScatterNode", "Scatter Points")
         layout.separator()
@@ -523,7 +548,8 @@ class GPencilMenu(bpy.types.Menu):
         insertNode(layout, "an_SetGPStrokeAttributesNode", "Set Stroke Attributes")
         insertNode(layout, "an_ReplicateGPStrokeNode", "Replicate Stroke")
         insertNode(layout, "an_TransformGPStrokeNode", "Transform Stroke")
-        insertNode(layout, "an_OffsetGPStrokeNode", "Offset GP Stroke")
+        insertNode(layout, "an_OffsetGPStrokeNode", "Offset Stroke")
+        insertNode(layout, "an_ChangeGPStrokeDirectionNode", "Change Stroke Direction")
         layout.separator()
         insertNode(layout, "an_GPStrokeFromPointsNode", "Stroke From Points")
         insertNode(layout, "an_GPStrokeFromSplineNode", "Stroke From Spline")
@@ -596,12 +622,14 @@ class FalloffMenu(bpy.types.Menu):
         insertNode(layout, "an_ObjectControllerFalloffNode", "Object Controller")
         insertNode(layout, "an_SoundFalloffNode", "Sound")
         insertNode(layout, "an_SplineFalloffNode", "Spline")
+        insertNode(layout, "an_MeshFalloffNode", "Mesh Falloff")
         layout.separator()
         insertNode(layout, "an_ConstantFalloffNode", "Constant")
         insertNode(layout, "an_CustomFalloffNode", "Custom")
         layout.separator()
         insertNode(layout, "an_DirectionalFalloffNode", "Directional")
         insertNode(layout, "an_PointDistanceFalloffNode", "Point Distance")
+        insertNode(layout, "an_RadialFalloffNode", "Radial")
         layout.separator()
         insertNode(layout, "an_InterpolateFalloffNode", "Interpolate")
         insertNode(layout, "an_RemapFalloffNode", "Remap")

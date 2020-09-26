@@ -26,7 +26,7 @@ sourceTypeItems = [
 ]
 
 extractionTypeItems = [
-    ("DEFAULT", "Default", "Use polygon center and first edge as basis.", "NONE", 0),
+    ("DEFAULT", "Default", "Use polygon center and first edge as basis", "NONE", 0),
     ("EDGE", "Edge", "Use one of the edges as basis", "NONE", 1)
 ]
 

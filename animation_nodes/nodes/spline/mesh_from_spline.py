@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import *
-from ... data_structures import Mesh
 from ... base_types import AnimationNode
 from . c_utils import getMatricesAlongSpline
+from ... data_structures import Mesh, LongList
 from .. mesh.c_utils import getReplicatedVertices
 from . spline_evaluation_base import SplineEvaluationBase
 from ... algorithms.mesh_generation.circle import getPointsOnCircle
@@ -86,4 +86,7 @@ class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
                 allEdges.append((0, len(shape) - 1))
                 allEdges.append(((amount - 1) * len(shape), amount * len(shape) - 1))
 
-        return Mesh(allVertices, allEdges, allPolygons, skipValidation = True)
+        materialIndices = LongList(length = len(allPolygons))
+        materialIndices.fill(0)
+
+        return Mesh(allVertices, allEdges, allPolygons, materialIndices, skipValidation = True)

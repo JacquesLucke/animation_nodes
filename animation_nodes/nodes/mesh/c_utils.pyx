@@ -24,7 +24,8 @@ from ... math cimport (
     Vector3, Matrix4, toVector3, distanceSquaredVec3,
     scaleVec3, subVec3, crossVec3, distanceVec3, lengthVec3, dotVec3,
     transformVec3AsPoint_InPlace, normalizeVec3_InPlace, scaleVec3_Inplace,
-    normalizeLengthVec3_Inplace, transformVec3AsPoint, transformVec3AsDirection
+    normalizeLengthVec3_Inplace, transformVec3AsPoint, transformVec3AsDirection,
+    matrixFromNormalizedAxisData,
 )
 
 # Edge Operations
@@ -221,7 +222,9 @@ def getIndividualPolygonsMesh(Mesh mesh):
 
     newLoopEdges = getIndividualPolygons_LoopEdges(mesh.polygons)
 
-    newMesh = Mesh(newVertices, newEdges, newPolygons, skipValidation = True)
+    materialIndices = LongList(length = len(newPolygons))
+    materialIndices.fill(0)
+    newMesh = Mesh(newVertices, newEdges, newPolygons, materialIndices, skipValidation = True)
     newMesh.setLoopEdges(newLoopEdges)
 
     newMesh.copyMeshProperties(mesh)
@@ -407,7 +410,7 @@ def matricesFromNormalizedAxisData(Vector3DList origins, Vector3DList xDirection
     cdef Matrix4x4List matrices = Matrix4x4List(length = origins.length)
     cdef Py_ssize_t i
     for i in range(matrices.length):
-        createMatrix(matrices.data + i, origins.data + i,
+        matrixFromNormalizedAxisData(matrices.data + i, origins.data + i,
             xDirections.data + i, yDirections.data + i, zDirections.data + i)
     return matrices
 
@@ -448,7 +451,7 @@ def extractPolygonTransforms(Vector3DList vertices, PolygonIndicesList polygons,
         scaleVec3_Inplace(&bitangent, -1)
 
         if calcNormal:
-            createMatrix(transforms.data + i, &center, &normal, &tangent, &bitangent)
+            matrixFromNormalizedAxisData(transforms.data + i, &center, &normal, &tangent, &bitangent)
         if calcInverted:
             createInvertedMatrix(invertedTransforms.data + i, &center, &normal, &tangent, &bitangent)
 
@@ -483,13 +486,6 @@ cdef inline void extractPolygonData(Vector3 *vertices,
 
     # Tangent
     tangent[0] = a
-
-cdef inline void createMatrix(Matrix4 *m, Vector3 *center, Vector3 *tangent,
-                              Vector3 *bitangent, Vector3 *normal):
-    m.a11, m.a12, m.a13, m.a14 = tangent.x, bitangent.x, normal.x, center.x
-    m.a21, m.a22, m.a23, m.a24 = tangent.y, bitangent.y, normal.y, center.y
-    m.a31, m.a32, m.a33, m.a34 = tangent.z, bitangent.z, normal.z, center.z
-    m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
 
 cdef inline void createInvertedMatrix(Matrix4 *m, Vector3 *center, Vector3 *tangent,
                                       Vector3 *bitangent, Vector3 *normal):
@@ -564,7 +560,9 @@ def replicateMesh(Mesh source, transformations):
     newPolygonNormals = getReplicatedNormals(source.getPolygonNormals(), transformations)
     newLoopEdges = getReplicatedLoopEdges(source.getLoopEdges(), len(transformations), edgeAmount)
 
-    mesh = Mesh(newVertices, newEdges, newPolygons, skipValidation = True)
+    materialIndices = source.materialIndices.repeated(amount = len(transformations))
+
+    mesh = Mesh(newVertices, newEdges, newPolygons, materialIndices, skipValidation = True)
     mesh.setVertexNormals(newVertexNormals)
     mesh.setPolygonNormals(newPolygonNormals)
     mesh.setLoopEdges(newLoopEdges)

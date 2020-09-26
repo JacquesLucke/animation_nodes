@@ -140,6 +140,11 @@ cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b):
     result.y = a.z * b.x - a.x * b.z
     result.z = a.x * b.y - a.y * b.x
 
+cdef float scalarTripleProduct(Vector3 *a, Vector3 *b, Vector3 *c):
+    cdef Vector3 crossProduct
+    crossVec3(&crossProduct, b, c)
+    return dotVec3(a, &crossProduct)
+
 @cython.cdivision(True)
 cdef void projectVec3(Vector3* result, Vector3* a, Vector3* b):
     # https://en.wikipedia.org/wiki/Vector_projection#Vector_projection_2

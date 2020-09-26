@@ -2,6 +2,73 @@
 
 ### Added
 
+- Added *Filter Material List By Name* node.
+- Added *Change GP Stroke Direction* node.
+- Added create list option to the *Random Quaternion* node.
+- Added *Random Boolean* node.
+- Added *Random Color* node.
+- Added *Find Shortest Path* node.
+
+### Fixed
+
+- Fixed nextBoolean method for XoShiRo256StarStar generators.
+
+### Changed
+
+
+
+## 2.2.0 (01 September 2020)
+
+### Added
+
+- Added an option to hide subprogram sockets by default.
+- Added default values for Script subprogram inputs.
+- Added subtract method to the *Mix Falloff* node.
+- Added order weight option for Viewport Input node.
+- Added regular polygons mesh generators menu and search entries.
+- Added curve dimensions option to the Separate Text node.
+- Added matrices output in *Mesh Points Scatter* node.
+- Added edges mode in *Mesh Points Scatter* node.
+- Added *Vertex Color Fill* attribute to GP strokes.
+- Added *Radial Falloff* node.
+- Added *Radial* mode to *Object Controller Falloff* node.
+- Added *Create Trigger* operator to *Object Controller Falloff* node.
+- Added *Extract Matrix Basis* node.
+- Added *Normals* output in *Mesh Points Scatter* node.
+- Added Interpolation input to *Remap Falloff* node.
+- Added *Decompose Text* node to menu.
+- Added *Repeat List Elements* node.
+- Added Material Indices to Mesh structure.
+- Added Material Indices output to *Bmesh Mesh Data* node.
+- Added Material Indices input to *Combine Mesh* node.
+- Added implicit conversion from Polygon Indices List to Integer List.
+- Added *Insert List Element* node.
+- Added option to remove Channel in *Wiggle Action* node.
+- Added Curvature output to Evaluate Spline node.
+- Added Interpolation input to *Float Range* node.
+- Added *Mesh Falloff* node.
+- Added Object property to BVH Tree socket.
+
+### Fixed
+
+- Fixed the *Make ELement Copies* option in the *Repeat List* node.
+- Fixed the *Map Range* node when the input max is less than input min.
+- Fixed Sound nodes when scene fps base is not one.
+
+### Changed
+
+- Removed Material Indices input from *Mesh Object Output* node.
+- Vectorized *Separate Color* node.
+- Vectorized *Separate Quaternion* node.
+- Vectorized *Combine Quaternion* node.
+- Replaced the inputs of the mesh *Construct BVH Tree* node with a mesh.
+
+# 2.1
+
+## 2.1.8 (08 August 2020)
+
+### Added
+
 - Added GP Stroke From Spline node.
 - Added Spline From GP Stroke node.
 - Added Offset GP Stroke node.
@@ -42,6 +109,7 @@
 - Fixed *Object Action Output* node when action contain bad channels.
 - Fixed *Mesh From Spline* node when *Closed Shape* and *Cap Ends* are enabled.
 - Fixed wrong sign in scale for matrix list in *Decomposed Matrix* node.
+- Fixed bad link conversions between Object and Shape Key sockets.
 
 ### Changed
 
@@ -51,6 +119,7 @@
 - Migrate CI/CD pipeline to Github Workflows.
 - Moved Problems panel to UI region.
 - Add CI/CD build for Python 3.8 on Linux.
+- Rename the *Sort* node as *Sort Numbers* node.
 
 ## 2.1.7 (22 February 2020)
 

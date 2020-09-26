@@ -1,8 +1,10 @@
-from libc.math cimport M_PI as PI
+from libc.math cimport M_PI as PI, sqrt, sin, cos
+from ... math cimport quaternionNormalize_InPlace
+from ... algorithms.random_number_generators cimport XoShiRo256Plus
 
 from ... data_structures cimport (
     Vector3DList, EulerList, DoubleList,
-    VirtualDoubleList
+    VirtualDoubleList, Quaternion, QuaternionList
 )
 
 cdef float degreeToRadianFactor = <float>(PI / 180)
@@ -68,3 +70,54 @@ def getAxisListOfEulerList(EulerList eulers, str axis, bint useDegree):
         for i in range(output.length):
             output.data[i] = eulers.data[i].z * factor
     return output
+
+def combineQuaternionList(Py_ssize_t amount,
+                          VirtualDoubleList w, VirtualDoubleList x,
+                          VirtualDoubleList y, VirtualDoubleList z):
+    cdef QuaternionList output = QuaternionList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        output.data[i].w = <float>w.get(i)
+        output.data[i].x = <float>x.get(i)
+        output.data[i].y = <float>y.get(i)
+        output.data[i].z = <float>z.get(i)
+        quaternionNormalize_InPlace(&output.data[i])
+    return output
+
+def getAxisListOfQuaternionList(QuaternionList quaternions, str axis):
+    assert axis in "wxyz"
+    cdef DoubleList output = DoubleList(length = quaternions.length)
+    cdef Py_ssize_t i
+    if axis == "w":
+        for i in range(output.length):
+            output.data[i] = quaternions.data[i].w
+    elif axis == "x":
+        for i in range(output.length):
+            output.data[i] = quaternions.data[i].x
+    elif axis == "y":
+        for i in range(output.length):
+            output.data[i] = quaternions.data[i].y
+    elif axis == "z":
+        for i in range(output.length):
+            output.data[i] = quaternions.data[i].z
+    return output
+
+#base on the expression from http://planning.cs.uiuc.edu/node198.html
+def randomQuaternionList(int seed, int amount):
+    cdef QuaternionList result = QuaternionList(length = amount)
+    cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
+    cdef double u1, u2, u3, k1, k2
+    cdef Py_ssize_t i
+    for i in range(amount):
+        u1 = rng.nextFloat()
+        u2 = rng.nextFloat() * 2 * PI
+        u3 = rng.nextFloat() * 2 * PI
+        k1 = sqrt(1 - u1)
+        k2 = sqrt(u1)
+        result.data[i].w = k1 * sin(u2)
+        result.data[i].x = k1 * cos(u2)
+        result.data[i].y = k2 * sin(u3)
+        result.data[i].z = k2 * cos(u3)
+        quaternionNormalize_InPlace(result.data + i)
+
+    return result

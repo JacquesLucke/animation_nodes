@@ -19,8 +19,7 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         if self.sourceType == "MESH_DATA":
-            self.newInput("Vector List", "Vector List", "vectorList")
-            self.newInput("Polygon Indices List", "Polygon Indices", "polygonsIndices")
+            self.newInput("Mesh", "Mesh", "mesh")
         elif self.sourceType == "BMESH":
             self.newInput("BMesh", "BMesh", "bm")
         elif self.sourceType == "OBJECT":
@@ -40,12 +39,11 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
         elif self.sourceType == "OBJECT":
             return "execute_Object"
 
-    def execute_Mesh(self, vectorList, polygonsIndices, epsilon):
-        if len(polygonsIndices) == 0:
+    def execute_Mesh(self, mesh, epsilon):
+        if len(mesh.polygons) == 0:
             return self.getFallbackBVHTree()
 
-        if 0 <= polygonsIndices.getMinIndex() <= polygonsIndices.getMaxIndex() < len(vectorList):
-            return BVHTree.FromPolygons(vectorList, polygonsIndices, epsilon = max(epsilon, 0))
+        return BVHTree.FromPolygons(mesh.vertices, mesh.polygons, epsilon = max(epsilon, 0))
 
     def execute_BMesh(self, bm, epsilon):
         return BVHTree.FromBMesh(bm, epsilon = max(epsilon, 0))
@@ -58,10 +56,13 @@ class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
 
         evaluatedObject = getEvaluatedID(object)
         mesh = evaluatedObject.data
+        polygons = mesh.an.getPolygonIndices()
+        if len(polygons) == 0:
+            return self.getFallbackBVHTree()
         vertices = mesh.an.getVertices()
         vertices.transform(evaluatedObject.matrix_world)
-        polygons = mesh.an.getPolygonIndices()
-        return self.execute_Mesh(vertices, polygons, epsilon)
+
+        return BVHTree.FromPolygons(vertices, polygons, epsilon = max(epsilon, 0))
 
     def getFallbackBVHTree(self):
         return self.outputs[0].getDefaultValue()

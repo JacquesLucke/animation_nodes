@@ -4,8 +4,8 @@ from libc.string cimport memcpy
 from numpy.polynomial import Polynomial
 from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (
-    subVec3, normalizeVec3_InPlace, lengthVec3,
-    toPyVector3, mixVec3, isCloseVec3
+    subVec3, normalizeVec3_InPlace, lengthVec3, crossVec3,
+    toPyVector3, mixVec3, isCloseVec3, lengthSquaredVec3,
 )
 
 from mathutils import Vector
@@ -187,6 +187,12 @@ cdef class BezierSpline(Spline):
         cdef Vector3* w[4]
         getSegmentData_Parameter(self, parameter, &t, w)
         evaluateBezierSegment_Tangent(result, t, w)
+
+    cdef float evaluateCurvature_LowLevel(self, float parameter):
+        cdef float t
+        cdef Vector3* w[4]
+        getSegmentData_Parameter(self, parameter, &t, w)
+        return evaluateBezierSegment_Curvature(t, w)
 
     cdef float evaluateRadius_LowLevel(self, float parameter):
         cdef long indices[2]
@@ -482,3 +488,20 @@ cdef inline void evaluateBezierSegment_Tangent(Vector3 *result, float t, Vector3
     result.x = w[0].x*coeff0 + w[1].x*coeff1 + w[2].x*coeff2 + w[3].x*coeff3
     result.y = w[0].y*coeff0 + w[1].y*coeff1 + w[2].y*coeff2 + w[3].y*coeff3
     result.z = w[0].z*coeff0 + w[1].z*coeff1 + w[2].z*coeff2 + w[3].z*coeff3
+
+cdef inline void evaluateBezierSegment_Normal(Vector3 *result, float t, Vector3 **w):
+    result.x = 6 * (1 - t) * (w[2].x - 2 * w[1].x + w[0].x) + 6 * t * (w[3].x - 2 * w[2].x + w[1].x)
+    result.y = 6 * (1 - t) * (w[2].y - 2 * w[1].y + w[0].y) + 6 * t * (w[3].y - 2 * w[2].y + w[1].y)
+    result.z = 6 * (1 - t) * (w[2].z - 2 * w[1].z + w[0].z) + 6 * t * (w[3].z - 2 * w[2].z + w[1].z)
+
+@cython.cdivision(True)
+cdef inline float evaluateBezierSegment_Curvature(float t, Vector3 **w):
+    cdef Vector3 tangent
+    evaluateBezierSegment_Tangent(&tangent, t, w)
+    cdef Vector3 normal
+    evaluateBezierSegment_Normal(&normal, t, w)
+    cdef Vector3 cross
+    crossVec3(&cross, &tangent, &normal)
+    cdef float crossLength = lengthVec3(&cross)
+    cdef float tangentLengthSquared = lengthSquaredVec3(&tangent)
+    return crossLength / (tangentLengthSquared ** 1.5)

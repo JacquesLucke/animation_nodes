@@ -47,3 +47,12 @@ cdef void quatFromAxisAngle(Quaternion *q, Vector3 *axis, float angle):
     q.y = axis.y * factor
     q.z = axis.z * factor
     q.w = cq
+
+@cython.cdivision(True)
+cdef void quaternionNormalize_InPlace(Quaternion *q):
+    cdef float length = sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z)
+    if length != 0:
+        q.w /= length
+        q.x /= length
+        q.y /= length
+        q.z /= length

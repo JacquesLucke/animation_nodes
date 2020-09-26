@@ -13,6 +13,7 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Vertex Normals", "vertexNormals")
         self.newOutput("Vector List", "Polygon Normals", "polygonNormals")
         self.newOutput("Vector List", "Polygon Centers", "polygonCenters")
+        self.newOutput("Integer List", "Material Indices", "materialIndices")
         self.newOutput("Text List", "UV Map Names", "uvMapNames")
         self.newOutput("Text List", "Vertex Color Layers", "vertexColorLayerNames")
 
@@ -29,6 +30,8 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
             yield "polygonNormals = mesh.getPolygonNormals()"
         if "polygonCenters" in required:
             yield "polygonCenters = mesh.getPolygonCenters()"
+        if "materialIndices" in required:
+            yield "materialIndices = mesh.materialIndices"
         if "uvMapNames" in required:
             yield "uvMapNames = mesh.getUVMapNames()"
         if "vertexColorLayerNames" in required:

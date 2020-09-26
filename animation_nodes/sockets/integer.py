@@ -72,3 +72,4 @@ registerImplicitConversion("Boolean List", "Integer List", convert_BooleanList_t
 
 for dataType in ["Float List", "Edge Indices", "Polygon Indices"]:
     registerImplicitConversion(dataType, "Integer List", "LongList.fromValues(value)")
+registerImplicitConversion("Polygon Indices List", "Integer List", "LongList.fromValues(value.indices)")
