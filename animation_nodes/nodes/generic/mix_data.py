@@ -3,7 +3,14 @@ from bpy.props import *
 from ... utils.math import mixEulers
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
-from . c_utils import mixDoubleLists, mixVectorLists, mixQuaternionLists, mixColorLists
+from . c_utils import (
+    mixColorLists,
+    mixEulerLists,
+    mixDoubleLists,
+    mixVectorLists,
+    mixMatrixLists,
+    mixQuaternionLists
+)
 from ... data_structures import (
     Color,
     EulerList,
@@ -108,19 +115,3 @@ def getMixCode(dataType, mix1, mix2, factor):
     if dataType == "Matrix": return mix1.lerp(mix2, factor)
     if dataType == "Color": return Color([v1 * (1 - factor) + v2 * factor for v1, v2 in zip(mix1, mix2)])
     if dataType == "Euler": return mixEulers(mix1, mix2, factor)
-
-def mixMatrixLists(matricesA, matricesB, influences):
-    amount = VirtualDoubleList.getMaxRealLength(matricesA, matricesB, influences)
-    results = Matrix4x4List(length = amount)
-    for i in range(amount):
-        results[i] = matricesA[i].lerp(matricesB[i], influences[i])
-
-    return results
-
-def mixEulerLists(eulersA, eulersB, influences):
-    amount = VirtualDoubleList.getMaxRealLength(eulersA, eulersB, influences)
-    results = EulerList(length = amount)
-    for i in range(amount):
-        results[i] = mixEulers(eulersA[i], eulersB[i], influences[i])
-
-    return results
