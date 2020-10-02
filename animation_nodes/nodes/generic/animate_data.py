@@ -40,7 +40,7 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
         yield "outTime = time - finalDuration"
 
 def getMixCode(dataType, mix1 = "a", mix2 = "b", factor = "f", result = "result"):
-    if dataType in ("Float", "Vector", "Quaternion"): return "{} = {} * (1 - {}) + {} * {}".format(result, mix1, factor, mix2, factor)
-    if dataType == "Matrix": return "{} = {}.lerp({}, {})".format(result, mix1, mix2, factor)
-    if dataType == "Color": return "{} = [v1 * (1 - {}) + v2 * {} for v1, v2 in zip({}, {})]".format(result, factor, factor, mix1, mix2)
-    if dataType == "Euler": return "{} = animation_nodes.utils.math.mixEulers({}, {}, {})".format(result, mix1, mix2, factor)
+    if dataType in ("Float", "Vector", "Quaternion"): return f"{result} = {mix1} * (1 - {factor}) + {mix2} * {factor}"
+    if dataType == "Matrix": return f"{result} = {mix1}.lerp({mix2}, {factor})"
+    if dataType == "Color": return f"{result} = [v1 * (1 - {factor}) + v2 * {factor} for v1, v2 in zip({mix1}, {mix2})]"
+    if dataType == "Euler": return f"{result} = animation_nodes.utils.math.mixEulers({mix1}, {mix2}, {factor})"

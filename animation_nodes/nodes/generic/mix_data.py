@@ -83,32 +83,38 @@ class MixDataNode(bpy.types.Node, AnimationNode):
             factors = VirtualDoubleList.create(factor, 0)
             mix1s = VirtualDoubleList.create(mix1, 0)
             mix2s = VirtualDoubleList.create(mix2, 0)
-            return mixDoubleLists(mix1s, mix2s, factors)
+            amount = VirtualDoubleList.getMaxRealLength(mix1s, mix2s, factors)
+            return mixDoubleLists(mix1s, mix2s, factors, amount)
         elif self.dataType == "Vector":
             factors = VirtualDoubleList.create(factor, 0)
             mix1s = VirtualVector3DList.create(mix1, 0)
             mix2s = VirtualVector3DList.create(mix2, 0)
-            return mixVectorLists(mix1s, mix2s, factors)
+            amount = VirtualDoubleList.getMaxRealLength(mix1s, mix2s, factors)
+            return mixVectorLists(mix1s, mix2s, factors, amount)
         elif self.dataType == "Quaternion":
             factors = VirtualDoubleList.create(factor, 0)
             mix1s = QuaternionList.fromValue(mix1)
             mix2s = QuaternionList.fromValue(mix2)
-            return mixQuaternionLists(mix1s, mix2s, factors)
+            amount = VirtualDoubleList.getMaxRealLength(factors)
+            return mixQuaternionLists(mix1s, mix2s, factors, amount)
         elif self.dataType == "Matrix":
             factors = VirtualDoubleList.create(factor, 0)
             mix1s = VirtualMatrix4x4List.create(mix1, 0)
             mix2s = VirtualMatrix4x4List.create(mix2, 0)
-            return mixMatrixLists(mix1s, mix2s, factors)
+            amount = VirtualDoubleList.getMaxRealLength(mix1s, mix2s, factors)
+            return mixMatrixLists(mix1s, mix2s, factors, amount)
         elif self.dataType == "Color":
             factors = VirtualDoubleList.create(factor, 0)
             mix1s = VirtualColorList.create(mix1, 0)
             mix2s = VirtualColorList.create(mix2, 0)
-            return mixColorLists(mix1s, mix2s, factors)
+            amount = VirtualDoubleList.getMaxRealLength(mix1s, mix2s, factors)
+            return mixColorLists(mix1s, mix2s, factors, amount)
         elif self.dataType == "Euler":
             factors = VirtualDoubleList.create(factor, 0)
             mix1s = VirtualEulerList.create(mix1, 0)
             mix2s = VirtualEulerList.create(mix2, 0)
-            return mixEulerLists(mix1s, mix2s, factors)
+            amount = VirtualDoubleList.getMaxRealLength(mix1s, mix2s, factors)
+            return mixEulerLists(mix1s, mix2s, factors, amount)
 
 def getMixCode(dataType, mix1, mix2, factor):
     if dataType in ("Float", "Vector", "Quaternion"): return mix1 * (1 - factor) + mix2 * factor
