@@ -11,7 +11,7 @@ from ... data_structures cimport (
     VirtualDoubleList,
     VirtualVector3DList,
     VirtualMatrix4x4List,
-    VirtualQuaternionList
+    VirtualQuaternionList,
 )
 
 def mixDoubleLists(VirtualDoubleList numbersA, VirtualDoubleList numbersB, VirtualDoubleList factors,
@@ -20,7 +20,7 @@ def mixDoubleLists(VirtualDoubleList numbersA, VirtualDoubleList numbersB, Virtu
     cdef Py_ssize_t i
 
     for i in range(amount):
-        results.data[i] = lerp(<float>numbersA.get(i), <float>numbersB.get(i), <float>factors.get(i))
+        results.data[i] = lerp(numbersA.get(i), numbersB.get(i), factors.get(i))
 
     return results
 

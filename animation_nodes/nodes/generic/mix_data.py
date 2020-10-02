@@ -9,7 +9,7 @@ from . c_utils import (
     mixDoubleLists,
     mixVectorLists,
     mixMatrixLists,
-    mixQuaternionLists
+    mixQuaternionLists,
 )
 from ... data_structures import (
     Color,
@@ -18,7 +18,7 @@ from ... data_structures import (
     VirtualDoubleList,
     VirtualVector3DList,
     VirtualMatrix4x4List,
-    VirtualQuaternionList
+    VirtualQuaternionList,
 )
 
 nodeTypes = {
@@ -49,12 +49,12 @@ class MixDataNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("Float", "useFactorList", ("Factor", "factor"),
-            ("Factors", "factor")))
-        self.newInput(VectorizedSocket(self.dataType, ["useAList"], ("A", "a"), ("As", "a")))
-        self.newInput(VectorizedSocket(self.dataType, ["useBList"], ("B", "b"), ("Bs", "b")))
+            ("Factors", "factor")), dataIsModified = True)
+        self.newInput(VectorizedSocket(self.dataType, ["useAList"], ("A", "a"), ("A", "a")))
+        self.newInput(VectorizedSocket(self.dataType, ["useBList"], ("B", "b"), ("B", "b")))
 
         self.newOutput(VectorizedSocket(self.dataType, ["useAList", "useBList", "useFactorList"],
-            ("Result", "result"), ("Results", "results")))
+            ("Result", "result"), ("Results", "result")))
 
     def draw(self, layout):
         layout.prop(self, "clampFactor")
@@ -64,19 +64,17 @@ class MixDataNode(bpy.types.Node, AnimationNode):
             return nodeTypes[self.outputs[0].dataType.strip("List").rstrip()]
         return nodeTypes[self.outputs[0].dataType]
 
-    def getExecutionFunctionName(self):
+    def getExecutionCode(self, required):
         if any([self.useAList, self.useBList, self.useFactorList]):
-            return "execute_MixDataList"
+            yield "result = self.execute_MixDataList(a, b, factor)"
         else:
-            return "execute_MixData"
+            if self.clampFactor:
+                yield "f = min(max(factor, 0.0), 1.0)"
+            else:
+                yield "f = factor"
+            yield getMixCode(self.dataType, "a", "b", "f", "result")
 
-    def execute_MixData(self, factor, a, b):
-        f = factor
-        if self.clampFactor:
-            f = min(max(factor, 0.0), 1.0)
-        return getMixCode(self.dataType, a, b, f)
-
-    def execute_MixDataList(self, factor, mix1, mix2):
+    def execute_MixDataList(self, mix1, mix2, factor):
         if self.clampFactor:
             if self.useFactorList:
                 factor.clamp(0, 1)
@@ -110,8 +108,8 @@ class MixDataNode(bpy.types.Node, AnimationNode):
             amount = VirtualDoubleList.getMaxRealLength(mix1s, mix2s, factors)
             return mixEulerLists(mix1s, mix2s, factors, amount)
 
-def getMixCode(dataType, mix1, mix2, factor):
-    if dataType in ("Float", "Vector", "Quaternion"): return mix1 * (1 - factor) + mix2 * factor
-    if dataType == "Matrix": return mix1.lerp(mix2, factor)
-    if dataType == "Color": return Color([v1 * (1 - factor) + v2 * factor for v1, v2 in zip(mix1, mix2)])
-    if dataType == "Euler": return mixEulers(mix1, mix2, factor)
+def getMixCode(dataType, mix1 = "a", mix2 = "b", factor = "f", result = "result"):
+    if dataType in ("Float", "Vector", "Quaternion"): return f"{result} = {mix1} * (1 - {factor}) + {mix2} * {factor}"
+    if dataType == "Matrix": return f"{result} = {mix1}.lerp({mix2}, {factor})"
+    if dataType == "Color": return f"{result} = [v1 * (1 - {factor}) + v2 * {factor} for v1, v2 in zip({mix1}, {mix2})]"
+    if dataType == "Euler": return f"{result} = animation_nodes.utils.math.mixEulers({mix1}, {mix2}, {factor})"

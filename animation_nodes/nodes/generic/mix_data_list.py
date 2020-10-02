@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import *
-from . animate_data import getMixCode
+from . mix_data import getMixCode
 from ... sockets.info import toListDataType
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode

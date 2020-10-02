@@ -1,5 +1,5 @@
 cimport cython
-from . number cimport lerp
+from . number cimport lerpFloat
 from . vector cimport crossVec3, scaleVec3_Inplace, scaleVec3, lengthVec3, angleVec3, projectOnCenterPlaneVec3, normalizeVec3, dotVec3, subVec3
 from libc.math cimport cos, sin, sqrt
 
@@ -59,7 +59,7 @@ cdef void quaternionNormalize_InPlace(Quaternion *q):
         q.z /= length
 
 cdef void mixQuat(Quaternion* target, Quaternion* x, Quaternion* y, float factor):
-    target.w = lerp(x.w, y.w, factor)
-    target.x = lerp(x.x, y.x, factor)
-    target.y = lerp(x.y, y.y, factor)
-    target.z = lerp(x.z, y.z, factor)
+    target.w = lerpFloat(x.w, y.w, factor)
+    target.x = lerpFloat(x.x, y.x, factor)
+    target.y = lerpFloat(x.y, y.y, factor)
+    target.z = lerpFloat(x.z, y.z, factor)

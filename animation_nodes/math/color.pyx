@@ -1,6 +1,6 @@
 cimport cython
 from . color cimport Color
-from . number cimport lerp
+from . number cimport lerpFloat
 
 cdef void addColor(Color* target, Color* a, Color* b):
     target.r = a.r + b.r
@@ -21,10 +21,10 @@ cdef void scaleColor_Inplace(Color* c, float factor):
     c.a *= factor
 
 cdef void mixColor(Color* target, Color* x, Color* y, float factor):
-    target.r = lerp(x.r, y.r, factor)
-    target.g = lerp(x.g, y.g, factor)
-    target.b = lerp(x.b, y.b, factor)
-    target.a = lerp(x.a, y.a, factor)
+    target.r = lerpFloat(x.r, y.r, factor)
+    target.g = lerpFloat(x.g, y.g, factor)
+    target.b = lerpFloat(x.b, y.b, factor)
+    target.a = lerpFloat(x.a, y.a, factor)
 
 # https://www.w3.org/TR/css-color-3/#hsl-color
 

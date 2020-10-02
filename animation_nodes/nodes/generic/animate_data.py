@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from . mix_data import getMixCode
 from ... base_types import AnimationNode
 from ... events import executionCodeChanged
 
@@ -38,9 +39,3 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
         yield "influence = interpolation(influence)"
         yield getMixCode(self.dataType, "start", "end", "influence", "result")
         yield "outTime = time - finalDuration"
-
-def getMixCode(dataType, mix1 = "a", mix2 = "b", factor = "f", result = "result"):
-    if dataType in ("Float", "Vector", "Quaternion"): return f"{result} = {mix1} * (1 - {factor}) + {mix2} * {factor}"
-    if dataType == "Matrix": return f"{result} = {mix1}.lerp({mix2}, {factor})"
-    if dataType == "Color": return f"{result} = [v1 * (1 - {factor}) + v2 * {factor} for v1, v2 in zip({mix1}, {mix2})]"
-    if dataType == "Euler": return f"{result} = animation_nodes.utils.math.mixEulers({mix1}, {mix2}, {factor})"

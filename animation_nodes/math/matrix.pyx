@@ -1,5 +1,5 @@
 from libc.math cimport sin, cos, sqrt
-from . number cimport lerp
+from . number cimport lerpFloat
 
 cdef void transformVec3AsPoint_InPlace(Vector3* v, Matrix4* m):
     cdef float newX, newY, newZ
@@ -326,22 +326,22 @@ cdef void matrixFromNormalizedAxisData(Matrix4 *m, Vector3 *center, Vector3 *tan
     m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
 
 cdef void mixMat4(Matrix4* target, Matrix4* x, Matrix4* y, float factor):
-    target.a11 = lerp(x.a11, y.a11, factor)
-    target.a12 = lerp(x.a12, y.a12, factor)
-    target.a13 = lerp(x.a13, y.a13, factor)
-    target.a14 = lerp(x.a14, y.a14, factor)
+    target.a11 = lerpFloat(x.a11, y.a11, factor)
+    target.a12 = lerpFloat(x.a12, y.a12, factor)
+    target.a13 = lerpFloat(x.a13, y.a13, factor)
+    target.a14 = lerpFloat(x.a14, y.a14, factor)
 
-    target.a21 = lerp(x.a21, y.a21, factor)
-    target.a22 = lerp(x.a22, y.a22, factor)
-    target.a23 = lerp(x.a23, y.a23, factor)
-    target.a24 = lerp(x.a24, y.a24, factor)
+    target.a21 = lerpFloat(x.a21, y.a21, factor)
+    target.a22 = lerpFloat(x.a22, y.a22, factor)
+    target.a23 = lerpFloat(x.a23, y.a23, factor)
+    target.a24 = lerpFloat(x.a24, y.a24, factor)
 
-    target.a31 = lerp(x.a31, y.a31, factor)
-    target.a32 = lerp(x.a32, y.a32, factor)
-    target.a33 = lerp(x.a33, y.a33, factor)
-    target.a34 = lerp(x.a34, y.a34, factor)
+    target.a31 = lerpFloat(x.a31, y.a31, factor)
+    target.a32 = lerpFloat(x.a32, y.a32, factor)
+    target.a33 = lerpFloat(x.a33, y.a33, factor)
+    target.a34 = lerpFloat(x.a34, y.a34, factor)
 
-    target.a41 = lerp(x.a41, y.a41, factor)
-    target.a42 = lerp(x.a42, y.a42, factor)
-    target.a43 = lerp(x.a43, y.a43, factor)
-    target.a44 = lerp(x.a44, y.a44, factor)
+    target.a41 = lerpFloat(x.a41, y.a41, factor)
+    target.a42 = lerpFloat(x.a42, y.a42, factor)
+    target.a43 = lerpFloat(x.a43, y.a43, factor)
+    target.a44 = lerpFloat(x.a44, y.a44, factor)
