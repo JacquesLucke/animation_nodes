@@ -1,5 +1,4 @@
-cimport cython
-from ... math cimport lerp, Quaternion, mixVec3, mixEul3, mixMat4, mixQuat, mixColor
+from ... math cimport lerp, mixVec3, mixEul3, mixMat4, mixQuat, mixColor
 from ... data_structures cimport (
     ColorList,
     EulerList,
@@ -11,7 +10,8 @@ from ... data_structures cimport (
     VirtualEulerList,
     VirtualDoubleList,
     VirtualVector3DList,
-    VirtualMatrix4x4List
+    VirtualMatrix4x4List,
+    VirtualQuaternionList
 )
 
 def mixDoubleLists(VirtualDoubleList numbersA, VirtualDoubleList numbersB, VirtualDoubleList factors,
@@ -34,22 +34,13 @@ def mixVectorLists(VirtualVector3DList vectorsA, VirtualVector3DList vectorsB, V
 
     return results
 
-def mixQuaternionLists(QuaternionList quaternionsA, QuaternionList quaternionsB, VirtualDoubleList factors,
+def mixQuaternionLists(VirtualQuaternionList quaternionsA, VirtualQuaternionList quaternionsB, VirtualDoubleList factors,
                        long amount):
-    cdef long amountA = quaternionsA.length
-    cdef long amountB = quaternionsB.length
-    amount = max(amount, amountA, amountB)
-
-    cdef QuaternionList _quaternionsA = getVirtualQuaternionList(amount, quaternionsA)
-    cdef QuaternionList _quaternionsB = getVirtualQuaternionList(amount, quaternionsB)
     cdef QuaternionList results = QuaternionList(length = amount)
-    cdef Quaternion quaternionA
-    cdef Quaternion quaternionB
-    cdef float factor
     cdef Py_ssize_t i
 
     for i in range(amount):
-        mixQuat(results.data + i, _quaternionsA.data + i, _quaternionsB.data + i, <float>factors.get(i))
+        mixQuat(results.data + i, quaternionsA.get(i), quaternionsB.get(i), <float>factors.get(i))
 
     return results
 
@@ -83,17 +74,3 @@ def mixEulerLists(VirtualEulerList eulersA, VirtualEulerList eulersB, VirtualDou
         mixEul3(results.data + i, eulersA.get(i), eulersB.get(i), <float>factors.get(i))
 
     return results
-
-@cython.cdivision(True)
-cdef QuaternionList getVirtualQuaternionList(long amount, QuaternionList qs):
-    cdef long amountQ = qs.length
-    if amountQ == amount: return qs
-
-    cdef QuaternionList _qs = QuaternionList(length = amount)
-    cdef Py_ssize_t i, index
-    for i in range(amount):
-        index = i
-        if i >= amountQ:
-            index = i % amountQ
-        _qs.data[i] = qs.data[index]
-    return _qs
