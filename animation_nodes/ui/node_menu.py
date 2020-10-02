@@ -224,6 +224,7 @@ class BooleanMenu(bpy.types.Menu):
         insertNode(layout, "an_DataInputNode", "Boolean", {"assignedType" : repr("Boolean")})
         insertNode(layout, "an_InvertBooleanNode", "Invert")
         insertNode(layout, "an_CompareNode", "Compare")
+        insertNode(layout, "an_CompareNumbersNode", "Compare Numbers")
         insertNode(layout, "an_SwitchNode", "Switch")
         insertNode(layout, "an_LogicOperatorsNode", "Logic")
         insertNode(layout, "an_BooleanListLogicNode", "List Logic")
