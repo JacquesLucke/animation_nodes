@@ -29,7 +29,7 @@ def convert_BooleanList_to_DoubleList(BooleanList inList):
         outList.data[i] = 1 if inList.data[i] != 0 else 0
     return outList
 
-def generateRandomBooleans(Py_ssize_t count, Py_ssize_t seed, float probablity):
+def generateRandomBooleans(Py_ssize_t seed, Py_ssize_t count, float probablity):
     cdef Py_ssize_t i
     cdef XoShiRo256Plus rng = XoShiRo256Plus(seed)
     cdef BooleanList bools = BooleanList(length = count)
