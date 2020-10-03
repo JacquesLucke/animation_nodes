@@ -4,7 +4,6 @@ from bpy.props import *
 from ... data_structures import Color
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from . c_utils import generateRandomColors
 
 class RandomColor(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomColorNode"
@@ -36,12 +35,9 @@ class RandomColor(bpy.types.Node, AnimationNode):
     def getExecutionCode(self, required):
         yield "_seed = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
         if self.createList:
-            yield "colors = self.execute_colorList(_seed, count)"
+            yield "colors = AN.nodes.color.c_utils.generateRandomColors(_seed, count)"
         else:
             yield "color = self.execute_colorSingle(_seed)"
-
-    def execute_colorList(self, seed, count):
-        return generateRandomColors(seed, count)
 
     def execute_colorSingle(self, seed):
         random.seed(seed)
