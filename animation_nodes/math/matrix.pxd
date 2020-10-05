@@ -64,5 +64,3 @@ cdef float getMatrix3x3PartDeterminant(Matrix3_or_Matrix4 *m)
 
 cdef void matrixFromNormalizedAxisData(Matrix4 *m, Vector3 *center, Vector3 *tangent,
                                        Vector3 *bitangent, Vector3 *normal)
-
-cdef void mixMat4(Matrix4* target, Matrix4* x, Matrix4* y, float factor)
