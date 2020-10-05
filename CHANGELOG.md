@@ -16,6 +16,7 @@
 
 ### Changed
 
+-Vectorized Convert Rotations node.
 
 
 ## 2.2.0 (01 September 2020)
