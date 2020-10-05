@@ -5,6 +5,11 @@
 - Added *Filter Material List By Name* node.
 - Added *Change GP Stroke Direction* node.
 - Added create list option to the *Random Quaternion* node.
+- Added *Random Boolean* node.
+- Added *Random Color* node.
+- Added *Find Shortest Path* node.
+- Added *Compare Numbers* node.
+
 ### Fixed
 
 - Fixed nextBoolean method for XoShiRo256StarStar generators.
