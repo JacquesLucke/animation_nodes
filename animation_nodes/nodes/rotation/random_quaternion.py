@@ -1,10 +1,8 @@
 import bpy
 import random
 from bpy.props import *
-from ... utils.math import cantorPair
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from . c_utils import randomQuaternionList
 
 class RandomQuaternionNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomQuaternionNode"
@@ -31,11 +29,11 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
         row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
     def getExecutionCode(self, required):
+        yield "_seed = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
         if self.createList:
-            yield "randomQuaternions = self.randomQuaternions(seed, count)"
+            yield "randomQuaternions = AN.nodes.rotation.c_utils.randomQuaternionList(_seed, count)"
         else:
-            yield "seed_ = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
-            yield "randomQuaternion = Quaternion(algorithms.random.randomNumberTuple(seed_, 4, math.pi))"
+            yield "randomQuaternion = Quaternion(algorithms.random.randomNumberTuple(_seed, 4, math.pi))"
             yield "randomQuaternion.normalize()"
 
     def getUsedModules(self):
@@ -46,7 +44,3 @@ class RandomQuaternionNode(bpy.types.Node, AnimationNode):
         
     def randomizeNodeSeed(self):
         self.nodeSeed = int(random.random() * 100)
-
-    def randomQuaternions(self, seed, count):
-        seed_ = cantorPair(max(seed, 0), self.nodeSeed)
-        return randomQuaternionList(seed_, count)
