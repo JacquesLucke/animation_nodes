@@ -2,6 +2,7 @@ from ... data_structures cimport (
     LongList,
     FloatList,
     DoubleList,
+    BooleanList,
     Interpolation,
     VirtualDoubleList
 )
@@ -102,3 +103,46 @@ def offsetFloats(FloatList numbers, VirtualDoubleList offsets, FloatList influen
     for i in range(len(numbers)):
         offset = offsets.get(i)
         numbers.data[i] += offset * influences.data[i]
+
+def compareNumbers_Equal(VirtualDoubleList a, VirtualDoubleList b, long amount):
+    cdef BooleanList result = BooleanList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        result.data[i] = a.get(i) == b.get(i)
+    return result
+
+def compareNumbers_NotEqual(VirtualDoubleList a, VirtualDoubleList b, long amount):
+    cdef BooleanList result = BooleanList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        result.data[i] = a.get(i) != b.get(i)
+    return result
+
+def compareNumbers_LessThan(VirtualDoubleList a, VirtualDoubleList b, long amount):
+    cdef BooleanList result = BooleanList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        result.data[i] = a.get(i) < b.get(i)
+    return result
+
+def compareNumbers_GreaterThan(VirtualDoubleList a, VirtualDoubleList b, long amount):
+    cdef BooleanList result = BooleanList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        result.data[i] = a.get(i) > b.get(i)
+    return result
+
+def compareNumbers_LessThanOrEqual(VirtualDoubleList a, VirtualDoubleList b, long amount):
+    cdef BooleanList result = BooleanList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        result.data[i] = a.get(i) <= b.get(i)
+    return result
+
+def compareNumbers_GreaterThanOrEqual(VirtualDoubleList a, VirtualDoubleList b, long amount):
+    cdef BooleanList result = BooleanList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        result.data[i] = a.get(i) >= b.get(i)
+    return result
+

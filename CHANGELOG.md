@@ -1,7 +1,7 @@
 ## Unreleased
 
 ### Added
-
+- Added create a list option to the *Random Quaternion* node
 - Added *Filter Material List By Name* node.
 - Added *Change GP Stroke Direction* node.
 - Added create list option to the *Random Quaternion* node.
@@ -88,6 +88,7 @@
 - Added mesh *Triangulation* methods and *Triangulate Mesh* node.
 - Added Mesh Points Scatter node.
 - Added support for 2D vectors in 3D viewer node.
+- Added *Vertex Color Fill* in *GP Stroke Info*, *GP Stroke From Points*, and *Set GP Stroke Attributes* nodes.
 
 ### Fixed
 
