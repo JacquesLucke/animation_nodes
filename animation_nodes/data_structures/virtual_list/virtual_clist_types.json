@@ -19,6 +19,11 @@
         "Import" : "from ... math.euler cimport Euler3",
         "Return" : "Pointer"
     },
+    "QuaternionList" : {
+        "Type" : "Quaternion",
+        "Import" : "from ... math.quaternion cimport Quaternion",
+        "Return" : "Pointer"
+    },
     "ColorList" : {
       "Type" : "Color",
       "Import" : "from ... math.color cimport Color",
