@@ -137,9 +137,9 @@ def quaternionsToMatrices(QuaternionList q):
 
 #base on https://en.m.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 #base on https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions
-def eulersToQuaternions(EulerList eulers):
+def eulersToQuaternions(EulerList e):
     cdef Py_ssize_t i
-    cdef int count = eulers.getLength()
+    cdef int count = e.getLength()
     cdef QuaternionList q = QuaternionList(length=count)
 
     for i in range(count):
