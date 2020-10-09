@@ -1,4 +1,5 @@
 from . math.color cimport *
+from . math.euler cimport *
 from . math.vector cimport *
 from . math.matrix cimport *
 from . math.number cimport *

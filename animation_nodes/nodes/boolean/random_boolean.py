@@ -2,9 +2,7 @@ import bpy
 import random
 from bpy.props import *
 from ... events import propertyChanged
-from ... utils.math import cantorPair
 from ... base_types import AnimationNode
-from . c_utils import generateRandomBooleans
 
 class RandomBooleanNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_RandomBooleanNode"
@@ -32,20 +30,14 @@ class RandomBooleanNode(bpy.types.Node, AnimationNode):
         row.prop(self, "createList", text = "", icon = "LINENUMBERS_ON")
 
     def getExecutionCode(self, required):
+        yield "_seed = AN.utils.math.cantorPair(max(seed, 0), self.nodeSeed)"
         if self.createList:
-            yield "booleans = self.execute_list(seed, count, probability)"
+            yield "booleans = AN.nodes.boolean.c_utils.generateRandomBooleans(_seed, count, probability)"
         else:
-            yield "boolean = self.execute_single(seed, probability)"
-
-    def execute_list(self, seed, count, probability):
-        seed_ = cantorPair(max(seed, 0), self.nodeSeed)
-
-        return generateRandomBooleans(count, seed_, probability)
+            yield "boolean = self.execute_single(_seed, probability)"
 
     def execute_single(self, seed, probability):
-        seed_ = cantorPair(max(seed, 0), self.nodeSeed)
-        random.seed(seed_)
-        
+        random.seed(seed)  
         return random.random() < probability
 
     def duplicate(self, sourceNode):

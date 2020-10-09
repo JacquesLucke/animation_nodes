@@ -81,3 +81,9 @@ cdef double clamp(double x, double minValue, double maxValue):
     if x < minValue: return minValue
     if x > maxValue: return maxValue
     return x
+
+cdef double lerp(double x, double y, double p):
+    return (1.0 - p) * x + p * y
+
+cdef float lerpFloat(float x, float y, float p):
+    return (1.0 - p) * x + p * y
