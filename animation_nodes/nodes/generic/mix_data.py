@@ -93,7 +93,7 @@ class MixDataNode(bpy.types.Node, AnimationNode):
             return mixVectorLists(mix1s, mix2s, factors, amount)
         elif self.dataType == "Quaternion":
             mix1s, mix2s = VirtualQuaternionList.createMultiple((mix1, 0), (mix2, 0))
-            amount = VirtualDoubleList.getMaxRealLength(factors)
+            amount = VirtualDoubleList.getMaxRealLength(mix1s, mix2s, factors)
             return mixQuaternionLists(mix1s, mix2s, factors, amount)
         elif self.dataType == "Matrix":
             mix1s, mix2s = VirtualMatrix4x4List.createMultiple((mix1, 0), (mix2, 0))
