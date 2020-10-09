@@ -1,6 +1,7 @@
 from mathutils import Vector, Matrix, Euler
 from mathutils import Quaternion as PyQuaternion
 from .. data_structures.color import Color as PyColor
+from libc.math cimport M_PI as PI, sqrt, abs, sin, cos, asin, acos, atan2, copysign
 
 # Vectors
 ##########################################################
@@ -120,7 +121,19 @@ cdef toPyEuler3(Euler3* e):
     if e.order == 3: return Euler((e.x, e.y, e.z), "YZX")
     if e.order == 4: return Euler((e.x, e.y, e.z), "ZXY")
     if e.order == 5: return Euler((e.x, e.y, e.z), "ZYX")
-
+    
+cdef eulerToQuaternionInPlace(Quaternion* q, Euler3 *e):
+    cdef float cr = cos(e.x * 0.5)
+    cdef float sr = sin(e.x * 0.5)
+    cdef float cp = cos(e.y * 0.5)
+    cdef float sp = sin(e.y * 0.5)
+    cdef float cy = cos(e.z * 0.5)
+    cdef float sy = sin(e.z * 0.5)
+    
+    q.w = cr * cp * cy + sr * sp * sy
+    q.x = sr * cp * cy - cr * sp * sy
+    q.y = cr * sp * cy + sr * cp * sy
+    q.z = cr * cp * sy - sr * sp * cy
 
 # Quaternions
 ##########################################################
@@ -139,7 +152,74 @@ cdef setQuaternion(Quaternion* q, value):
 cdef toPyQuaternion(Quaternion* q):
     return PyQuaternion((q.w, q.x, q.y, q.z))
 
+cdef quaternionToMatrix4Inplace(Matrix4 *m, Quaternion *q):
+    cdef float sqw = q.w * q.w
+    cdef float sqx = q.x * q.x
+    cdef float sqy = q.y * q.y
+    cdef float sqz = q.z * q.z
 
+    cdef invs = 1 / (sqx + sqy + sqz +sqw)
+
+    m.a11 = (sqx - sqy - sqz + sqw) * invs
+    m.a22 = (-sqx + sqy - sqz + sqw) * invs
+    m.a33 = (-sqx - sqy + sqz + sqw) * invs
+
+    cdef tmp1 = q.x * q.y
+    cdef tmp2 = q.z * q.w
+
+    m.a21 = 2.0 * (tmp1 + tmp2) * invs
+    m.a12 = 2.0 * (tmp1 - tmp2) * invs
+
+    tmp1 = q.x * q.z
+    tmp2 = q.y * q.w
+
+    m.a31 = 2.0 * (tmp1 - tmp2) * invs
+    m.a13 = 2.0 * (tmp1 + tmp2) * invs
+
+    tmp1 = q.y * q.z
+    tmp2 = q.x * q.w
+
+    m.a32 = 2.0 * (tmp1 + tmp2) * invs
+    m.a23 = 2.0 * (tmp1 - tmp2) * invs
+
+#base on https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions
+cdef quaternionToEulerInPlace(Euler3 *e, Quaternion *q):
+    cdef float sinr_cosp = 2 * (q.w * q.x + q.y * q.z)
+    cdef float cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y)
+    e.x = atan2(sinr_cosp, cosr_cosp)
+
+    cdef float sinp = 2 * (q.w * q.y - q.z * q.x)
+    if abs(sinp) >= 1.0:
+        e.y = copysign(M_PI/2, sinp)
+    else:
+        e.y = asin(sinp)
+
+    cdef float siny_cosp = 2 * (q.w * q.z + q.x * q.y)
+    cdef float cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
+    e.z = atan2(siny_cosp, cosy_cosp)
+    e.order = 0
+
+#base on https://en.m.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+cdef quaternionToAxis_AngleInPlace(Vector3 *v, float a, Quaternion *q):
+    quaternionNormalize_InPlace(q)
+    cdef float k = sqrt(1 - q.w * q.w)
+    cdef float u = 2 * acos(q.w)
+    
+    v.x = q.x / k
+    v.y = q.y / k
+    v.z = q.z / k
+    a = u
+    
+cdef axis_AngleToQuaternionInPlace(Quaternion *q, Vector3 *v, float a):
+    #normalizeVec3_InPlace(v)
+    cdef u1 = sin(a / 2)
+    cdef u2 = cos(a / 2)
+    
+    q.w = u2
+    q.x = v.x * u1
+    q.y = v.y * u1
+    q.z = v.z * u1
+    
 # Colors
 ###########################################################
 
