@@ -25,10 +25,15 @@ cdef toPyVector4(Vector4* v)
 cdef Euler3 toEuler3(value) except *
 cdef setEuler3(Euler3* e, value)
 cdef toPyEuler3(Euler3* e)
+cdef eulerToQuaternionInPlace(Quaternion* q, Euler3 *e)
 
 cdef Quaternion toQuaternion(value) except *
 cdef setQuaternion(Quaternion* q, value)
 cdef toPyQuaternion(Quaternion* q)
+cdef quaternionToMatrix4Inplace(Matrix4 *m, Quaternion *q)
+cdef quaternionToEulerInPlace(Euler3 *e, Quaternion *q)
+cdef quaternionToAxis_AngleInPlace(Vector3 *v, float a, Quaternion *q)
+cdef axis_AngleToQuaternionInPlace(Quaternion *q, Vector3 *v, float a)
 
 cdef Color toColor(value) except *
 cdef setColor(Color* c, value)
