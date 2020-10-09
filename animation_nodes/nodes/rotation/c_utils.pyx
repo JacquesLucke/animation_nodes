@@ -1,4 +1,4 @@
-from libc.math cimport M_PI as PI
+from libc.math cimport M_PI as PI, sqrt, sin, cos, asin, acos
 from ... math cimport (
     quaternionNormalize_InPlace, normalizeVec3_InPlace,
     eulerToQuaternionInPlace, quaternionToMatrix4Inplace,
