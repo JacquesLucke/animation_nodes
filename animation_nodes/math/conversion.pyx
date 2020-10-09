@@ -201,7 +201,6 @@ cdef quaternionToEulerInPlace(Euler3 *e, Quaternion *q):
 
 #base on https://en.m.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 cdef quaternionToAxis_AngleInPlace(Vector3 *v, float a, Quaternion *q):
-    quaternionNormalize_InPlace(q)
     cdef float k = sqrt(1 - q.w * q.w)
     cdef float u = 2 * acos(q.w)
     
@@ -211,7 +210,6 @@ cdef quaternionToAxis_AngleInPlace(Vector3 *v, float a, Quaternion *q):
     a = u
     
 cdef axis_AngleToQuaternionInPlace(Quaternion *q, Vector3 *v, float a):
-    #normalizeVec3_InPlace(v)
     cdef u1 = sin(a / 2)
     cdef u2 = cos(a / 2)
     
