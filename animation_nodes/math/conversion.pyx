@@ -190,7 +190,7 @@ cdef quaternionToEulerInPlace(Euler3 *e, Quaternion *q):
 
     cdef float sinp = 2 * (q.w * q.y - q.z * q.x)
     if abs(sinp) >= 1.0:
-        e.y = copysign(M_PI/2, sinp)
+        e.y = copysign(PI/2, sinp)
     else:
         e.y = asin(sinp)
 
