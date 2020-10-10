@@ -1,14 +1,16 @@
-from ... math cimport lerp, mixVec3, mixEul3, mixQuat, mixColor
+from ... math cimport lerp, mixVec3, mixEul3, mixQuat, mixColor, mixMatrix4
 from ... data_structures cimport (
     ColorList,
     EulerList,
     DoubleList,
     Vector3DList,
+    Matrix4x4List,
     QuaternionList,
     VirtualColorList,
     VirtualEulerList,
     VirtualDoubleList,
     VirtualVector3DList,
+    VirtualMatrix4x4List,
     VirtualQuaternionList,
 )
 
@@ -61,3 +63,13 @@ def mixEulerLists(VirtualEulerList eulersA, VirtualEulerList eulersB, VirtualDou
         mixEul3(results.data + i, eulersA.get(i), eulersB.get(i), <float>factors.get(i))
 
     return results
+
+def mixMatrixLists(VirtualMatrix4x4List matricesA, VirtualMatrix4x4List matricesB, VirtualDoubleList factors,
+                  long amount):
+    cdef Matrix4x4List results = Matrix4x4List(length = amount)
+    cdef Py_ssize_t i
+
+    for i in range(amount):
+        mixMatrix4(results.data + i, matricesA.get(i), matricesB.get(i), <float>factors.get(i))
+
+    return results    
