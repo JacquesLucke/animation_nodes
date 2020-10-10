@@ -1,5 +1,6 @@
 from . vector cimport Vector3, Vector4
 from . euler cimport Euler3
+from . quaternion cimport Quaternion
 
 cdef struct Matrix4:
     float a11, a12, a13, a14
@@ -64,3 +65,10 @@ cdef float getMatrix3x3PartDeterminant(Matrix3_or_Matrix4 *m)
 
 cdef void matrixFromNormalizedAxisData(Matrix4 *m, Vector3 *center, Vector3 *tangent,
                                        Vector3 *bitangent, Vector3 *normal)
+
+cdef void setRotationWXYZScaleMatrix(Matrix3_or_Matrix4* m, Quaternion *q, Vector3* s)
+cdef void setTranslationRotationWXYZScaleMatrix(Matrix4 *m, Vector3 *t, Quaternion *q, Vector3 *s)
+
+cdef void translationScaleFromMatrix(Vector3 *translation, Vector3 *scale, Matrix4 *m)
+
+cdef void mixMatrix4(Matrix4* target, Matrix4* a, Matrix4* b, float factor)

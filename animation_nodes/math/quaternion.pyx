@@ -1,7 +1,7 @@
 cimport cython
 from . number cimport lerpFloat
 from . vector cimport crossVec3, scaleVec3_Inplace, scaleVec3, lengthVec3, angleVec3, projectOnCenterPlaneVec3, normalizeVec3, dotVec3, subVec3
-from libc.math cimport cos, sin, sqrt
+from libc.math cimport cos, sin, acos, sqrt, abs, fabs
 
 cdef void setUnitQuaternion(Quaternion *q):
     q.x, q.y, q.z, q.w = 0, 0, 0, 1
@@ -63,3 +63,23 @@ cdef void mixQuat(Quaternion* target, Quaternion* x, Quaternion* y, float factor
     target.x = lerpFloat(x.x, y.x, factor)
     target.y = lerpFloat(x.y, y.y, factor)
     target.z = lerpFloat(x.z, y.z, factor)
+
+# https://gitlab.com/bztsrc/slerp-opt
+cdef void quaternionSlerp(Quaternion* target, Quaternion* x, Quaternion* y, float factor):
+    cdef float a = 1 - factor
+    cdef float b = factor
+    cdef float d = x.x * y.x + x.y * y.y + x.z * y.z + x.w * y.w
+    cdef float c = fabs(d)
+
+    if c < 0.99999:
+        c = acos(c)
+        b = 1 / sin(c)
+        a = sin(a * c) * b
+        b *= sin(factor * c)
+        if d < 0:
+            b = -b
+
+    target.w = x.w * a + y.w * b
+    target.x = x.x * a + y.x * b
+    target.y = x.y * a + y.y * b
+    target.z = x.z * a + y.z * b
