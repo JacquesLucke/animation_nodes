@@ -14,6 +14,7 @@
 
 - Fixed nextBoolean method for XoShiRo256StarStar generators.
 - Fixed OpenGL fragment shaders on Core contexts.
+- Fixed triangulateMesh method of Mesh.
 
 ### Changed
 
