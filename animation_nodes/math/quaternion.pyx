@@ -83,4 +83,3 @@ cdef void quaternionSlerp(Quaternion* target, Quaternion* x, Quaternion* y, floa
     target.x = x.x * a + y.x * b
     target.y = x.y * a + y.y * b
     target.z = x.z * a + y.z * b
-    
