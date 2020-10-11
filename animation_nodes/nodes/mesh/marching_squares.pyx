@@ -1,12 +1,17 @@
 import bpy
 from bpy.props import *
-from ... utils.limits cimport INT_MAX
-from ... base_types import AnimationNode
 from ... math cimport Vector3
+from ... utils.limits cimport INT_MAX
+from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures cimport (
-    Mesh, Vector3DList, EdgeIndicesList,
-    PolygonIndicesList, Falloff, FalloffEvaluator,
+    Mesh,
+    Falloff,
     FloatList,
+    Vector3DList,
+    EdgeIndicesList,
+    FalloffEvaluator,
+    VirtualDoubleList,
+    PolygonIndicesList,
 )
 
 class MarchingSquaresNode(bpy.types.Node, AnimationNode):
@@ -17,17 +22,27 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
     __annotations__ = {}
 
     __annotations__["clampFalloff"] = BoolProperty(name = "Clamp Falloff", default = False)
+    __annotations__["useToleranceList"] = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Integer", "X Divisions", "xDivisions", value = 3, minValue = 2)
         self.newInput("Integer", "Y Divisions", "yDivisions", value = 3, minValue = 2)
         self.newInput("Float", "Size", "size", value = 5)
-        self.newInput("Integer", "Cell Index", "index")
         self.newInput("Falloff", "Falloff", "falloff")
+        self.newInput(VectorizedSocket("Float", "useToleranceList",
+            ("Tolerance", "tolerances"), ("Tolerances", "tolerances")), value = 0.25)
 
         self.newOutput("Mesh", "Mesh", "mesh")
+        self.newOutput("Vector List", "Grid Points", "points", hide = True)
 
-    def execute(self, xDivisions, yDivisions, size, index, falloff):
+    def execute(self, xDivisions, yDivisions, size, falloff, tolerances):
+        cdef VirtualDoubleList _tolerances = VirtualDoubleList.create(tolerances, 0.001)
+        cdef long amountTol
+        if not self.useToleranceList:
+            amountTol = 1
+        else:
+            amountTol = _tolerances.getRealLength()
+
         cdef double xDis, yDis
         cdef Vector3DList points
         points, xDis, yDis = getGridPoints(xDivisions, yDivisions, 1, size, size, size)
@@ -36,7 +51,7 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
         cdef long nx, ny, amountCell
         nx, ny = limitAmount(xDivisions), limitAmount(yDivisions)
 
-        cdef Py_ssize_t i, j, offset, ia, ib, ic, id
+        cdef Py_ssize_t i, j, k, offset, ia, ib, ic, id
         cdef double _xDis, _yDis
         cdef long _nx, _ny
 
@@ -54,9 +69,11 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
                 id = j + offset
                 ic = id + 1
 
-                meshes.append(getMesh(points, strengths, _xDis, _yDis, ia, ib, ic, id))
+                for k in range(amountTol):
+                    meshes.append(getMeshOfSquare(points, strengths, <float>_tolerances.get(k),
+                                                  _xDis, _yDis, ia, ib, ic, id))
 
-        return Mesh.join(*meshes)
+        return Mesh.join(*meshes), points
 
     def getFieldStrengths(self, Vector3DList vectors, falloff):
         cdef FalloffEvaluator falloffEvaluator = self.getFalloffEvaluator(falloff)
@@ -67,9 +84,9 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
         try: return falloff.getEvaluator("LOCATION", self.clampFalloff)
         except: self.raiseErrorMessage("This falloff cannot be evaluated for vectors")
 
-def getMesh(Vector3DList points, FloatList strengths, double _xDis, double _yDis,
-            Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
-    cdef int index = binaryToDecimal(strengths.data[ia], strengths.data[ib],
+def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, double _xDis, double _yDis,
+                    Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
+    cdef int index = binaryToDecimal(tolerance, strengths.data[ia], strengths.data[ib],
                                      strengths.data[ic], strengths.data[id])
 
     cdef Vector3DList vertices = Vector3DList(length = 2)
@@ -205,18 +222,18 @@ def getMesh(Vector3DList points, FloatList strengths, double _xDis, double _yDis
     elif index == 15:
         return Mesh()
 
-cdef int binaryToDecimal(float a, float b, float c, float d):
+cdef int binaryToDecimal(float t, float a, float b, float c, float d):
     # binary order (d, c, b, a)
-    if a <= 0.25: a = 0
+    if a <= t: a = 0
     else: a = 1
 
-    if b <= 0.25: b = 0
+    if b <= t: b = 0
     else: b = 1
 
-    if c <= 0.25: c = 0
+    if c <= t: c = 0
     else: c = 1
 
-    if d <= 0.25: d = 0
+    if d <= t: d = 0
     else: d = 1
 
     return <int>(8 * a + 4 * b + 2 * c + d)
@@ -227,8 +244,8 @@ cdef getGridPoints(long xDivisions, long yDivisions, long zDivisions, float size
         int xDiv = limitAmount(xDivisions)
         int yDiv = limitAmount(yDivisions)
         int zDiv = limitAmount(zDivisions)
+        double xOffset, yOffset, zOffset
         double xDis, yDis, zDis
-        double xOffset, yOffset
         long x, y, z, index
         Vector3 vector
         Vector3DList points = Vector3DList(length = xDiv * yDiv * zDiv)
