@@ -58,14 +58,8 @@ cdef void quaternionNormalize_InPlace(Quaternion *q):
         q.y /= length
         q.z /= length
 
-cdef void mixQuat(Quaternion* target, Quaternion* x, Quaternion* y, float factor):
-    target.w = lerpFloat(x.w, y.w, factor)
-    target.x = lerpFloat(x.x, y.x, factor)
-    target.y = lerpFloat(x.y, y.y, factor)
-    target.z = lerpFloat(x.z, y.z, factor)
-    
 # https://gitlab.com/bztsrc/slerp-opt
-cdef void quaternionSlerp(Quaternion* target, Quaternion* x, Quaternion* y, float factor):
+cdef void mixQuat(Quaternion* target, Quaternion* x, Quaternion* y, float factor):
     cdef float a = 1 - factor
     cdef float b = factor
     cdef float d = x.x * y.x + x.y * y.y + x.z * y.z + x.w * y.w
