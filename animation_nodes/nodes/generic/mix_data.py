@@ -113,7 +113,7 @@ def getMixCode(dataType, mix1 = "a", mix2 = "b", factor = "f", result = "result"
     if dataType == "Matrix": return f"{result} = {mix1}.lerp({mix2}, {factor})"
     if dataType == "Color": return f"{result} = Color([v1 * (1 - {factor}) + v2 * {factor} for v1, v2 in zip({mix1}, {mix2})])"
     if dataType == "Euler": return f"{result} = animation_nodes.utils.math.mixEulers({mix1}, {mix2}, {factor})"
-    if dataType == "Quaternion": return f"{result} = {mix1}.slerp({mix2}, {factor})"
+    if dataType == "Quaternion": return f"{result} = animation_nodes.utils.math.mixQuaternions({mix1}, {mix2}, {factor})"
 
 def mixMatrixLists(matricesA, matricesB, factors, amount):
     results = Matrix4x4List(length = amount)
