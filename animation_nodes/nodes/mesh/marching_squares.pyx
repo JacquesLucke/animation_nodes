@@ -84,145 +84,199 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
         try: return falloff.getEvaluator("LOCATION", self.clampFalloff)
         except: self.raiseErrorMessage("This falloff cannot be evaluated for vectors")
 
-def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, double _xDis, double _yDis,
-                    Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
-    cdef int index = binaryToDecimal(tolerance, strengths.data[ia], strengths.data[ib],
-                                     strengths.data[ic], strengths.data[id])
+def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, double _xDis,
+                    double _yDis, Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
+    cdef float a, b, c, d
+    a, b, c, d = strengths.data[ia], strengths.data[ib], strengths.data[ic], strengths.data[id]
+
+    cdef Vector3 va, vb, vc, vd, v1, v2
+    va, vb, vc, vd = points.data[ia], points.data[ib], points.data[ic], points.data[id]
 
     cdef Vector3DList vertices = Vector3DList(length = 2)
     cdef EdgeIndicesList edges = EdgeIndicesList(length = 1)
     cdef PolygonIndicesList polygons = PolygonIndicesList()
 
+    cdef long index = binaryToDecimal(tolerance, a, b, c, d)
+    v1.z = 0.
+    v2.z = 0.
     if index == 0:
         return Mesh()
     elif index == 1:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[id]
-        vertices.data[1] = points.data[id]
-        vertices.data[0].x += _xDis
-        vertices.data[1].y += _yDis
+
+        v1.x = lerp(tolerance, vd.x, vc.x, d, c)
+        v1.y = vc.y
+        v2.x = vd.x
+        v2.y = lerp(tolerance, vd.y, va.y, d, a)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 2:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ib]
-        vertices.data[1] = points.data[ic]
-        vertices.data[0].y -= _yDis
-        vertices.data[1].x -= _xDis
+
+        v1.x = lerp(tolerance, vc.x, vd.x, c, d)
+        v1.y = vc.y
+        v2.x = vc.x
+        v2.y = lerp(tolerance, vc.y, vb.y, c, b)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 3:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ib]
-        vertices.data[1] = points.data[id]
-        vertices.data[0].y -= _yDis
-        vertices.data[1].y += _yDis
+
+        v1.x = vc.x
+        v1.y = lerp(tolerance, vc.y, vb.y, c, b)
+        v2.x = vd.x
+        v2.y = lerp(tolerance, vd.y, va.y, d, a)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 4:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ia]
-        vertices.data[1] = points.data[ib]
-        vertices.data[0].x += _xDis
-        vertices.data[1].y -= _yDis
+
+        v1.x = lerp(tolerance, vb.x, va.x, b, a)
+        v1.y = vb.y
+        v2.x = vb.x
+        v2.y = lerp(tolerance, vb.y, vc.y, b, c)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 5:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ib]
-        vertices.data[1] = points.data[ic]
-        vertices.data[0].y -= _yDis
-        vertices.data[1].x -= _xDis
+
+        v1.x = vb.x
+        v1.y = lerp(tolerance, vb.y, vc.y, b, c)
+        v2.x = lerp(tolerance, vd.x, vc.x, d, c)
+        v2.y = vd.y
+        vertices.data[0] = v1
+        vertices.data[1] = v2
 
         edges.append((2,3))
-        vertices.append_LowLevel(points.data[id])
-        vertices.append_LowLevel(points.data[ia])
-        vertices.data[2].y += _yDis
-        vertices.data[3].x += _xDis
+
+        v1.x = lerp(tolerance, vb.x, va.x, b, a)
+        v1.y = vb.y
+        v2.x = vd.x
+        v2.y = lerp(tolerance, vd.y, va.y, d, a)
+        vertices.append_LowLevel(v1)
+        vertices.append_LowLevel(v2)
         return Mesh(vertices, edges, polygons)
     elif index == 6:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ib]
-        vertices.data[1] = points.data[ic]
-        vertices.data[0].x -= _xDis
-        vertices.data[1].x -= _xDis
+
+        v1.x = lerp(tolerance, vb.x, va.x, b, a)
+        v1.y = vb.y
+        v2.x = lerp(tolerance, vc.x, vd.x, c, d)
+        v2.y = vc.y
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 7:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ia]
-        vertices.data[1] = points.data[id]
-        vertices.data[0].x += _xDis
-        vertices.data[1].y += _yDis
+
+        v1.x = lerp(tolerance, vb.x, va.x, b, a)
+        v1.y = vb.y
+        v2.x = vd.x
+        v2.y = lerp(tolerance, vd.y, va.y, d, a)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 8:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ia]
-        vertices.data[1] = points.data[id]
-        vertices.data[0].x += _xDis
-        vertices.data[1].y += _yDis
+
+        v1.x = lerp(tolerance, va.x, vb.x, a, b)
+        v1.y = va.y
+        v2.x = va.x
+        v2.y = lerp(tolerance, va.y, vd.y, a, d)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 9:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ia]
-        vertices.data[1] = points.data[id]
-        vertices.data[0].x += _xDis
-        vertices.data[1].x += _xDis
+
+        v1.x = lerp(tolerance, va.x, vb.x, a, b)
+        v1.y = va.y
+        v2.x = lerp(tolerance, vd.x, vc.x, d, c)
+        v2.y = vd.y
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 10:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ia]
-        vertices.data[1] = points.data[ib]
-        vertices.data[0].x += _xDis
-        vertices.data[1].y -= _yDis
+
+        v1.x = lerp(tolerance, va.x, vb.x, a, b)
+        v1.y = va.y
+        v2.x = vc.x
+        v2.y = lerp(tolerance, vc.y, vb.y, c, b)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
 
         edges.append((2,3))
-        vertices.append_LowLevel(points.data[ic])
-        vertices.append_LowLevel(points.data[id])
-        vertices.data[2].x -= _xDis
-        vertices.data[3].y += _yDis
+
+        v1.x = va.x
+        v1.y = lerp(tolerance, va.y, vd.y, a, d)
+        v2.x = lerp(tolerance, vc.x, vd.x, c, d)
+        v2.y = vc.y
+        vertices.append_LowLevel(v1)
+        vertices.append_LowLevel(v2)
         return Mesh(vertices, edges, polygons)
     elif index == 11:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ia]
-        vertices.data[1] = points.data[ib]
-        vertices.data[0].x += _xDis
-        vertices.data[1].y -= _yDis
+
+        v1.x = lerp(tolerance, va.x, vb.x, a, b)
+        v1.y = va.y
+        v2.x = vc.x
+        v2.y = lerp(tolerance, vc.y, vb.y, c, b)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 12:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ia]
-        vertices.data[1] = points.data[ib]
-        vertices.data[0].y -= _yDis
-        vertices.data[1].y -= _yDis
+
+        v1.x = va.x
+        v1.y = lerp(tolerance, va.y, vd.y, a, d)
+        v2.x = vb.x
+        v2.y = lerp(tolerance, vb.y, vc.y, b, c)
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 13:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ib]
-        vertices.data[1] = points.data[ic]
-        vertices.data[0].y -= _yDis
-        vertices.data[1].x -= _xDis
+
+        v1.x = vb.x
+        v1.y = lerp(tolerance, vb.y, vc.y, b, c)
+        v2.x = lerp(tolerance, vd.x, vc.x, d, c)
+        v2.y = vd.y
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 14:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
-        vertices.data[0] = points.data[ic]
-        vertices.data[1] = points.data[id]
-        vertices.data[0].x -= _xDis
-        vertices.data[1].y += _yDis
+
+        v1.x = va.x
+        v1.y = lerp(tolerance, va.y, vd.y, a, d)
+        v2.x = lerp(tolerance, vc.x, vd.x, c, d)
+        v2.y = vc.y
+        vertices.data[0] = v1
+        vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
     elif index == 15:
         return Mesh()
 
-cdef int binaryToDecimal(float t, float a, float b, float c, float d):
+cdef long binaryToDecimal(float t, float a, float b, float c, float d):
     # binary order (d, c, b, a)
     if a <= t: a = 0
     else: a = 1
@@ -236,7 +290,10 @@ cdef int binaryToDecimal(float t, float a, float b, float c, float d):
     if d <= t: d = 0
     else: d = 1
 
-    return <int>(8 * a + 4 * b + 2 * c + d)
+    return <long>(8.0 * a + 4.0 * b + 2.0 * c + d)
+
+cdef float lerp(float tolerance, float t1, float t2, float f1, float f2):
+    return t1 + (tolerance - f1) * (t2 - t1) / (f2 - f1)
 
 cdef getGridPoints(long xDivisions, long yDivisions, long zDivisions, float size1,
                    float size2, float size3, distanceMode = "SIZE"):
