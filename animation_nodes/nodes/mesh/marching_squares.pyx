@@ -1,7 +1,8 @@
 import bpy
+import cython
 from bpy.props import *
-from ... math cimport Vector3
 from ... utils.limits cimport INT_MAX
+from ... math cimport Vector3, toVector3
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures cimport (
     Mesh,
@@ -14,6 +15,11 @@ from ... data_structures cimport (
     PolygonIndicesList,
 )
 
+distanceModeItems = [
+    ("STEP", "Step", "Define the distance between two points", "NONE", 0),
+    ("SIZE", "Size", "Define how large the grid will be in total", "NONE", 1)
+]
+
 class MarchingSquaresNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MarchingSquaresNode"
     bl_label = "Marching Squares"
@@ -21,22 +27,35 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
 
     __annotations__ = {}
 
+    __annotations__["distanceMode"] = EnumProperty(name = "Distance Mode", default = "SIZE",
+        items = distanceModeItems, update = AnimationNode.refresh)
     __annotations__["clampFalloff"] = BoolProperty(name = "Clamp Falloff", default = False)
     __annotations__["useToleranceList"] = VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput("Integer", "X Divisions", "xDivisions", value = 3, minValue = 2)
         self.newInput("Integer", "Y Divisions", "yDivisions", value = 3, minValue = 2)
-        self.newInput("Float", "Size", "size", value = 5)
+        if self.distanceMode == "STEP":
+            self.newInput("Float", "X Distance", "xSize", value = 1)
+            self.newInput("Float", "Y Distance", "ySize", value = 1)
+        elif self.distanceMode == "SIZE":
+            self.newInput("Float", "Width", "xSize", value = 5)
+            self.newInput("Float", "Length", "ySize", value = 5)
         self.newInput("Falloff", "Falloff", "falloff")
         self.newInput(VectorizedSocket("Float", "useToleranceList",
             ("Tolerance", "tolerances"), ("Tolerances", "tolerances")), value = 0.25)
+        self.newInput("Vector", "Grid Offset", "offset", hide = True)
 
         self.newOutput("Mesh", "Mesh", "mesh")
         self.newOutput("Vector List", "Grid Points", "points", hide = True)
 
-    def execute(self, xDivisions, yDivisions, size, falloff, tolerances):
-        cdef VirtualDoubleList _tolerances = VirtualDoubleList.create(tolerances, 0.001)
+    def draw(self, layout):
+        col = layout.column()
+        col.prop(self, "distanceMode", text = "")
+
+    def execute(self, xDivisions, yDivisions, xSize, ySize, falloff, tolerances, offset):
+        cdef Vector3 _offset = toVector3(offset)
+        cdef VirtualDoubleList _tolerances = VirtualDoubleList.create(tolerances, 0.0001)
         cdef long amountTol
         if not self.useToleranceList:
             amountTol = 1
@@ -45,13 +64,13 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
 
         cdef double xDis, yDis
         cdef Vector3DList points
-        points, xDis, yDis = getGridPoints(xDivisions, yDivisions, 1, size, size, size)
+        points, xDis, yDis = getGridPoints(xDivisions, yDivisions, xSize, ySize, _offset, self.distanceMode)
 
         cdef FloatList strengths = self.getFieldStrengths(points, falloff)
         cdef long nx, ny, amountCell
         nx, ny = limitAmount(xDivisions), limitAmount(yDivisions)
 
-        cdef Py_ssize_t i, j, k, offset, ia, ib, ic, id
+        cdef Py_ssize_t i, j, k, index, ia, ib, ic, id
         cdef double _xDis, _yDis
         cdef long _nx, _ny
 
@@ -61,12 +80,12 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
 
         meshes = []
         for i in range(_ny):
-            offset = nx * i
+            index = nx * i
             for j in range(_nx):
                 # Counter-Clockwise
-                ia = nx + offset + j
+                ia = nx + index + j
                 ib = ia + 1
-                id = j + offset
+                id = j + index
                 ic = id + 1
 
                 for k in range(amountTol):
@@ -84,6 +103,7 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
         try: return falloff.getEvaluator("LOCATION", self.clampFalloff)
         except: self.raiseErrorMessage("This falloff cannot be evaluated for vectors")
 
+# http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/
 def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, double _xDis,
                     double _yDis, Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
     cdef float a, b, c, d
@@ -96,12 +116,12 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
     cdef EdgeIndicesList edges = EdgeIndicesList(length = 1)
     cdef PolygonIndicesList polygons = PolygonIndicesList()
 
-    cdef long index = binaryToDecimal(tolerance, a, b, c, d)
-    v1.z = 0.
-    v2.z = 0.
-    if index == 0:
+    cdef long indexSquare = binaryToDecimal(tolerance, a, b, c, d)
+    v1.z = va.z
+    v2.z = va.z
+    if indexSquare == 0:
         return Mesh()
-    elif index == 1:
+    elif indexSquare == 1:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -112,7 +132,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 2:
+    elif indexSquare == 2:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -123,7 +143,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 3:
+    elif indexSquare == 3:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -134,7 +154,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 4:
+    elif indexSquare == 4:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -145,7 +165,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 5:
+    elif indexSquare == 5:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -165,7 +185,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.append_LowLevel(v1)
         vertices.append_LowLevel(v2)
         return Mesh(vertices, edges, polygons)
-    elif index == 6:
+    elif indexSquare == 6:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -176,7 +196,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 7:
+    elif indexSquare == 7:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -187,7 +207,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 8:
+    elif indexSquare == 8:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -198,7 +218,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 9:
+    elif indexSquare == 9:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -209,7 +229,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 10:
+    elif indexSquare == 10:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -229,7 +249,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.append_LowLevel(v1)
         vertices.append_LowLevel(v2)
         return Mesh(vertices, edges, polygons)
-    elif index == 11:
+    elif indexSquare == 11:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -240,7 +260,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 12:
+    elif indexSquare == 12:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -251,7 +271,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 13:
+    elif indexSquare == 13:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -262,7 +282,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 14:
+    elif indexSquare == 14:
         edges.data[0].v1 = 0
         edges.data[0].v2 = 1
 
@@ -273,7 +293,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, d
         vertices.data[0] = v1
         vertices.data[1] = v2
         return Mesh(vertices, edges, polygons)
-    elif index == 15:
+    elif indexSquare == 15:
         return Mesh()
 
 cdef long binaryToDecimal(float t, float a, float b, float c, float d):
@@ -292,40 +312,38 @@ cdef long binaryToDecimal(float t, float a, float b, float c, float d):
 
     return <long>(8.0 * a + 4.0 * b + 2.0 * c + d)
 
+@cython.cdivision(True)
 cdef float lerp(float tolerance, float t1, float t2, float f1, float f2):
     return t1 + (tolerance - f1) * (t2 - t1) / (f2 - f1)
 
-cdef getGridPoints(long xDivisions, long yDivisions, long zDivisions, float size1,
-                   float size2, float size3, distanceMode = "SIZE"):
+@cython.cdivision(True)
+cdef getGridPoints(long xDivisions, long yDivisions, float size1, float size2,
+                   Vector3 offset, str distanceMode):
     cdef:
         int xDiv = limitAmount(xDivisions)
         int yDiv = limitAmount(yDivisions)
-        int zDiv = limitAmount(zDivisions)
-        double xOffset, yOffset, zOffset
-        double xDis, yDis, zDis
-        long x, y, z, index
+        double xOffset, yOffset
+        double xDis, yDis
+        long x, y, index
         Vector3 vector
-        Vector3DList points = Vector3DList(length = xDiv * yDiv * zDiv)
+        Vector3DList points = Vector3DList(length = xDiv * yDiv)
 
     if distanceMode == "STEP":
-        xDis, yDis, zDis = size1, size2, size3
+        xDis, yDis = size1, size2
     elif distanceMode == "SIZE":
         xDis = size1 / max(xDiv - 1, 1)
         yDis = size2 / max(yDiv - 1, 1)
-        zDis = size3 / max(zDiv - 1, 1)
 
-    xOffset = xDis * (xDiv - 1) / 2 * int(1)
-    yOffset = yDis * (yDiv - 1) / 2 * int(1)
-    zOffset = zDis * (zDiv - 1) / 2 * int(0)
+    xOffset = xDis * (xDiv - 1) / 2
+    yOffset = yDis * (yDiv - 1) / 2
 
     for x in range(xDiv):
         for y in range(yDiv):
-            for z in range(zDiv):
-                index = z * xDiv * yDiv + y * xDiv + x
-                vector.x = <float>(x * xDis - xOffset)
-                vector.y = <float>(y * yDis - yOffset)
-                vector.z = <float>(z * zDis - zOffset)
-                points.data[index] = vector
+            index = y * xDiv + x
+            vector.x = <float>(x * xDis - xOffset) + offset.x
+            vector.y = <float>(y * yDis - yOffset) + offset.y
+            vector.z =  offset.z
+            points.data[index] = vector
 
     return points, xDis, yDis
 
