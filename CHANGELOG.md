@@ -17,6 +17,7 @@
 ### Changed
 
 - Vectorized *Mix* nodes.
+- *Quaternon Mix* node now uses slerp for mixing
 
 ## 2.2.0 (01 September 2020)
 
