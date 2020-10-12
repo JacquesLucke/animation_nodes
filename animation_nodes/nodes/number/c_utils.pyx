@@ -156,5 +156,5 @@ def convertAngles(DoubleList values, str mode):
             result.data[i] = degToRad(values.data[i])
     elif mode == 'RADIAN_TO_DEGREE':
         for i in range(amount):
-            result.data[i] = degToRad(values.data[i])
+            result.data[i] = radToDeg(values.data[i])
     return result
