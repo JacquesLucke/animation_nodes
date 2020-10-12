@@ -103,7 +103,8 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
         try: return falloff.getEvaluator("LOCATION", self.clampFalloff)
         except: self.raiseErrorMessage("This falloff cannot be evaluated for vectors")
 
-# http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/
+# http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/ is modified for multiple
+# tolerance values.
 def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, double _xDis,
                     double _yDis, Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
     cdef float a, b, c, d
