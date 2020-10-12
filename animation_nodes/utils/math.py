@@ -1,4 +1,5 @@
-from mathutils import Matrix, Euler
+from mathutils import Matrix, Euler, Quaternion
+from math import sin, acos, fabs
 
 def composeMatrix(location, rotation, scale):
     # Scale
@@ -39,5 +40,26 @@ def mixEulers(a, b, factor):
     z = a.z * (1 - factor) + b.z * factor
     return Euler((x, y, z), a.order)
 
+def mixQuaternions(x, y, factor):
+    a = 1 - factor
+    b = factor
+    d = x.x * y.x + x.y * y.y + x.z * y.z + x.w * y.w
+    c = fabs(d)
+
+    if c < 0.999:
+        c = acos(c)
+        b = 1 / sin(c)
+        a = sin(a * c) * b
+        b *= sin(factor * c)
+        if d < 0:
+            b = -b
+
+    qw = x.w * a + y.w * b
+    qx = x.x * a + y.x * b
+    qy = x.y * a + y.y * b
+    qz = x.z * a + y.z * b
+    return Quaternion((qw, qx, qy, qz))
+
 def cantorPair(a, b):
     return int((a + b) * (a + b + 1) / 2 + b)
+   
