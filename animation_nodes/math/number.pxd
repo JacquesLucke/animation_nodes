@@ -34,5 +34,5 @@ cdef double clamp(double x, double minValue, double maxValue)
 cdef double lerp(double x, double y, double p)
 cdef float lerpFloat(float x, float y, float p)
 
-cdef double degToRad(double value)
-cdef double radToDeg(double value)
+cdef double degreeToRadian(double value)
+cdef double radianToDegree(double value)

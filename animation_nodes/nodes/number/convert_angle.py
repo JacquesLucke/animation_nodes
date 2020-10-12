@@ -30,7 +30,10 @@ class ConvertAngleNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         if self.useList:
-            return "outAngles = AN.nodes.number.c_utils.convertAngles(inAngles, self.conversionType)"
+            if self.conversionType == "DEGREE_TO_RADIAN":
+                return "outAngles = AN.nodes.number.c_utils.degreesToRadians(inAngles)"
+            if self.conversionType == "RADIAN_TO_DEGREE":
+                return "outAngles = AN.nodes.number.c_utils.radiansToDegrees(inAngles)"
         else:
             if self.conversionType == "DEGREE_TO_RADIAN": return "outAngle = inAngle / 180 * math.pi"
             if self.conversionType == "RADIAN_TO_DEGREE": return "outAngle = inAngle * 180 / math.pi"
