@@ -10,6 +10,7 @@ from ... data_structures cimport (
 from ... utils.limits cimport INT_MAX
 from ... utils.clamp cimport clamp, clampLong
 from ... algorithms.random cimport randomDouble_Range
+from ... math cimport degToRad, radToDeg
 
 def range_LongList_StartStep(amount, start, step):
     cdef long long _amount = clampLong(amount)
@@ -146,3 +147,14 @@ def compareNumbers_GreaterThanOrEqual(VirtualDoubleList a, VirtualDoubleList b, 
         result.data[i] = a.get(i) >= b.get(i)
     return result
 
+def convertAngles(DoubleList values, str mode):
+    cdef Py_ssize_t i
+    cdef Py_ssize_t amount = values.length
+    cdef DoubleList result = DoubleList(length = amount)
+    if mode == 'DEGREE_TO_RADIAN':
+        for i in range(amount):
+            result.data[i] = degToRad(values.data[i])
+    elif mode == 'RADIAN_TO_DEGREE':
+        for i in range(amount):
+            result.data[i] = degToRad(values.data[i])
+    return result
