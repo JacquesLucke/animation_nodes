@@ -163,12 +163,11 @@ def axisListAngleListToQuaternionList(Vector3DList vs, DoubleList angles, bint u
     cdef QuaternionList qs = QuaternionList(length = amount)
 
     for i in range(amount):
-        if usedegree == False:
-            angles.data[i] = angles.data[i]
-        else:
-            angles.data[i] = angles.data[i] * degreeToRadianFactor
+        angle = <float>angles.data[i]
+        if useDegree:
+            angle = angle * degreeToRadianFactor
 
-        quatFromAxisAngle(qs.data + i, vs.data + i, angles.data + i)
+        quatFromAxisAngle(qs.data + i, vs.data + i, angle)
         quaternionNormalize_InPlace(qs.data + i)
 
     return qs
@@ -183,11 +182,10 @@ def quaternionListToAxisListAngleList(QuaternionList qs, bint usedegree = False)
     for i in range(amount):
         quaternionNormalize_InPlace(qs.data + i)
         u = 2 * acos(qs.data[i].w)
-        if usedegree == False:
-            angles.data[i] = u
-        else:
-            angles.data[i] = u * radianToDegreeFactor
-        quaternionToAxisAngles(&a.data[i], angles.data[i], &q.data[i])
-        normalizeVec3_InPlace(a.data + i)
+        angle = u
+        if useDegree:
+            angle = u * degreeToRadianFactor
+        quaternionToAxisAngles(vs.data + i, angle, qs.data + i)
+        normalizeVec3_InPlace(vs.data + i)
 
     return vs, angles
