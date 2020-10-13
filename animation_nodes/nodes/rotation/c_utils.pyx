@@ -1,9 +1,9 @@
 from libc.math cimport M_PI as PI, sqrt, sin, cos, asin, acos
 from ... math cimport (
     quaternionNormalize_InPlace, normalizeVec3_InPlace,
-    eulerToQuaternionInPlace, quaternionToMatrix4Inplace,
-    quaternionToEulerInPlace, quaternionToAxis_AngleInPlace,
-    axis_AngleToQuaternionInPlace
+    euler3ToQuaternion, quaternionToMatrix4,
+    quaternionToEuler3, quaternionToAxisAngle,
+    quatFromAxisAngle
 )
 from ... algorithms.random_number_generators cimport XoShiRo256Plus
 
@@ -127,68 +127,67 @@ def randomQuaternionList(int seed, int amount):
 
     return result
 
-def quaternionsToMatrices(QuaternionList q):
-    cdef Py_ssize_t count = len(q)
-    cdef Matrix4x4List m = Matrix4x4List(length = count)
-
-    for i in range(count):
-        quaternionToMatrix4Inplace(&m.data[i], &q.data[i])
-    return m
-
-#base on https://en.m.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-#base on https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions
-def eulersToQuaternions(EulerList e):
+def quaternionListToMatrixList(QuaternionList qs):
     cdef Py_ssize_t i
-    cdef int count = e.getLength()
-    cdef QuaternionList q = QuaternionList(length=count)
+    cdef long amount = qs.length
+    cdef Matrix4x4List ms = Matrix4x4List(length = amount)
 
-    for i in range(count):
-        eulerToQuaternionInPlace(&q.data[i], &e.data[i])
-        quaternionNormalize_InPlace(q.data + i)
+    for i in range(amount):
+        quaternionToMatrix4(ms.data + i, qs.data + i)
+    return ms
 
-    return q
-
-def quaternionsToEulers(QuaternionList q):
+def eulerListToQuaternionList(EulerList es):
     cdef Py_ssize_t i
-    cdef int count = q.getLength()
-    cdef EulerList e = EulerList(length=count)
-    e.fill(0)
+    cdef long amount = es.length
+    cdef QuaternionList qs = QuaternionList(length = amount)
 
-    for i in range(count):
-        quaternionToEulerInPlace(&e.data[i], &q.data[i])
+    for i in range(amount):
+        euler3ToQuaternion(qs.data + i, es.data + i)
+        quaternionNormalize_InPlace(qs.data + i)
 
-    return e
+    return qs
 
-def axises_AnglesToQuaternions(Vector3DList a, DoubleList angles, bint usedegree=False):
+def quaternionListToEulerList(QuaternionList qs):
     cdef Py_ssize_t i
-    cdef int count = len(a)
-    cdef QuaternionList q = QuaternionList(length=count)
+    cdef long amount = qs.length
+    cdef EulerList es = EulerList(length = amount)
 
-    for i in range(count):
+    for i in range(amount):
+        quaternionToEuler3(es.data + i, qs.data + i)
+
+    return es
+
+def axisListAngleListToQuaternionList(Vector3DList vs, DoubleList angles, bint usedegree = False):
+    cdef Py_ssize_t i
+    cdef long amount = vs.length
+    cdef QuaternionList qs = QuaternionList(length = amount)
+
+    for i in range(amount):
         if usedegree == False:
             angles.data[i] = angles.data[i]
         else:
             angles.data[i] = angles.data[i] * degreeToRadianFactor
 
-        axis_AngleToQuaternionInPlace(&q.data[i], &a.data[i], angles.data[i])
-        quaternionNormalize_InPlace(q.data + i)
+        quatFromAxisAngle(qs.data + i, vs.data + i, angles.data + i)
+        quaternionNormalize_InPlace(qs.data + i)
 
-    return q
+    return qs
 
-def quaternionsToAxises_Angles(QuaternionList q, bint usedegree=False):
+def quaternionListToAxisListAngleList(QuaternionList qs, bint usedegree = False):
     cdef Py_ssize_t i
-    cdef int count = len(q)
+    cdef long amount = qs.length
     cdef double u
-    cdef Vector3DList a = Vector3DList(length=count)
-    cdef DoubleList angles = DoubleList(length=count)
+    cdef Vector3DList vs = Vector3DList(length = amount)
+    cdef DoubleList angles = DoubleList(length = amount)
 
-    for i in range(count):
-        u = 2 * acos(q.data[i].w)
+    for i in range(amount):
+        quaternionNormalize_InPlace(qs.data + i)
+        u = 2 * acos(qs.data[i].w)
         if usedegree == False:
             angles.data[i] = u
         else:
             angles.data[i] = u * radianToDegreeFactor
-        quaternionToAxis_AngleInPlace(&a.data[i], angles.data[i], &q.data[i])
+        quaternionToAxisAngles(&a.data[i], angles.data[i], &q.data[i])
         normalizeVec3_InPlace(a.data + i)
 
-    return a, angles
+    return vs, angles
