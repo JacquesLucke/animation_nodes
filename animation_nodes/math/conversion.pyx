@@ -1,6 +1,5 @@
 from mathutils import Vector, Matrix, Euler
 from mathutils import Quaternion as PyQuaternion
-from . math import quaternionNormalize_InPlace
 from .. data_structures.color import Color as PyColor
 from libc.math cimport M_PI as PI, sqrt, abs, sin, cos, asin, acos, atan2, copysign
 
