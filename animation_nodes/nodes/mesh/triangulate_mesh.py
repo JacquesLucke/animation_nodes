@@ -28,7 +28,7 @@ class TriangulateMeshNode(bpy.types.Node, AnimationNode):
             mesh.triangulateMesh(method = "FAN")
 
         try:
-            checkMeshData(mesh.vertices, mesh.edges, mesh.polygons)
+            checkMeshData(mesh.vertices, mesh.edges, mesh.polygons, mesh.materialIndices)
             return mesh
         except Exception as e:
             self.raiseErrorMessage(str(e))

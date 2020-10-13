@@ -9,6 +9,7 @@
 - Added *Random Color* node.
 - Added *Find Shortest Path* node.
 - Added *Compare Numbers* node.
+- Added *Copy Object Modifiers* node.
 
 ### Fixed
 

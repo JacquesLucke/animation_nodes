@@ -4,6 +4,7 @@ cdef struct Color:
 cdef void addColor(Color* target, Color* a, Color* b)
 cdef void addColor_Inplace(Color* c, Color* a)
 cdef void scaleColor_Inplace(Color* c, float factor)
+cdef void mixColor(Color* target, Color* x, Color* y, float factor)
 
 cdef void hsla_to_rgba(Color* c, float h, float s, float l, float a)
 cdef void hsva_to_rgba(Color* c, float h, float s, float v, float a)
