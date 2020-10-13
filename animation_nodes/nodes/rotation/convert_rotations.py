@@ -92,18 +92,18 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self, required):
         if self.conversionType == "QUATERNION_TO_EULER":
             if self.useList:
-                return "eulers = AN.nodes.rotation.c_utils.quaternionsToEulers(quaternions)"
+                return "eulers = AN.nodes.rotation.c_utils.quaternionListToEulerList(quaternions)"
             else:
                 return "euler = quaternion.to_euler('XYZ')"
         if self.conversionType == "EULER_TO_QUATERNION":
             if self.useList:
-                return "quaternions = AN.nodes.rotation.c_utils.eulersToQuaternions(eulers)"
+                return "quaternions = AN.nodes.rotation.c_utils.eulerListToQuaternionList(eulers)"
             else:
                 return "quaternion = euler.to_quaternion()"
 
         if self.conversionType == "QUATERNION_TO_MATRIX":
             if self.useList:
-                return "matrices = AN.nodes.rotation.c_utils.quaternionsToMatrices(quaternions)"
+                return "matrices = AN.nodes.rotation.c_utils.quaternionListToMatrxList(quaternions)"
             else:
                 return "matrix = quaternion.normalized().to_matrix().to_4x4()"
         if self.conversionType == "MATRIX_TO_QUATERNION":
@@ -126,23 +126,23 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
         if self.conversionType == "QUATERNION_TO_AXIS_ANGLE":
             if self.useDegree:
                 if self.useList:
-                    return "axises, angles = AN.nodes.rotation.c_utils.quaternionsToAxises_Angles(quaternions, True)"
+                    return "axises, angles = AN.nodes.rotation.c_utils.quaternionListToAxisListAngleList(quaternions, True)"
                 else:
                     return "axis, angle = quaternion.axis, math.degrees(quaternion.angle)"
             else:
                 if self.useList:
-                    return "axises, angles = AN.nodes.rotation.c_utils.quaternionsToAxises_Angles(quaternions, False)"
+                    return "axises, angles = AN.nodes.rotation.c_utils.quaternionListToAxisListAngleList(quaternions)"
                 else:
                     return "axis, angle = quaternion.to_axis_angle()"
         if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
             if self.useDegree:
                 if self.useList:
-                    return "quaternions = AN.nodes.rotation.c_utils.axises_AnglesToQuaternions(axises, angles, True)"
+                    return "quaternions = AN.nodes.rotation.c_utils.axisListAngleListToQuaternionList(axises, angles, True)"
                 else:
                     return "quaternion = Quaternion(axis, math.radians(angle))"
             else:
                 if self.useList:
-                    return "quaternions = AN.nodes.rotation.c_utils.axises_AnglesToQuaternions(axises, angles, False)"
+                    return "quaternions = AN.nodes.rotation.c_utils.axiseListAngleListToQuaternionList(axises, angles, False)"
                 else:
                     return "quaternion = Quaternion(axis, angle)"
 
