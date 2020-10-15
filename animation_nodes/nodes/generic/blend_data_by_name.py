@@ -6,7 +6,8 @@ dataTypes = {
     "Object" : "objects",
     "Scene" : "scenes",
     "Collection" : "collections",
-    "Text Block" : "texts" }
+    "Text Block" : "texts", 
+    "Material" : "materials" }
 
 class BlendDataByNameNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_BlendDataByNameNode"
