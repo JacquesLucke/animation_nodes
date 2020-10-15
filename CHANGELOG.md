@@ -9,14 +9,19 @@
 - Added *Random Color* node.
 - Added *Find Shortest Path* node.
 - Added *Compare Numbers* node.
+- Added *Copy Object Modifiers* node.
 
 ### Fixed
 
 - Fixed nextBoolean method for XoShiRo256StarStar generators.
+- Fixed OpenGL fragment shaders on Core contexts.
+- Fixed triangulateMesh method of Mesh.
 
 ### Changed
 
 - Vectorized *Mix* nodes.
+- *Mix Quaternions* node now uses slerp for mixing
+- Vectorized *Convert Angle* node
 
 ## 2.2.0 (01 September 2020)
 
