@@ -103,7 +103,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
 
         if self.conversionType == "QUATERNION_TO_MATRIX":
             if self.useList:
-                return "matrices = AN.nodes.rotation.c_utils.quaternionListToMatrxList(quaternions)"
+                return "matrices = AN.nodes.rotation.c_utils.quaternionListToMatrixList(quaternions)"
             else:
                 return "matrix = quaternion.normalized().to_matrix().to_4x4()"
         if self.conversionType == "MATRIX_TO_QUATERNION":
@@ -131,7 +131,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
                     return "axis, angle = quaternion.axis, math.degrees(quaternion.angle)"
             else:
                 if self.useList:
-                    return "axises, angles = AN.nodes.rotation.c_utils.quaternionListToAxisListAngleList(quaternions)"
+                    return "axises, angles = AN.nodes.rotation.c_utils.quaternionListToAxisListAngleList(quaternions, False)"
                 else:
                     return "axis, angle = quaternion.to_axis_angle()"
         if self.conversionType == "AXIS_ANGLE_TO_QUATERNION":
@@ -142,7 +142,7 @@ class ConvertRotationsNode(bpy.types.Node, AnimationNode):
                     return "quaternion = Quaternion(axis, math.radians(angle))"
             else:
                 if self.useList:
-                    return "quaternions = AN.nodes.rotation.c_utils.axiseListAngleListToQuaternionList(axises, angles, False)"
+                    return "quaternions = AN.nodes.rotation.c_utils.axisListAngleListToQuaternionList(axises, angles, False)"
                 else:
                     return "quaternion = Quaternion(axis, angle)"
 
