@@ -179,7 +179,7 @@ def quaternionListToAxisListAngleList(QuaternionList qs, bint useDegree = False)
     cdef DoubleList angles = DoubleList(length = amount)
 
     for i in range(amount):
-        quaternionToAxisAngles(vs.data + i, <float>angles.data[i], qs.data + i)
+        quaternionToAxisAngle(vs.data + i, <float>angles.data[i], qs.data + i)
         if useDegree:
             angles.data[i] = <float>angles.data[i] * radianToDegreeFactor
         
