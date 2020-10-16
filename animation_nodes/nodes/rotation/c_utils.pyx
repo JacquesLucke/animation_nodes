@@ -157,7 +157,7 @@ def quaternionListToEulerList(QuaternionList qs):
 
     return es
 
-def axisListAngleListToQuaternionList(Vector3DList vs, DoubleList angles, bint usedegree = False):
+def axisListAngleListToQuaternionList(Vector3DList vs, DoubleList angles, bint useDegree = False):
     cdef Py_ssize_t i
     cdef long amount = vs.length
     cdef QuaternionList qs = QuaternionList(length = amount)
@@ -172,20 +172,17 @@ def axisListAngleListToQuaternionList(Vector3DList vs, DoubleList angles, bint u
 
     return qs
 
-def quaternionListToAxisListAngleList(QuaternionList qs, bint usedegree = False):
+def quaternionListToAxisListAngleList(QuaternionList qs, bint useDegree = False):
     cdef Py_ssize_t i
     cdef long amount = qs.length
-    cdef double u
     cdef Vector3DList vs = Vector3DList(length = amount)
     cdef DoubleList angles = DoubleList(length = amount)
 
     for i in range(amount):
-        quaternionNormalize_InPlace(qs.data + i)
-        u = 2 * acos(qs.data[i].w)
-        angle = u
+        quaternionToAxisAngles(vs.data + i, <float>angles.data[i], qs.data + i)
         if useDegree:
-            angle = u * degreeToRadianFactor
-        quaternionToAxisAngles(vs.data + i, angle, qs.data + i)
+            angles.data[i] = <float>angles.data[i] * radianToDegreeFactor
+        
         normalizeVec3_InPlace(vs.data + i)
 
     return vs, angles
