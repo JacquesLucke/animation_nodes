@@ -25,10 +25,13 @@ cdef toPyVector4(Vector4* v)
 cdef Euler3 toEuler3(value) except *
 cdef setEuler3(Euler3* e, value)
 cdef toPyEuler3(Euler3* e)
+cdef euler3ToQuaternion(Quaternion* q, Euler3 *e)
 
 cdef Quaternion toQuaternion(value) except *
 cdef setQuaternion(Quaternion* q, value)
 cdef toPyQuaternion(Quaternion* q)
+cdef quaternionToMatrix4(Matrix4 *m, Quaternion *q)
+cdef quaternionToEuler3(Euler3 *e, Quaternion *q)
 
 cdef Color toColor(value) except *
 cdef setColor(Color* c, value)
