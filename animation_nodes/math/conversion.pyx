@@ -1,7 +1,8 @@
 from mathutils import Vector, Matrix, Euler
 from mathutils import Quaternion as PyQuaternion
 from .. data_structures.color import Color as PyColor
-
+from .. math cimport quaternionNormalize_InPlace
+from libc.math cimport M_PI as PI, sqrt, abs, sin, cos, asin, acos, atan2, copysign
 # Vectors
 ##########################################################
 
@@ -121,6 +122,19 @@ cdef toPyEuler3(Euler3* e):
     if e.order == 4: return Euler((e.x, e.y, e.z), "ZXY")
     if e.order == 5: return Euler((e.x, e.y, e.z), "ZYX")
 
+#https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+cdef euler3ToQuaternion(Quaternion* q, Euler3 *e):
+    cdef float cx = cos(e.x * 0.5)
+    cdef float sx = sin(e.x * 0.5)
+    cdef float cy = cos(e.y * 0.5)
+    cdef float sy = sin(e.y * 0.5)
+    cdef float cz = cos(e.z * 0.5)
+    cdef float sz = sin(e.z * 0.5)
+    
+    q.w = cx * cy * cz + sx * sy * sz
+    q.x = sx * cy * cz - cx * sy * sz
+    q.y = cx * sy * cz + sx * cy * sz
+    q.z = cx * cy * sz - sx * sy * cz
 
 # Quaternions
 ##########################################################
@@ -139,7 +153,49 @@ cdef setQuaternion(Quaternion* q, value):
 cdef toPyQuaternion(Quaternion* q):
     return PyQuaternion((q.w, q.x, q.y, q.z))
 
+#https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
+cdef quaternionToMatrix4(Matrix4 *m, Quaternion *q):
+    quaternionNormalize_InPlace(q)
+    cdef float w, x, y, z
+    w, x, y, z = q.w, q.x, q.y, q.z
+    cdef float ww = w * w
+    cdef float xx = x * x
+    cdef float yy = y * y
+    cdef float zz = z * z
 
+    cdef invs = 1 / (xx + yy + zz +ww)
+
+    m.a11 = (xx - yy - zz + ww) * invs
+    m.a22 = (-xx + yy - zz + ww) * invs
+    m.a33 = (-xx - yy + zz + ww) * invs
+
+    m.a21 = 2.0 * (x * y + z * w) * invs
+    m.a12 = 2.0 * (x * y - z * w) * invs
+
+    m.a31 = 2.0 * (x * z - y * w) * invs
+    m.a13 = 2.0 * (x * z + y * w) * invs
+
+    m.a32 = 2.0 * (y * z + x * w) * invs
+    m.a23 = 2.0 * (y * z - x * w) * invs
+
+#https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+cdef quaternionToEuler3(Euler3 *e, Quaternion *q):
+    quaternionNormalize_InPlace(q)
+    cdef float sinrCosp = 2 * (q.w * q.x + q.y * q.z)
+    cdef float cosrCosp = 1 - 2 * (q.x * q.x + q.y * q.y)
+    e.x = atan2(sinrCosp, cosrCosp)
+
+    cdef float sinp = 2 * (q.w * q.y - q.z * q.x)
+    if abs(sinp) >= 1.0:
+        e.y = copysign(PI/2, sinp)
+    else:
+        e.y = asin(sinp)
+
+    cdef float sinyCosp = 2 * (q.w * q.z + q.x * q.y)
+    cdef float cosyCosp = 1 - 2 * (q.y * q.y + q.z * q.z)
+    e.z = atan2(sinyCosp, cosyCosp)
+    e.order = 0
+    
 # Colors
 ###########################################################
 
