@@ -196,17 +196,6 @@ cdef quaternionToEuler3(Euler3 *e, Quaternion *q):
     cdef float cosyCosp = 1 - 2 * (q.y * q.y + q.z * q.z)
     e.z = atan2(sinyCosp, cosyCosp)
     e.order = 0
-
-#https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
-cdef quaternionToAxisAngle(Vector3 *v, float *a, Quaternion *q):
-    quaternionNormalize_InPlace(q)
-    cdef float k = sqrt(1 - q.w * q.w)
-    
-    v.x = q.x / k
-    v.y = q.y / k
-    v.z = q.z / k
-    
-    a[0] = <float>(2 * acos(q.w))
     
 # Colors
 ###########################################################
