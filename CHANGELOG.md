@@ -22,6 +22,7 @@
 - Vectorized *Mix* nodes.
 - *Mix Quaternions* node now uses slerp for mixing
 - Vectorized *Convert Angle* node
+- Vectorized *Convert Rotation* node
 
 ## 2.2.0 (01 September 2020)
 
