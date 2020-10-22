@@ -1,6 +1,4 @@
 import bpy
-from . c_utils import calculateVectorDotProducts
-from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 
 class VectorDotProductNode(bpy.types.Node, AnimationNode):
@@ -21,12 +19,9 @@ class VectorDotProductNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         if self.useListA or self.useListB:
-            yield "dotProducts = self.calculateDotProducts(a, b)"
+            yield "_vA = VirtualVector3DList.create(a, (0, 0, 0))"
+            yield "_vB = VirtualVector3DList.create(b, (0, 0, 0))"
+            yield "dotProducts = AN.nodes.vector.c_utils.calculateVectorDotProducts(_vA, _vB)"
         else:
             yield "distance = (a - b).length"
             yield "dotProduct = a.dot(b)"
-
-    def calculateDotProducts(self, a, b):
-        vectors1 = VirtualVector3DList.create(a, (0, 0, 0))
-        vectors2 = VirtualVector3DList.create(b, (0, 0, 0))
-        return calculateVectorDotProducts(vectors1, vectors2)
