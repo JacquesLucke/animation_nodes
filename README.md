@@ -1,5 +1,5 @@
 
-# AN with BlueFox nodes
+# AN with New nodes
 
 Fork from [AnimationNodes](https://github.com/JacquesLucke/animation_nodes) created by Jacques Luke and nodes from AN+EN([3DSinghVFX](https://github.com/3DSinghVFX/animation_nodes/tree/extranodes)). This branch adds effector nodes, extra falloff nodes and more.
 
