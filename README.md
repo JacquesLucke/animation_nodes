@@ -1,12 +1,10 @@
-Animation Nodes
-===============
 
-![Build And Deploy](https://github.com/JacquesLucke/animation_nodes/workflows/Build%20And%20Deploy/badge.svg)
+# AN with BlueFox nodes
 
-Animation Nodes is a node based visual scripting system designed for motion graphics in [Blender](http://blender.org).
+Fork from [AnimationNodes](https://github.com/JacquesLucke/animation_nodes) created by Jacques Luke and nodes from AN+EN([3DSinghVFX](https://github.com/3DSinghVFX/animation_nodes/tree/extranodes)). This branch adds effector nodes, extra falloff nodes and more.
 
-Download the latest version from the Animation Nodes website. https://animation-nodes.com/#download
-
-Get started with Animation Nodes by reading the get started guide. http://animation-nodes.com/#get-started
-
-[![Showreel](https://img.youtube.com/vi/nCghhlMOwRg/0.jpg)](https://www.youtube.com/watch?v=nCghhlMOwRg)
+| DOWNLOAD              
+|----------------|
+|[Linux Build](https://github.com/kdsin23/AN_NEWNODES/releases/download/Daily/animation_nodes_v2_2_linux_py37.zip)        |
+|[MacOS Build](https://github.com/kdsin23/AN_NEWNODES/releases/download/Daily/animation_nodes_v2_2_macOS_py37.zip)         |
+|[Windows Build](https://github.com/kdsin23/AN_NEWNODES/releases/download/Daily/animation_nodes_v2_2_windows_py37.zip)
