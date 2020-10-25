@@ -150,7 +150,7 @@ def main_Build(options, configs):
     )
     checkBuildOptions(options)
 
-    changedFileStates = build(skipCompilation = "--nocompile" in options)
+    changedFileStates = build(configs, skipCompilation = "--nocompile" in options)
     printChangedFileStates(changedFileStates, currentDirectory)
 
     if "--copy" in options:
@@ -185,11 +185,11 @@ def printIndentedPathList(paths, basepath):
             print("  {}".format(os.path.relpath(path, basepath)))
 
 @returnChangedFileStates(currentDirectory)
-def build(skipCompilation = False):
+def build(configs, skipCompilation = False):
     setupInfoList = getSetupInfoList(addonDirectory)
 
     execute_PyPreprocess(setupInfoList, addonDirectory)
-    execute_Cythonize(setupInfoList, addonDirectory)
+    execute_Cythonize(setupInfoList, addonDirectory, configs)
 
     if not skipCompilation:
         execute_CompileLibraries(setupInfoList, addonDirectory)
