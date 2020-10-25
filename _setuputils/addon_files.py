@@ -22,6 +22,16 @@ def iterRelativeExportCFiles(basepath):
                 fullpath = os.path.join(root, filename)
                 yield os.path.relpath(fullpath, basepath)
 
+def iterRelativeHeaderFiles(basepath):
+    for root, dirs, files in os.walk(basepath, topdown = True):
+        for directory in dirs:
+            if isAddonDirectoryIgnored(directory):
+                dirs.remove(directory)
+        for filename in files:
+            if filename.endswith(".pxd"):
+                fullpath = os.path.join(root, filename)
+                yield os.path.relpath(fullpath, basepath)
+
 def isAddonDirectoryIgnored(name):
     return name in {".git", "__pycache__"}
 

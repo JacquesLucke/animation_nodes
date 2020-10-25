@@ -10,6 +10,7 @@
 - Added *Find Shortest Path* node.
 - Added *Compare Numbers* node.
 - Added *Copy Object Modifiers* node.
+- Added *Export Headers* option to the setup script.
 
 ### Fixed
 

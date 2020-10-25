@@ -1,7 +1,7 @@
 import os
 import zipfile
 from . generic import *
-from . addon_files import iterRelativeAddonFiles, iterRelativeExportCFiles
+from . addon_files import iterRelativeAddonFiles, iterRelativeExportCFiles, iterRelativeHeaderFiles
 
 currentDirectory = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,7 +18,7 @@ def execute_Export(addonDirectory, exportPath, addonName):
 
 def execute_ExportC(addonDirectory, exportCPath, exportCSetupPath, addonName):
     removeFile(exportCPath)
-    topdir = "animation_nodes_c"
+    topdir = f"{addonName}_c"
 
     with zipfile.ZipFile(exportCPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
         for relativePath in iterRelativeExportCFiles(addonDirectory):
@@ -39,3 +39,26 @@ def execute_ExportC(addonDirectory, exportCPath, exportCSetupPath, addonName):
 
     print("Exported C Build:")
     print("    " + exportCPath)
+
+def execute_ExportHeaders(addonDirectory, exportHeadersPath, addonName):
+    removeFile(exportHeadersPath)
+    topdir = f"{addonName}_headers"
+
+    with zipfile.ZipFile(exportHeadersPath, "w", zipfile.ZIP_DEFLATED) as zipFile:
+        modulePaths = set()
+        for relativePath in iterRelativeHeaderFiles(addonDirectory):
+            absolutePath = os.path.join(addonDirectory, relativePath)
+            zipFile.write(absolutePath, os.path.join(topdir, addonName, relativePath))
+
+            directory = os.path.dirname(relativePath)
+            while directory:
+                modulePaths.add(directory)
+                directory = os.path.dirname(directory)
+
+        modulePaths.add("")
+        for relativePath in modulePaths:
+            arcpath = os.path.join(topdir, addonName, relativePath, "__init__.py")
+            zipFile.writestr(arcpath, bytes())
+
+    print("Exported Headers:")
+    print("    " + exportHeadersPath)
