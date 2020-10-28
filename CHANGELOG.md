@@ -10,6 +10,7 @@
 - Added *Find Shortest Path* node.
 - Added *Compare Numbers* node.
 - Added *Copy Object Modifiers* node.
+- Added *Export Headers* option to the setup script.
 - Added *Marching Squares* node.
 
 ### Fixed
@@ -21,6 +22,9 @@
 ### Changed
 
 - Vectorized *Mix* nodes.
+- *Mix Quaternions* node now uses slerp for mixing
+- Vectorized *Convert Angle* node
+- Vectorized *Vector Dot Product* node
 
 ## 2.2.0 (01 September 2020)
 

@@ -87,3 +87,9 @@ cdef double lerp(double x, double y, double p):
 
 cdef float lerpFloat(float x, float y, float p):
     return (1.0 - p) * x + p * y
+
+cdef double degreeToRadian(double value):
+    return value * PI / 180
+
+cdef double radianToDegree(double value):
+    return value * 180 / PI

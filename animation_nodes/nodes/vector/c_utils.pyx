@@ -1,4 +1,4 @@
-from ... math cimport Vector3, distanceVec3, lengthVec3
+from ... math cimport Vector3, distanceVec3, lengthVec3, dotVec3
 from ... data_structures cimport (
     DoubleList, Vector3DList, CDefaultList, Vector2DList,
     VirtualDoubleList, VirtualVector3DList, FloatList)
@@ -105,3 +105,12 @@ def offset3DVectors(Vector3DList vectors, VirtualVector3DList offsets, FloatList
         vectors.data[i].x += offset.x * influence
         vectors.data[i].y += offset.y * influence
         vectors.data[i].z += offset.z * influence
+
+def calculateVectorDotProducts(Py_ssize_t amount,
+                        VirtualVector3DList vectors1,
+                        VirtualVector3DList vectors2):
+    cdef Py_ssize_t i
+    cdef DoubleList dotProducts = DoubleList(length = amount)
+    for i in range(amount):
+        dotProducts.data[i] = dotVec3(vectors1.get(i), vectors2.get(i))
+    return dotProducts

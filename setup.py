@@ -23,8 +23,8 @@ from _setuputils.compilation import execute_Compile
 from _setuputils.copy_addon import execute_CopyAddon
 from _setuputils.pypreprocess import execute_PyPreprocess
 from _setuputils.setup_info_files import getSetupInfoList
-from _setuputils.export import execute_Export, execute_ExportC
 from _setuputils.compile_libraries import execute_CompileLibraries
+from _setuputils.export import execute_Export, execute_ExportC, execute_ExportHeaders
 
 addonName = "animation_nodes"
 addonDirectory = os.path.join(currentDirectory, addonName)
@@ -41,6 +41,7 @@ exportName = "{}_v{}_{}_{}_py{}{}".format(
 
 exportPath = os.path.join(currentDirectory, exportName + ".zip")
 exportCPath = os.path.join(currentDirectory, "{}_c.zip".format(addonName))
+exportHeadersPath = os.path.join(currentDirectory, "{}_headers.zip".format(addonName))
 exportCSetupPath = os.path.join(currentDirectory, "_export_c_setup.py")
 
 possibleCommands = ["build", "help", "clean"]
@@ -49,6 +50,7 @@ buildOptionDescriptions = [
     ("--copy", "Copy build to location specified in the conf.json file"),
     ("--export", "Create installable .zip file"),
     ("--exportc", "Create build that can be compiled without cython"),
+    ("--exportheaders", "Create a .zip file containing pxd definition files"),
     ("--nocompile", "Don't compile the extension modules"),
     ("--noversioncheck", "Don't check the used Python version")
 ]
@@ -148,7 +150,7 @@ def main_Build(options, configs):
     )
     checkBuildOptions(options)
 
-    changedFileStates = build(skipCompilation = "--nocompile" in options)
+    changedFileStates = build(configs, skipCompilation = "--nocompile" in options)
     printChangedFileStates(changedFileStates, currentDirectory)
 
     if "--copy" in options:
@@ -162,6 +164,8 @@ def main_Build(options, configs):
         execute_Export(addonDirectory, exportPath, addonName)
     if "--exportc" in options:
         execute_ExportC(addonDirectory, exportCPath, exportCSetupPath, addonName)
+    if "--exportheaders" in options:
+        execute_ExportHeaders(addonDirectory, exportHeadersPath, addonName)
 
 def printChangedFileStates(states, basepath):
     printHeader("File System Changes")
@@ -181,11 +185,11 @@ def printIndentedPathList(paths, basepath):
             print("  {}".format(os.path.relpath(path, basepath)))
 
 @returnChangedFileStates(currentDirectory)
-def build(skipCompilation = False):
+def build(configs, skipCompilation = False):
     setupInfoList = getSetupInfoList(addonDirectory)
 
     execute_PyPreprocess(setupInfoList, addonDirectory)
-    execute_Cythonize(setupInfoList, addonDirectory)
+    execute_Cythonize(setupInfoList, addonDirectory, configs)
 
     if not skipCompilation:
         execute_CompileLibraries(setupInfoList, addonDirectory)
