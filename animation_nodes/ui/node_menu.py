@@ -475,6 +475,7 @@ class MeshOperatorsMenu(bpy.types.Menu):
         insertNode(layout, "an_FindShortestPathNode", "Find Shortest Path")
         insertNode(layout, "an_EdgeToTubeNode", "Edge to Tube")
         insertNode(layout, "an_MeshPointsScatterNode", "Scatter Points")
+        insertNode(layout, "an_MarchingSquaresNode", "Marching Squares")
         layout.separator()
         insertNode(layout, "an_CreateEdgesNode", "Create Edges")
         insertNode(layout, "an_CreateEdgeIndicesNode", "Create Edge Indices")
