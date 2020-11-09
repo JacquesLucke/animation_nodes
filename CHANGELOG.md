@@ -11,6 +11,7 @@
 - Added *Compare Numbers* node.
 - Added *Copy Object Modifiers* node.
 - Added *Export Headers* option to the setup script.
+- Added *Modules* option to the *Script* node.
 
 ### Fixed
 

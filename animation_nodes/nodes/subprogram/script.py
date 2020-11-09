@@ -1,5 +1,7 @@
+import re
 import bpy
 from bpy.props import *
+from importlib.util import find_spec
 from ... sockets.info import toIdName
 from ... tree_info import getNodesByType
 from ... utils.handlers import eventHandler
@@ -14,9 +16,11 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
     bl_idname = "an_ScriptNode"
     bl_label = "Script"
     bl_width_default = 200
+    errorHandlingType = "MESSAGE"
 
     def scriptExecutionCodeChanged(self, context):
         self.errorMessage = ""
+        self.resetErrorMessage()
         executionCodeChanged()
 
     executionCode: StringProperty(default = "")
@@ -35,6 +39,10 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
 
     correctOutputTypes: BoolProperty(name = "Correct Output Types", default = True,
         description = "Try to correct the type of variables, return default otherwise",
+        update = scriptExecutionCodeChanged)
+
+    moduleNames: StringProperty(name = "Modules", default = "",
+        description = "Comma separated module names which can be used inside the script",
         update = scriptExecutionCodeChanged)
 
     def setup(self):
@@ -100,11 +108,15 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         col = layout.column()
         col.label(text = "Description:")
         col.prop(self, "subprogramDescription", text = "")
+
         layout.prop(self, "interactiveMode")
+
         col = layout.column(align = True)
         col.prop(self, "debugMode")
         col.prop(self, "initializeMissingOutputs")
         col.prop(self, "correctOutputTypes")
+
+        layout.prop(self, "moduleNames")
 
         col = layout.column()
         col.label(text = "Input Defaults:")
@@ -130,6 +142,22 @@ class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
         else:
             self.invokeSelector(layout, "DATA_TYPE", "newOutputSocket",
                 text = "New Output", icon = "ADD")
+
+    def getUsedModules(self):
+        moduleNames = re.split("\W+", self.moduleNames)
+        modules = []
+        badModules = set()
+        for module in moduleNames:
+            if module == "": continue
+            if not find_spec(module):
+                badModules.add(module)
+            else:
+                modules.append(module)
+
+        if len(badModules) != 0:
+            badModulesString = ", ".join(badModules)
+            self.setErrorMessage(f"Can not import the following modules: {badModulesString}.")
+        return modules
 
     def edit(self):
         removedLink = self.removeLinks()
