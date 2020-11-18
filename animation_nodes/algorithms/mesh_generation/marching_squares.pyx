@@ -20,7 +20,7 @@ def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize,
     cdef FloatList strengths = falloffEvaluator.evaluateList(points)
 
     cdef long nx = limitAmount(xDivisions), ny = limitAmount(yDivisions)
-    cdef Py_ssize_t i, j, k, index, ia, ib, ic, id
+    cdef Py_ssize_t i, j, k, index, a, b, c, d
     cdef long _nx = nx - 1, _ny = ny - 1
 
     meshes = []
@@ -28,21 +28,21 @@ def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize,
         index = nx * i
         for j in range(_nx):
             # Clockwise-Order
-            ia = nx + index + j
-            ib = ia + 1
-            id = j + index
-            ic = id + 1
+            a = nx + index + j
+            b = a + 1
+            d = j + index
+            c = d + 1
 
             for k in range(amountThreshold):
                 meshes.append(getMeshOfSquare(points, strengths, <float>thresholds.get(k),
-                                              ia, ib, ic, id))
+                                              a, b, c, d))
 
     return Mesh.join(*meshes), points
 
 # http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/ is modified for multiple
 # tolerance values.
 def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
-                    Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
+                    Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d):
     '''
     Indices order for a square
         a-------b
@@ -51,214 +51,106 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
         '       '
         d-------c
     '''
-    cdef float a, b, c, d
-    a, b, c, d = strengths.data[ia], strengths.data[ib], strengths.data[ic], strengths.data[id]
+    cdef long indexSquare = binaryToDecimal(a, b, c, d, strengths, tolerance)
+    if indexSquare == 0:
+        return Mesh()
+    elif indexSquare == 1:
+        return getMeshSingle(d, c, d, a, points, strengths, tolerance)
+    elif indexSquare == 2:
+        return getMeshSingle(c, d, c, b, points, strengths, tolerance)
+    elif indexSquare == 3:
+        return getMeshSingle(c, b, d, a, points, strengths, tolerance)
+    elif indexSquare == 4:
+        return getMeshSingle(b, a, b, c, points, strengths, tolerance)
+    elif indexSquare == 5:
+        return getMeshDouble(b, c, d, c, b, a, d, a, points, strengths, tolerance)
+    elif indexSquare == 6:
+        return getMeshSingle(b, a, c, d, points, strengths, tolerance)
+    elif indexSquare == 7:
+        return getMeshSingle(b, a, d, a, points, strengths, tolerance)
+    elif indexSquare == 8:
+        return getMeshSingle(a, b, a, d, points, strengths, tolerance)
+    elif indexSquare == 9:
+        return getMeshSingle(a, b, d, c, points, strengths, tolerance)
+    elif indexSquare == 10:
+        return getMeshDouble(a, b, c, b, a, d, c, d, points, strengths, tolerance)
+    elif indexSquare == 11:
+        return getMeshSingle(a, b, c, b, points, strengths, tolerance)
+    elif indexSquare == 12:
+        return getMeshSingle(a, d, b, c, points, strengths, tolerance)
+    elif indexSquare == 13:
+        return getMeshSingle(b, c, d, c, points, strengths, tolerance)
+    elif indexSquare == 14:
+        return getMeshSingle(a, d, c, d, points, strengths, tolerance)
+    elif indexSquare == 15:
+        return Mesh()
 
-    cdef Vector3 va, vb, vc, vd, v1, v2
-    va, vb, vc, vd = points.data[ia], points.data[ib], points.data[ic], points.data[id]
+cdef long binaryToDecimal(Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d,
+                          FloatList strengths, float t):
+    cdef float sa, sb, sc, sd
+    sa, sb, sc, sd = strengths.data[a], strengths.data[b], strengths.data[c], strengths.data[d]
 
+    # binary order (sd, sc, sb, sa)
+    if sa <= t: sa = 0
+    else: sa = 1
+
+    if sb <= t: sb = 0
+    else: sb = 1
+
+    if sc <= t: sc = 0
+    else: sc = 1
+
+    if sd <= t: sd = 0
+    else: sd = 1
+
+    return <long>(8.0 * sa + 4.0 * sb + 2.0 * sc + sd)
+
+cdef Mesh getMeshSingle(Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d,
+                        Vector3DList points, FloatList strengths, float tolerance):
     cdef Vector3DList vertices = Vector3DList(length = 2)
     cdef EdgeIndicesList edges = EdgeIndicesList(length = 1)
     cdef PolygonIndicesList polygons = PolygonIndicesList()
 
-    cdef long indexSquare = binaryToDecimal(tolerance, a, b, c, d)
-    v1.z = va.z
-    v2.z = va.z
-    if indexSquare == 0:
-        return Mesh()
-    elif indexSquare == 1:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
+    edges.data[0].v1 = 0
+    edges.data[0].v2 = 1
 
-        v1.x = lerp(tolerance, vd.x, vc.x, d, c)
-        v1.y = vc.y
-        v2.x = vd.x
-        v2.y = lerp(tolerance, vd.y, va.y, d, a)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 2:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
+    lerpVec3(vertices.data + 0, points.data + a, points.data + b, strengths.data[a],
+             strengths.data[b], tolerance)
+    lerpVec3(vertices.data + 1, points.data + c, points.data + d, strengths.data[c],
+             strengths.data[d], tolerance)
+    return Mesh(vertices, edges, polygons)
 
-        v1.x = lerp(tolerance, vc.x, vd.x, c, d)
-        v1.y = vc.y
-        v2.x = vc.x
-        v2.y = lerp(tolerance, vc.y, vb.y, c, b)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 3:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
+cdef Mesh getMeshDouble(Py_ssize_t a1, Py_ssize_t b1, Py_ssize_t c1, Py_ssize_t d1,
+                        Py_ssize_t a2, Py_ssize_t b2, Py_ssize_t c2, Py_ssize_t d2,
+                        Vector3DList points, FloatList strengths, float tolerance):
+    cdef Vector3DList vertices = Vector3DList(length = 4)
+    cdef EdgeIndicesList edges = EdgeIndicesList(length = 2)
+    cdef PolygonIndicesList polygons = PolygonIndicesList()
 
-        v1.x = vc.x
-        v1.y = lerp(tolerance, vc.y, vb.y, c, b)
-        v2.x = vd.x
-        v2.y = lerp(tolerance, vd.y, va.y, d, a)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 4:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
+    edges.data[0].v1 = 0
+    edges.data[0].v2 = 1
 
-        v1.x = lerp(tolerance, vb.x, va.x, b, a)
-        v1.y = vb.y
-        v2.x = vb.x
-        v2.y = lerp(tolerance, vb.y, vc.y, b, c)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 5:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
+    lerpVec3(vertices.data + 0, points.data + a1, points.data + b1, strengths.data[a1],
+             strengths.data[b1], tolerance)
+    lerpVec3(vertices.data + 1, points.data + c1, points.data + d1, strengths.data[c1],
+             strengths.data[d1], tolerance)
 
-        v1.x = vb.x
-        v1.y = lerp(tolerance, vb.y, vc.y, b, c)
-        v2.x = lerp(tolerance, vd.x, vc.x, d, c)
-        v2.y = vd.y
-        vertices.data[0] = v1
-        vertices.data[1] = v2
+    edges.data[1].v1 = 2
+    edges.data[1].v2 = 3
 
-        edges.append((2,3))
+    lerpVec3(vertices.data + 2, points.data + a2, points.data + b2, strengths.data[a2],
+             strengths.data[b2], tolerance)
+    lerpVec3(vertices.data + 3, points.data + c2, points.data + d2, strengths.data[c2],
+             strengths.data[d2], tolerance)
+    return Mesh(vertices, edges, polygons)
 
-        v1.x = lerp(tolerance, vb.x, va.x, b, a)
-        v1.y = vb.y
-        v2.x = vd.x
-        v2.y = lerp(tolerance, vd.y, va.y, d, a)
-        vertices.append_LowLevel(v1)
-        vertices.append_LowLevel(v2)
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 6:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = lerp(tolerance, vb.x, va.x, b, a)
-        v1.y = vb.y
-        v2.x = lerp(tolerance, vc.x, vd.x, c, d)
-        v2.y = vc.y
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 7:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = lerp(tolerance, vb.x, va.x, b, a)
-        v1.y = vb.y
-        v2.x = vd.x
-        v2.y = lerp(tolerance, vd.y, va.y, d, a)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 8:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = lerp(tolerance, va.x, vb.x, a, b)
-        v1.y = va.y
-        v2.x = va.x
-        v2.y = lerp(tolerance, va.y, vd.y, a, d)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 9:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = lerp(tolerance, va.x, vb.x, a, b)
-        v1.y = va.y
-        v2.x = lerp(tolerance, vd.x, vc.x, d, c)
-        v2.y = vd.y
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 10:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = lerp(tolerance, va.x, vb.x, a, b)
-        v1.y = va.y
-        v2.x = vc.x
-        v2.y = lerp(tolerance, vc.y, vb.y, c, b)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-
-        edges.append((2,3))
-
-        v1.x = va.x
-        v1.y = lerp(tolerance, va.y, vd.y, a, d)
-        v2.x = lerp(tolerance, vc.x, vd.x, c, d)
-        v2.y = vc.y
-        vertices.append_LowLevel(v1)
-        vertices.append_LowLevel(v2)
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 11:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = lerp(tolerance, va.x, vb.x, a, b)
-        v1.y = va.y
-        v2.x = vc.x
-        v2.y = lerp(tolerance, vc.y, vb.y, c, b)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 12:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = va.x
-        v1.y = lerp(tolerance, va.y, vd.y, a, d)
-        v2.x = vb.x
-        v2.y = lerp(tolerance, vb.y, vc.y, b, c)
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 13:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = vb.x
-        v1.y = lerp(tolerance, vb.y, vc.y, b, c)
-        v2.x = lerp(tolerance, vd.x, vc.x, d, c)
-        v2.y = vd.y
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 14:
-        edges.data[0].v1 = 0
-        edges.data[0].v2 = 1
-
-        v1.x = va.x
-        v1.y = lerp(tolerance, va.y, vd.y, a, d)
-        v2.x = lerp(tolerance, vc.x, vd.x, c, d)
-        v2.y = vc.y
-        vertices.data[0] = v1
-        vertices.data[1] = v2
-        return Mesh(vertices, edges, polygons)
-    elif indexSquare == 15:
-        return Mesh()
-
-cdef long binaryToDecimal(float t, float a, float b, float c, float d):
-    # binary order (d, c, b, a)
-    if a <= t: a = 0
-    else: a = 1
-
-    if b <= t: b = 0
-    else: b = 1
-
-    if c <= t: c = 0
-    else: c = 1
-
-    if d <= t: d = 0
-    else: d = 1
-
-    return <long>(8.0 * a + 4.0 * b + 2.0 * c + d)
+cdef void lerpVec3(Vector3* target, Vector3* va, Vector3* vb, float a, float b, float tolerance):
+    target.x = lerp(va.x, vb.x, a, b, tolerance)
+    target.y = lerp(va.y, vb.y, a, b, tolerance)
+    target.z = lerp(va.z, vb.z, a, b, tolerance)
 
 @cython.cdivision(True)
-cdef float lerp(float tolerance, float t1, float t2, float f1, float f2):
+cdef float lerp(float t1, float t2, float f1, float f2, float tolerance):
     return t1 + (tolerance - f1) * (t2 - t1) / (f2 - f1)
 
 @cython.cdivision(True)
