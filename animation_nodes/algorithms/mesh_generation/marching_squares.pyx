@@ -11,16 +11,15 @@ from ... data_structures cimport (
     PolygonIndicesList,
 )
 
-def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize, FalloffEvaluator falloffEvaluator,
-                    long amountThreshold, VirtualDoubleList thresholds, offset, str distanceMode):
+def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize,
+                    FalloffEvaluator falloffEvaluator, long amountThreshold,
+                    VirtualDoubleList thresholds, offset, str distanceMode):
 
-    cdef double xDis, yDis
-    cdef Vector3DList points
-    points, xDis, yDis = getGridPoints(xDivisions, yDivisions, xSize, ySize, toVector3(offset), distanceMode)
-
+    cdef Vector3DList points = getGridPoints(xDivisions, yDivisions, xSize, ySize,
+                                             toVector3(offset), distanceMode)
     cdef FloatList strengths = falloffEvaluator.evaluateList(points)
+
     cdef long nx = limitAmount(xDivisions), ny = limitAmount(yDivisions)
-    cdef double _xDis = xDis / 2.0, _yDis = yDis / 2.0
     cdef Py_ssize_t i, j, k, index, ia, ib, ic, id
     cdef long _nx = nx - 1, _ny = ny - 1
 
@@ -28,7 +27,7 @@ def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize, 
     for i in range(_ny):
         index = nx * i
         for j in range(_nx):
-            # Counter-Clockwise
+            # Clockwise-Order
             ia = nx + index + j
             ib = ia + 1
             id = j + index
@@ -36,14 +35,14 @@ def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize, 
 
             for k in range(amountThreshold):
                 meshes.append(getMeshOfSquare(points, strengths, <float>thresholds.get(k),
-                                              _xDis, _yDis, ia, ib, ic, id))
+                                              ia, ib, ic, id))
 
     return Mesh.join(*meshes), points
 
 # http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/ is modified for multiple
 # tolerance values.
-def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, double _xDis,
-                    double _yDis, Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
+def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
+                    Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
     '''
     Indices order for a square
         a-------b
@@ -263,8 +262,8 @@ cdef float lerp(float tolerance, float t1, float t2, float f1, float f2):
     return t1 + (tolerance - f1) * (t2 - t1) / (f2 - f1)
 
 @cython.cdivision(True)
-cdef getGridPoints(long xDivisions, long yDivisions, float size1, float size2,
-                   Vector3 offset, str distanceMode):
+cdef Vector3DList getGridPoints(long xDivisions, long yDivisions, float size1,
+                                float size2, Vector3 offset, str distanceMode):
     cdef:
         int xDiv = limitAmount(xDivisions)
         int yDiv = limitAmount(yDivisions)
@@ -291,7 +290,7 @@ cdef getGridPoints(long xDivisions, long yDivisions, float size1, float size2,
             vector.z =  offset.z
             points.data[index] = vector
 
-    return points, xDis, yDis
+    return points
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)
