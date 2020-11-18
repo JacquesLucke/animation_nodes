@@ -44,6 +44,14 @@ def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize, 
 # tolerance values.
 def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance, double _xDis,
                     double _yDis, Py_ssize_t ia, Py_ssize_t ib, Py_ssize_t ic, Py_ssize_t id):
+    '''
+    Indices order for a square
+        a-------b
+        '       '
+        '       '
+        '       '
+        d-------c
+    '''
     cdef float a, b, c, d
     a, b, c, d = strengths.data[ia], strengths.data[ib], strengths.data[ic], strengths.data[id]
 
