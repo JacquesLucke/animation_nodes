@@ -32,6 +32,7 @@ def createOperatorWithDescription(description):
         "bl_idname" : idName,
         "bl_label" : "Are you sure?",
         "bl_description" : description,
+        "bl_options" : {"UNDO"},
         "invoke" : invoke_InvokeFunction,
         "execute" : execute_InvokeFunction,
         "__annotations__" : {
