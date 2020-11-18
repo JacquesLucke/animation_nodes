@@ -3,6 +3,7 @@ from ... utils.limits cimport INT_MAX
 from ... math cimport Vector3, toVector3
 from ... data_structures cimport (
     Mesh,
+    LongList,
     FloatList,
     Vector3DList,
     EdgeIndicesList,
@@ -11,9 +12,9 @@ from ... data_structures cimport (
     PolygonIndicesList,
 )
 
-def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize,
-                    FalloffEvaluator falloffEvaluator, long amountThreshold,
-                    VirtualDoubleList thresholds, offset, str distanceMode):
+def marchingSquaresOnGrid(long xDivisions, long yDivisions, float xSize, float ySize,
+                          FalloffEvaluator falloffEvaluator, long amountThreshold,
+                          VirtualDoubleList thresholds, offset, str distanceMode):
 
     cdef Vector3DList points = getGridPoints(xDivisions, yDivisions, xSize, ySize,
                                              toVector3(offset), distanceMode)
@@ -27,7 +28,7 @@ def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize,
     for i in range(_ny):
         index = nx * i
         for j in range(_nx):
-            # Clockwise-Order
+            # Clockwise order.
             a = nx + index + j
             b = a + 1
             d = j + index
@@ -36,15 +37,37 @@ def marchingSquares(long xDivisions, long yDivisions, float xSize, float ySize,
             for k in range(amountThreshold):
                 meshes.append(getMeshOfSquare(points, strengths, <float>thresholds.get(k),
                                               a, b, c, d))
-
     return Mesh.join(*meshes), points
 
+def marchingSquaresOnMesh(Mesh mesh, FalloffEvaluator falloffEvaluator, long amountThreshold,
+                          VirtualDoubleList thresholds):
+
+    cdef Vector3DList points = mesh.vertices
+    cdef PolygonIndicesList polygons = mesh.polygons
+    cdef FloatList strengths = falloffEvaluator.evaluateList(points)
+
+    cdef unsigned int *polyStarts = polygons.polyStarts.data
+    cdef unsigned int *indices = polygons.indices.data
+    cdef Py_ssize_t i, a, b, c, d, start
+
+    meshes = []
+    for i in range(polygons.getLength()):
+        start = polyStarts[i]
+        a = indices[start]
+        b = indices[start + 1]
+        c = indices[start + 2]
+        d = indices[start + 3]
+        for j in range(amountThreshold):
+            meshes.append(getMeshOfSquare(points, strengths, <float>thresholds.get(j),
+                                          a, b, c, d))
+    return Mesh.join(*meshes)
+
 # http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/ is modified for multiple
-# tolerance values.
+# tolerance values, and works for grid as well as mesh surface.
 def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
                     Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d):
     '''
-    Indices order for a square
+    Indices order for a square.
         a-------b
         '       '
         '       '
@@ -90,7 +113,7 @@ cdef long binaryToDecimal(Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d
     cdef float sa, sb, sc, sd
     sa, sb, sc, sd = strengths.data[a], strengths.data[b], strengths.data[c], strengths.data[d]
 
-    # binary order (sd, sc, sb, sa)
+    # Binary order (sd, sc, sb, sa).
     if sa <= t: sa = 0
     else: sa = 1
 
