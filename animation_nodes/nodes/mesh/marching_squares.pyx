@@ -48,7 +48,7 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
                 self.newInput("Float", "Width", "xSize", value = 5)
                 self.newInput("Float", "Length", "ySize", value = 5)
         else:
-            self.newInput("Mesh", "Mesh", "mesh")
+            self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
         self.newInput("Falloff", "Falloff", "falloff")
         self.newInput(VectorizedSocket("Float", "useToleranceList",
             ("Threshold", "thresholds"), ("Thresholds", "thresholds")), value = 0.25)
