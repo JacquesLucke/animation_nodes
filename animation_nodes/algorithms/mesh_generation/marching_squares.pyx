@@ -49,6 +49,8 @@ def marchingSquaresOnMesh(Mesh mesh, FalloffEvaluator falloffEvaluator, long amo
     cdef unsigned int *polyStarts = polygons.polyStarts.data
     cdef unsigned int *indices = polygons.indices.data
     cdef Py_ssize_t i, a, b, c, d, start
+    cdef long indexSquare
+    cdef float tolerance
 
     meshes = []
     for i in range(polygons.getLength()):
@@ -58,14 +60,18 @@ def marchingSquaresOnMesh(Mesh mesh, FalloffEvaluator falloffEvaluator, long amo
         c = indices[start + 2]
         d = indices[start + 3]
         for j in range(amountThreshold):
-            meshes.append(getMeshOfSquare(points, strengths, <float>thresholds.get(j),
-                                          a, b, c, d))
+            tolerance = <float>thresholds.get(j)
+            indexSquare = binaryToDecimal(a, b, c, d, strengths, tolerance)
+            if indexSquare == 0 or indexSquare == 15: continue
+            meshes.append(getMeshOfSquare(points, strengths, tolerance,
+                                          a, b, c, d, indexSquare))
     return Mesh.join(*meshes)
 
 # http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/ is modified for multiple
 # tolerance values, and works for grid as well as mesh surface.
 def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
-                    Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d):
+                    Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d,
+                    long indexSquare):
     '''
     Indices order for a square.
         a-------b
@@ -74,10 +80,7 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
         '       '
         d-------c
     '''
-    cdef long indexSquare = binaryToDecimal(a, b, c, d, strengths, tolerance)
-    if indexSquare == 0:
-        return Mesh()
-    elif indexSquare == 1:
+    if indexSquare == 1:
         return getMeshSingle(d, c, d, a, points, strengths, tolerance)
     elif indexSquare == 2:
         return getMeshSingle(c, d, c, b, points, strengths, tolerance)
@@ -105,8 +108,6 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
         return getMeshSingle(b, c, d, c, points, strengths, tolerance)
     elif indexSquare == 14:
         return getMeshSingle(a, d, c, d, points, strengths, tolerance)
-    elif indexSquare == 15:
-        return Mesh()
 
 cdef long binaryToDecimal(Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d,
                           FloatList strengths, float t):
