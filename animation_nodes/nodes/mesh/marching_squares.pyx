@@ -1,8 +1,16 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures cimport Falloff, FalloffEvaluator, VirtualDoubleList
+from ... data_structures.meshes.mesh_data import calculatePolygonNormals
 from ... algorithms.mesh_generation.marching_squares import marchingSquaresOnGrid, marchingSquaresOnMesh
+from ... data_structures cimport (
+    Mesh,
+    Falloff,
+    Vector3DList,
+    FalloffEvaluator,
+    VirtualDoubleList,
+    PolygonIndicesList,
+)
 
 modeItems = [
     ("GRID", "Grid", "Grid points for marching", "NONE", 0),
@@ -50,6 +58,8 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
         self.newOutput("Mesh", "Mesh", "mesh")
         if self.mode == "GRID":
             self.newOutput("Vector List", "Grid Points", "points", hide = True)
+        else:
+            self.newOutput("Vector List", "Normals", "normals", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "mode", text = "")
@@ -77,6 +87,11 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
                                      amountThreshold, _thresholds, offset, self.distanceMode)
 
     def execute_MarchingSquaresOnMesh(self, mesh, falloff, thresholds):
+        cdef Vector3DList vertices = mesh.vertices
+        cdef PolygonIndicesList polygons = mesh.polygons
+        if vertices.length == 0:
+            return Mesh(), Vector3DList()
+
         cdef VirtualDoubleList _thresholds = VirtualDoubleList.create(thresholds, 0)
         cdef long amountThreshold
 
@@ -86,7 +101,9 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
             amountThreshold = _thresholds.getRealLength()
 
         cdef FalloffEvaluator falloffEvaluator = self.getFalloffEvaluator(falloff)
-        return marchingSquaresOnMesh(mesh, falloffEvaluator, amountThreshold, _thresholds)
+        cdef Vector3DList polyNormals = calculatePolygonNormals(vertices, polygons)
+        return marchingSquaresOnMesh(vertices, polygons, polyNormals, falloffEvaluator,
+                                     amountThreshold, _thresholds)
 
     def getFalloffEvaluator(self, falloff):
         try: return falloff.getEvaluator("LOCATION", self.clampFalloff)

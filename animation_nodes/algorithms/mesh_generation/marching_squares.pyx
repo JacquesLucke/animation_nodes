@@ -1,9 +1,9 @@
 import cython
 from ... utils.limits cimport INT_MAX
-from ... math cimport Vector3, toVector3
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from ... math cimport Vector3, toVector3, normalizeVec3_InPlace
 from ... data_structures cimport (
     Mesh,
-    LongList,
     FloatList,
     Vector3DList,
     EdgeIndicesList,
@@ -12,19 +12,81 @@ from ... data_structures cimport (
     PolygonIndicesList,
 )
 
+cdef struct Vertex:
+    Vector3 location
+    Vector3 normal
+
+cdef struct VertexList:
+    Py_ssize_t vertexAmount
+    Vertex *data
+
+
+cdef struct Edge:
+    Py_ssize_t start
+    Py_ssize_t end
+
+cdef struct EdgeList:
+    Py_ssize_t edgeAmount
+    Edge *data
+
+
+cdef struct EdgePrevious:
+    Py_ssize_t start
+    Py_ssize_t end
+    Py_ssize_t vertexIndex
+
+cdef struct EdgePreviousList:
+    Py_ssize_t edgePreviousAmount
+    EdgePrevious *data
+
+
 def marchingSquaresOnGrid(long xDivisions, long yDivisions, float xSize, float ySize,
                           FalloffEvaluator falloffEvaluator, long amountThreshold,
                           VirtualDoubleList thresholds, offset, str distanceMode):
 
+    cdef long nx = limitAmount(xDivisions), ny = limitAmount(yDivisions)
+    cdef long _nx = nx - 1, _ny = ny - 1
+    cdef long squareAmount = _nx * _ny
+
+    # Initialization of vertices of contour.
+    cdef Vertex* vertices
+    cdef VertexList vertexList
+
+    vertexList.vertexAmount = 0
+    vertexList.data = <Vertex*>PyMem_Malloc(4 * squareAmount * sizeof(Vertex))
+    vertices = vertexList.data
+
+    # Initialization of edges contour.
+    cdef Edge* edges
+    cdef EdgeList edgeList
+
+    edgeList.edgeAmount = 0
+    edgeList.data = <Edge*>PyMem_Malloc(2 * squareAmount * sizeof(Edge))
+    edges = edgeList.data
+
+    # Initialization of edgesPrevious.
+    cdef EdgePrevious* edgesPrevious
+    cdef EdgePreviousList edgePreviousList
+
+    edgePreviousList.edgePreviousAmount = 0
+    edgePreviousList.data = <EdgePrevious*>PyMem_Malloc(4 * squareAmount * sizeof(EdgePrevious))
+    edgesPrevious = edgePreviousList.data
+
+    cdef Py_ssize_t i
+    for i in range(2 * squareAmount):
+        edgesPrevious[i].start = -1
+        edgesPrevious[i].end = -1
+
     cdef Vector3DList points = getGridPoints(xDivisions, yDivisions, xSize, ySize,
                                              toVector3(offset), distanceMode)
     cdef FloatList strengths = falloffEvaluator.evaluateList(points)
+    cdef Py_ssize_t j, k, index, a, b, c, d
+    cdef Vector3 polyNormal
 
-    cdef long nx = limitAmount(xDivisions), ny = limitAmount(yDivisions)
-    cdef Py_ssize_t i, j, k, index, a, b, c, d
-    cdef long _nx = nx - 1, _ny = ny - 1
+    polyNormal.x = 0
+    polyNormal.y = 0
+    polyNormal.z = 0
 
-    meshes = []
     for i in range(_ny):
         index = nx * i
         for j in range(_nx):
@@ -35,43 +97,107 @@ def marchingSquaresOnGrid(long xDivisions, long yDivisions, float xSize, float y
             c = d + 1
 
             for k in range(amountThreshold):
-                meshes.append(getMeshOfSquare(points, strengths, <float>thresholds.get(k),
-                                              a, b, c, d))
-    return Mesh.join(*meshes), points
+                marchingSquare(points, strengths, <float>thresholds.get(k), a, b, c, d,
+                               &vertexList, &edgeList, &edgePreviousList, polyNormal)
 
-def marchingSquaresOnMesh(Mesh mesh, FalloffEvaluator falloffEvaluator, long amountThreshold,
-                          VirtualDoubleList thresholds):
+    cdef Py_ssize_t vertexAmount = vertexList.vertexAmount
+    cdef Vector3DList verticesOut = Vector3DList(length = vertexAmount)
+    for i in range(vertexAmount):
+        verticesOut.data[i] = vertices[i].location
 
-    cdef Vector3DList points = mesh.vertices
-    cdef PolygonIndicesList polygons = mesh.polygons
+    cdef Py_ssize_t edgeAmount = edgeList.edgeAmount
+    cdef EdgeIndicesList edgesOut = EdgeIndicesList(length = edgeAmount)
+    for i in range(edgeAmount):
+       edgesOut.data[i].v1 = edges[i].start
+       edgesOut.data[i].v2 = edges[i].end
+
+    cdef PolygonIndicesList polygonsOut = PolygonIndicesList()
+
+    PyMem_Free(vertices)
+    PyMem_Free(edges)
+    PyMem_Free(edgesPrevious)
+    return Mesh(verticesOut, edgesOut, polygonsOut), points
+
+
+def marchingSquaresOnMesh(Vector3DList points, PolygonIndicesList polygons, Vector3DList polyNormals,
+                          FalloffEvaluator falloffEvaluator, long amountThreshold, VirtualDoubleList thresholds):
+
+    cdef long polyAmount = polygons.getLength()
+
+    # Initialization of vertices of contour.
+    cdef Vertex* vertices
+    cdef VertexList vertexList
+
+    vertexList.vertexAmount = 0
+    vertexList.data = <Vertex*>PyMem_Malloc(4 * polyAmount * sizeof(Vertex))
+    vertices = vertexList.data
+
+    # Initialization of edges contour.
+    cdef Edge* edges
+    cdef EdgeList edgeList
+
+    edgeList.edgeAmount = 0
+    edgeList.data = <Edge*>PyMem_Malloc(2 * polyAmount * sizeof(Edge))
+    edges = edgeList.data
+
+    # Initialization of edgesPrevious.
+    cdef EdgePrevious* edgesPrevious
+    cdef EdgePreviousList edgePreviousList
+
+    edgePreviousList.edgePreviousAmount = 0
+    edgePreviousList.data = <EdgePrevious*>PyMem_Malloc(4 * polyAmount * sizeof(EdgePrevious))
+    edgesPrevious = edgePreviousList.data
+
+    cdef Py_ssize_t i
+    for i in range(2 * polyAmount):
+        edgesPrevious[i].start = -1
+        edgesPrevious[i].end = -1
+
     cdef FloatList strengths = falloffEvaluator.evaluateList(points)
-
     cdef unsigned int *polyStarts = polygons.polyStarts.data
     cdef unsigned int *indices = polygons.indices.data
-    cdef Py_ssize_t i, a, b, c, d, start
-    cdef long indexSquare
-    cdef float tolerance
+    cdef Py_ssize_t a, b, c, d, start
+    cdef Vector3 polyNormal
 
-    meshes = []
     for i in range(polygons.getLength()):
         start = polyStarts[i]
         a = indices[start]
         b = indices[start + 1]
         c = indices[start + 2]
         d = indices[start + 3]
+        polyNormal = polyNormals.data[i]
+        normalizeVec3_InPlace(&polyNormal)
         for j in range(amountThreshold):
-            tolerance = <float>thresholds.get(j)
-            indexSquare = binaryToDecimal(a, b, c, d, strengths, tolerance)
-            if indexSquare == 0 or indexSquare == 15: continue
-            meshes.append(getMeshOfSquare(points, strengths, tolerance,
-                                          a, b, c, d, indexSquare))
-    return Mesh.join(*meshes)
+            marchingSquare(points, strengths, <float>thresholds.get(j), a, b, c, d,
+                           &vertexList, &edgeList, &edgePreviousList, polyNormal)
+
+
+    cdef Py_ssize_t vertexAmount = vertexList.vertexAmount
+    cdef Vector3DList verticesOut = Vector3DList(length = vertexAmount)
+    cdef Vector3DList normalsOut = Vector3DList(length = vertexAmount)
+    for i in range(vertexAmount):
+        verticesOut.data[i] = vertices[i].location
+        normalsOut.data[i] = vertices[i].normal
+
+    cdef Py_ssize_t edgeAmount = edgeList.edgeAmount
+    cdef EdgeIndicesList edgesOut = EdgeIndicesList(length = edgeAmount)
+    for i in range(edgeAmount):
+       edgesOut.data[i].v1 = edges[i].start
+       edgesOut.data[i].v2 = edges[i].end
+
+    cdef PolygonIndicesList polygonsOut = PolygonIndicesList()
+
+    PyMem_Free(vertices)
+    PyMem_Free(edges)
+    PyMem_Free(edgesPrevious)
+    return Mesh(verticesOut, edgesOut, polygonsOut), normalsOut
+
 
 # http://jamie-wong.com/2014/08/19/metaballs-and-marching-squares/ is modified for multiple
 # tolerance values, and works for grid as well as mesh surface.
-def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
-                    Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d,
-                    long indexSquare):
+cdef marchingSquare(Vector3DList points, FloatList strengths, float tolerance, Py_ssize_t a,
+                     Py_ssize_t b, Py_ssize_t c, Py_ssize_t d, VertexList* vertexList,
+                     EdgeList* edgeList, EdgePreviousList* edgePreviousList, Vector3 polyNormal):
     '''
     Indices order for a square.
         a-------b
@@ -80,34 +206,56 @@ def getMeshOfSquare(Vector3DList points, FloatList strengths, float tolerance,
         '       '
         d-------c
     '''
-    if indexSquare == 1:
-        return getMeshSingle(d, c, d, a, points, strengths, tolerance)
+    cdef long indexSquare = binaryToDecimal(a, b, c, d, strengths, tolerance)
+    if indexSquare == 0 or indexSquare == 15:
+        return
+    elif indexSquare == 1:
+        calculateContourSegment(d, c, d, a, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 2:
-        return getMeshSingle(c, d, c, b, points, strengths, tolerance)
+        calculateContourSegment(c, d, c, b, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 3:
-        return getMeshSingle(c, b, d, a, points, strengths, tolerance)
+        calculateContourSegment(c, b, d, a, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 4:
-        return getMeshSingle(b, a, b, c, points, strengths, tolerance)
+        calculateContourSegment(b, a, b, c, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 5:
-        return getMeshDouble(b, c, d, c, b, a, d, a, points, strengths, tolerance)
+        calculateContourSegment(b, c, d, c, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
+        calculateContourSegment(b, a, d, a, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 6:
-        return getMeshSingle(b, a, c, d, points, strengths, tolerance)
+        calculateContourSegment(b, a, c, d, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 7:
-        return getMeshSingle(b, a, d, a, points, strengths, tolerance)
+        calculateContourSegment(b, a, d, a, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 8:
-        return getMeshSingle(a, b, a, d, points, strengths, tolerance)
+        calculateContourSegment(a, b, a, d, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 9:
-        return getMeshSingle(a, b, d, c, points, strengths, tolerance)
+        calculateContourSegment(a, b, d, c, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 10:
-        return getMeshDouble(a, b, c, b, a, d, c, d, points, strengths, tolerance)
+        calculateContourSegment(a, b, c, b, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
+        calculateContourSegment(a, d, c, d, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 11:
-        return getMeshSingle(a, b, c, b, points, strengths, tolerance)
+        calculateContourSegment(a, b, c, b, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 12:
-        return getMeshSingle(a, d, b, c, points, strengths, tolerance)
+        calculateContourSegment(a, d, b, c, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 13:
-        return getMeshSingle(b, c, d, c, points, strengths, tolerance)
+        calculateContourSegment(b, c, d, c, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
     elif indexSquare == 14:
-        return getMeshSingle(a, d, c, d, points, strengths, tolerance)
+        calculateContourSegment(a, d, c, d, points, strengths, tolerance, vertexList,
+                                edgeList, edgePreviousList, polyNormal)
+
 
 cdef long binaryToDecimal(Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d,
                           FloatList strengths, float t):
@@ -129,53 +277,83 @@ cdef long binaryToDecimal(Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d
 
     return <long>(8.0 * sa + 4.0 * sb + 2.0 * sc + sd)
 
-cdef Mesh getMeshSingle(Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d,
-                        Vector3DList points, FloatList strengths, float tolerance):
-    cdef Vector3DList vertices = Vector3DList(length = 2)
-    cdef EdgeIndicesList edges = EdgeIndicesList(length = 1)
-    cdef PolygonIndicesList polygons = PolygonIndicesList()
 
-    edges.data[0].v1 = 0
-    edges.data[0].v2 = 1
+cdef void calculateContourSegment(Py_ssize_t a, Py_ssize_t b, Py_ssize_t c, Py_ssize_t d,
+                                  Vector3DList points, FloatList strengths, float tolerance,
+                                  VertexList* vertexList, EdgeList* edgeList,
+                                  EdgePreviousList* edgePreviousList, Vector3 polyNormal):
+    cdef Py_ssize_t start, end
+    start = calculateVertexUpdateEdgePreviousList(a, b, points, strengths, tolerance,
+                                                  vertexList, edgePreviousList, polyNormal)
+    end = calculateVertexUpdateEdgePreviousList(c, d, points, strengths, tolerance,
+                                                vertexList, edgePreviousList, polyNormal)
+    if start == end: return
+    cdef Py_ssize_t edgeAmount = edgeList[0].edgeAmount
+    cdef Edge* edges = edgeList[0].data
+    cdef Py_ssize_t i, startExist, endExist
+    for i in range(edgeAmount):
+        startExist = edges[i].start
+        endExist = edges[i].end
+        if start == startExist and end == endExist:
+            return
+        if start == endExist and end == startExist:
+            return
 
-    lerpVec3(vertices.data + 0, points.data + a, points.data + b, strengths.data[a],
-             strengths.data[b], tolerance)
-    lerpVec3(vertices.data + 1, points.data + c, points.data + d, strengths.data[c],
-             strengths.data[d], tolerance)
-    return Mesh(vertices, edges, polygons)
+    edges[edgeAmount].start = start
+    edges[edgeAmount].end = end
+    edgeList[0].edgeAmount += 1
 
-cdef Mesh getMeshDouble(Py_ssize_t a1, Py_ssize_t b1, Py_ssize_t c1, Py_ssize_t d1,
-                        Py_ssize_t a2, Py_ssize_t b2, Py_ssize_t c2, Py_ssize_t d2,
-                        Vector3DList points, FloatList strengths, float tolerance):
-    cdef Vector3DList vertices = Vector3DList(length = 4)
-    cdef EdgeIndicesList edges = EdgeIndicesList(length = 2)
-    cdef PolygonIndicesList polygons = PolygonIndicesList()
 
-    edges.data[0].v1 = 0
-    edges.data[0].v2 = 1
+cdef Py_ssize_t calculateVertexUpdateEdgePreviousList(Py_ssize_t a, Py_ssize_t b,
+                                                      Vector3DList points, FloatList strengths,
+                                                      float tolerance, VertexList* vertexList,
+                                                      EdgePreviousList* edgePreviousList,
+                                                      Vector3 polyNormal):
+    cdef Py_ssize_t vertexAmount = vertexList[0].vertexAmount
+    cdef Vertex* vertices = vertexList[0].data
 
-    lerpVec3(vertices.data + 0, points.data + a1, points.data + b1, strengths.data[a1],
-             strengths.data[b1], tolerance)
-    lerpVec3(vertices.data + 1, points.data + c1, points.data + d1, strengths.data[c1],
-             strengths.data[d1], tolerance)
+    cdef Py_ssize_t edgePreviousAmount = edgePreviousList[0].edgePreviousAmount
+    cdef EdgePrevious* edgesPrevious = edgePreviousList[0].data
+    cdef Py_ssize_t i, start, end, vertexIndex
 
-    edges.data[1].v1 = 2
-    edges.data[1].v2 = 3
+    vertexIndex = -1
+    for i in range(edgePreviousAmount):
+        start = edgesPrevious[i].start
+        end = edgesPrevious[i].end
+        if a == start and b == end:
+            vertexIndex = edgesPrevious[i].vertexIndex
+            break
+        elif a == end and b == start:
+            vertexIndex = edgesPrevious[i].vertexIndex
+            break
 
-    lerpVec3(vertices.data + 2, points.data + a2, points.data + b2, strengths.data[a2],
-             strengths.data[b2], tolerance)
-    lerpVec3(vertices.data + 3, points.data + c2, points.data + d2, strengths.data[c2],
-             strengths.data[d2], tolerance)
-    return Mesh(vertices, edges, polygons)
+    cdef Vector3 v
+    if vertexIndex == -1:
+        lerpVec3(&v, points.data + a, points.data + b, strengths.data[a], strengths.data[b],
+                 tolerance)
+        vertexIndex = vertexAmount
+        vertices[vertexAmount].location = v
+        vertices[vertexAmount].normal = polyNormal
+        vertexList[0].vertexAmount += 1
+
+    edgesPrevious[edgePreviousAmount].vertexIndex = vertexIndex
+    edgesPrevious[edgePreviousAmount].start = a
+    edgesPrevious[edgePreviousAmount].end = b
+    edgePreviousList[0].edgePreviousAmount += 1
+
+    return vertexIndex
+
 
 cdef void lerpVec3(Vector3* target, Vector3* va, Vector3* vb, float a, float b, float tolerance):
     target.x = lerp(va.x, vb.x, a, b, tolerance)
     target.y = lerp(va.y, vb.y, a, b, tolerance)
     target.z = lerp(va.z, vb.z, a, b, tolerance)
 
+
 @cython.cdivision(True)
 cdef float lerp(float t1, float t2, float f1, float f2, float tolerance):
     return t1 + (tolerance - f1) * (t2 - t1) / (f2 - f1)
+
 
 @cython.cdivision(True)
 cdef Vector3DList getGridPoints(long xDivisions, long yDivisions, float size1,
