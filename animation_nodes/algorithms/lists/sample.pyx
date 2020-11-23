@@ -34,7 +34,7 @@ def sample_PythonList(list myList, amount, seed):
     cdef int i
     for i in range(amount):
         outList[i] = myList[indices.data[i]]
-    return outList
+    return outList, indices
 
 def sample_CList(CList sourceList, amount, seed):
     if amount < 0 or amount > len(sourceList):
@@ -58,11 +58,11 @@ def sample_CList(CList sourceList, amount, seed):
                _sourceList + selectedIndices.data[i] * elementSize,
                elementSize)
 
-    return newList
+    return newList, selectedIndices
 
 def sample_PolygonIndicesList(PolygonIndicesList sourceList, amount, seed):
     indices = getUniqueIndices(len(sourceList), amount, seed)
-    return sourceList.copyWithNewOrder(LongList.fromValues(indices))
+    return sourceList.copyWithNewOrder(LongList.fromValues(indices)), indices
 
 
 

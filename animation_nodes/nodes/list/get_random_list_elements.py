@@ -31,9 +31,11 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
 
         if self.selectionType == "SINGLE":
             self.newOutput(ListTypeSelectorSocket("Element", "outElement", "BASE", prop))
+            self.newOutput("Integer", "Index", "index")
         elif self.selectionType == "MULTIPLE":
             self.newInput("Integer", "Amount", "amount", value = 3, minValue = 0)
             self.newOutput(ListTypeSelectorSocket("List", "outList", "LIST", prop))
+            self.newOutput("Integer List", "Indices", "indices")
 
     def draw(self, layout):
         layout.prop(self, "selectionType", text = "")
@@ -43,12 +45,15 @@ class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
         yield "_seed = self.nodeSeed * 154245 + seed * 13412"
         if self.selectionType == "SINGLE":
             yield "random.seed(_seed)"
-            yield "if len(inList) == 0: outElement = self.outputs['Element'].getDefaultValue()"
-            yield "else: outElement = random.choice(inList)"
+            yield "if len(inList) == 0:"
+            yield "    outElement, index = self.outputs['Element'].getDefaultValue(), 0"
+            yield "else:"
+            yield "    index = random.randint(0, len(inList) - 1)"
+            yield "    outElement = inList[index]"
         elif self.selectionType == "MULTIPLE":
             yield "_seed += amount * 45234"
             yield "_amount = min(max(amount, 0), len(inList))"
-            yield "outList = AN.algorithms.lists.sample('%s', inList, _amount, _seed)" % self.assignedType
+            yield "outList, indices = AN.algorithms.lists.sample('%s', inList, _amount, _seed)" % self.assignedType
 
     def getUsedModules(self):
         return ["random"]

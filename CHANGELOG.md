@@ -11,6 +11,7 @@
 - Added *Compare Numbers* node.
 - Added *Copy Object Modifiers* node.
 - Added *Export Headers* option to the setup script.
+- Added *Indices* output to *Get Random List Elements* node.
 
 ### Fixed
 
