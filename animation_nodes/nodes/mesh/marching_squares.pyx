@@ -91,6 +91,8 @@ class MarchingSquaresNode(bpy.types.Node, AnimationNode):
         cdef PolygonIndicesList polygons = mesh.polygons
         if vertices.length == 0:
             return Mesh(), Vector3DList()
+        if polygons.polyLengths.getMinValue() < 4 or polygons.polyLengths.getMaxValue() > 4:
+            self.raiseErrorMessage("Mesh has non-quad polygons")
 
         cdef VirtualDoubleList _thresholds = VirtualDoubleList.create(thresholds, 0)
         cdef long amountThreshold
