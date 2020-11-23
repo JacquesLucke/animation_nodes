@@ -5,7 +5,7 @@ from libc.string cimport memcpy
 from . shuffle import shuffle_CList
 from ... utils.limits cimport INT_MAX
 from ... sockets.info import getSocketClass
-from .. random cimport randomDouble_Positive
+from .. random_number_generators cimport XoShiRo256Plus
 from ... data_structures cimport CList, PolygonIndicesList, IntegerList, LongList
 
 def sample(str dataType, myList, amount, seed):
@@ -95,16 +95,15 @@ cdef void selectUniqueIndices_Naive(int listLength, int amount, int seed, int* i
     '''
     cdef:
         int index
-        int i, k, j
+        int i, j
         double _indexFactor = <double>listLength
         bint indexTaken
+        XoShiRo256Plus rng = XoShiRo256Plus(seed)
 
-    k = 0
     for i in range(amount):
         while True:
-            k += 1
             indexTaken = False
-            index = <int>(randomDouble_Positive(seed + k * 242243 + i * 341345) * _indexFactor)
+            index = <int>(rng.nextDouble() * _indexFactor)
 
             for j in range(i):
                 if index == indicesOut[j]:
@@ -127,10 +126,11 @@ cdef void selectUniqueIndices_ReservoirSampling(int listLength, int amount, int 
         double elementsToPick = amount
         double elementsLeft = listLength
         double propability
+        XoShiRo256Plus rng = XoShiRo256Plus(seed)
 
     while elementsToPick > 0:
         propability = elementsToPick / elementsLeft
-        if randomDouble_Positive(seed + i * 6745629) < propability:
+        if rng.nextDouble() < propability:
             indicesOut[k] = i
             elementsToPick -= 1
             k += 1
