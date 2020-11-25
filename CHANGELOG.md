@@ -19,6 +19,7 @@
 - Fixed OpenGL fragment shaders on Core contexts.
 - Fixed triangulateMesh method of Mesh.
 - Fixed freeze in Is Inside Volume node.
+- Fixed Grease Pencil Nodes for API changes.
 
 ### Changed
 
