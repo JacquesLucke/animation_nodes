@@ -117,7 +117,7 @@ class GPObjectInputNode(bpy.types.Node, AnimationNode):
         strokePoints.foreach_get("vertex_color", vertexColors.asNumpyArray())
 
         return GPStroke(vertices, strengths, pressures, uvRotations, vertexColors, stroke.line_width, stroke.hardness,
-                        stroke.draw_cyclic, stroke.start_cap_mode, stroke.end_cap_mode, self.getVertexColorFill(stroke),
+                        stroke.use_cyclic, stroke.start_cap_mode, stroke.end_cap_mode, self.getVertexColorFill(stroke),
                         stroke.material_index, stroke.display_mode)
 
     def getVertexColorFill(self, stroke):

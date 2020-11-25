@@ -26,5 +26,5 @@ class ChangeGPStrokeDirectionNode(bpy.types.Node, AnimationNode):
         uvRotations = stroke.uvRotations.reversed()
         vertexColors = stroke.vertexColors.reversed()
         return GPStroke(vertices, strengths, pressures, uvRotations, vertexColors, stroke.lineWidth,
-                        stroke.hardness, stroke.drawCyclic, stroke.startCapMode, stroke.endCapMode,
+                        stroke.hardness, stroke.useCyclic, stroke.startCapMode, stroke.endCapMode,
                         stroke.vertexColorFill, stroke.materialIndex, stroke.displayMode)
