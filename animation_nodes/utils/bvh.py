@@ -21,7 +21,7 @@ def isInsideVolume(bvhTree, vector):
 
 def countHits(bvhTree, start, direction):
     hits = 0
-    offset = direction * 0.000005
+    offset = direction * 0.0001
     location = bvhTree.ray_cast(start, direction)[0]
 
     while location is not None:
