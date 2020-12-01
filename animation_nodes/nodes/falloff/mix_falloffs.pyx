@@ -10,10 +10,11 @@ mixTypeItems = [
     ("MAX", "Max", "", "NONE", 2),
     ("MIN", "Min", "", "NONE", 3),
     ("SUBTRACT", "Subtract", "", "NONE", 4),
+    ("OVERLAY", "Overlay", "", "NONE", 5),
 ]
 
 # Types that don't support list mixing.
-onlyTwoTypes = ["SUBTRACT"]
+onlyTwoTypes = ["SUBTRACT", "OVERLAY"]
 
 class MixFalloffsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixFalloffsNode"
@@ -68,6 +69,7 @@ class MixFalloffs:
             elif method == "MAX": return MaxTwoFalloffs(*falloffs)
             elif method == "MIN": return MinTwoFalloffs(*falloffs)
             elif method == "SUBTRACT": return SubtractTwoFalloffs(*falloffs)
+            elif method == "OVERLAY": return OverlayTwoFalloffs(*falloffs)
             raise Exception("invalid method")
         else:
             if method == "ADD": return AddFalloffs(falloffs)
@@ -142,6 +144,28 @@ cdef class SubtractTwoFalloffs(MixTwoFalloffsBase):
         cdef float *b = dependencyResults[1]
         for i in range(amount):
             target[i] = a[i] - b[i]
+
+cdef class OverlayTwoFalloffs(MixTwoFalloffsBase):
+    cdef list getClampingRequirements(self):
+        return [True, False]
+
+    cdef float evaluate(self, float *dependencyResults):
+        cdef float a = dependencyResults[0]
+        cdef float b = dependencyResults[1]
+        if a < 0.5:
+            return a + b * (a * 2)
+        else:
+            return a + b * ((1 - a) * 2)
+
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        cdef float *a = dependencyResults[0]
+        cdef float *b = dependencyResults[1]
+        for i in range(amount):
+            if a[i] < 0.5:
+                target[i] = a[i] + b[i] * (a[i] * 2)
+            else:
+                target[i] = a[i] + b[i] * ((1 - a[i]) * 2)
 
 
 cdef class MixFalloffsBase(CompoundFalloff):
