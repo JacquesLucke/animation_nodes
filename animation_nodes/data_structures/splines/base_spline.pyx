@@ -5,7 +5,9 @@ from ... math cimport (
     toPyVector3, toVector3,
     findNearestLineParameter,
     distanceSumOfVector3DList,
-    rotateAroundAxisVec3
+    rotateAroundAxisVec3,
+    scaleMatrix3x3Part,
+    matrixFromNormalizedAxisData,
 )
 
 ctypedef void (*EvaluateVector)(Spline, float, Vector3*)
@@ -174,6 +176,37 @@ cdef class Spline:
         cdef FloatList result = FloatList(length = amount)
         self.calcDistributedTilts_LowLevel(amount, result.data, start, end, distributionType)
         return result
+
+    def getDistributedMatrices(self, Py_ssize_t amount,
+                               float start = 0, float end = 1,
+                               str distributionType = "RESOLUTION",
+                               bint useRadius = True):
+        cdef Vector3DList points = Vector3DList(length = amount)
+        self.calcDistributedPoints_LowLevel(amount, points.data, start, end, distributionType)
+        cdef Vector3DList tangents = Vector3DList(length = amount)
+        self.calcDistributedTangents_LowLevel(amount, tangents.data, start, end, distributionType)
+        cdef Vector3DList normals = Vector3DList(length = amount)
+        self.ensureNormals()
+        self.calcDistributedNormals_LowLevel(amount, normals.data, start, end, distributionType)
+
+        cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
+        cdef Vector3 bitangent
+        cdef Py_ssize_t i
+        for i in range(amount):
+            normalizeVec3_InPlace(tangents.data + i)
+            normalizeVec3_InPlace(normals.data + i)
+            crossVec3(&bitangent, tangents.data + i, normals.data + i)
+            matrixFromNormalizedAxisData(matrices.data + i, points.data + i,
+                tangents.data + i, normals.data + i, &bitangent)
+
+        cdef FloatList radii
+        if useRadius:
+            radii = FloatList(length = amount)
+            self.calcDistributedRadii_LowLevel(amount, radii.data, start, end, distributionType)
+            for i in range(amount):
+                scaleMatrix3x3Part(matrices.data + i, radii.data[i])
+
+        return matrices
 
 
     def samplePoints(self, FloatList parameters,

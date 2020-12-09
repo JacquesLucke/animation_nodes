@@ -1,5 +1,5 @@
 from ... math.vector cimport Vector3
-from .. lists.base_lists cimport FloatList, Vector3DList
+from .. lists.base_lists cimport FloatList, Vector3DList, Matrix4x4List
 
 cdef class Spline:
     cdef:

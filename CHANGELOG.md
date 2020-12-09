@@ -13,6 +13,7 @@
 - Added *Export Headers* option to the setup script.
 - Added *Indices* output to *Get Random List Elements* node.
 - Added *Overlay* mode to *Mix Falloff* node.
+- Added *Spline* mode to *Distribute Matrices* node.
 
 ### Fixed
 
