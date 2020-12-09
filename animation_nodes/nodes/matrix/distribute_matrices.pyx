@@ -3,8 +3,8 @@ from bpy.props import *
 from math import pi as _pi
 from libc.math cimport sin, cos
 from ... utils.limits cimport INT_MAX
+from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... events import executionCodeChanged
 from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList, Spline
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
@@ -57,15 +57,17 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         default = "UNIFORM", items = splineDistributionMethodItems, update = AnimationNode.refresh)
 
     __annotations__["centerAlongX"] = BoolProperty(name = "Center Along X", default = True,
-        description = "Center the grid along the x axis", update = executionCodeChanged)
+        description = "Center the grid along the x axis", update = propertyChanged)
     __annotations__["centerAlongY"] = BoolProperty(name = "Center Along Y", default = True,
-        description = "Center the grid along the y axis", update = executionCodeChanged)
+        description = "Center the grid along the y axis", update = propertyChanged)
     __annotations__["centerAlongZ"] = BoolProperty(name = "Center Along Z", default = False,
-        description = "Center the grid along the z axis", update = executionCodeChanged)
+        description = "Center the grid along the z axis", update = propertyChanged)
 
-    __annotations__["exactCircleSegment"] = BoolProperty(name = "Exact Circle Segment", default = False)
+    __annotations__["exactCircleSegment"] = BoolProperty(name = "Exact Circle Segment", default = False,
+        update = propertyChanged)
 
-    __annotations__["splineResolution"] = IntProperty(name = "Spline Resolution", default = 5)
+    __annotations__["splineResolution"] = IntProperty(name = "Spline Resolution", default = 5,
+        update = propertyChanged)
 
     def create(self):
         if self.mode == "LINEAR":
