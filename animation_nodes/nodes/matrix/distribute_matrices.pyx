@@ -66,7 +66,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     __annotations__["exactCircleSegment"] = BoolProperty(name = "Exact Circle Segment", default = False,
         update = propertyChanged)
 
-    __annotations__["splineResolution"] = IntProperty(name = "Spline Resolution", default = 5,
+    __annotations__["splineResolution"] = IntProperty(name = "Spline Resolution", min = 2, default = 20,
+        description = "Increase to have a more accurate evaluation if the type is set to Uniform",
         update = propertyChanged)
 
     def create(self):
