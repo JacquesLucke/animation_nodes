@@ -14,6 +14,8 @@
 - Added *Indices* output to *Get Random List Elements* node.
 - Added *Overlay* mode to *Mix Falloff* node.
 - Added *Spline* mode to *Distribute Matrices* node.
+- Added *Fill Caps* option to *Curve Object Output* node.
+- Added *Bevel Mode* option to *Curve Object Output* node.
 
 ### Fixed
 

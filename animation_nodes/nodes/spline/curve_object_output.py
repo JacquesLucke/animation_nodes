@@ -29,7 +29,9 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         self.newInput("Integer", "Preview Resolution", "previewResolution", value = 12)
         self.newInput("Object", "Taper Object", "taperObject")
         self.newInput("Object", "Bevel Object", "bevelObject")
+        self.newInput("Boolean", "Fill Caps", "fillCaps")
         self.newInput("Text", "Fill Mode", "fillMode", value = "FRONT")
+        self.newInput("Text", "Bevel Mode", "bevelMode", value = "ROUND")
 
         self.newOutput("Object", "Object", "object")
 
@@ -57,7 +59,9 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         if s["Preview Resolution"].isUsed:  yield "    curve.resolution_u = previewResolution"
         if s["Taper Object"].isUsed:        yield "    curve.taper_object = taperObject"
         if s["Bevel Object"].isUsed:        yield "    curve.bevel_object = bevelObject"
+        if s["Fill Caps"].isUsed:           yield "    curve.use_fill_caps = fillCaps"
         if s["Fill Mode"].isUsed:           yield "    self.setFillMode(curve, fillMode)"
+        if s["Bevel Mode"].isUsed:          yield "    self.setBevelMode(curve, bevelMode)"
 
     def setSplines(self, object, splines):
         setSplinesOnBlenderObject(object, splines)
@@ -68,6 +72,12 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
             curve.fill_mode = fillMode
         else:
             self.setErrorMessage("The fill mode is invalid. \n\nPossible values for 'Fill Mode' are: \n3D Curve: 'FULL', 'HALF', 'BACK', 'FRONT' \n2D Curve: 'NONE', 'BACK', 'FRONT', 'BOTH'")
+
+    def setBevelMode(self, curve, bevelMode):
+        if bevelMode in ("ROUND", "OBJECT", "PROFILE"):
+            curve.bevel_mode = bevelMode
+        else:
+            self.setErrorMessage("The bevel mode is invalid. \n\nPossible values for 'Bevel Mode' are: 'ROUND', 'OBJECT', 'PROFILE'")
 
     def getBakeCode(self):
         yield "if getattr(object, 'type', '') == 'CURVE':"
