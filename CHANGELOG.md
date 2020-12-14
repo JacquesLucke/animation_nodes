@@ -16,6 +16,7 @@
 - Added *Spline* mode to *Distribute Matrices* node.
 - Added *Fill Caps* option to *Curve Object Output* node.
 - Added *Bevel Mode* option to *Curve Object Output* node.
+- Added *Paramater* option to *Spline Falloff* node.
 
 ### Fixed
 
