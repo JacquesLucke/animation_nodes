@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 from mathutils import Vector
+from ... events import executionCodeChanged
 from . spline_evaluation_base import SplineEvaluationBase
 from ... base_types import AnimationNode, VectorizedSocket
 
@@ -11,6 +12,11 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     evaluateRange: BoolProperty(name = "Evaluate Range", default = False,
         description = "Evaluate automatically distributed parameters on the spline",
         update = AnimationNode.refresh)
+
+    wrapParameters: BoolProperty(name = "Wrap Parameters", default = False,
+        description = ("Wrap the input parameters such that a parameter larger than 1"
+                       " wraps to the start of the spline and vice versa"),
+        update = executionCodeChanged)
 
     useParameterList: VectorizedSocket.newProperty()
 
@@ -60,6 +66,10 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
 
+        col = layout.column()
+        col.active = not self.evaluateRange
+        col.prop(self, "wrapParameters")
+
     def getExecutionCode(self, required):
         yield "if spline.isEvaluable():"
         if self.parameterType == "UNIFORM":
@@ -105,7 +115,10 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
 
     def getExecutionCode_Parameters_List(self, required):
         yield "_parameters = FloatList.fromValues(parameters)"
-        yield "_parameters.clamp(0, 1)"
+        if self.wrapParameters:
+            yield "_parameters = AN.nodes.spline.c_utils.wrapSplineParameters(_parameters)"
+        else:
+            yield "_parameters.clamp(0, 1)"
 
         if self.parameterType == "UNIFORM":
             yield "_parameters = spline.toUniformParameters(_parameters)"
@@ -127,7 +140,10 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             yield "curvatures = DoubleList.fromValues(_curvatures)"
 
     def getExecutionCode_Parameters_Single(self, required):
-        yield "_parameter = min(max(parameter, 0), 1)"
+        if self.wrapParameters:
+            yield "_parameter = parameter % 1.0"
+        else:
+            yield "_parameter = min(max(parameter, 0), 1)"
 
         if self.parameterType == "UNIFORM":
             yield "_parameter = spline.toUniformParameter(_parameter)"

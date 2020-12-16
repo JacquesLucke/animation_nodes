@@ -41,3 +41,10 @@ def tiltSplinePoints(Spline spline, VirtualFloatList tilts, bint accumulate):
             splineTilts.data[i] += tilts.get(i)
 
     spline.markChanged()
+
+def wrapSplineParameters(FloatList parameters):
+    cdef FloatList result = FloatList(length = len(parameters))
+    cdef Py_ssize_t i
+    for i in range(len(parameters)):
+        result.data[i] = parameters.data[i] % 1.0
+    return result
