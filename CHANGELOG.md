@@ -18,6 +18,7 @@
 - Added *Bevel Mode* option to *Curve Object Output* node.
 - Added *Paramater* option to *Spline Falloff* node.
 - Added *Wrap Paramaters* option to *Evaluate Spline* node.
+- Added *Matrix* output to the *Evaluate Spline* node.
 
 ### Fixed
 

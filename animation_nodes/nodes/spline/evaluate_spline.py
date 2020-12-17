@@ -32,6 +32,7 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newOutput("Float List", "Radii", "radii")
             self.newOutput("Float List", "Tilts", "tilts", hide = True)
             self.newOutput("Float List", "Curvatures", "curvatures", hide = True)
+            self.newOutput("Matrix List", "Matrices", "matrices", hide = True)
         else:
             self.newInput(VectorizedSocket("Float", "useParameterList",
                 ("Parameter", "parameter", dict(minValue = 0, maxValue = 1)),
@@ -55,6 +56,9 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newOutput(VectorizedSocket("Float", "useParameterList",
                 ("Curvature", "curvature", dict(hide = True)),
                 ("Curvatures", "curvatures", dict(hide = True))))
+            self.newOutput(VectorizedSocket("Matrix", "useParameterList",
+                ("Matrix", "matrix", dict(hide = True)),
+                ("Matrices", "matrices", dict(hide = True))))
 
     def draw(self, layout):
         row = layout.row(align = True)
@@ -74,7 +78,7 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         yield "if spline.isEvaluable():"
         if self.parameterType == "UNIFORM":
             yield "    spline.ensureUniformConverter(self.resolution)"
-        if "normal" in required or "normals" in required:
+        if any(output in required for output in ("normal", "normals", "matrix", "matrices")):
             yield "    spline.ensureNormals()"
 
         if self.evaluateRange:
@@ -106,6 +110,8 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         if "curvatures" in required:
             yield "_curvatures = spline.getDistributedCurvatures(_amount, _start, _end, self.parameterType)"
             yield "curvatures = DoubleList.fromValues(_curvatures)"
+        if "matrices" in required:
+            yield "matrices = spline.getDistributedMatrices(_amount, _start, _end, self.parameterType)"
 
     def getExecutionCode_Parameters(self, required):
         if self.useParameterList:
@@ -138,6 +144,8 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         if "curvatures" in required:
             yield "_curvatures = spline.sampleCurvatures(_parameters, False, 'RESOLUTION')"
             yield "curvatures = DoubleList.fromValues(_curvatures)"
+        if "matrices" in required:
+            yield "matrices = spline.sampleMatrices(_parameters, False, 'RESOLUTION')"
 
     def getExecutionCode_Parameters_Single(self, required):
         if self.wrapParameters:
@@ -160,3 +168,5 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             yield "tilt = spline.evaluateTilt(_parameter)"
         if "curvature" in required:
             yield "curvature = spline.evaluateCurvature(_parameter)"
+        if "matrix" in required:
+            yield "matrix = spline.evaluateMatrix(_parameter)"

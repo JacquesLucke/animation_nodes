@@ -112,7 +112,6 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             if self.splineDistributionMethod != "VERTICES":
                 self.newInput("Float", "Start", "start", value = 0.0).setRange(0.0, 1.0)
                 self.newInput("Float", "End", "end", value = 1.0).setRange(0.0, 1.0)
-            self.newInput("Boolean", "Use Radius", "useRadius", value = True)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Vector List", "Vectors", "vectors")
@@ -161,11 +160,11 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             yield "matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel)"
         elif self.mode == "SPLINE":
             if self.splineDistributionMethod == "STEP":
-                yield "matrices = self.execute_SplineStep(spline, step, start, end, useRadius)"
+                yield "matrices = self.execute_SplineStep(spline, step, start, end)"
             elif self.splineDistributionMethod in ("RESOLUTION", "UNIFORM"):
-                yield "matrices = self.execute_SplineCount(spline, count, start, end, useRadius)"
+                yield "matrices = self.execute_SplineCount(spline, count, start, end)"
             else:
-                yield "matrices = self.execute_SplineVertices(spline, useRadius)"
+                yield "matrices = self.execute_SplineVertices(spline)"
 
         if "vectors" in required:
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
@@ -287,29 +286,31 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
         return matrices
 
-    def execute_SplineStep(self, Spline spline, float step, float start, float end, bint useRadius):
+    def execute_SplineStep(self, Spline spline, float step, float start, float end):
         if not spline.isEvaluable(): return Matrix4x4List()
         spline.ensureUniformConverter(self.splineResolution)
         start = spline.toUniformParameter(min(max(start, 0), 1))
         end = spline.toUniformParameter(min(max(end, 0), 1))
+        spline.ensureNormals()
         cdef float length = spline.getPartialLength(start, end, self.splineResolution)
         cdef Py_ssize_t count = <Py_ssize_t>(length / step) if step != 0 else 0
-        return self.execute_SplineCount(spline, count, start, end, useRadius)
+        return self.execute_SplineCount(spline, count, start, end)
 
-    def execute_SplineCount(self, Spline spline, Py_ssize_t count, float start, float end, bint useRadius):
+    def execute_SplineCount(self, Spline spline, Py_ssize_t count, float start, float end):
         if not spline.isEvaluable(): return Matrix4x4List()
         if self.splineDistributionMethod == "UNIFORM":
             spline.ensureUniformConverter(self.splineResolution)
             start = spline.toUniformParameter(min(max(start, 0), 1))
             end = spline.toUniformParameter(min(max(end, 0), 1))
+        spline.ensureNormals()
         count = max(count, 0)
         distributionType = "UNIFORM" if self.splineDistributionMethod != "RESOLUTION" else "RESOLUTION"
-        return spline.getDistributedMatrices(count, start, end, distributionType, useRadius)
+        return spline.getDistributedMatrices(count, start, end, distributionType)
 
-    def execute_SplineVertices(self, Spline spline, bint useRadius):
+    def execute_SplineVertices(self, Spline spline):
         if not spline.isEvaluable(): return Matrix4x4List()
         count = len(spline.points)
-        return spline.getDistributedMatrices(count, 0, 1, "RESOLUTION", useRadius)
+        return spline.getDistributedMatrices(count, 0, 1, "RESOLUTION")
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)

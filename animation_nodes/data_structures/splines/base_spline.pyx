@@ -2,7 +2,7 @@ from ... utils.lists cimport findListSegment_LowLevel
 from ... math cimport (
     distanceSquaredVec3, crossVec3, projectOnCenterPlaneVec3,
     almostZeroVec3, angleVec3, dotVec3, normalizeVec3_InPlace,
-    toPyVector3, toVector3,
+    toPyVector3, toVector3, toPyMatrix4,
     findNearestLineParameter,
     distanceSumOfVector3DList,
     rotateAroundAxisVec3,
@@ -11,6 +11,7 @@ from ... math cimport (
 )
 
 ctypedef void (*EvaluateVector)(Spline, float, Vector3*)
+ctypedef void (*EvaluateMatrix)(Spline, float, Matrix4*)
 ctypedef float (*EvaluateFloat)(Spline, float)
 
 cdef class Spline:
@@ -134,6 +135,12 @@ cdef class Spline:
         evaluateDistributed(self, amount, self.evaluateTilt_LowLevel,
             start, end, distributionType, result)
 
+    cdef calcDistributedMatrices_LowLevel(self, Py_ssize_t amount, Matrix4 *result,
+                                          float start = 0, float end = 1,
+                                          str distributionType = "RESOLUTION"):
+        evaluateDistributed(self, amount, self.evaluateMatrix_LowLevel,
+            start, end, distributionType, result)
+
 
     def getDistributedPoints(self, Py_ssize_t amount,
                              float start = 0, float end = 1,
@@ -179,34 +186,10 @@ cdef class Spline:
 
     def getDistributedMatrices(self, Py_ssize_t amount,
                                float start = 0, float end = 1,
-                               str distributionType = "RESOLUTION",
-                               bint useRadius = True):
-        cdef Vector3DList points = Vector3DList(length = amount)
-        self.calcDistributedPoints_LowLevel(amount, points.data, start, end, distributionType)
-        cdef Vector3DList tangents = Vector3DList(length = amount)
-        self.calcDistributedTangents_LowLevel(amount, tangents.data, start, end, distributionType)
-        cdef Vector3DList normals = Vector3DList(length = amount)
-        self.ensureNormals()
-        self.calcDistributedNormals_LowLevel(amount, normals.data, start, end, distributionType)
-
-        cdef Matrix4x4List matrices = Matrix4x4List(length = amount)
-        cdef Vector3 bitangent
-        cdef Py_ssize_t i
-        for i in range(amount):
-            normalizeVec3_InPlace(tangents.data + i)
-            normalizeVec3_InPlace(normals.data + i)
-            crossVec3(&bitangent, tangents.data + i, normals.data + i)
-            matrixFromNormalizedAxisData(matrices.data + i, points.data + i,
-                tangents.data + i, normals.data + i, &bitangent)
-
-        cdef FloatList radii
-        if useRadius:
-            radii = FloatList(length = amount)
-            self.calcDistributedRadii_LowLevel(amount, radii.data, start, end, distributionType)
-            for i in range(amount):
-                scaleMatrix3x3Part(matrices.data + i, radii.data[i])
-
-        return matrices
+                               str distributionType = "RESOLUTION"):
+        cdef Matrix4x4List result = Matrix4x4List(length = amount)
+        self.calcDistributedMatrices_LowLevel(amount, result.data, start, end, distributionType)
+        return result
 
 
     def samplePoints(self, FloatList parameters,
@@ -258,6 +241,14 @@ cdef class Spline:
             _parameters.data, result.data, _parameters.length)
         return result
 
+    def sampleMatrices(self, FloatList parameters,
+                       bint checkRange = True, parameterType = "RESOLUTION"):
+        cdef FloatList _parameters = prepareSampleParameters(self, parameters, checkRange, parameterType)
+        cdef Matrix4x4List result = Matrix4x4List(length = parameters.length)
+        evaluateFunction_Array(self, self.evaluateMatrix_LowLevel,
+            _parameters.data, result.data, _parameters.length)
+        return result
+
 
 
 
@@ -283,6 +274,9 @@ cdef class Spline:
 
     def evaluateTilt(self, float t):
         return evaluateFunction_PyResult(self, self.evaluateTilt_LowLevel, t)
+
+    def evaluateMatrix(self, float t):
+        return evaluateFunction_PyResult(self, self.evaluateMatrix_LowLevel, t)
 
 
     cdef void evaluatePoint_LowLevel(self, float t, Vector3 *result):
@@ -312,6 +306,18 @@ cdef class Spline:
 
     cdef float evaluateTilt_LowLevel(self, float t):
         raise NotImplementedError()
+
+    cdef void evaluateMatrix_LowLevel(self, float t, Matrix4 *result):
+        cdef Vector3 point, tangent, normal, bitangent
+        self.evaluatePoint_LowLevel(t, &point)
+        self.evaluateTangent_LowLevel(t, &tangent)
+        self.evaluateNormal_LowLevel(t, &normal)
+        normalizeVec3_InPlace(&tangent)
+        normalizeVec3_InPlace(&normal)
+        crossVec3(&bitangent, &tangent, &normal)
+        matrixFromNormalizedAxisData(result, &point, &tangent, &normal, &bitangent)
+        cdef float radius = self.evaluateRadius_LowLevel(t)
+        scaleMatrix3x3Part(result, radius)
 
 
     # Projection
@@ -428,6 +434,7 @@ cdef class Spline:
 ctypedef fused EvaluateFunction:
     EvaluateVector
     EvaluateFloat
+    EvaluateMatrix
 
 cdef evaluateDistributed(Spline spline, Py_ssize_t amount, EvaluateFunction evaluate, float start, float end, str distributionType, void *target):
     spline.checkEvaluability()
@@ -447,6 +454,8 @@ cdef evaluateDistributed(Spline spline, Py_ssize_t amount, EvaluateFunction eval
             evaluate(spline, (start + end) / 2, <Vector3*>target)
         elif EvaluateFunction is EvaluateFloat:
             (<float*>target)[0] = evaluate(spline, (start + end) / 2)
+        elif EvaluateFunction is EvaluateMatrix:
+            evaluate(spline, (start + end) / 2, <Matrix4*>target)
         return
 
     cdef float step
@@ -468,6 +477,8 @@ cdef evaluateDistributed(Spline spline, Py_ssize_t amount, EvaluateFunction eval
             evaluate(spline, t, <Vector3*>target + i)
         elif EvaluateFunction is EvaluateFloat:
             (<float*>target)[i] = evaluate(spline, t)
+        elif EvaluateFunction is EvaluateMatrix:
+            evaluate(spline, t, <Matrix4*>target + i)
 
 def prepareSampleParameters(Spline spline, FloatList parameters,
                             bint checkRange, str parameterType):
@@ -501,6 +512,11 @@ cdef evaluateFunction_PyResult(Spline spline, EvaluateFunction evaluate, float t
     if EvaluateFunction is EvaluateFloat:
         return evaluate(spline, t)
 
+    cdef Matrix4 matrixResult
+    if EvaluateFunction is EvaluateMatrix:
+        evaluate(spline, t, &matrixResult)
+        return toPyMatrix4(&matrixResult)
+
 
 # Evaluate Function on Array
 ######################################################
@@ -513,6 +529,8 @@ cdef evaluateFunction_Array(Spline spline, EvaluateFunction evaluate,
             evaluate(spline, parameters[i], <Vector3*>results + i)
         elif EvaluateFunction is EvaluateFloat:
             (<float*>results)[i] = evaluate(spline, parameters[i])
+        elif EvaluateFunction is EvaluateMatrix:
+            evaluate(spline, parameters[i], <Matrix4*>results + i)
 
 
 # Calculate Normals
