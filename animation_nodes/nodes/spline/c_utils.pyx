@@ -47,4 +47,6 @@ def wrapSplineParameters(FloatList parameters):
     cdef Py_ssize_t i
     for i in range(len(parameters)):
         result.data[i] = parameters.data[i] % 1.0
+        if parameters.data[i] != 0 and result.data[i] == 0:
+            result.data[i] = 1.0
     return result

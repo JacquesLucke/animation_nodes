@@ -149,7 +149,7 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
 
     def getExecutionCode_Parameters_Single(self, required):
         if self.wrapParameters:
-            yield "_parameter = parameter % 1.0"
+            yield "_parameter = 1 if parameter != 0 and parameter % 1 == 0 else parameter % 1"
         else:
             yield "_parameter = min(max(parameter, 0), 1)"
 
