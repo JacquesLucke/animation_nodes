@@ -27,6 +27,7 @@
 - Fixed triangulateMesh method of Mesh.
 - Fixed freeze in Is Inside Volume node.
 - Fixed Grease Pencil Nodes for API changes.
+- Fixed *Wiggle Action* node when channel is not a valid identifier.
 
 ### Changed
 

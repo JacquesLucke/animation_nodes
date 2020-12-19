@@ -60,9 +60,21 @@ class ActionChannelsNodeBase:
     def getChannels(self):
         return [item.getChannel() for item in self.channels]
 
+    def getFirstInvalidChannel(self):
+        for channelItem in self.channels:
+            channel = channelItem.getChannel()
+            if isinstance(channel, PathActionChannel):
+                if not channel.path.isidentifier():
+                    return channel.path
+            elif isinstance(channel, PathIndexActionChannel):
+                if not channel.property.isidentifier():
+                    return channel.property
+        return None
+
 class WiggleActionNode(bpy.types.Node, AnimationNode, ActionChannelsNodeBase):
     bl_idname = "an_WiggleActionNode"
     bl_label = "Wiggle Action"
+    errorHandlingType = "EXCEPTION"
 
     def create(self):
         self.newInput("Integer", "Seed", "seed")
@@ -73,8 +85,14 @@ class WiggleActionNode(bpy.types.Node, AnimationNode, ActionChannelsNodeBase):
         self.drawChannels(layout)
 
     def execute(self, seed, amplitude):
+        self.validateChannels()
         channels = self.getChannels()
         return WiggleAction(amplitude, channels, seed)
+
+    def validateChannels(self):
+        invalidPath = self.getFirstInvalidChannel()
+        if invalidPath is None: return
+        self.raiseErrorMessage(repr(invalidPath) + " is not a valid channel!")
 
 cdef class WiggleAction(UnboundedAction):
     cdef float amplitude
