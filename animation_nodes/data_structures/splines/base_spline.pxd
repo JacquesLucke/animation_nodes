@@ -32,14 +32,6 @@ cdef class Spline:
     cdef checkNormals(self)
     cpdef ensureNormals(self)
 
-    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
-        float start = ?, float end = ?,
-        str distributionType = ?)
-
-    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
-        float start = ?, float end = ?,
-        str distributionType = ?)
-
 
     # Evaluate Single Parameter
     #############################################
