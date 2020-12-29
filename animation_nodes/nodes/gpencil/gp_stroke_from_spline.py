@@ -33,4 +33,4 @@ class GPStrokeFromSplineNode(bpy.types.Node, AnimationNode):
         uvRotations.fill(0)
         return GPStroke(vertices = vertices, strengths = strengths,
                         pressures = pressures, uvRotations = uvRotations,
-                        drawCyclic = spline.cyclic)
+                        useCyclic = spline.cyclic)

@@ -3,9 +3,9 @@ from bpy.props import *
 from math import pi as _pi
 from libc.math cimport sin, cos
 from ... utils.limits cimport INT_MAX
+from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... events import executionCodeChanged
-from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList
+from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList, Spline
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
     setMatrixTranslation, setRotationZMatrix, toVector3, scaleMatrix3x3Part)
@@ -16,7 +16,8 @@ modeItems = [
     ("GRID", "Grid", "", "NONE", 1),
     ("CIRCLE", "Circle", "", "NONE", 2),
     ("MESH", "Mesh", "", "NONE", 3),
-    ("SPIRAL", "Spiral", "", "NONE", 4)
+    ("SPIRAL", "Spiral", "", "NONE", 4),
+    ("SPLINE", "Spline", "", "NONE", 5),
 ]
 
 distanceModeItems = [
@@ -29,6 +30,12 @@ meshModeItems = [
     ("POLYGONS", "Polygons", "", "NONE", 1)
 ]
 
+splineDistributionMethodItems = (
+    ("UNIFORM", "Uniform", "", "NONE", 0),
+    ("STEP", "Step", "", "NONE", 1),
+    ("RESOLUTION", "Resolution", "","NONE", 2),
+    ("VERTICES", "Vertices", "", "NONE", 3),
+)
 
 class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DistributeMatricesNode"
@@ -46,14 +53,22 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     __annotations__["meshMode"] = EnumProperty(name = "Mesh Mode", default = "VERTICES",
         items = meshModeItems, update = AnimationNode.refresh)
 
-    __annotations__["centerAlongX"] = BoolProperty(name = "Center Along X", default = True,
-        description = "Center the grid along the x axis", update = executionCodeChanged)
-    __annotations__["centerAlongY"] = BoolProperty(name = "Center Along Y", default = True,
-        description = "Center the grid along the y axis", update = executionCodeChanged)
-    __annotations__["centerAlongZ"] = BoolProperty(name = "Center Along Z", default = False,
-        description = "Center the grid along the z axis", update = executionCodeChanged)
+    __annotations__["splineDistributionMethod"] = EnumProperty(name = "Distribution Method",
+        default = "UNIFORM", items = splineDistributionMethodItems, update = AnimationNode.refresh)
 
-    __annotations__["exactCircleSegment"] = BoolProperty(name = "Exact Circle Segment", default = False)
+    __annotations__["centerAlongX"] = BoolProperty(name = "Center Along X", default = True,
+        description = "Center the grid along the x axis", update = propertyChanged)
+    __annotations__["centerAlongY"] = BoolProperty(name = "Center Along Y", default = True,
+        description = "Center the grid along the y axis", update = propertyChanged)
+    __annotations__["centerAlongZ"] = BoolProperty(name = "Center Along Z", default = False,
+        description = "Center the grid along the z axis", update = propertyChanged)
+
+    __annotations__["exactCircleSegment"] = BoolProperty(name = "Exact Circle Segment", default = False,
+        update = propertyChanged)
+
+    __annotations__["splineResolution"] = IntProperty(name = "Spline Resolution", min = 2, default = 20,
+        description = "Increase to have a more accurate evaluation if the type is set to Uniform",
+        update = propertyChanged)
 
     def create(self):
         if self.mode == "LINEAR":
@@ -88,6 +103,15 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "End Size", "endSize", value = 0.5, minValue = 0)
             self.newInput("Float", "Start Angle", "startAngle", value = 0)
             self.newInput("Float", "End Angle", "endAngel", value = 6 * PI)
+        elif self.mode == "SPLINE":
+            self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
+            if self.splineDistributionMethod == "STEP":
+                self.newInput("Float", "Step", "step", value = 0.1, minValue = 0)
+            elif self.splineDistributionMethod in ("RESOLUTION", "UNIFORM"):
+                self.newInput("Integer", "Count", "count", value = 50, minValue = 0)
+            if self.splineDistributionMethod != "VERTICES":
+                self.newInput("Float", "Start", "start", value = 0.0).setRange(0.0, 1.0)
+                self.newInput("Float", "End", "end", value = 1.0).setRange(0.0, 1.0)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Vector List", "Vectors", "vectors")
@@ -104,10 +128,15 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             row.prop(self, "centerAlongX", text = "X", toggle = True)
             row.prop(self, "centerAlongY", text = "Y", toggle = True)
             row.prop(self, "centerAlongZ", text = "Z", toggle = True)
+        if self.mode == "SPLINE":
+            col.prop(self, "splineDistributionMethod", text = "")
 
     def drawAdvanced(self, layout):
         if self.mode == "CIRCLE":
             layout.prop(self, "exactCircleSegment")
+        if self.mode == "SPLINE":
+            if self.splineDistributionMethod in ("UNIFORM", "STEP"):
+                layout.prop(self, "splineResolution")
 
     def getExecutionCode(self, required):
         if self.mode == "LINEAR":
@@ -129,6 +158,13 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
                 yield "matrices = self.execute_Polygons(mesh)"
         elif self.mode == "SPIRAL":
             yield "matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel)"
+        elif self.mode == "SPLINE":
+            if self.splineDistributionMethod == "STEP":
+                yield "matrices = self.execute_SplineStep(spline, step, start, end)"
+            elif self.splineDistributionMethod in ("RESOLUTION", "UNIFORM"):
+                yield "matrices = self.execute_SplineCount(spline, count, start, end)"
+            else:
+                yield "matrices = self.execute_SplineVertices(spline)"
 
         if "vectors" in required:
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
@@ -249,6 +285,32 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             rotateStep(&iCos, &iSin, stepCos, stepSin)
 
         return matrices
+
+    def execute_SplineStep(self, Spline spline, float step, float start, float end):
+        if not spline.isEvaluable(): return Matrix4x4List()
+        spline.ensureUniformConverter(self.splineResolution)
+        start = spline.toUniformParameter(min(max(start, 0), 1))
+        end = spline.toUniformParameter(min(max(end, 0), 1))
+        spline.ensureNormals()
+        cdef float length = spline.getPartialLength(start, end, self.splineResolution)
+        cdef Py_ssize_t count = <Py_ssize_t>(length / step) if step != 0 else 0
+        return self.execute_SplineCount(spline, count, start, end)
+
+    def execute_SplineCount(self, Spline spline, Py_ssize_t count, float start, float end):
+        if not spline.isEvaluable(): return Matrix4x4List()
+        if self.splineDistributionMethod == "UNIFORM":
+            spline.ensureUniformConverter(self.splineResolution)
+            start = spline.toUniformParameter(min(max(start, 0), 1))
+            end = spline.toUniformParameter(min(max(end, 0), 1))
+        spline.ensureNormals()
+        count = max(count, 0)
+        distributionType = "UNIFORM" if self.splineDistributionMethod != "RESOLUTION" else "RESOLUTION"
+        return spline.getDistributedMatrices(count, start, end, distributionType)
+
+    def execute_SplineVertices(self, Spline spline):
+        if not spline.isEvaluable(): return Matrix4x4List()
+        count = len(spline.points)
+        return spline.getDistributedMatrices(count, 0, 1, "RESOLUTION")
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)

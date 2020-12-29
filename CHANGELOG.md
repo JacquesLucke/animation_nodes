@@ -10,18 +10,34 @@
 - Added *Find Shortest Path* node.
 - Added *Compare Numbers* node.
 - Added *Copy Object Modifiers* node.
+- Added *Export Headers* option to the setup script.
+- Added *Indices* output to *Get Random List Elements* node.
+- Added *Overlay* mode to *Mix Falloff* node.
+- Added *Spline* mode to *Distribute Matrices* node.
+- Added *Fill Caps* option to *Curve Object Output* node.
+- Added *Bevel Mode* option to *Curve Object Output* node.
+- Added *Paramater* option to *Spline Falloff* node.
+- Added *Wrap Paramaters* option to *Evaluate Spline* node.
+- Added *Matrix* output to the *Evaluate Spline* node.
 
 ### Fixed
 
 - Fixed nextBoolean method for XoShiRo256StarStar generators.
 - Fixed OpenGL fragment shaders on Core contexts.
 - Fixed triangulateMesh method of Mesh.
+- Fixed freeze in Is Inside Volume node.
+- Fixed Grease Pencil Nodes for API changes.
+- Fixed *Wiggle Action* node when channel is not a valid identifier.
 
 ### Changed
 
 - Vectorized *Mix* nodes.
-- *Mix Quaternions* node now uses slerp for mixing
-- Vectorized *Convert Angle* node
+- Use slerp in the *Mix Quaternions* node.
+- Vectorized *Convert Angle* node.
+- Vectorized *Vector Dot Product* node.
+- Socket enable/disable option for *Shade Object Smooth* node.
+- Support undo for node operators.
+- Increased default spline resolution for Spline nodes.
 
 ## 2.2.0 (01 September 2020)
 

@@ -17,12 +17,16 @@ class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
 
         self.newInput(VectorizedSocket("Boolean", "useSmoothList",
             ("Smooth", "smooth"), ("Smooth", "smooth")))
+        socket = self.inputs[1]
+        socket.useIsUsedProperty = True
+        socket.isUsed = False
 
         self.newOutput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object"), ("Objects", "objects")))
 
     def getExecutionCode(self, required):
-        return "object = self.execute_Single(object, smooth)"
+        if self.inputs[1].isUsed:
+            return "object = self.execute_Single(object, smooth)"
 
     def execute_Single(self, object, smooth):
         if getattr(object, "type", "") == "MESH":

@@ -34,7 +34,7 @@ jobs:
       - name: Setup Development Enviroment
         uses: ilammy/msvc-dev-cmd@v1
       - name: Build
-        run: python setup.py build --export --noversioncheck
+        run: python setup.py build --export --exportheaders --noversioncheck
       - name: Upload Builds
         uses: actions/upload-artifact@v2
         with:

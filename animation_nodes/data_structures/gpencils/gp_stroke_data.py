@@ -6,7 +6,7 @@ from ... data_structures.color import Color
 class GPStroke:
     def __init__(self, vertices = None, strengths = None, pressures = None,
                  uvRotations = None, vertexColors = None, lineWidth = None,
-                 hardness = None, drawCyclic = None, startCapMode = None,
+                 hardness = None, useCyclic = None, startCapMode = None,
                  endCapMode = None, vertexColorFill = None, materialIndex = None,
                  displayMode = None):
 
@@ -17,7 +17,7 @@ class GPStroke:
         if vertexColors is None: vertexColors = ColorList()
         if lineWidth is None: lineWidth = 250
         if hardness is None: hardness = 1
-        if drawCyclic is None: drawCyclic = False
+        if useCyclic is None: useCyclic = False
         if startCapMode is None: startCapMode = "ROUND"
         if endCapMode is None: endCapMode = "ROUND"
         if vertexColorFill is None: vertexColorFill = Color((0, 0, 0, 0))
@@ -31,7 +31,7 @@ class GPStroke:
         self.vertexColors = vertexColors
         self.lineWidth = lineWidth
         self.hardness = hardness
-        self.drawCyclic = drawCyclic
+        self.useCyclic = useCyclic
         self.startCapMode = startCapMode
         self.endCapMode = endCapMode
         self.vertexColorFill = vertexColorFill
@@ -44,7 +44,7 @@ class GPStroke:
             Points: {len(self.vertices)}
             Line Width: {self.lineWidth}
             Hardeness: {self.hardness}
-            Cyclic: {self.drawCyclic}
+            Cyclic: {self.useCyclic}
             Start Cap Mode: {self.startCapMode}
             End Cap Mode: {self.endCapMode}
             Vertex Color Fill: {self.vertexColorFill}
@@ -54,5 +54,5 @@ class GPStroke:
     def copy(self):
         return GPStroke(self.vertices.copy(), self.strengths.copy(), self.pressures.copy(),
                         self.uvRotations.copy(), self.vertexColors.copy(), self.lineWidth,
-                        self.hardness, self.drawCyclic, self.startCapMode, self.endCapMode,
+                        self.hardness, self.useCyclic, self.startCapMode, self.endCapMode,
                         self.vertexColorFill, self.materialIndex, self.displayMode)
