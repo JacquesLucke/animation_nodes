@@ -309,6 +309,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
     def execute_SplineVertices(self, Spline spline):
         if not spline.isEvaluable(): return Matrix4x4List()
+        spline.ensureNormals()
         count = len(spline.points)
         return spline.getDistributedMatrices(count, 0, 1, "RESOLUTION")
 
