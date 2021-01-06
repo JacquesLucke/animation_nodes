@@ -37,10 +37,19 @@ splineDistributionMethodItems = (
     ("VERTICES", "Vertices", "", "NONE", 3),
 )
 
+searchItems = {
+    "Distribute Linear" : "LINEAR",
+    "Distribute Grid" : "GRID",
+    "Distribute Circle" : "CIRCLE",
+    "Distribute MESH" : "MESH",
+    "Distribute Spiral" : "SPIRAL",
+    "Distribute Spline" : "SPLINE",
+}
+
 class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DistributeMatricesNode"
     bl_label = "Distribute Matrices"
-    bl_width_default = 160
+    searchTags = [(name, {"mode" : repr(op)}) for name, op in searchItems.items()]
 
     __annotations__ = {}
 
