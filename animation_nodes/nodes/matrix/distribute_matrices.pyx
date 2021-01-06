@@ -5,7 +5,7 @@ from libc.math cimport sin, cos
 from ... utils.limits cimport INT_MAX
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList, Spline
+from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList, Spline, Interpolation
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
 from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
     setMatrixTranslation, setRotationZMatrix, toVector3, scaleMatrix3x3Part)
@@ -78,6 +78,10 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     __annotations__["splineResolution"] = IntProperty(name = "Spline Resolution", min = 2, default = 20,
         description = "Increase to have a more accurate evaluation if the type is set to Uniform",
         update = propertyChanged)
+    
+    __annotations__["centerAxis"] =  BoolProperty(name = "Center Axis",
+        description = "Center the spiral along Z axis",
+        default = False, update = propertyChanged)
 
     def create(self):
         if self.mode == "LINEAR":
@@ -112,6 +116,9 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "End Size", "endSize", value = 0.5, minValue = 0)
             self.newInput("Float", "Start Angle", "startAngle", value = 0)
             self.newInput("Float", "End Angle", "endAngel", value = 6 * PI)
+            self.newInput("Float", "Altitude", "altitude", value = 0)
+            self.newInput("Interpolation", "Interpolation_1", "interpolation_1", defaultDrawType = "PROPERTY_ONLY", hide = True)
+            self.newInput("Interpolation", "Interpolation_2", "interpolation_2", defaultDrawType = "PROPERTY_ONLY", hide = True)
         elif self.mode == "SPLINE":
             self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
             if self.splineDistributionMethod == "STEP":
@@ -139,6 +146,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             row.prop(self, "centerAlongZ", text = "Z", toggle = True)
         if self.mode == "SPLINE":
             col.prop(self, "splineDistributionMethod", text = "")
+        if self.mode == "SPIRAL":
+            layout.prop(self, "centerAxis")
 
     def drawAdvanced(self, layout):
         if self.mode == "CIRCLE":
@@ -166,7 +175,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             elif self.meshMode == "POLYGONS":
                 yield "matrices = self.execute_Polygons(mesh)"
         elif self.mode == "SPIRAL":
-            yield "matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel)"
+            yield "matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel, altitude, interpolation_1, interpolation_2)"
         elif self.mode == "SPLINE":
             if self.splineDistributionMethod == "STEP":
                 yield "matrices = self.execute_SplineStep(spline, step, start, end)"
@@ -263,7 +272,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         return matrices
 
     def execute_Spiral(self, Py_ssize_t _amount, float startRadius, float endRadius,
-                             float startSize, float endSize, float startAngle, float endAngle):
+                             float startSize, float endSize, float startAngle, float endAngle,
+                             float altitude, Interpolation interpolation_1, Interpolation interpolation_2):
         cdef Py_ssize_t i
         cdef Vector3 position
         cdef float iCos, iSin, stepCos, stepSin, f, size
@@ -276,16 +286,19 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         iSin = sin(startAngle)
         stepCos = cos(angleStep)
         stepSin = sin(angleStep)
+        
+        Zoffset = altitude / 2 * int(self.centerAxis)
 
         for i in range(amount):
             f = <float>i * factor
 
             size = f * (endSize - startSize) + startSize
-            radius = f * (endRadius - startRadius) + startRadius
+            radius = (endRadius - startRadius) * interpolation_1(max(min(f, 1.0), 0.0)) + startRadius
+            Zstep = altitude * interpolation_2(max(min(f, 1.0), 0.0))
 
             position.x = iCos * radius
             position.y = iSin * radius
-            position.z = 0
+            position.z = Zstep - Zoffset
 
             setTranslationMatrix(matrices.data + i, &position)
             setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
