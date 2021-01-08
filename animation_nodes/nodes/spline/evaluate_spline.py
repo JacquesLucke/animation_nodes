@@ -32,7 +32,7 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newOutput("Float List", "Radii", "radii")
             self.newOutput("Float List", "Tilts", "tilts", hide = True)
             self.newOutput("Float List", "Curvatures", "curvatures", hide = True)
-            self.newOutput("Matrix List", "Matrices", "matrices", hide = True)
+            self.newOutput("Matrix List", "Matrices", "matrices")
         else:
             parameterInputSettings = dict()
             if not self.wrapParameters:
