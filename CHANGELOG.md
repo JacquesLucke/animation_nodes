@@ -19,6 +19,7 @@
 - Added *Paramater* option to *Spline Falloff* node.
 - Added *Wrap Paramaters* option to *Evaluate Spline* node.
 - Added *Matrix* output to the *Evaluate Spline* node.
+- Added search tags for Distribute Matrices node.
 
 ### Fixed
 
@@ -38,6 +39,7 @@
 - Socket enable/disable option for *Shade Object Smooth* node.
 - Support undo for node operators.
 - Increased default spline resolution for Spline nodes.
+- Inprove spiral in Distribute Matrices node.
 
 ## 2.2.0 (01 September 2020)
 
