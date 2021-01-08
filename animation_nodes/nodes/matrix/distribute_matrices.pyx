@@ -116,8 +116,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             self.newInput("Float", "End Size", "endSize", value = 0.5, minValue = 0)
             self.newInput("Float", "Start Angle", "startAngle", value = 0)
             self.newInput("Float", "End Angle", "endAngel", value = 6 * PI)
-            self.newInput("Float", "Spiral Height", "spiralHeight", value = 0)
-            self.newInput("Interpolation", "Spiral Interpolation", "spiralInterpolation", defaultDrawType = "PROPERTY_ONLY", hide = True)
+            self.newInput("Float", "Height", "spiralHeight", value = 0)
+            self.newInput("Interpolation", "Radius Interpolation", "radiusInterpolation", defaultDrawType = "PROPERTY_ONLY", hide = True)
             self.newInput("Interpolation", "Height Interpolation", "heightInterpolation", defaultDrawType = "PROPERTY_ONLY", hide = True)
         elif self.mode == "SPLINE":
             self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
@@ -175,7 +175,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             elif self.meshMode == "POLYGONS":
                 yield "matrices = self.execute_Polygons(mesh)"
         elif self.mode == "SPIRAL":
-            yield "matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel, spiralHeight, spiralInterpolation, heightInterpolation)"
+            yield "matrices = self.execute_Spiral(amount, startRadius, endRadius, startSize, endSize, startAngle, endAngel,\
+                                                  spiralHeight, radiusInterpolation, heightInterpolation)"
         elif self.mode == "SPLINE":
             if self.splineDistributionMethod == "STEP":
                 yield "matrices = self.execute_SplineStep(spline, step, start, end)"
@@ -287,15 +288,17 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         stepCos = cos(angleStep)
         stepSin = sin(angleStep)
         
+        zOffset = (spiralHeight / 2) * self.centerSpiral
+        
         for i in range(amount):
             f = <float>i * factor
 
             size = f * (endSize - startSize) + startSize
-            radius = radius = (endRadius - startRadius) * radiusInterpolation.evaluate(f) + startRadius
+            radius = (endRadius - startRadius) * radiusInterpolation.evaluate(f) + startRadius
 
             position.x = iCos * radius
             position.y = iSin * radius
-            position.z = spiralHeight * heightInterpolation.evaluate(f) - spiralHeight / 2 * self.centerSpiral
+            position.z = spiralHeight * heightInterpolation.evaluate(f) - zOffset
 
             setTranslationMatrix(matrices.data + i, &position)
             setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
