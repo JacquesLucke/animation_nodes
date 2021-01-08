@@ -16,7 +16,7 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     wrapParameters: BoolProperty(name = "Wrap Parameters", default = False,
         description = ("Wrap the input parameters such that a parameter larger than 1"
                        " wraps to the start of the spline and vice versa"),
-        update = executionCodeChanged)
+        update = AnimationNode.refresh)
 
     useParameterList: VectorizedSocket.newProperty()
 
@@ -34,8 +34,11 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             self.newOutput("Float List", "Curvatures", "curvatures", hide = True)
             self.newOutput("Matrix List", "Matrices", "matrices", hide = True)
         else:
+            parameterInputSettings = dict()
+            if not self.wrapParameters:
+                parameterInputSettings = dict(minValue = 0, maxValue = 1)
             self.newInput(VectorizedSocket("Float", "useParameterList",
-                ("Parameter", "parameter", dict(minValue = 0, maxValue = 1)),
+                ("Parameter", "parameter", parameterInputSettings),
                 ("Parameters", "parameters")))
 
             self.newOutput(VectorizedSocket("Vector", "useParameterList",
