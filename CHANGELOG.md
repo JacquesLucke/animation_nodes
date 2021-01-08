@@ -20,6 +20,7 @@
 - Added *Wrap Paramaters* option to *Evaluate Spline* node.
 - Added *Matrix* output to the *Evaluate Spline* node.
 - Added search tags for Distribute Matrices node.
+- Added material index to spline structure.
 
 ### Fixed
 

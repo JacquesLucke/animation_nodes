@@ -35,6 +35,7 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
             ("Tilt", "tilt"),
             ("Tilts", "tilts")))
         self.newInput("Boolean", "Cyclic", "cyclic", value = False)
+        self.newInput("Integer", "Material Index", "materialIndex")
         self.newOutput("Spline", "Spline", "spline")
 
     def draw(self, layout):
@@ -49,13 +50,13 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         elif self.splineType == "POLY":
             return "execute_Poly"
 
-    def execute_Bezier(self, points, leftHandles, rightHandles, radii, tilts, cyclic):
+    def execute_Bezier(self, points, leftHandles, rightHandles, radii, tilts, cyclic, materialIndex):
         self.correctHandlesListIfNecessary(points, leftHandles)
         self.correctHandlesListIfNecessary(points, rightHandles)
         _radii = self.prepareFloatList(radii, len(points))
         _tilts = self.prepareFloatList(tilts, len(points))
 
-        spline = BezierSpline(points, leftHandles, rightHandles, _radii, _tilts, cyclic)
+        spline = BezierSpline(points, leftHandles, rightHandles, _radii, _tilts, cyclic, materialIndex)
         if self.improveBezierHandles:
             spline.improveStraightBezierSegments()
 
@@ -67,10 +68,10 @@ class SplineFromPointsNode(bpy.types.Node, AnimationNode):
         elif len(points) > len(handles):
             handles += points[len(handles):]
 
-    def execute_Poly(self, points, radii, tilts, cyclic):
+    def execute_Poly(self, points, radii, tilts, cyclic, materialIndex):
         _radii = self.prepareFloatList(radii, len(points))
         _tilts = self.prepareFloatList(tilts, len(points))
-        return PolySpline(points, _radii, _tilts, cyclic)
+        return PolySpline(points, _radii, _tilts, cyclic, materialIndex)
 
     def prepareFloatList(self, source, pointAmount):
         if isinstance(source, DoubleList):

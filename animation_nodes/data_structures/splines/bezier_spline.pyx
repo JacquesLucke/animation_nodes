@@ -23,7 +23,8 @@ cdef class BezierSpline(Spline):
                         Vector3DList rightHandles = None,
                         FloatList radii = None,
                         FloatList tilts = None,
-                        bint cyclic = False):
+                        bint cyclic = False,
+                        long materialIndex = 0):
         if points is None: points = Vector3DList()
         if leftHandles is None: leftHandles = points.copy()
         if rightHandles is None: rightHandles = points.copy()
@@ -39,6 +40,7 @@ cdef class BezierSpline(Spline):
         self.radii = radii
         self.tilts = tilts
         self.cyclic = cyclic
+        self.materialIndex = materialIndex
         self.type = "BEZIER"
         self.markChanged()
 
@@ -47,7 +49,8 @@ cdef class BezierSpline(Spline):
         f"""AN Spline Object:
         Points: {self.points.length}
         Type: {self.type}
-        Cyclic: {self.cyclic}""")
+        Cyclic: {self.cyclic}
+        Material Index: {self.materialIndex}""")
 
     cpdef void markChanged(self):
         Spline.markChanged(self)
@@ -70,7 +73,8 @@ cdef class BezierSpline(Spline):
                             self.rightHandles.copy(),
                             self.radii.copy(),
                             self.tilts.copy(),
-                            self.cyclic)
+                            self.cyclic,
+                            self.materialIndex)
 
     def transform(self, matrix):
         self.points.transform(matrix)
@@ -311,7 +315,7 @@ cdef class BezierSpline(Spline):
         _newTilts[0] = _oldTilts[startIndices[0]] * (1 - startT) + _oldTilts[startIndices[1]] * startT
         _newTilts[newPointAmount - 1] = _oldTilts[endIndices[0]] * (1 - endT) + _oldTilts[endIndices[1]] * endT
 
-        return BezierSpline(newPoints, newLeftHandles, newRightHandles, newRadii, newTilts)
+        return BezierSpline(newPoints, newLeftHandles, newRightHandles, newRadii, newTilts, False, self.materialIndex)
 
     def improveStraightBezierSegments(self):
         cdef Py_ssize_t i

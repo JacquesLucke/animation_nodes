@@ -21,6 +21,7 @@ def setSplinesOnBlenderObject(object, list splines):
 cdef appendBezierSpline(object bSplines, BezierSpline spline):
     bSpline = bSplines.new("BEZIER")
     bSpline.use_cyclic_u = spline.cyclic
+    bSpline.material_index = spline.materialIndex
 
     # one point is already there
     bSpline.bezier_points.add(len(spline.points) - 1)
@@ -46,6 +47,7 @@ cdef appendPolySpline(object bSplines, PolySpline spline):
 
     bSpline = bSplines.new("POLY")
     bSpline.use_cyclic_u = spline.cyclic
+    bSpline.material_index = spline.materialIndex
 
     # one point is already there
     points = bSpline.points

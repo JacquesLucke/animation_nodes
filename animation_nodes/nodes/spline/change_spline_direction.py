@@ -27,11 +27,13 @@ class ChangeSplineDirectionNode(bpy.types.Node, AnimationNode):
             return PolySpline(points = spline.points.reversed(),
                               radii = spline.radii.reversed(),
                               tilts = spline.tilts.reversed(),
-                              cyclic = spline.cyclic)
+                              cyclic = spline.cyclic,
+                              materialIndex = spline.materialIndex)
         elif spline.type == "BEZIER":
             return BezierSpline(points = spline.points.reversed(),
                                 leftHandles = spline.rightHandles.reversed(),
                                 rightHandles = spline.leftHandles.reversed(),
                                 radii = spline.radii.reversed(),
                                 tilts = spline.tilts.reversed(),
-                                cyclic = spline.cyclic)
+                                cyclic = spline.cyclic,
+                                materialIndex = spline.materialIndex)
