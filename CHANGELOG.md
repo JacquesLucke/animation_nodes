@@ -41,6 +41,7 @@
 - Support undo for node operators.
 - Increased default spline resolution for Spline nodes.
 - Inprove spiral in Distribute Matrices node.
+- Remove redundant attribute setting in *Object Instancer* node.
 
 ## 2.2.0 (01 September 2020)
 

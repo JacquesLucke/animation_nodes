@@ -254,9 +254,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
         if self.removeAnimationData and newObject.animation_data is not None:
             newObject.animation_data.action = None
-        newObject.hide_select = False
-        newObject.hide_viewport = False
-        newObject.hide_render = False
+
         if not self.copyFromSource and self.objectType == "Empty":
             newObject.empty_display_type = self.emptyDisplayType
         return newObject
