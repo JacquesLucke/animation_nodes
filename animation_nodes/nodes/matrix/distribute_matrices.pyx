@@ -137,6 +137,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         col.prop(self, "mode", text = "")
         if self.mode in ("LINEAR", "GRID"):
             col.prop(self, "distanceMode", text = "")
+            if self.mode == "LINEAR":
+                layout.prop(self, "centerAlongX", text = "Center Linear", toggle = True)
         if self.mode == "MESH":
             col.prop(self, "meshMode", text = "")
         if self.mode == "GRID":
