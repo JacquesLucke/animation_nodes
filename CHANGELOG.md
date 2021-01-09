@@ -21,6 +21,7 @@
 - Added *Matrix* output to the *Evaluate Spline* node.
 - Added search tags for Distribute Matrices node.
 - Added material index to spline structure.
+- Added *Center Linear* option to linear mode in *Distribute Matrix* node
 
 ### Fixed
 
