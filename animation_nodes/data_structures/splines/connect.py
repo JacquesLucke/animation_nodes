@@ -15,6 +15,7 @@ def joinPolySplines(splines):
     for spline in splines:
         newSpline.points.extend(spline.points)
         newSpline.radii.extend(spline.radii)
+    newSpline.materialIndex = splines[0].materialIndex
     return newSpline
 
 def joinInBezierSpline(splines):
@@ -29,6 +30,7 @@ def joinInBezierSpline(splines):
         elif isinstance(spline, BezierSpline):
             newSpline.leftHandles.extend(spline.leftHandles)
             newSpline.rightHandles.extend(spline.rightHandles)
+    newSpline.materialIndex = splines[0].materialIndex
     return newSpline
 
 def allPolySplines(splines):

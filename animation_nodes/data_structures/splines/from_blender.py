@@ -37,6 +37,7 @@ def createBezierSpline(bSpline):
 
     spline = BezierSpline(points, leftHandles, rightHandles, radii, tilts)
     spline.cyclic = bSpline.use_cyclic_u
+    spline.materialIndex = bSpline.material_index
     return spline
 
 def createPolySpline(bSpline):
@@ -52,4 +53,5 @@ def createPolySpline(bSpline):
 
     spline = PolySpline(splinePoints, radii, tilts)
     spline.cyclic = bSpline.use_cyclic_u
+    spline.materialIndex = bSpline.material_index
     return spline

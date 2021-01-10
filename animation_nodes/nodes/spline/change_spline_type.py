@@ -41,7 +41,8 @@ class ChangeSplineTypeNode(bpy.types.Node, AnimationNode):
                 return PolySpline(points = spline.points.copy(),
                                   radii = spline.radii.copy(),
                                   tilts = spline.tilts.copy(),
-                                  cyclic = spline.cyclic)
+                                  cyclic = spline.cyclic,
+                                  materialIndex = spline.materialIndex)
         elif self.targetType == "BEZIER":
             if spline.type == "BEZIER":
                 return spline.copy()
@@ -49,4 +50,5 @@ class ChangeSplineTypeNode(bpy.types.Node, AnimationNode):
                 return BezierSpline(points = spline.points.copy(),
                                     radii = spline.radii.copy(),
                                     tilts = spline.tilts.copy(),
-                                    cyclic = spline.cyclic)
+                                    cyclic = spline.cyclic,
+                                    materialIndex = spline.materialIndex)

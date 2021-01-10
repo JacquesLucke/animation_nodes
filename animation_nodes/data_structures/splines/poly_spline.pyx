@@ -13,7 +13,11 @@ from ... math cimport (
 
 cdef class PolySpline(Spline):
 
-    def __cinit__(self, Vector3DList points = None, FloatList radii = None, FloatList tilts = None, bint cyclic = False):
+    def __cinit__(self, Vector3DList points = None,
+                        FloatList radii = None,
+                        FloatList tilts = None,
+                        bint cyclic = False,
+                        long materialIndex = 0):
         if points is None:
             points = Vector3DList()
         if radii is None:
@@ -28,6 +32,7 @@ cdef class PolySpline(Spline):
         self.radii = radii
         self.tilts = tilts
         self.cyclic = cyclic
+        self.materialIndex = materialIndex
         self.markChanged()
 
     def __repr__(self):
@@ -35,7 +40,8 @@ cdef class PolySpline(Spline):
         f"""AN Spline Object:
         Points: {self.points.length}
         Type: {self.type}
-        Cyclic: {self.cyclic}""")
+        Cyclic: {self.cyclic}
+        Material Index: {self.materialIndex}""")
 
     cpdef void markChanged(self):
         Spline.markChanged(self)
@@ -51,7 +57,11 @@ cdef class PolySpline(Spline):
         self.markChanged()
 
     def copy(self):
-        return PolySpline(self.points.copy(), self.radii.copy(), self.tilts.copy(), self.cyclic)
+        return PolySpline(self.points.copy(),
+                          self.radii.copy(),
+                          self.tilts.copy(),
+                          self.cyclic,
+                          self.materialIndex)
 
     def transform(self, matrix):
         self.points.transform(matrix)
@@ -175,7 +185,7 @@ cdef class PolySpline(Spline):
         memcpy(_newRadii + 1, _oldRadii + startIndices[1], sizeof(float) * (newPointAmount - 2))
         memcpy(_newTilts + 1, _oldTilts + startIndices[1], sizeof(float) * (newPointAmount - 2))
 
-        return PolySpline(newPoints, newRadii, newTilts)
+        return PolySpline(newPoints, newRadii, newTilts, False, self.materialIndex)
 
 
     cdef void evaluatePoint_LowLevel(self, float parameter, Vector3 *result):

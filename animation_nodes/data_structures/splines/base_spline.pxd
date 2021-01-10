@@ -5,6 +5,7 @@ from .. lists.base_lists cimport FloatList, Vector3DList, Matrix4x4List
 cdef class Spline:
     cdef:
         public bint cyclic
+        public long materialIndex
         readonly str type
         FloatList uniformParameters
 
