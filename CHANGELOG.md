@@ -21,7 +21,8 @@
 - Added *Matrix* output to the *Evaluate Spline* node.
 - Added search tags for Distribute Matrices node.
 - Added material index to spline structure.
-- Added *Center Linear and directionAxis* option to linear mode in *Distribute Matrix* node
+- Added Height and Interpolation inputs to Spiral in *Distribute Matrices* node.
+- Added Center and Direction options to Linear in *Distribute Matrices* node.
 
 ### Fixed
 
@@ -41,7 +42,6 @@
 - Socket enable/disable option for *Shade Object Smooth* node.
 - Support undo for node operators.
 - Increased default spline resolution for Spline nodes.
-- Inprove spiral in Distribute Matrices node.
 - Remove redundant attribute setting in *Object Instancer* node.
 
 ## 2.2.0 (01 September 2020)
