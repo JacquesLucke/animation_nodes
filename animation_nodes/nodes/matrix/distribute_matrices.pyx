@@ -46,6 +46,8 @@ searchItems = {
     "Distribute Spline" : "SPLINE",
 }
 
+directionAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
+
 class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DistributeMatricesNode"
     bl_label = "Distribute Matrices"
@@ -82,6 +84,12 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     __annotations__["centerSpiral"] =  BoolProperty(name = "Center Spiral",
         description = "Center the spiral along Z axis",
         default = False, update = propertyChanged)
+    
+    __annotations__["centerLinear"] =  BoolProperty(name = "Center Linear",
+        description = "Center the linear along the axis",
+        default = False, update = propertyChanged)
+
+    __annotations__["directionAxis"] = EnumProperty(items = directionAxisItems, update = propertyChanged, default = "X")
 
     def create(self):
         if self.mode == "LINEAR":
@@ -137,8 +145,9 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         col.prop(self, "mode", text = "")
         if self.mode in ("LINEAR", "GRID"):
             col.prop(self, "distanceMode", text = "")
-            if self.mode == "LINEAR":
-                layout.prop(self, "centerAlongX", text = "Center Linear", toggle = True)
+        if self.mode == "LINEAR":
+            layout.prop(self, "directionAxis", expand = True)
+            layout.prop(self, "centerLinear", toggle = True)
         if self.mode == "MESH":
             col.prop(self, "meshMode", text = "")
         if self.mode == "GRID":
@@ -191,7 +200,15 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
 
     def execute_Linear(self, amount, size):
-        return self.execute_Grid(amount, 1, 1, size, 0, 0)
+        if self.directionAxis == "X":
+            self.centerAlongX = self.centerLinear
+            return self.execute_Grid(amount, 1, 1, size, 0, 0)
+        elif self.directionAxis == "Y":
+            self.centerAlongY = self.centerLinear
+            return self.execute_Grid(1, amount, 1, 0, size, 0)
+        else:
+            self.centerAlongZ = self.centerLinear
+            return self.execute_Grid(1, 1, amount, 0, 0, size)
 
     def execute_Grid(self, xDivisions, yDivisions, zDivisions, size1, size2, size3):
         cdef:
