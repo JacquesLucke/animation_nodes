@@ -23,6 +23,7 @@
 - Added material index to spline structure.
 - Added Height and Interpolation inputs to Spiral in *Distribute Matrices* node.
 - Added Center and Direction options to Linear in *Distribute Matrices* node.
+- Added Range Step option to *Evaluate Spline* node.
 
 ### Fixed
 

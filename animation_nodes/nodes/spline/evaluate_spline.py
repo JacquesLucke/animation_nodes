@@ -5,12 +5,18 @@ from ... events import executionCodeChanged
 from . spline_evaluation_base import SplineEvaluationBase
 from ... base_types import AnimationNode, VectorizedSocket
 
+evaluationTypeItems = [
+    ("PARAMETER", "Parameter", "", "NONE", 0),
+    ("RANGE_COUNT", "Range Count", "", "NONE", 1),
+    ("RANGE_STEP", "Range Step", "", "NONE", 2),
+]
+
 class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_EvaluateSplineNode"
     bl_label = "Evaluate Spline"
 
-    evaluateRange: BoolProperty(name = "Evaluate Range", default = False,
-        description = "Evaluate automatically distributed parameters on the spline",
+    evaluationType: EnumProperty(name = "Evaluation Type", default = "PARAMETER",
+        items = evaluationTypeItems, description = "Type of evaluation",
         update = AnimationNode.refresh)
 
     wrapParameters: BoolProperty(name = "Wrap Parameters", default = False,
@@ -22,8 +28,11 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
 
     def create(self):
         self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
-        if self.evaluateRange:
-            self.newInput("Integer", "Amount", "amount", value = 50)
+        if self.evaluationType in ("RANGE_COUNT", "RANGE_STEP"):
+            if self.evaluationType == "RANGE_COUNT":
+                self.newInput("Integer", "Amount", "amount", value = 50)
+            else:
+                self.newInput("Float", "Step", "step", value = 0.1)
             self.newInput("Float", "Start", "start", value = 0.0).setRange(0.0, 1.0)
             self.newInput("Float", "End", "end", value = 1.0).setRange(0.0, 1.0)
             self.newOutput("Vector List", "Locations", "locations")
@@ -64,9 +73,9 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
                 ("Matrices", "matrices", dict(hide = True))))
 
     def draw(self, layout):
-        row = layout.row(align = True)
-        row.prop(self, "parameterType", text = "")
-        row.prop(self, "evaluateRange", text = "", icon = "CENTER_ONLY")
+        layout.prop(self, "evaluationType", text = "")
+        if self.evaluationType != "RANGE_STEP":
+            layout.prop(self, "parameterType", text = "")
 
     def drawAdvanced(self, layout):
         col = layout.column()
@@ -74,17 +83,17 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.prop(self, "resolution")
 
         col = layout.column()
-        col.active = not self.evaluateRange
+        col.active = self.evaluationType == "PARAMETER"
         col.prop(self, "wrapParameters")
 
     def getExecutionCode(self, required):
         yield "if spline.isEvaluable():"
-        if self.parameterType == "UNIFORM":
+        if self.parameterType == "UNIFORM" or self.evaluationType == "RANGE_STEP":
             yield "    spline.ensureUniformConverter(self.resolution)"
         if any(output in required for output in ("normal", "normals", "matrix", "matrices")):
             yield "    spline.ensureNormals()"
 
-        if self.evaluateRange:
+        if self.evaluationType in ("RANGE_COUNT", "RANGE_STEP"):
             yield from ("    " + c for c in self.getExecutionCode_Range(required))
         else:
             yield from ("    " + c for c in self.getExecutionCode_Parameters(required))
@@ -94,27 +103,36 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             yield "    {} = self.outputs['{}'].getDefaultValue()".format(s.identifier, s.name)
 
     def getExecutionCode_Range(self, required):
-        yield "_amount = max(amount, 0)"
         yield "_start = min(max(start, 0), 1)"
         yield "_end = min(max(end, 0), 1)"
 
+        if self.evaluationType == "RANGE_STEP":
+            yield "uniformStart = spline.toUniformParameter(_start)"
+            yield "uniformEnd = spline.toUniformParameter(_end)"
+            yield "length = spline.getPartialLength(uniformStart, uniformEnd, self.resolution)"
+            yield "_amount = int(length / step) if step > 0 else 0"
+            yield "parameterType = 'UNIFORM'"
+        else:
+            yield "_amount = max(amount, 0)"
+            yield "parameterType = self.parameterType"
+
         if "locations" in required:
-            yield "locations = spline.getDistributedPoints(_amount, _start, _end, self.parameterType)"
+            yield "locations = spline.getDistributedPoints(_amount, _start, _end, parameterType)"
         if "tangents" in required:
-            yield "tangents = spline.getDistributedTangents(_amount, _start, _end, self.parameterType)"
+            yield "tangents = spline.getDistributedTangents(_amount, _start, _end, parameterType)"
         if "normals" in required:
-            yield "normals = spline.getDistributedNormals(_amount, _start, _end, self.parameterType)"
+            yield "normals = spline.getDistributedNormals(_amount, _start, _end, parameterType)"
         if "radii" in required:
-            yield "_radii = spline.getDistributedRadii(_amount, _start, _end, self.parameterType)"
+            yield "_radii = spline.getDistributedRadii(_amount, _start, _end, parameterType)"
             yield "radii = DoubleList.fromValues(_radii)"
         if "tilts" in required:
-            yield "_tilts = spline.getDistributedTilts(_amount, _start, _end, self.parameterType)"
+            yield "_tilts = spline.getDistributedTilts(_amount, _start, _end, parameterType)"
             yield "tilts = DoubleList.fromValues(_tilts)"
         if "curvatures" in required:
-            yield "_curvatures = spline.getDistributedCurvatures(_amount, _start, _end, self.parameterType)"
+            yield "_curvatures = spline.getDistributedCurvatures(_amount, _start, _end, parameterType)"
             yield "curvatures = DoubleList.fromValues(_curvatures)"
         if "matrices" in required:
-            yield "matrices = spline.getDistributedMatrices(_amount, _start, _end, self.parameterType)"
+            yield "matrices = spline.getDistributedMatrices(_amount, _start, _end, parameterType)"
 
     def getExecutionCode_Parameters(self, required):
         if self.useParameterList:
