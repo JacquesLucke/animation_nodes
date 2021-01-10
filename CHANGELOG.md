@@ -43,6 +43,7 @@
 - Support undo for node operators.
 - Increased default spline resolution for Spline nodes.
 - Remove redundant attribute setting in *Object Instancer* node.
+- Vectorized *Offset Splines* node.
 
 ## 2.2.0 (01 September 2020)
 
