@@ -333,15 +333,15 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         cdef float uniformStart = spline.toUniformParameter(min(max(start, 0), 1))
         cdef float uniformEnd = spline.toUniformParameter(min(max(end, 0), 1))
         cdef float length = spline.getPartialLength(uniformStart, uniformEnd, self.splineResolution)
-        cdef Py_ssize_t count = <Py_ssize_t>(length / step) if step != 0 else 0
+        cdef Py_ssize_t count = <Py_ssize_t>(length / step) if step > 0 else 0
         return self.execute_SplineCount(spline, count, start, end)
 
     def execute_SplineCount(self, Spline spline, Py_ssize_t count, float start, float end):
         if not spline.isEvaluable(): return Matrix4x4List()
         if self.splineDistributionMethod == "UNIFORM":
             spline.ensureUniformConverter(self.splineResolution)
-            start = spline.toUniformParameter(min(max(start, 0), 1))
-            end = spline.toUniformParameter(min(max(end, 0), 1))
+        start = min(max(start, 0), 1)
+        end = min(max(end, 0), 1)
         spline.ensureNormals()
         count = max(count, 0)
         distributionType = "UNIFORM" if self.splineDistributionMethod != "RESOLUTION" else "RESOLUTION"
