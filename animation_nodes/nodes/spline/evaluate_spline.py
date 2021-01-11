@@ -69,8 +69,8 @@ class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
                 ("Curvature", "curvature", dict(hide = True)),
                 ("Curvatures", "curvatures", dict(hide = True))))
             self.newOutput(VectorizedSocket("Matrix", "useParameterList",
-                ("Matrix", "matrix", dict(hide = True)),
-                ("Matrices", "matrices", dict(hide = True))))
+                ("Matrix", "matrix"),
+                ("Matrices", "matrices")))
 
     def draw(self, layout):
         layout.prop(self, "evaluationType", text = "")
