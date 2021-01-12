@@ -45,6 +45,7 @@
 - Increased default spline resolution for Spline nodes.
 - Remove redundant attribute setting in *Object Instancer* node.
 - Vectorized *Offset Splines* node.
+- Vectorized *Convert Rotations* node.
 
 ## 2.2.0 (01 September 2020)
 
