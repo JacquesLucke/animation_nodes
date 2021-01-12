@@ -3,8 +3,8 @@ from libc.math cimport M_PI as PI, sqrt, sin, cos, asin, acos
 from ... math cimport (
     quaternionNormalize_InPlace, normalizeVec3_InPlace,
     euler3ToQuaternion, quaternionToMatrix4,
-    quaternionToEuler3, quatToAxisAngle,
-    quatFromAxisAngle
+    quaternionToEuler3, quaternionToAxisAngle,
+    quaternionFromAxisAngle
 )
 from ... algorithms.random_number_generators cimport XoShiRo256Plus
 
@@ -144,7 +144,6 @@ def eulerListToQuaternionList(EulerList es):
 
     for i in range(amount):
         euler3ToQuaternion(qs.data + i, es.data + i)
-        quaternionNormalize_InPlace(qs.data + i)
 
     return qs
 
@@ -168,7 +167,7 @@ def axisListAngleListToQuaternionList(Vector3DList vs, DoubleList angles, bint u
         if useDegree:
             angle = angle * degreeToRadianFactor
 
-        quatFromAxisAngle(qs.data + i, vs.data + i, angle)
+        quaternionFromAxisAngle(qs.data + i, vs.data + i, angle)
         quaternionNormalize_InPlace(qs.data + i)
 
     return qs
@@ -181,7 +180,7 @@ def quaternionListToAxisListAngleList(QuaternionList qs, bint useDegree = False)
     cdef DoubleList angles = DoubleList(length = amount)
 
     for i in range(amount):
-        quatToAxisAngle(vs.data + i, &angle, qs.data + i)
+        quaternionToAxisAngle(vs.data + i, &angle, qs.data + i)
         normalizeVec3_InPlace(vs.data + i)
         
         if useDegree:
