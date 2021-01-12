@@ -157,7 +157,7 @@ cdef euler3ToQuaternion(Quaternion* q, Euler3 *e):
 ##########################################################
 
 # https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-cdef quaternionToEuler3(Euler3 *e, Quaternion *q):
+cdef void quaternionToEuler3(Euler3 *e, Quaternion *q):
     cdef float sinrCosp = 2 * (q.w * q.x + q.y * q.z)
     cdef float cosrCosp = 1 - 2 * (q.x * q.x + q.y * q.y)
     e.x = atan2(sinrCosp, cosrCosp)
@@ -179,7 +179,7 @@ cdef quaternionToEuler3(Euler3 *e, Quaternion *q):
 # https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
 
 @cython.cdivision(True)
-cdef quaternionToMatrix4(Matrix4 *m, Quaternion *q):
+cdef void quaternionToMatrix4(Matrix4 *m, Quaternion *q):
     quaternionNormalize_InPlace(q)
     cdef float w, x, y, z
     w, x, y, z = q.w, q.x, q.y, q.z
