@@ -9,6 +9,7 @@
 - Added MIDI Note socket.
 - Added MIDI Track socket.
 - Added *MIDI File Reader* node.
+- Added *MIDI Track Info* node.
 
 ### Fixed
 
