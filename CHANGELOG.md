@@ -2,6 +2,20 @@
 
 ### Added
 
+
+
+### Fixed
+
+
+
+### Changed
+
+
+
+## 2.2.1 (13 January 2021)
+
+### Added
+
 - Added *Filter Material List By Name* node.
 - Added *Change GP Stroke Direction* node.
 - Added create list option to the *Random Quaternion* node.
