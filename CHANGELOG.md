@@ -2,7 +2,7 @@
 
 ### Added
 
-
+- Added MIDI parser library.
 
 ### Fixed
 
