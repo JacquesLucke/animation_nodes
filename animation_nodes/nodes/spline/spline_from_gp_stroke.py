@@ -24,5 +24,5 @@ class SplineFromGPStrokeNode(bpy.types.Node, AnimationNode):
 
         return PolySpline(points = stroke.vertices.copy(),
                           radii = stroke.pressures.copy(),
-                          cyclic = stroke.drawCyclic,
+                          cyclic = stroke.useCyclic,
                           materialIndex = stroke.materialIndex)
