@@ -6,6 +6,7 @@
 - Added MIDI Track data structure.
 - Added MIDI Note data structure.
 - Added MIDI file reader utility.
+- Added MIDI Note socket.
 
 ### Fixed
 
