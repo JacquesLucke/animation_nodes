@@ -3,6 +3,7 @@
 ### Added
 
 - Added MIDI parser library.
+- Added MIDI Track data structure.
 
 ### Fixed
 
