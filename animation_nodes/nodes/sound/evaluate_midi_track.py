@@ -8,7 +8,7 @@ evaluationTypeItems = (
 )
 
 class EvaluateMIDITrackNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_EvaluateMidiTrackNode"
+    bl_idname = "an_EvaluateMIDITrackNode"
     bl_label = "Evaluate MIDI Track"
 
     evaluationType: EnumProperty(name = "Evaluation Type", default = "SINGLE",
@@ -30,7 +30,7 @@ class EvaluateMIDITrackNode(bpy.types.Node, AnimationNode):
         self.newInput("Interpolation", "Release Interpolation",
                 "releaseInterpolation", defaultDrawType = "PROPERTY_ONLY")
         self.newInput("Scene", "Scene", "scene", hide = True)
-        
+
         if self.evaluationType == "SINGLE":
             self.newOutput("Float", "Note Value", "noteValue")
         else:
