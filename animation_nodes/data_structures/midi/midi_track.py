@@ -1,3 +1,4 @@
+from typing import List
 from . midi_note import MIDINote
 from dataclasses import dataclass, field
 
@@ -5,7 +6,7 @@ from dataclasses import dataclass, field
 class MIDITrack:
     name: str = ""
     index: int = 0
-    notes: list[MIDINote] = field(default_factory = list)
+    notes: List[MIDINote] = field(default_factory = list)
 
     def evaluate(self, time, channel, noteNumber, attackTime, attackInterpolation, releaseTime, releaseInterpolation):
         noteFilter = lambda note: note.channel == channel and note.noteNumber == noteNumber

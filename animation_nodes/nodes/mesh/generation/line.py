@@ -26,6 +26,8 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
             self.newInput("Boolean", "Cyclic", "cyclic", value = False)
 
         self.newOutput("Mesh", "Mesh", "mesh")
+        self.newOutput("Vector List", "Vertices", "vertices", hide = True)
+        self.newOutput("Edge Indices", "Edges", "edges", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "lineMode", text = "")
@@ -38,7 +40,8 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
 
     def execute_StartEndLine(self, start, end, steps):
         steps = max(steps, 2)
-        return getLineMesh(start, end, steps)
+        mesh = getLineMesh(start, end, steps)
+        return mesh, mesh.vertices, mesh.edges
 
     def execute_PointsLine(self, points, cyclic):
         pointAmount = len(points)
@@ -46,4 +49,5 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
             self.raiseErrorMessage("Points list should have at least two points.")
         if pointAmount < 3 and cyclic:
             self.raiseErrorMessage("For cyclic, Points list should have at least three points.")
-        return getLinesMesh(points, cyclic)
+        mesh = getLinesMesh(points, cyclic)
+        return mesh, mesh.vertices, mesh.edges

@@ -18,7 +18,7 @@ readMIDIFile.cache_clear = lambda: readMIDIFileCached.cache_clear()
 
 # Notes:
 # - If no tempo event was found, a default tempo event of tempo 500,000 will be
-#   inserted at time 0. The same applies of no tempo event happens at time 0,
+#   inserted at time 0. The same applies if no tempo event happens at time 0,
 #   this is done to guarantee any channel event will be preceded by a tempo event.
 # - MIDI format 1 is a special format where the first track only contains tempo
 #   events that represents the tempo map of all other tracks. So the code is
@@ -66,8 +66,8 @@ class TempoMap:
 #   channel and note number. The `numberOfNotes` member in NoteOnRecord represents
 #   the number of such consecutive events. Note Off Events decrement that number
 #   and are only considered when that number becomes 1.
-# - The MIDI parser takes care of running status Note On Events with zero velocity
-#   so the code needed check for that.
+# - The MIDI parser takes care of running-status Note On Events with zero velocity
+#   so the code needn't check for that.
 
 @dataclass
 class NoteOnRecord:
