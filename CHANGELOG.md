@@ -16,7 +16,7 @@
 
 ### Fixed
 
-- Fixed `bl_idname` of *Evaluate MIDI Track* node.
+
 
 ### Changed
 
