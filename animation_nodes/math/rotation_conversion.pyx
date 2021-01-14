@@ -1,17 +1,10 @@
 cimport cython
 from . vector cimport lengthVec3
 from . conversion cimport toPyEuler3
-<<<<<<< HEAD
 from . matrix cimport setIdentityMatrix
 from . quaternion cimport setUnitQuaternion
 from mathutils import Vector, Matrix, Euler
 from . matrix cimport normalizeMatrix_3x3_Part
-=======
-from . quaternion cimport setUnitQuaternion
-from mathutils import Vector, Matrix, Euler
-from . matrix cimport normalizeMatrix_3x3_Part
-from .. math cimport quaternionNormalize_InPlace
->>>>>>> 1f02f68795d8a426250a239ea27999ddcacba2c2
 from libc.math cimport (
     M_PI as PI, sqrt, hypot, abs,
     sin, cos, asin, acos, atan2, copysign
@@ -187,10 +180,6 @@ cdef void quaternionToEuler3(Euler3 *e, Quaternion *q):
 
 @cython.cdivision(True)
 cdef void quaternionToMatrix4(Matrix4 *m, Quaternion *q):
-<<<<<<< HEAD
-=======
-    quaternionNormalize_InPlace(q)
->>>>>>> 1f02f68795d8a426250a239ea27999ddcacba2c2
     cdef float w, x, y, z
     w, x, y, z = q.w, q.x, q.y, q.z
     cdef float ww = w * w
@@ -205,7 +194,6 @@ cdef void quaternionToMatrix4(Matrix4 *m, Quaternion *q):
     cdef float yw = y * w
     cdef float xw = x * w
 
-<<<<<<< HEAD
     cdef float dot = xx + yy + zz + ww
     if dot == 0:
         setIdentityMatrix(m)
@@ -225,22 +213,6 @@ cdef void quaternionToMatrix4(Matrix4 *m, Quaternion *q):
 
     m.a32 = 2.0 * (yz + xw) * invs
     m.a23 = 2.0 * (yz - xw) * invs
-=======
-    cdef invs = xx + yy + zz + ww
-
-    m.a11 = (xx - yy - zz + ww) / invs
-    m.a22 = (-xx + yy - zz + ww) / invs
-    m.a33 = (-xx - yy + zz + ww) / invs
-
-    m.a21 = 2.0 * (xy + zw) / invs
-    m.a12 = 2.0 * (xy - zw) / invs
-
-    m.a31 = 2.0 * (xz - yw) / invs
-    m.a13 = 2.0 * (xz + yw) / invs
-
-    m.a32 = 2.0 * (yz + xw) / invs
-    m.a23 = 2.0 * (yz - xw) / invs
->>>>>>> 1f02f68795d8a426250a239ea27999ddcacba2c2
     
     m.a44 = 1.0
     m.a14 = m.a24 = m.a34 = 0.0
@@ -282,19 +254,10 @@ cdef void quaternionToAxisAngle(Vector3 *v, float *a, Quaternion *q):
     if k == 0:
         v.x = 1
         v.y = 0
-<<<<<<< HEAD
         v.z = 0 
-=======
-        v.z = 0
-    
->>>>>>> 1f02f68795d8a426250a239ea27999ddcacba2c2
     else:
         v.x = q.x / k
         v.y = q.y / k
         v.z = q.z / k
     
     a[0] = <float>(2 * acos(q.w))
-<<<<<<< HEAD
-=======
-
->>>>>>> 1f02f68795d8a426250a239ea27999ddcacba2c2
