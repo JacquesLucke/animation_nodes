@@ -1,6 +1,14 @@
-from libc.math cimport atan2, sqrt, hypot, cos, sin
-from . matrix cimport normalizeMatrix_3x3_Part
+cimport cython
+from . vector cimport lengthVec3
 from . conversion cimport toPyEuler3
+from . matrix cimport setIdentityMatrix
+from . quaternion cimport setUnitQuaternion
+from mathutils import Vector, Matrix, Euler
+from . matrix cimport normalizeMatrix_3x3_Part
+from libc.math cimport (
+    M_PI as PI, sqrt, hypot, abs,
+    sin, cos, asin, acos, atan2, copysign
+)
 
 # Matrix to Euler
 ################################################################
@@ -122,3 +130,134 @@ cdef void normalizedAxisCosAngleToMatrix(Matrix3_or_Matrix4* m, Vector3* axis, f
     if Matrix3_or_Matrix4 is Matrix4:
         m.a14, m.a24, m.a34 = 0, 0, 0
         m.a41, m.a42, m.a43, m.a44 = 0, 0, 0, 1
+
+# Euler to Quaternion
+##########################################################    
+        
+# https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+cdef void euler3ToQuaternion(Quaternion *q, Euler3 *e):
+    cdef float cx = cos(e.x * 0.5)
+    cdef float sx = sin(e.x * 0.5)
+    cdef float cy = cos(e.y * 0.5)
+    cdef float sy = sin(e.y * 0.5)
+    cdef float cz = cos(e.z * 0.5)
+    cdef float sz = sin(e.z * 0.5)
+    
+    cdef float cxcy = cx * cy
+    cdef float sxcy = sx * cy
+    cdef float sxsy = sx * sy
+    cdef float cxsy = cx * sy
+    
+    q.w = cxcy * cz + sxsy * sz
+    q.x = sxcy * cz - cxsy * sz
+    q.y = cxsy * cz + sxcy * sz
+    q.z = cxcy * sz - sxsy * cz
+    
+# Quaternion to Euler
+##########################################################
+
+# https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+cdef void quaternionToEuler3(Euler3 *e, Quaternion *q):
+    cdef float sinrCosp = 2 * (q.w * q.x + q.y * q.z)
+    cdef float cosrCosp = 1 - 2 * (q.x * q.x + q.y * q.y)
+    e.x = atan2(sinrCosp, cosrCosp)
+
+    cdef float sinp = 2 * (q.w * q.y - q.z * q.x)
+    if abs(sinp) >= 1.0:
+        e.y = copysign(PI / 2, sinp)
+    else:
+        e.y = asin(sinp)
+
+    cdef float sinyCosp = 2 * (q.w * q.z + q.x * q.y)
+    cdef float cosyCosp = 1 - 2 * (q.y * q.y + q.z * q.z)
+    e.z = atan2(sinyCosp, cosyCosp)
+    e.order = 0
+
+# Quaternion to Matrix
+##########################################################
+
+# https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
+
+@cython.cdivision(True)
+cdef void quaternionToMatrix4(Matrix4 *m, Quaternion *q):
+    cdef float w, x, y, z
+    w, x, y, z = q.w, q.x, q.y, q.z
+    cdef float ww = w * w
+    cdef float xx = x * x
+    cdef float yy = y * y
+    cdef float zz = z * z
+
+    cdef float xy = x * y
+    cdef float xz = x * z
+    cdef float yz = y * z
+    cdef float zw = z * w
+    cdef float yw = y * w
+    cdef float xw = x * w
+
+    cdef float dot = xx + yy + zz + ww
+    if dot == 0:
+        setIdentityMatrix(m)
+        return
+
+    cdef float invs = 1 / dot
+
+    m.a11 = (xx - yy - zz + ww) * invs
+    m.a22 = (-xx + yy - zz + ww) * invs
+    m.a33 = (-xx - yy + zz + ww) * invs
+
+    m.a21 = 2.0 * (xy + zw) * invs
+    m.a12 = 2.0 * (xy - zw) * invs
+
+    m.a31 = 2.0 * (xz - yw) * invs
+    m.a13 = 2.0 * (xz + yw) * invs
+
+    m.a32 = 2.0 * (yz + xw) * invs
+    m.a23 = 2.0 * (yz - xw) * invs
+    
+    m.a44 = 1.0
+    m.a14 = m.a24 = m.a34 = 0.0
+    m.a41 = m.a42 = m.a43 = 0.0
+
+# Quaternion from AxisAngle
+##########################################################
+
+@cython.cdivision(True)
+cdef void quaternionFromAxisAngle(Quaternion *q, Vector3 *axis, float angle):
+    cdef float axisLength = lengthVec3(axis)
+    if axisLength < 0.000001:
+        setUnitQuaternion(q)
+        return
+
+    cdef float ca = cos(angle)
+
+    # in case the float library is not accurate
+    if ca > 1: ca = 1
+    elif ca < -1: ca = -1
+
+    cdef float cq = sqrt((1 + ca) / 2) # cos(acos(ca) / 2)
+    cdef float sq = sqrt((1 - ca) / 2) # sin(acos(ca) / 2)
+
+    cdef float factor = sq / axisLength
+    q.x = axis.x * factor
+    q.y = axis.y * factor
+    q.z = axis.z * factor
+    q.w = cq
+
+# Quaternion to AxisAngle
+##########################################################
+
+# https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
+@cython.cdivision(True)
+cdef void quaternionToAxisAngle(Vector3 *v, float *a, Quaternion *q):
+    cdef float k = sqrt(1 - q.w * q.w)
+
+    if k == 0:
+        v.x = 1
+        v.y = 0
+        v.z = 0 
+    else:
+        v.x = q.x / k
+        v.y = q.y / k
+        v.z = q.z / k
+    
+    a[0] = <float>(2 * acos(q.w))
