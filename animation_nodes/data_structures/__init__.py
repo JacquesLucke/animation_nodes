@@ -32,6 +32,9 @@ def importDataStructures():
     from . sounds.sound_data import SoundData
     from . sounds.sound_sequence import SoundSequence
 
+    from . midi.midi_note import MIDINote
+    from . midi.midi_track import MIDITrack
+
     from . action import (
         Action, ActionEvaluator, ActionChannel,
         PathActionChannel, PathIndexActionChannel,

@@ -2,6 +2,29 @@
 
 ### Added
 
+- Added MIDI parser library.
+- Added MIDI Track data structure.
+- Added MIDI Note data structure.
+- Added MIDI file reader utility.
+- Added MIDI Note socket.
+- Added MIDI Track socket.
+- Added *MIDI File Reader* node.
+- Added *MIDI Track Info* node.
+- Added *MIDI Note Info* node.
+- Added *Evaluate MIDI Track* node.
+
+### Fixed
+
+
+
+### Changed
+
+
+
+## 2.2.1 (13 January 2021)
+
+### Added
+
 - Added *Filter Material List By Name* node.
 - Added *Change GP Stroke Direction* node.
 - Added create list option to the *Random Quaternion* node.
