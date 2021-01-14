@@ -19,7 +19,7 @@
 
 ### Changed
 
-
+- Vectorized *Convert Rotations* node.
 
 ## 2.2.1 (13 January 2021)
 
