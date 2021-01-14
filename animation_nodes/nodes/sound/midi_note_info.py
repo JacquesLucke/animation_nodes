@@ -9,7 +9,7 @@ class MIDINoteInfoNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("MIDI Note", "useNotesList",
-            ("note", "note"), ("notes", "notes")))
+            ("Note", "note"), ("Notes", "notes")))
         self.newOutput(VectorizedSocket("Integer", "useNotesList",
             ("Channel", "channel"), ("Channels", "channels")))
         self.newOutput(VectorizedSocket("Integer", "useNotesList",

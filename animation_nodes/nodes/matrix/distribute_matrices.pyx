@@ -41,7 +41,7 @@ searchItems = {
     "Distribute Linear" : "LINEAR",
     "Distribute Grid" : "GRID",
     "Distribute Circle" : "CIRCLE",
-    "Distribute MESH" : "MESH",
+    "Distribute Mesh" : "MESH",
     "Distribute Spiral" : "SPIRAL",
     "Distribute Spline" : "SPLINE",
 }

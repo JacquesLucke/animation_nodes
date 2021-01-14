@@ -12,6 +12,7 @@
 - Added *MIDI Track Info* node.
 - Added *MIDI Note Info* node.
 - Added *Evaluate MIDI Track* node.
+- Added Vertices and Edges output to Line Mesh node.
 
 ### Fixed
 
@@ -39,8 +40,8 @@
 - Added *Spline* mode to *Distribute Matrices* node.
 - Added *Fill Caps* option to *Curve Object Output* node.
 - Added *Bevel Mode* option to *Curve Object Output* node.
-- Added *Paramater* option to *Spline Falloff* node.
-- Added *Wrap Paramaters* option to *Evaluate Spline* node.
+- Added *Parameter* option to *Spline Falloff* node.
+- Added *Wrap Parameters* option to *Evaluate Spline* node.
 - Added *Matrix* output to the *Evaluate Spline* node.
 - Added search tags for Distribute Matrices node.
 - Added material index to spline structure.
@@ -187,7 +188,7 @@
 - Added GP Layer From Frames node.
 - Added GP Object Output node.
 - Added Change Spline Direction node.
-- Added Transfrom GP Layer node.
+- Added Transform GP Layer node.
 - Added Replicate GP Stroke node.
 - Added Transform GP Stoke node.
 - Added Set GP Layer Attributes node.
@@ -216,7 +217,7 @@
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
-- Vectorize *Combine Color* node.
+- Vectorized *Combine Color* node.
 - Replace the Font socket pick operator with a *Load Font* operator.
 - Moved panels from the Tool region to the UI region.
 
@@ -342,7 +343,7 @@
 
 ### Added
 
-- Added *Spline Per Branche* option to *Splines From Edges* node.
+- Added *Spline Per Branch* option to *Splines From Edges* node.
 - Added more troubleshooting info upon unsuccessful installation of the add-on.
 - Added *Combine Mesh* node to the menu.
 - Added *Collection Info* node.
