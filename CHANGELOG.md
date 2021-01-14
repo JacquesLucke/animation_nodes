@@ -20,7 +20,6 @@
 ### Changed
 
 - Removed Deform and Scene inputs from *Bmesh From Object* node.
-- Vectorized *Convert Rotations* node.
 
 ## 2.2.1 (13 January 2021)
 
