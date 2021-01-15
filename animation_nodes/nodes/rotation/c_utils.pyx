@@ -1,9 +1,15 @@
-from libc.math cimport M_PI as PI, sqrt, sin, cos
-from ... math cimport quaternionNormalize_InPlace
+
+from libc.math cimport M_PI as PI, sqrt, sin, cos, asin, acos
+from ... math cimport (
+    quaternionNormalize_InPlace, normalizeVec3_InPlace,
+    euler3ToQuaternion, quaternionToMatrix4,
+    quaternionToEuler3, quaternionToAxisAngle,
+    quaternionFromAxisAngle
+)
 from ... algorithms.random_number_generators cimport XoShiRo256Plus
 
 from ... data_structures cimport (
-    Vector3DList, EulerList, DoubleList,
+    Vector3DList, EulerList, DoubleList, Matrix4x4List,
     VirtualDoubleList, Quaternion, QuaternionList
 )
 
@@ -121,3 +127,64 @@ def randomQuaternionList(int seed, int amount):
         quaternionNormalize_InPlace(result.data + i)
 
     return result
+
+def quaternionListToMatrixList(QuaternionList qs):
+    cdef Py_ssize_t i
+    cdef long amount = qs.length
+    cdef Matrix4x4List ms = Matrix4x4List(length = amount)
+
+    for i in range(amount):
+        quaternionToMatrix4(ms.data + i, qs.data + i)
+    return ms
+
+def eulerListToQuaternionList(EulerList es):
+    cdef Py_ssize_t i
+    cdef long amount = es.length
+    cdef QuaternionList qs = QuaternionList(length = amount)
+
+    for i in range(amount):
+        euler3ToQuaternion(qs.data + i, es.data + i)
+
+    return qs
+
+def quaternionListToEulerList(QuaternionList qs):
+    cdef Py_ssize_t i
+    cdef long amount = qs.length
+    cdef EulerList es = EulerList(length = amount)
+
+    for i in range(amount):
+        quaternionToEuler3(es.data + i, qs.data + i)
+
+    return es
+
+def axisListAngleListToQuaternionList(Vector3DList vs, DoubleList angles, bint useDegree = False):
+    cdef Py_ssize_t i
+    cdef long amount = vs.length
+    cdef QuaternionList qs = QuaternionList(length = amount)
+
+    for i in range(amount):
+        angle = <float>angles.data[i]
+        if useDegree:
+            angle = angle * degreeToRadianFactor
+
+        quaternionFromAxisAngle(qs.data + i, vs.data + i, angle)
+        quaternionNormalize_InPlace(qs.data + i)
+
+    return qs
+
+def quaternionListToAxisListAngleList(QuaternionList qs, bint useDegree = False):
+    cdef Py_ssize_t i
+    cdef float angle
+    cdef long amount = qs.length
+    cdef Vector3DList vs = Vector3DList(length = amount)
+    cdef DoubleList angles = DoubleList(length = amount)
+
+    for i in range(amount):
+        quaternionToAxisAngle(vs.data + i, &angle, qs.data + i)
+        normalizeVec3_InPlace(vs.data + i)
+        
+        if useDegree:
+            angle *= radianToDegreeFactor 
+        angles.data[i] = angle   
+
+    return vs, angles

@@ -28,28 +28,6 @@ cdef void rotVec3ByQuat(Vector3 *target, Vector3 *v, Quaternion *q):
     target.z = v.z + q.w * t.z + p.z
 
 @cython.cdivision(True)
-cdef void quatFromAxisAngle(Quaternion *q, Vector3 *axis, float angle):
-    cdef float axisLength = lengthVec3(axis)
-    if axisLength < 0.000001:
-        setUnitQuaternion(q)
-        return
-
-    cdef float ca = cos(angle)
-
-    # in case the float library is not accurate
-    if ca > 1: ca = 1
-    elif ca < -1: ca = -1
-
-    cdef float cq = sqrt((1 + ca) / 2) # cos(acos(ca) / 2)
-    cdef float sq = sqrt((1 - ca) / 2) # sin(acos(ca) / 2)
-
-    cdef float factor = sq / axisLength
-    q.x = axis.x * factor
-    q.y = axis.y * factor
-    q.z = axis.z * factor
-    q.w = cq
-
-@cython.cdivision(True)
 cdef void quaternionNormalize_InPlace(Quaternion *q):
     cdef float length = sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z)
     if length != 0:

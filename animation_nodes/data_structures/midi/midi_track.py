@@ -28,4 +28,4 @@ class MIDITrack:
         return noteValues
 
     def copy(self):
-        return MIDITrack([n.copy() for n in self.notes], self.name, self.index)
+        return MIDITrack(self.name, self.index, [n.copy() for n in self.notes])
