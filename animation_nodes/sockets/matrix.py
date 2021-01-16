@@ -1,7 +1,9 @@
 import bpy
+from bpy.props import *
 from mathutils import Matrix
 from .. data_structures import Matrix4x4List
 from .. base_types import AnimationNodeSocket, CListSocket
+from .. utils.nodes import newNodeAtCursor, invokeTranslation
 
 class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_MatrixSocket"
@@ -10,6 +12,17 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     drawColor = (1, 0.56, 0.3, 1)
     storable = True
     comparable = False
+
+    def drawProperty(self, layout, text, node):
+        row = layout.row(align = True)
+        if not self.is_linked:
+            self.invokeFunction(row, node, "createComposeMatrixNode", icon = "PLUS")
+        row.label(text = " " + text)
+
+    def createComposeMatrixNode(self):
+        node = newNodeAtCursor("an_ComposeMatrixNode")
+        node.nodeTree.links.new(node.outputs[0], self)
+        invokeTranslation()
 
     @classmethod
     def getDefaultValue(cls):
@@ -26,7 +39,6 @@ class MatrixSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         else:
             try: return Matrix(value), 1
             except: return cls.getDefaultValue(), 2
-
 
 class MatrixListSocket(bpy.types.NodeSocket, CListSocket):
     bl_idname = "an_MatrixListSocket"
