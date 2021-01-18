@@ -1,15 +1,21 @@
 import bpy
-from ... base_types import AnimationNode
+from ... data_structures import DoubleList
+from ... base_types import AnimationNode, VectorizedSocket
 
 class DelayTimeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DelayTimeNode"
     bl_label = "Delay Time"
     dynamicLabelType = "HIDDEN_ONLY"
 
+    useList: VectorizedSocket.newProperty()
+
     def create(self):
         self.newInput("Float", "Time", "time")
-        self.newInput("Float", "Delay", "delay", value = 10)
-        self.newOutput("Float", "Time", "outTime")
+        self.newInput(VectorizedSocket("Float", "useList",
+            ("Delay", "delay",dict(value = 10, minValue = 0)),
+            ("Delays", "delays")))
+        self.newOutput(VectorizedSocket("Float", "useList",
+            ("Time", "outTime"), ("Times", "outTimes")))
 
     def drawLabel(self):
         delaySocket = self.inputs["Delay"]
@@ -20,4 +26,7 @@ class DelayTimeNode(bpy.types.Node, AnimationNode):
         else: return "Delay Time"
 
     def getExecutionCode(self, required):
-        return "outTime = time - delay"
+        if self.useList:
+            return "outTimes = DoubleList.fromValues((time - delay) for delay in delays)"
+        else:
+            return "outTime = time - delay"
