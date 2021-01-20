@@ -16,7 +16,7 @@
 
 ### Fixed
 
-
+- Fixed ID Key distance sorting.
 
 ### Changed
 
