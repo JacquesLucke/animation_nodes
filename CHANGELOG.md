@@ -22,6 +22,7 @@
 
 - Removed Deform and Scene inputs from *Bmesh From Object* node.
 - Vectorized *Convert Rotations* node.
+- Vectorized *Delay Time* node.
 - Corrected mesh components' order and names.
 
 ## 2.2.1 (13 January 2021)
