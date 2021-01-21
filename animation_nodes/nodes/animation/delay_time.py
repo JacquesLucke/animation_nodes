@@ -1,5 +1,5 @@
 import bpy
-from . c_utils import delayTime_Multiple
+from . c_utils import executeSubtract_A_B
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualDoubleList, DoubleList
 
@@ -31,31 +31,15 @@ class DelayTimeNode(bpy.types.Node, AnimationNode):
         else: return "Delay Time"
 
     def getExecutionCode(self, required):
-        if self.useListA and self.useListB:
-            return "outTimes = self.executeList_Both(times, delays)"
-        elif self.useListA and not self.useListB:
-            return "outTimes = self.executeList_Times(times, delay)"
-        elif not self.useListA and self.useListB:
-            return "outTimes = self.executeList_Delays(time, delays)"
+        if self.useListA or self.useListB:
+            args = ", ".join(socket.identifier for socket in self.inputs)
+            return "outTimes = self.executeList({})".format(args)
         else:
             return "outTime = time - delay"
 
-    def executeList_Both(self, times, delays):
-        virtualA, virtualB = VirtualDoubleList.createMultiple((times, 0), (delays, 0))
-        amount = VirtualDoubleList.getMaxRealLength(virtualA, virtualB)
+    def executeList(self, time, delay):
+        virtualTimes, virtualDelays = VirtualDoubleList.createMultiple((time, 0), (delay, 0))
+        amount = VirtualDoubleList.getMaxRealLength(virtualTimes, virtualDelays)
 
-        return delayTime_Multiple(virtualA, virtualB, amount)
+        return executeSubtract_A_B(virtualTimes, virtualDelays, amount)
 
-    def executeList_Times(self, times, delay):
-        delays = DoubleList.fromValue(delay)
-        virtualA, virtualB = VirtualDoubleList.createMultiple((times, 0), (delays, 0))
-        amount = VirtualDoubleList.getMaxRealLength(virtualA, virtualB)
-
-        return delayTime_Multiple(virtualA, virtualB, amount)
-
-    def executeList_Delays(self, time, delays):
-        times = DoubleList.fromValue(time)
-        virtualA, virtualB = VirtualDoubleList.createMultiple((times, 0), (delays, 0))
-        amount = VirtualDoubleList.getMaxRealLength(virtualA, virtualB)
-
-        return delayTime_Multiple(virtualA, virtualB, amount)
