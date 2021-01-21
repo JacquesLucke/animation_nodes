@@ -46,7 +46,7 @@ class TempoMap:
                 time += event.deltaTime
                 if not isinstance(event, TempoEvent): continue
                 tempoEvents.append(TempoEventRecord(time, event.tempo))
-            if len(tempoEvents) == 0 or tempoEvents[0].tempo != 0:
+            if len(tempoEvents) == 0 or tempoEvents[0].time != 0:
                 tempoEvents.append(TempoEventRecord(0))
             tempoTracks.append(tempoEvents)
         return TempoMap(midiFile.midiFormat, midiFile.ppqn, tempoTracks)
