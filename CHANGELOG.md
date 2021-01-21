@@ -24,6 +24,7 @@
 - Vectorized *Convert Rotations* node.
 - Vectorized *Delay Time* node.
 - Corrected mesh components' order and names.
+- Skip selection sorting if no node tree exist.
 
 ## 2.2.1 (13 January 2021)
 
