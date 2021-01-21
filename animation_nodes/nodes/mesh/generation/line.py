@@ -26,8 +26,8 @@ class LineMeshNode(bpy.types.Node, AnimationNode):
             self.newInput("Boolean", "Cyclic", "cyclic", value = False)
 
         self.newOutput("Mesh", "Mesh", "mesh")
-        self.newOutput("Vector List", "Vertices", "vertices", hide = True)
-        self.newOutput("Edge Indices", "Edges", "edges", hide = True)
+        self.newOutput("Vector List", "Vertex Locations", "vertices", hide = True)
+        self.newOutput("Edge Indices", "Edge Indices", "edges", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "lineMode", text = "")

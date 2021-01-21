@@ -8,7 +8,7 @@ class SeparatePolygonsNode(bpy.types.Node, AnimationNode):
     errorHandlingType = "EXCEPTION"
 
     def create(self):
-        self.newInput("Vector List", "Vertices", "inVertices")
+        self.newInput("Vector List", "Vertex Locations", "inVertices")
         self.newInput("Polygon Indices List", "Polygon Indices", "inPolygonIndices")
 
         self.newOutput("Vector List", "Vertices", "outVertices")
