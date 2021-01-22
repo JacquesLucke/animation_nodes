@@ -1,29 +1,8 @@
 import bpy
 from bpy.props import *
 from . mix_data import getMixCode
-from ... utils.math import mixEulers
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
-
-from . c_utils import (
-    mixColorLists,
-    mixEulerLists,
-    mixDoubleLists,
-    mixVectorLists,
-    mixQuaternionLists,
-    executeTimeList,
-    calculateInfluenceList,
-)
-from ... data_structures import (
-    Color,
-    Matrix4x4List,
-    VirtualColorList,
-    VirtualEulerList,
-    VirtualDoubleList,
-    VirtualVector3DList,
-    VirtualMatrix4x4List,
-    VirtualQuaternionList,
-)
 
 class AnimateDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AnimateDataNode"
@@ -69,7 +48,27 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
     def getExecutionCode(self, required):
         if any([self.useListA, self.useListB, self.useListC, self.useListD]):
             args = ", ".join(socket.identifier for socket in self.inputs)
-            yield "results, outTimes = self.executeDataList({})".format(args)
+            yield f"time, start, end, interpolation, duration = {args}"
+            yield "times = AN.data_structures.VirtualDoubleList.create(time, 0)"
+            yield "durations = AN.data_structures.VirtualDoubleList.create(duration, 0)"
+            if self.dataType == "Float":
+                yield f"starts, ends = AN.data_structures.VirtualDoubleList.createMultiple((start, 0), (end, 0))"
+            elif self.dataType == "Vector":
+                yield f"starts, ends = AN.data_structures.VirtualVector3DList.createMultiple((start, 0), (end, 0))"
+            elif self.dataType == "Matrix":
+                yield f"starts, ends = AN.data_structures.VirtualMatrix4x4List.createMultiple((start, 0), (end, 0))"
+            else:
+                yield f"starts, ends = AN.data_structures.Virtual{self.dataType}List.createMultiple((start, 0), (end, 0))"
+            yield "amount = AN.data_structures.VirtualDoubleList.getMaxRealLength(times, starts, ends, durations)"
+            yield "factors = AN.nodes.generic.c_utils.calculateInfluenceList(times, interpolation, durations, amount)"
+            yield "_factors = AN.data_structures.VirtualDoubleList.create(factors, 0)"
+            yield "outTimes = AN.nodes.generic.c_utils.executeTimeList(times, durations, amount)"
+            if self.dataType == "Float":
+                yield "results = AN.nodes.generic.c_utils.mixDoubleLists(starts, ends, _factors, amount)"
+            elif self.dataType == "Matrix":
+                yield "results = AN.nodes.generic.mix_data.mixMatrixLists(starts, ends, _factors, amount)"
+            else:
+                yield f"results = AN.nodes.generic.c_utils.mix{self.dataType}Lists(starts, ends, _factors, amount)"
 
         else:
             yield "finalDuration = max(duration, 0.0001)"
@@ -77,45 +76,4 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
             yield "influence = interpolation(influence)"
             yield getMixCode(self.dataType, "start", "end", "influence", "result")
             yield "outTime = time - finalDuration"
-
-    def executeDataList(self, time, start, end, interpolation, duration):
-        times = VirtualDoubleList.create(time, 0)
-        durations = VirtualDoubleList.create(duration, 0)
-
-        if self.dataType == "Float":
-            starts, ends = VirtualDoubleList.createMultiple((start, 0), (end, 0))      
-            amount = VirtualDoubleList.getMaxRealLength(times, starts, ends, durations)
-            factors = calculateInfluenceList(times, interpolation, durations, amount)
-            _factors = VirtualDoubleList.create(factors, 0)
-            return mixDoubleLists(starts, ends, _factors, amount), executeTimeList(times, durations, amount)
-        elif self.dataType == "Vector":
-            starts, ends = VirtualVector3DList.createMultiple((start, 0), (end, 0))
-            amount = VirtualDoubleList.getMaxRealLength(times, starts, ends, durations)
-            factors = calculateInfluenceList(times, interpolation, durations, amount)
-            _factors = VirtualDoubleList.create(factors, 0)
-            return mixVectorLists(starts, ends, _factors, amount), executeTimeList(times, durations, amount)
-        elif self.dataType == "Quaternion":
-            starts, ends = VirtualQuaternionList.createMultiple((start, 0), (end, 0))
-            amount = VirtualDoubleList.getMaxRealLength(times, starts, ends, durations)
-            factors = calculateInfluenceList(times, interpolation, durations, amount)
-            _factors = VirtualDoubleList.create(factors, 0)
-            return mixQuaternionLists(starts, ends, _factors, amount), executeTimeList(times, durations, amount)
-        elif self.dataType == "Matrix":
-            starts, ends = VirtualMatrix4x4List.createMultiple((start, 0), (end, 0))
-            amount = VirtualDoubleList.getMaxRealLength(times, starts, ends, durations)
-            factors = calculateInfluenceList(times, interpolation, durations, amount)
-            _factors = VirtualDoubleList.create(factors, 0)
-            return mixMatrixLists(starts, ends, _factors, amount), executeTimeList(times, durations, amount)
-        elif self.dataType == "Color":
-            starts, ends = VirtualColorList.createMultiple((start, 0), (end, 0))
-            amount = VirtualDoubleList.getMaxRealLength(times, starts, ends, durations)
-            factors = calculateInfluenceList(times, interpolation, durations, amount)
-            _factors = VirtualDoubleList.create(factors, 0)
-            return mixColorLists(starts, ends, _factors, amount), executeTimeList(times, durations, amount)
-        elif self.dataType == "Euler":
-            starts, ends = VirtualEulerList.createMultiple((start, 0), (end, 0))
-            amount = VirtualDoubleList.getMaxRealLength(times, starts, ends, durations)
-            factors = calculateInfluenceList(times, interpolation, durations, amount)
-            _factors = VirtualDoubleList.create(factors, 0)
-            return mixEulerLists(starts, ends, _factors, amount), executeTimeList(times, durations, amount)
 
