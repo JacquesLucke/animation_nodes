@@ -1,5 +1,6 @@
 import bpy
 from . handlers import eventHandler
+from . nodes import getAnimationNodeTrees
 
 enableSelectionSorting = True
 sortedSelectionNames = []
@@ -15,6 +16,9 @@ def getSortedSelectedObjectNames():
 
 @eventHandler("ALWAYS")
 def updateSelectionSorting():
+    nodeTrees = getAnimationNodeTrees()
+    if len(nodeTrees) == 0: return
+
     global sortedSelectionNames
 
     selectedNames = getSelectedObjectNames()
