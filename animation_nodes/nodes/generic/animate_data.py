@@ -4,6 +4,23 @@ from . mix_data import getMixCode
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
 
+dataTypeToVirtualListMapping = {
+    "Euler" : "VirtualEulerList",
+    "Color" : "VirtualColorList",
+    "Float" : "VirtualDoubleList",
+    "Vector" : "VirtualVector3DList",
+    "Matrix" : "VirtualMatrix4x4List",
+    "Quaternion" : "VirtualQuaternionList"
+}
+
+dataTypeToMixDataListMapping = {
+    "Euler" : "mixEulerLists",
+    "Color" : "mixColorLists",
+    "Float" : "mixDoubleLists",
+    "Vector" : "mixVectorLists",
+    "Quaternion" : "mixQuaternionLists"
+}
+
 class AnimateDataNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_AnimateDataNode"
     bl_label = "Animate Data"
@@ -27,15 +44,15 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput(VectorizedSocket("Float", "useListA",
-            ("Time", "time"), ("Times", "times")))
+            ("Time", "time"), ("Times", "time")))
         self.newInput(VectorizedSocket(self.dataType, ["useListB"],
-            ("Start", "start"), ("Starts", "starts")))
+            ("Start", "start"), ("Starts", "start")))
         self.newInput(VectorizedSocket(self.dataType, ["useListC"],
-            ("End", "end"), ("Ends", "ends")))
+            ("End", "end"), ("Ends", "end")))
         self.newInput("Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Float", "useListD",
             ("Duration", "duration", dict(value = 20, minValue = 0.001)),
-            ("Durations", "durations")))
+            ("Durations", "duration")))
 
         self.newOutput(VectorizedSocket("Float", ["useListA", "useListB",
             "useListC", "useListD"], ("Time", "outTime"), ("Times", "outTimes")))
@@ -47,28 +64,18 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
 
     def getExecutionCode(self, required):
         if any([self.useListA, self.useListB, self.useListC, self.useListD]):
-            args = ", ".join(socket.identifier for socket in self.inputs)
-            yield f"time, start, end, interpolation, duration = {args}"
             yield "times = AN.data_structures.VirtualDoubleList.create(time, 0)"
             yield "durations = AN.data_structures.VirtualDoubleList.create(duration, 0)"
-            if self.dataType == "Float":
-                yield f"starts, ends = AN.data_structures.VirtualDoubleList.createMultiple((start, 0), (end, 0))"
-            elif self.dataType == "Vector":
-                yield f"starts, ends = AN.data_structures.VirtualVector3DList.createMultiple((start, 0), (end, 0))"
-            elif self.dataType == "Matrix":
-                yield f"starts, ends = AN.data_structures.VirtualMatrix4x4List.createMultiple((start, 0), (end, 0))"
-            else:
-                yield f"starts, ends = AN.data_structures.Virtual{self.dataType}List.createMultiple((start, 0), (end, 0))"
+            yield f"starts, ends = AN.data_structures.{dataTypeToVirtualListMapping[self.dataType]}.createMultiple((start, 0), (end, 0))"
             yield "amount = AN.data_structures.VirtualDoubleList.getMaxRealLength(times, starts, ends, durations)"
             yield "factors = AN.nodes.generic.c_utils.calculateInfluenceList(times, interpolation, durations, amount)"
             yield "_factors = AN.data_structures.VirtualDoubleList.create(factors, 0)"
             yield "outTimes = AN.nodes.generic.c_utils.executeTimeList(times, durations, amount)"
-            if self.dataType == "Float":
-                yield "results = AN.nodes.generic.c_utils.mixDoubleLists(starts, ends, _factors, amount)"
-            elif self.dataType == "Matrix":
+
+            if self.dataType == "Matrix":
                 yield "results = AN.nodes.generic.mix_data.mixMatrixLists(starts, ends, _factors, amount)"
             else:
-                yield f"results = AN.nodes.generic.c_utils.mix{self.dataType}Lists(starts, ends, _factors, amount)"
+                yield f"results = AN.nodes.generic.c_utils.{dataTypeToMixDataListMapping[self.dataType]}(starts, ends, _factors, amount)"
 
         else:
             yield "finalDuration = max(duration, 0.0001)"
