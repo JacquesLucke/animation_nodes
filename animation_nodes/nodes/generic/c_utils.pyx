@@ -5,6 +5,7 @@ from ... data_structures cimport (
     DoubleList,
     Vector3DList,
     QuaternionList,
+    Interpolation,
     VirtualColorList,
     VirtualEulerList,
     VirtualDoubleList,
@@ -61,3 +62,23 @@ def mixEulerLists(VirtualEulerList eulersA, VirtualEulerList eulersB, VirtualDou
         mixEul3(results.data + i, eulersA.get(i), eulersB.get(i), <float>factors.get(i))
 
     return results
+
+def calculateInfluenceList(VirtualDoubleList times,
+                        Interpolation interpolation,
+                        VirtualDoubleList durations, long amount):
+    cdef DoubleList result = DoubleList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        finalDuration = max(durations.get(i), 0.0001)
+        influence = max(min(times.get(i) / finalDuration, 1.0), 0.0)
+        result.data[i] = interpolation.evaluate(influence)
+    return result
+
+def executeTimeList(VirtualDoubleList times, VirtualDoubleList durations, long amount):
+    cdef DoubleList result = DoubleList(length = amount)
+    cdef Py_ssize_t i
+    for i in range(amount):
+        finalDuration = max(durations.get(i), 0.0001)
+        result.data[i] = times.get(i) - finalDuration
+    return result
+
