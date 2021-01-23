@@ -10,7 +10,7 @@ from ... data_structures cimport (
     VirtualEulerList,
     VirtualDoubleList,
     VirtualVector3DList,
-    VirtualQuaternionList, 
+    VirtualQuaternionList,
 )
 
 def mixDoubleLists(VirtualDoubleList numbersA, VirtualDoubleList numbersB, VirtualDoubleList factors,

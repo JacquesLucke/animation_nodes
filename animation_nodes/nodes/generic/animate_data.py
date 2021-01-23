@@ -37,33 +37,33 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
 
     dataType: StringProperty(default = "Float", update = AnimationNode.refresh)
 
-    useListA: VectorizedSocket.newProperty()
-    useListB: VectorizedSocket.newProperty()
-    useListC: VectorizedSocket.newProperty()
-    useListD: VectorizedSocket.newProperty()
+    useListTime: VectorizedSocket.newProperty()
+    useListStart: VectorizedSocket.newProperty()
+    useListEnd: VectorizedSocket.newProperty()
+    useListDuration: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput(VectorizedSocket("Float", "useListA",
+        self.newInput(VectorizedSocket("Float", "useListTime",
             ("Time", "time"), ("Times", "time")))
-        self.newInput(VectorizedSocket(self.dataType, ["useListB"],
+        self.newInput(VectorizedSocket(self.dataType, ["useListStart"],
             ("Start", "start"), ("Starts", "start")))
-        self.newInput(VectorizedSocket(self.dataType, ["useListC"],
+        self.newInput(VectorizedSocket(self.dataType, ["useListEnd"],
             ("End", "end"), ("Ends", "end")))
         self.newInput("Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput(VectorizedSocket("Float", "useListD",
+        self.newInput(VectorizedSocket("Float", "useListDuration",
             ("Duration", "duration", dict(value = 20, minValue = 0.001)),
             ("Durations", "duration")))
 
-        self.newOutput(VectorizedSocket("Float", ["useListA", "useListB",
-            "useListC", "useListD"], ("Time", "outTime"), ("Times", "outTimes")))
-        self.newOutput(VectorizedSocket(self.dataType, ["useListA", "useListB", 
-            "useListC", "useListD"], ("Result", "result"), ("Results", "results")))
+        self.newOutput(VectorizedSocket("Float", ["useListTime", "useListStart",
+            "useListEnd", "useListDuration"], ("Time", "outTime"), ("Times", "outTimes")))
+        self.newOutput(VectorizedSocket(self.dataType, ["useListTime", "useListStart", 
+            "useListEnd", "useListDuration"], ("Result", "result"), ("Results", "results")))
 
     def drawLabel(self):
         return "Animate " + self.inputs[1].dataType
 
     def getExecutionCode(self, required):
-        if any([self.useListA, self.useListB, self.useListC, self.useListD]):
+        if any([self.useListTime, self.useListStart, self.useListEnd, self.useListDuration]):
             yield "times = AN.data_structures.VirtualDoubleList.create(time, 0)"
             yield "durations = AN.data_structures.VirtualDoubleList.create(duration, 0)"
             yield f"starts, ends = AN.data_structures.{dataTypeToVirtualListMapping[self.dataType]}.createMultiple((start, 0), (end, 0))"
