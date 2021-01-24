@@ -17,6 +17,7 @@
 ### Fixed
 
 - Fixed ID Key distance sorting.
+- Fixed nodetree.execute method in background mode.
 
 ### Changed
 
