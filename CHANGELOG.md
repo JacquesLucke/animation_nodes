@@ -19,6 +19,7 @@
 
 - Fixed ID Key distance sorting.
 - Fixed nodetree.execute method in background mode.
+- Fixed wrong types in *Get Struct List Elements* node.
 
 ### Changed
 
