@@ -364,7 +364,6 @@ class ObjectUtilsMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_MoveObjectNode", "Move")
         insertNode(layout, "an_TransformObjectNode", "Transform")
-        insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")
         insertNode(layout, "an_ResetObjectTransformsNode", "Reset Transformations")
         insertNode(layout, "an_CopyTransformsNode", "Copy Transformations")
         insertNode(layout, "an_GetSelectedObjectsNode", "Get Selected Objects")
