@@ -27,7 +27,8 @@
 - Vectorized *Delay Time* node.
 - Corrected mesh components' order and names.
 - Skip selection sorting if no node tree exist.
-- Vectorized *animate node*.
+- Vectorized *Animate Data* node.
+- Removed *Update Object Matrices* node.
 
 ## 2.2.1 (13 January 2021)
 
