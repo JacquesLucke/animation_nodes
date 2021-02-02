@@ -347,6 +347,8 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ShapeKeysFromObjectNode", "Shape Keys from Object")
         insertNode(layout, "an_ShapeKeyOutputNode", "Shape Key Output")
         layout.separator()
+        insertNode(layout, "an_EvaluateObjectNode", "Evaluate Object")
+        layout.separator()
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
         insertNode(layout, "an_CopyObjectModifiersNode", "Copy Modifiers")
