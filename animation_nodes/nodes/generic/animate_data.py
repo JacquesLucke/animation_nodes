@@ -49,18 +49,18 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
         self.newInput(VectorizedSocket("Float", "useListStartTime",
             ("Start Time", "startTime", dict(value = 0)), ("Start Times", "startTime")), hide = True)
         self.newInput(VectorizedSocket(self.dataType, "useListStart",
-            ("Start", "start"), ("Starts", "start")))
+            ("Start Value", "startValue"), ("Start Values", "startValue")))
         self.newInput(VectorizedSocket(self.dataType, "useListEnd",
-            ("End", "end"), ("Ends", "end")))
+            ("End Value", "endValue"), ("End Values", "endValue")))
         self.newInput("Interpolation", "interpolation", defaultDrawType = "PROPERTY_ONLY")
         self.newInput(VectorizedSocket("Float", "useListDuration",
             ("Duration", "duration", dict(value = 20, minValue = 0.001)),
             ("Durations", "duration")))
 
-        self.newOutput(VectorizedSocket("Float", ["useListTime", "useListStartTime", "useListStart",
-            "useListEnd", "useListDuration"], ("Time", "outTime"), ("Times", "outTimes")))
         self.newOutput(VectorizedSocket(self.dataType, ["useListTime", "useListStartTime", "useListStart",
             "useListEnd", "useListDuration"], ("Result", "result"), ("Results", "results")))
+        self.newOutput(VectorizedSocket("Float", ["useListTime", "useListStartTime", "useListStart",
+            "useListEnd", "useListDuration"], ("Time", "outTime"), ("Times", "outTimes")))
 
     def drawLabel(self):
         return "Animate " + self.inputs[1].dataType
@@ -70,20 +70,20 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
             yield "times = AN.data_structures.VirtualDoubleList.create(time, 0)"
             yield "startTimes = AN.data_structures.VirtualDoubleList.create(startTime, 0)"
             yield "durations = AN.data_structures.VirtualDoubleList.create(duration, 0)"
-            yield f"starts, ends = AN.data_structures.{dataTypeToVirtualListMapping[self.dataType]}.createMultiple((start, 0), (end, 0))"
-            yield "amount = AN.data_structures.VirtualDoubleList.getMaxRealLength(times, startTimes, starts, ends, durations)"
+            yield f"startValues, endValues = AN.data_structures.{dataTypeToVirtualListMapping[self.dataType]}.createMultiple((startValue, 0), (endValue, 0))"
+            yield "amount = AN.data_structures.VirtualDoubleList.getMaxRealLength(times, startTimes, startValues, endValues, durations)"
             yield "factors = AN.nodes.generic.c_utils.calculateInfluenceList(times, startTimes, interpolation, durations, amount)"
             yield "_factors = AN.data_structures.VirtualDoubleList.create(factors, 0)"
             yield "outTimes = AN.nodes.generic.c_utils.executeTimeList(times, startTimes, durations, amount)"
 
             if self.dataType == "Matrix":
-                yield "results = AN.nodes.generic.mix_data.mixMatrixLists(starts, ends, _factors, amount)"
+                yield "results = AN.nodes.generic.mix_data.mixMatrixLists(startValues, endValues, _factors, amount)"
             else:
-                yield f"results = AN.nodes.generic.c_utils.{dataTypeToMixDataListMapping[self.dataType]}(starts, ends, _factors, amount)"
+                yield f"results = AN.nodes.generic.c_utils.{dataTypeToMixDataListMapping[self.dataType]}(startValues, endValues, _factors, amount)"
 
         else:
             yield "finalDuration = max(duration, 0.0001)"
             yield "influence = max(min((time - startTime) / finalDuration, 1.0), 0.0)"
             yield "influence = interpolation(influence)"
-            yield getMixCode(self.dataType, "start", "end", "influence", "result")
+            yield getMixCode(self.dataType, "startValue", "endValue", "influence", "result")
             yield "outTime = time - startTime - finalDuration"
