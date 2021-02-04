@@ -347,6 +347,8 @@ class ObjectMenu(bpy.types.Menu):
         insertNode(layout, "an_ShapeKeysFromObjectNode", "Shape Keys from Object")
         insertNode(layout, "an_ShapeKeyOutputNode", "Shape Key Output")
         layout.separator()
+        insertNode(layout, "an_EvaluateObjectNode", "Evaluate Object")
+        layout.separator()
         insertNode(layout, "an_ObjectIDKeyNode", "ID Key")
         insertNode(layout, "an_CopyObjectDataNode", "Copy Data")
         insertNode(layout, "an_CopyObjectModifiersNode", "Copy Modifiers")
@@ -364,7 +366,6 @@ class ObjectUtilsMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_MoveObjectNode", "Move")
         insertNode(layout, "an_TransformObjectNode", "Transform")
-        insertNode(layout, "an_UpdateObjectMatricesNode", "Update Matrices")
         insertNode(layout, "an_ResetObjectTransformsNode", "Reset Transformations")
         insertNode(layout, "an_CopyTransformsNode", "Copy Transformations")
         insertNode(layout, "an_GetSelectedObjectsNode", "Get Selected Objects")

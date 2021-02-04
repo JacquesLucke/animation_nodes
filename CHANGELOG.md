@@ -12,7 +12,8 @@
 - Added *MIDI Track Info* node.
 - Added *MIDI Note Info* node.
 - Added *Evaluate MIDI Track* node.
-- Added Vertices and Edges output to *Line Mesh* node.
+- Added Vertices and Edges output to Line Mesh node.
+- Added *Evaluate Object* node.
 - Added Start Time to *Animate Data* nodes.
 
 ### Fixed
@@ -28,7 +29,8 @@
 - Vectorized *Delay Time* node.
 - Corrected mesh components' order and names.
 - Skip selection sorting if no node tree exist.
-- Vectorized *animate node*.
+- Vectorized *Animate Data* node.
+- Removed *Update Object Matrices* node.
 
 ## 2.2.1 (13 January 2021)
 
