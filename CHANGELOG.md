@@ -14,6 +14,7 @@
 - Added *Evaluate MIDI Track* node.
 - Added Vertices and Edges output to Line Mesh node.
 - Added *Evaluate Object* node.
+- Added Start Time to *Animate Data* nodes.
 
 ### Fixed
 
