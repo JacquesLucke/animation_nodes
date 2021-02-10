@@ -77,7 +77,7 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
         layout.separator()
 
         if self.sortMode == "SELECTION_ORDER":
-            pass
+            layout.operator("an.record_selection_order", text = "Record Selection Order")
         elif self.sortMode == "AXIS":
             layout.prop(self, "axis")
             layout.prop(self, "locationMode", text = "Location")
@@ -126,7 +126,10 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
         return {"FINISHED"}
 
     def sort_SelectionOrder(self):
-        return getSortedSelectedObjects()
+        selectedObjects = getSortedSelectedObjects()
+        if len(selectedObjects) == 0:
+            self.report({'WARNING'}, "No selection recorded. Please record selection first.")
+        return selectedObjects
 
     def sort_Axis(self):
         index = ["X", "Y", "Z"].index(self.axis)

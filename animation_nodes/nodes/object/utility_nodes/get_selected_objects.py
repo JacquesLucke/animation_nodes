@@ -1,13 +1,13 @@
 import bpy
 from .... events import isRendering
 from .... base_types import AnimationNode
-from .... utils.selection import getSortedSelectedObjects
+from .... utils.depsgraph import getActiveDepsgraph
+from .... utils.selection import getSelectedObjects, getActiveObject
 
 class GetSelectedObjectsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetSelectedObjectsNode"
     bl_label = "Get Selected Objects"
     searchTags = ["Get Active Object"]
-    bl_width_default = 200
 
     def create(self):
         self.newOutput("Object List", "Selected Objects", "selectedObjects")
@@ -17,8 +17,8 @@ class GetSelectedObjectsNode(bpy.types.Node, AnimationNode):
         if isRendering():
             return [], None
         else:
-            return (getSortedSelectedObjects(),
-                    bpy.data.window_managers[0].windows[0].view_layer.objects.active)
+            viewLayer = getActiveDepsgraph().view_layer
+            return getSelectedObjects(viewLayer), getActiveObject(viewLayer)
 
     def draw(self, layout):
         layout.label(text = "Disabled During Rendering", icon = "INFO")
