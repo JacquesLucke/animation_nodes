@@ -60,14 +60,13 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     __annotations__["mode"] = EnumProperty(name = "Mode", default = "GRID",
         items = modeItems, update = AnimationNode.refresh)
 
+    __annotations__["directionAxis"] = EnumProperty(items = directionAxisItems, update = propertyChanged, default = "X")
+    __annotations__["centerLinear"] =  BoolProperty(name = "Center Linear",
+        description = "Center the linear along the axis",
+        default = False, update = propertyChanged)
+
     __annotations__["distanceMode"] = EnumProperty(name = "Distance Mode", default = "SIZE",
         items = distanceModeItems, update = AnimationNode.refresh)
-
-    __annotations__["meshMode"] = EnumProperty(name = "Mesh Mode", default = "VERTICES",
-        items = meshModeItems, update = AnimationNode.refresh)
-
-    __annotations__["splineDistributionMethod"] = EnumProperty(name = "Distribution Method",
-        default = "UNIFORM", items = splineDistributionMethodItems, update = AnimationNode.refresh)
 
     __annotations__["centerAlongX"] = BoolProperty(name = "Center Along X", default = True,
         description = "Center the grid along the x axis", update = propertyChanged)
@@ -76,24 +75,24 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     __annotations__["centerAlongZ"] = BoolProperty(name = "Center Along Z", default = False,
         description = "Center the grid along the z axis", update = propertyChanged)
 
+    __annotations__["planeAxis"] = EnumProperty(items = planeAxisItems, update = propertyChanged, default = "XY")
+
+    __annotations__["meshMode"] = EnumProperty(name = "Mesh Mode", default = "VERTICES",
+        items = meshModeItems, update = AnimationNode.refresh)
+
+    __annotations__["centerSpiral"] =  BoolProperty(name = "Center Spiral",
+        description = "Center the spiral along Z axis",
+        default = False, update = propertyChanged)
+
+    __annotations__["splineDistributionMethod"] = EnumProperty(name = "Distribution Method",
+        default = "UNIFORM", items = splineDistributionMethodItems, update = AnimationNode.refresh)
+
     __annotations__["exactCircleSegment"] = BoolProperty(name = "Exact Circle Segment", default = False,
         update = propertyChanged)
 
     __annotations__["splineResolution"] = IntProperty(name = "Spline Resolution", min = 2, default = 20,
         description = "Increase to have a more accurate evaluation if the type is set to Uniform",
         update = propertyChanged)
-
-    __annotations__["centerSpiral"] =  BoolProperty(name = "Center Spiral",
-        description = "Center the spiral along Z axis",
-        default = False, update = propertyChanged)
-
-    __annotations__["centerLinear"] =  BoolProperty(name = "Center Linear",
-        description = "Center the linear along the axis",
-        default = False, update = propertyChanged)
-
-    __annotations__["directionAxis"] = EnumProperty(items = directionAxisItems, update = propertyChanged, default = "X")
-
-    __annotations__["planeAxis"] = EnumProperty(items = planeAxisItems, update = propertyChanged, default = "XY")
 
     def create(self):
         if self.mode == "LINEAR":
@@ -152,19 +151,19 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         if self.mode == "LINEAR":
             layout.prop(self, "directionAxis", expand = True)
             layout.prop(self, "centerLinear", toggle = True)
-        if self.mode == "CIRCLE":
-            layout.prop(self, "planeAxis", expand = True)
-        if self.mode == "MESH":
-            col.prop(self, "meshMode", text = "")
         if self.mode == "GRID":
             row = col.row(align = True)
             row.prop(self, "centerAlongX", text = "X", toggle = True)
             row.prop(self, "centerAlongY", text = "Y", toggle = True)
             row.prop(self, "centerAlongZ", text = "Z", toggle = True)
-        if self.mode == "SPLINE":
-            col.prop(self, "splineDistributionMethod", text = "")
+        if self.mode == "CIRCLE":
+            layout.prop(self, "planeAxis", expand = True)
+        if self.mode == "MESH":
+            col.prop(self, "meshMode", text = "")
         if self.mode == "SPIRAL":
             layout.prop(self, "centerSpiral", toggle = True)
+        if self.mode == "SPLINE":
+            col.prop(self, "splineDistributionMethod", text = "")
 
     def drawAdvanced(self, layout):
         if self.mode == "CIRCLE":
