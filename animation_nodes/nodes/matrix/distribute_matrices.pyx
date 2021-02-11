@@ -48,6 +48,8 @@ searchItems = {
 
 directionAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 
+planeAxisItems = [(axis, axis, "") for axis in ("XY", "YZ", "ZX")]
+
 class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DistributeMatricesNode"
     bl_label = "Distribute Matrices"
@@ -80,16 +82,18 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     __annotations__["splineResolution"] = IntProperty(name = "Spline Resolution", min = 2, default = 20,
         description = "Increase to have a more accurate evaluation if the type is set to Uniform",
         update = propertyChanged)
-    
+
     __annotations__["centerSpiral"] =  BoolProperty(name = "Center Spiral",
         description = "Center the spiral along Z axis",
         default = False, update = propertyChanged)
-    
+
     __annotations__["centerLinear"] =  BoolProperty(name = "Center Linear",
         description = "Center the linear along the axis",
         default = False, update = propertyChanged)
 
     __annotations__["directionAxis"] = EnumProperty(items = directionAxisItems, update = propertyChanged, default = "X")
+
+    __annotations__["planeAxis"] = EnumProperty(items = planeAxisItems, update = propertyChanged, default = "XY")
 
     def create(self):
         if self.mode == "LINEAR":
@@ -148,6 +152,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         if self.mode == "LINEAR":
             layout.prop(self, "directionAxis", expand = True)
             layout.prop(self, "centerLinear", toggle = True)
+        if self.mode == "CIRCLE":
+            layout.prop(self, "planeAxis", expand = True)
         if self.mode == "MESH":
             col.prop(self, "meshMode", text = "")
         if self.mode == "GRID":
@@ -260,9 +266,19 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         stepSin = sin(angleStep)
 
         for i in range(amount):
-            vector.x = iCos * radius
-            vector.y = iSin * radius
-            vector.z = 0
+            if self.planeAxis == "XY":
+                vector.x = iCos * radius
+                vector.y = iSin * radius
+                vector.z = 0
+            elif self.planeAxis == "YZ":
+                vector.x = 0
+                vector.y = iSin * radius
+                vector.z = iCos * radius
+            else:
+                vector.x = iCos * radius
+                vector.y = 0
+                vector.z = iSin * radius
+
             setTranslationMatrix(matrices.data + i, &vector)
             setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
 
@@ -306,9 +322,9 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         iSin = sin(startAngle)
         stepCos = cos(angleStep)
         stepSin = sin(angleStep)
-        
+
         zOffset = (spiralHeight / 2) * self.centerSpiral
-        
+
         for i in range(amount):
             f = <float>i * factor
 
