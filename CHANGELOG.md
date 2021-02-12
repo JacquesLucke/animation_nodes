@@ -15,6 +15,7 @@
 - Added Vertices and Edges output to Line Mesh node.
 - Added *Evaluate Object* node.
 - Added Start Time to *Animate Data* nodes.
+- Added Plane-Axis for *Circle* mode in *Distribute Matrices* node.
 
 ### Fixed
 
