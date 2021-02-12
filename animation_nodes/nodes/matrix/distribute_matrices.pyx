@@ -277,7 +277,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
             return matrices
 
-        elif self.planeAxis == "YZ":
+        if self.planeAxis == "YZ":
             for i in range(amount):
                 vector.x = 0
                 vector.y = iCos * radius
@@ -291,9 +291,9 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             return matrices
 
         for i in range(amount):
-            vector.x = iSin * radius
+            vector.x = iCos * radius
             vector.y = 0
-            vector.z = iCos * radius
+            vector.z = iSin * radius
 
             setTranslationMatrix(matrices.data + i, &vector)
             setMatrixCustomYRotation(matrices.data + i, iCos, iSin)
@@ -394,7 +394,7 @@ cdef inline void setMatrixCustomXRotation(Matrix4* m, double iCos, double iSin):
 
 cdef inline void setMatrixCustomYRotation(Matrix4* m, double iCos, double iSin):
     m.a11 = m.a33 = iCos
-    m.a13, m.a31 = iSin, -iSin
+    m.a13, m.a31 = -iSin, iSin
 
 cdef inline void setMatrixCustomZRotation(Matrix4* m, double iCos, double iSin):
     m.a11 = m.a22 = iCos
