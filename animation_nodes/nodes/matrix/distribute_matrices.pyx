@@ -264,22 +264,39 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         stepCos = cos(angleStep)
         stepSin = sin(angleStep)
 
-        for i in range(amount):
-            if self.planeAxis == "XY":
+        if self.planeAxis == "XY":
+            for i in range(amount):
                 vector.x = iCos * radius
                 vector.y = iSin * radius
                 vector.z = 0
-            elif self.planeAxis == "YZ":
+
+                setTranslationMatrix(matrices.data + i, &vector)
+                setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
+
+                rotateStep(&iCos, &iSin, stepCos, stepSin)
+
+            return matrices
+
+        elif self.planeAxis == "YZ":
+            for i in range(amount):
                 vector.x = 0
-                vector.y = iSin * radius
-                vector.z = iCos * radius
-            else:
-                vector.x = iCos * radius
-                vector.y = 0
+                vector.y = iCos * radius
                 vector.z = iSin * radius
 
+                setTranslationMatrix(matrices.data + i, &vector)
+                setMatrixCustomXRotation(matrices.data + i, iCos, iSin)
+
+                rotateStep(&iCos, &iSin, stepCos, stepSin)
+
+            return matrices
+
+        for i in range(amount):
+            vector.x = iSin * radius
+            vector.y = 0
+            vector.z = iCos * radius
+
             setTranslationMatrix(matrices.data + i, &vector)
-            setMatrixCustomZRotation(matrices.data + i, iCos, iSin)
+            setMatrixCustomYRotation(matrices.data + i, iCos, iSin)
 
             rotateStep(&iCos, &iSin, stepCos, stepSin)
 
@@ -370,6 +387,14 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)
+
+cdef inline void setMatrixCustomXRotation(Matrix4* m, double iCos, double iSin):
+    m.a22 = m.a33 = iCos
+    m.a23, m.a32 = -iSin, iSin
+
+cdef inline void setMatrixCustomYRotation(Matrix4* m, double iCos, double iSin):
+    m.a11 = m.a33 = iCos
+    m.a13, m.a31 = iSin, -iSin
 
 cdef inline void setMatrixCustomZRotation(Matrix4* m, double iCos, double iSin):
     m.a11 = m.a22 = iCos
