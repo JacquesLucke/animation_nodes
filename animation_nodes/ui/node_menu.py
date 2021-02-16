@@ -649,6 +649,7 @@ class MaterialMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_DataInputNode", "Material Input", {"assignedType" : repr("Material")})
         insertNode(layout, "an_ObjectMaterialInputNode", "Object Material Input")
+        insertNode(layout, "an_BlendDataByNameNode", "Material By Name", {"dataType" : repr("Material")})
         insertNode(layout, "an_ObjectMaterialOutputNode", "Object Material Output")
         insertNode(layout, "an_MaterialOutputNode", "Material Output")
         insertNode(layout, "an_CyclesMaterialOutputNode", "Cycles Material Output")
