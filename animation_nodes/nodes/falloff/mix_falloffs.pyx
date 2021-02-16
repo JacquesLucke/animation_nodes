@@ -10,10 +10,11 @@ mixTypeItems = [
     ("MAX", "Max", "", "NONE", 2),
     ("MIN", "Min", "", "NONE", 3),
     ("SUBTRACT", "Subtract", "", "NONE", 4),
+    ("OVERLAY", "Overlay", "", "NONE", 5),
 ]
 
 # Types that don't support list mixing.
-onlyTwoTypes = ["SUBTRACT"]
+onlyTwoTypes = ["SUBTRACT", "OVERLAY"]
 
 class MixFalloffsNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MixFalloffsNode"
@@ -68,6 +69,7 @@ class MixFalloffs:
             elif method == "MAX": return MaxTwoFalloffs(*falloffs)
             elif method == "MIN": return MinTwoFalloffs(*falloffs)
             elif method == "SUBTRACT": return SubtractTwoFalloffs(*falloffs)
+            elif method == "OVERLAY": return OverlayTwoFalloffs(*falloffs)
             raise Exception("invalid method")
         else:
             if method == "ADD": return AddFalloffs(falloffs)
@@ -142,6 +144,39 @@ cdef class SubtractTwoFalloffs(MixTwoFalloffsBase):
         cdef float *b = dependencyResults[1]
         for i in range(amount):
             target[i] = a[i] - b[i]
+
+# Overlay is defined as follows:
+# - First the A falloff is clamped.
+# - If the A falloff evaluates to a value less than 0.5, the B falloff is
+# evaluated and the overlay evaluates to (A + B * A), or more compactly,
+# (A *(1 + B)).  Essentially, B has no effect when A is zero and have the
+# maximum effect when A is 0.5. Since B is multiplied by A, only half of
+# B is added at its maximum, which is artistically desirable to have the
+# overlay in the [0, 1] range assuming B is clamped.
+# - If the A falloff evaluates to a value larger than 0.5. The same
+# evaluation happens but in reverse. In particular, B has no effect when
+# A is 1 and have the maximum effect when A is 0.5.
+cdef class OverlayTwoFalloffs(MixTwoFalloffsBase):
+    cdef list getClampingRequirements(self):
+        return [True, False]
+
+    cdef float evaluate(self, float *dependencyResults):
+        cdef float a = dependencyResults[0]
+        cdef float b = dependencyResults[1]
+        if a < 0.5:
+            return a * (1 + b)
+        else:
+            return a + b * (1 - a)
+
+    cdef void evaluateList(self, float **dependencyResults, Py_ssize_t amount, float *target):
+        cdef Py_ssize_t i
+        cdef float *a = dependencyResults[0]
+        cdef float *b = dependencyResults[1]
+        for i in range(amount):
+            if a[i] < 0.5:
+                target[i] = a[i] * (1 + b[i])
+            else:
+                target[i] = a[i] + b[i] * (1 - a[i])
 
 
 cdef class MixFalloffsBase(CompoundFalloff):

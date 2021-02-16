@@ -1,15 +1,26 @@
 import bpy
-from ... base_types import AnimationNode
+from . c_utils import executeSubtract_A_B
+from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualDoubleList, DoubleList
 
 class DelayTimeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_DelayTimeNode"
     bl_label = "Delay Time"
     dynamicLabelType = "HIDDEN_ONLY"
 
+    useListA: VectorizedSocket.newProperty()
+    useListB: VectorizedSocket.newProperty()
+    
+
     def create(self):
-        self.newInput("Float", "Time", "time")
-        self.newInput("Float", "Delay", "delay", value = 10)
-        self.newOutput("Float", "Time", "outTime")
+        self.newInput(VectorizedSocket("Float", "useListA",
+            ("Time", "time"), ("Times", "times")))
+        self.newInput(VectorizedSocket("Float", "useListB",
+            ("Delay", "delay", dict(value = 10)),
+            ("Delays", "delays")))
+        self.newOutput(VectorizedSocket("Float",
+            ["useListA", "useListB"],
+            ("Time", "outTime"), ("Times", "outTimes")))
 
     def drawLabel(self):
         delaySocket = self.inputs["Delay"]
@@ -20,4 +31,15 @@ class DelayTimeNode(bpy.types.Node, AnimationNode):
         else: return "Delay Time"
 
     def getExecutionCode(self, required):
-        return "outTime = time - delay"
+        if self.useListA or self.useListB:
+            args = ", ".join(socket.identifier for socket in self.inputs)
+            return "outTimes = self.executeList({})".format(args)
+        else:
+            return "outTime = time - delay"
+
+    def executeList(self, time, delay):
+        virtualTimes, virtualDelays = VirtualDoubleList.createMultiple((time, 0), (delay, 0))
+        amount = VirtualDoubleList.getMaxRealLength(virtualTimes, virtualDelays)
+
+        return executeSubtract_A_B(virtualTimes, virtualDelays, amount)
+

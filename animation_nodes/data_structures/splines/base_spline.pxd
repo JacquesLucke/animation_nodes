@@ -1,9 +1,11 @@
 from ... math.vector cimport Vector3
-from .. lists.base_lists cimport FloatList, Vector3DList
+from ... math.matrix cimport Matrix4
+from .. lists.base_lists cimport FloatList, Vector3DList, Matrix4x4List
 
 cdef class Spline:
     cdef:
         public bint cyclic
+        public long materialIndex
         readonly str type
         FloatList uniformParameters
 
@@ -31,14 +33,6 @@ cdef class Spline:
     cdef checkNormals(self)
     cpdef ensureNormals(self)
 
-    cdef calcDistributedNormals_LowLevel(self, Py_ssize_t amount, Vector3 *result,
-        float start = ?, float end = ?,
-        str distributionType = ?)
-
-    cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
-        float start = ?, float end = ?,
-        str distributionType = ?)
-
 
     # Evaluate Single Parameter
     #############################################
@@ -50,6 +44,7 @@ cdef class Spline:
     cdef float evaluateCurvature_LowLevel(self, float t)
     cdef float evaluateRadius_LowLevel(self, float t)
     cdef float evaluateTilt_LowLevel(self, float t)
+    cdef void evaluateMatrix_LowLevel(self, float t, Matrix4 *result)
 
 
     # Evaluate Multiple Parameters
@@ -71,6 +66,9 @@ cdef class Spline:
         float start = ?, float end = ?,
         str distributionType = ?)
     cdef calcDistributedTilts_LowLevel(self, Py_ssize_t amount, float *result,
+        float start = ?, float end = ?,
+        str distributionType = ?)
+    cdef calcDistributedMatrices_LowLevel(self, Py_ssize_t amount, Matrix4 *result,
         float start = ?, float end = ?,
         str distributionType = ?)
 

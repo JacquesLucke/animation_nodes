@@ -1,6 +1,7 @@
 import bpy
 from . import tree_info
 from . import event_handler
+from . update import updateEverything
 from . utils.handlers import eventHandler
 from . execution.measurements import resetMeasurements
 
@@ -51,6 +52,11 @@ def fileLoaded():
     forceSubprogramUpdate()
     event.fileChanged = True
     treeChanged()
+
+    # Always handler doesn't work when in background mode. Update everything
+    # here instead to facilitate manual tree execution.
+    if bpy.app.background:
+        updateEverything()
 
 @eventHandler("ADDON_LOAD_POST")
 def addonChanged():

@@ -38,7 +38,7 @@ class GetStructListElementsNode(bpy.types.Node, AnimationNode):
     def execute(self, structList):
         key = (self.elementDataType, self.elementKey)
         try:
-            return [struct[key] for struct in structList]
+            return self.outputs[0].correctValue([struct[key] for struct in structList])[0]
         except:
             self.setErrorMessage("The key does not exist in all structs")
-            return []
+            return self.outputs[0].getDefaultValue()

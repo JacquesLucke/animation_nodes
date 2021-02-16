@@ -2,6 +2,43 @@
 
 ### Added
 
+- Added MIDI parser library.
+- Added MIDI Track data structure.
+- Added MIDI Note data structure.
+- Added MIDI file reader utility.
+- Added MIDI Note socket.
+- Added MIDI Track socket.
+- Added *MIDI File Reader* node.
+- Added *MIDI Track Info* node.
+- Added *MIDI Note Info* node.
+- Added *Evaluate MIDI Track* node.
+- Added Vertices and Edges output to Line Mesh node.
+- Added *Evaluate Object* node.
+- Added Start Time to *Animate Data* nodes.
+- Added Plane-Axis for *Circle* mode in *Distribute Matrices* node.
+
+### Fixed
+
+- Fixed ID Key distance sorting.
+- Fixed nodetree.execute method in background mode.
+- Fixed wrong types in *Get Struct List Elements* node.
+
+### Changed
+
+- Removed Deform and Scene inputs from *Bmesh From Object* node.
+- Vectorized *Convert Rotations* node.
+- Vectorized *Delay Time* node.
+- Corrected mesh components' order and names.
+- Skip selection sorting if no node tree exist.
+- Vectorized *Animate Data* node.
+- Removed *Update Object Matrices* node.
+- The output of the *Get Selected Objects* node is no longer ordered.
+- Selection order now need to be recorded for *Integer ID Keys*.
+
+## 2.2.1 (13 January 2021)
+
+### Added
+
 - Added *Filter Material List By Name* node.
 - Added *Change GP Stroke Direction* node.
 - Added create list option to the *Random Quaternion* node.
@@ -12,6 +49,18 @@
 - Added *Copy Object Modifiers* node.
 - Added *Export Headers* option to the setup script.
 - Added *Indices* output to *Get Random List Elements* node.
+- Added *Overlay* mode to *Mix Falloff* node.
+- Added *Spline* mode to *Distribute Matrices* node.
+- Added *Fill Caps* option to *Curve Object Output* node.
+- Added *Bevel Mode* option to *Curve Object Output* node.
+- Added *Parameter* option to *Spline Falloff* node.
+- Added *Wrap Parameters* option to *Evaluate Spline* node.
+- Added *Matrix* output to the *Evaluate Spline* node.
+- Added search tags for Distribute Matrices node.
+- Added material index to spline structure.
+- Added Height and Interpolation inputs to Spiral in *Distribute Matrices* node.
+- Added Center and Direction options to Linear in *Distribute Matrices* node.
+- Added Range Step option to *Evaluate Spline* node.
 
 ### Fixed
 
@@ -20,6 +69,7 @@
 - Fixed triangulateMesh method of Mesh.
 - Fixed freeze in Is Inside Volume node.
 - Fixed Grease Pencil Nodes for API changes.
+- Fixed *Wiggle Action* node when channel is not a valid identifier.
 
 ### Changed
 
@@ -29,6 +79,9 @@
 - Vectorized *Vector Dot Product* node.
 - Socket enable/disable option for *Shade Object Smooth* node.
 - Support undo for node operators.
+- Increased default spline resolution for Spline nodes.
+- Remove redundant attribute setting in *Object Instancer* node.
+- Vectorized *Offset Splines* node.
 
 ## 2.2.0 (01 September 2020)
 
@@ -147,7 +200,7 @@
 - Added GP Layer From Frames node.
 - Added GP Object Output node.
 - Added Change Spline Direction node.
-- Added Transfrom GP Layer node.
+- Added Transform GP Layer node.
 - Added Replicate GP Stroke node.
 - Added Transform GP Stoke node.
 - Added Set GP Layer Attributes node.
@@ -176,7 +229,7 @@
 
 - Optimized the *Object Instancer* node.
 - Make all numeric types comparable.
-- Vectorize *Combine Color* node.
+- Vectorized *Combine Color* node.
 - Replace the Font socket pick operator with a *Load Font* operator.
 - Moved panels from the Tool region to the UI region.
 
@@ -302,7 +355,7 @@
 
 ### Added
 
-- Added *Spline Per Branche* option to *Splines From Edges* node.
+- Added *Spline Per Branch* option to *Splines From Edges* node.
 - Added more troubleshooting info upon unsuccessful installation of the add-on.
 - Added *Combine Mesh* node to the menu.
 - Added *Collection Info* node.

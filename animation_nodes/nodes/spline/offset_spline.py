@@ -19,12 +19,15 @@ class OffsetSplineNode(bpy.types.Node, AnimationNode):
     useRadius: BoolProperty(update = checkedPropertiesChanged)
     useTilt: BoolProperty(update = checkedPropertiesChanged)
 
+    useSplineList: VectorizedSocket.newProperty()
     useVectorList: VectorizedSocket.newProperty()
     useRadiusList: VectorizedSocket.newProperty()
     useTiltList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Spline", "Stroke", "spline", dataIsModified = True)
+        self.newInput(VectorizedSocket("Spline", "useSplineList",
+            ("Spline", "spline", dict(dataIsModified = True)),
+            ("Splines", "splines", dict(dataIsModified = True))))
         self.newInput("Falloff", "Falloff", "falloff")
         self.newInput(VectorizedSocket("Vector", "useVectorList",
             ("Location", "offsetLocations", dict(value = (0, 0, 1))),
@@ -36,7 +39,9 @@ class OffsetSplineNode(bpy.types.Node, AnimationNode):
             ("Tilt", "offsetTilt", dict(value = 1)),
             ("Tilts", "offsetTilts")))
 
-        self.newOutput("Spline", "Stroke", "spline")
+        self.newOutput(VectorizedSocket("Spline", "useSplineList",
+            ("Spline", "spline"),
+            ("Splines", "splines")))
 
         self.updateSocketVisibility()
 
@@ -55,29 +60,34 @@ class OffsetSplineNode(bpy.types.Node, AnimationNode):
         self.inputs[3].hide = not self.useRadius
         self.inputs[4].hide = not self.useTilt
 
-    def execute(self, spline, falloff, offsetLocations, offsetRadii, offsetTilts):
+    def execute(self, splines, falloff, offsetLocations, offsetRadii, offsetTilts):
         if not any((self.useLocation, self.useRadius, self.useTilt)):
-            return spline
+            return splines
+
+        if not self.useSplineList: splines = [splines]
+
+        _offsetRadii = VirtualDoubleList.create(offsetRadii, 0)
+        _offsetTilts = VirtualDoubleList.create(offsetTilts, 0)
+        _offsetLocations = VirtualVector3DList.create(offsetLocations, (0, 0, 0))
 
         falloffEvaluator = self.getFalloffEvaluator(falloff)
-        influences = falloffEvaluator.evaluateList(spline.points)
 
-        if self.useRadius:
-            _offsetRadii = VirtualDoubleList.create(offsetRadii, 0)
-            offsetFloats(spline.radii, _offsetRadii, influences)
+        for spline in splines:
+            influences = falloffEvaluator.evaluateList(spline.points)
 
-        if self.useTilt:
-            _offsetTilts = VirtualDoubleList.create(offsetTilts, 0)
-            offsetFloats(spline.tilts, _offsetTilts, influences)
+            if self.useRadius:
+                offsetFloats(spline.radii, _offsetRadii, influences)
 
-        if self.useLocation:
-            _offsetLocations = VirtualVector3DList.create(offsetLocations, (0, 0, 0))
-            offset3DVectors(spline.points, _offsetLocations, influences)
-            if spline.type == "BEZIER":
-                offset3DVectors(spline.leftHandles, _offsetLocations, influences)
-                offset3DVectors(spline.rightHandles, _offsetLocations, influences)
+            if self.useTilt:
+                offsetFloats(spline.tilts, _offsetTilts, influences)
 
-        return spline
+            if self.useLocation:
+                offset3DVectors(spline.points, _offsetLocations, influences)
+                if spline.type == "BEZIER":
+                    offset3DVectors(spline.leftHandles, _offsetLocations, influences)
+                    offset3DVectors(spline.rightHandles, _offsetLocations, influences)
+        
+        return splines if self.useSplineList else splines[0]
 
     def getFalloffEvaluator(self, falloff):
         try: return falloff.getEvaluator("LOCATION")
