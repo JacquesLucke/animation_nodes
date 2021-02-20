@@ -32,11 +32,12 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
             row.prop(self, "useWorldSpace", text = "", icon = "WORLD")
 
     def getValue(self):
-        if getattr(self.object, "type", "") != "CURVE":
+        if self.object is None: return BezierSpline()
+        if self.object.type not in ("CURVE", "FONT"):
             return BezierSpline()
 
         evaluatedObject = getEvaluatedID(self.object)
-        bSplines = evaluatedObject.data.splines
+        bSplines = evaluatedObject.an.getCurve().splines
         if len(bSplines) > 0:
             spline = createSplineFromBlenderSpline(bSplines[0])
             # Is None when the spline type is not supported.
@@ -61,7 +62,7 @@ class SplineSocket(bpy.types.NodeSocket, AnimationNodeSocket):
                 icon = "OUTLINER_OB_CURVE")
         else:
             object = bpy.context.active_object
-            if getattr(object, "type", "") == "CURVE":
+            if getattr(object, "type", "") in ("CURVE", "FONT"):
                 self.object = object
 
     @classmethod

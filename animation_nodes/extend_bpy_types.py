@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 from . utils.depsgraph import getEvaluatedID
 from . operators.callbacks import executeCallback
+from . utils.depsgraph import getActiveDepsgraph
 from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
                                FloatList, UShortList, UIntegerList, Vector2DList,
                                ColorList)
@@ -110,6 +111,17 @@ class ObjectProperties(bpy.types.PropertyGroup):
                 if applyModifiers: return getEvaluatedID(object).to_mesh()
                 else: return object.to_mesh()
             except: return None
+
+    def getCurve(self, applyModifiers = False):
+        bObject = self.id_data
+
+        if bObject is None: return None
+        if bObject.type not in ("CURVE", "FONT"): return None
+
+        if not applyModifiers and bObject.type == "CURVE":
+            return bObject.data
+
+        return bObject.to_curve(getActiveDepsgraph(), apply_modifiers = applyModifiers)
 
 class IDProperties(bpy.types.PropertyGroup):
     bl_idname = "an_IDProperties"
