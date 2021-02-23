@@ -44,7 +44,7 @@ class ObjectGetAttributeNode(bpy.types.Node, AnimationNode):
 
         if attribute.data_type in["FLOAT", "INT", "BOOLEAN"]:
             attribute.data.foreach_get("value", data.asNumpyArray())
-        elif attribute.dataType == "FLOAT_VECTOR":
+        elif attribute.data_type == "FLOAT_VECTOR":
             attribute.data.foreach_get("vector", data.asNumpyArray())
         else:
             attribute.data.foreach_get("color", data.asNumpyArray())
