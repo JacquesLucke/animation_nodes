@@ -39,7 +39,6 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
         else:
             amount = len(evaluatedObject.data.polygons)
 
-        print(attribute.domain, attribute.data_type)
         if attribute.data_type == "FLOAT":
             data = DoubleList(length = amount)
         elif attribute.data_type == "INT":
