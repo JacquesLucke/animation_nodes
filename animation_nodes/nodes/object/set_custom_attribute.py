@@ -30,6 +30,7 @@ domainItems = [
 class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetCustomAttributeNode"
     bl_label = "Set Custom Attribute"
+    errorHandlingType = "EXCEPTION"
 
     dataType: EnumProperty(name = "Data Type", default = "FLOAT",
         items = dataTypeItems, update = AnimationNode.refresh)
@@ -65,7 +66,9 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "domain", text = "")
 
     def execute(self, object, attName, data):
-        if object is None or attName == "": return object
+        if object is None: return object
+        if attName == "": self.raiseErrorMessage("Attribute name can't be empty.")
+
         attribute = object.data.attributes.get(attName)
         if attribute is None:
             attribute = object.data.attributes.new(attName, self.dataType, self.domain)

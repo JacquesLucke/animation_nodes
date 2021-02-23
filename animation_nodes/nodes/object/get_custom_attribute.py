@@ -14,6 +14,7 @@ from ... data_structures import (
 class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetCustomAttributeNode"
     bl_label = "Get Custom Attribute"
+    errorHandlingType = "EXCEPTION"
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
@@ -21,11 +22,13 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
         self.newOutput("Generic", "Value", "data")
 
     def execute(self, object, attName):
-        if object is None or attName == "": return None
-        evaluatedObject = getEvaluatedID(object)
+        if object is None: return None
+        if attName == "": self.raiseErrorMessage("Attribute name can't be empty.")
 
+        evaluatedObject = getEvaluatedID(object)
         attribute = evaluatedObject.data.attributes.get(attName)
-        if attribute is None: return None
+        if attribute is None:
+            self.raiseErrorMessage(f"""Object does not have attribute with name '{attName}'.\nAvailable: {evaluatedObject.data.attributes.keys()}""")
 
         if attribute.domain == "POINT":
             amount = len(evaluatedObject.data.vertices)
