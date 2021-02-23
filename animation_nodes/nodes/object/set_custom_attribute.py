@@ -17,17 +17,19 @@ dataTypeItems = [
     ("INT", "Integer", "", "NONE", 1),
     ("FLOAT_VECTOR", "Vector", "", "NONE", 2),
     ("FLOAT_COLOR", "Color", "", "NONE", 3),
-    ("BOOLEAN", "Boolean", "", "NONE", 4),
+    ("BYTE_COLOR", "Byte Color", "", "NONE", 4),
+    ("BOOLEAN", "Boolean", "", "NONE", 5),
 ]
 domainItems = [
     ("POINT", "Point", "", "NONE", 0),
     ("EDGE", "Edge", "", "NONE", 1),
-    ("POLYGON", "Polygon", "NONE", 2),
+    ("CORNER", "Corner", "", "NONE", 2),
+    ("POLYGON", "Polygon", "NONE", 3),
 ]
 
-class ObjectSetAttributeNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_ObjectSetAttributeNode"
-    bl_label = "Object Set Attribute"
+class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_SetCustomAttributeNode"
+    bl_label = "Set Custom Attribute"
 
     dataType: EnumProperty(name = "Data Type", default = "FLOAT",
         items = dataTypeItems, update = AnimationNode.refresh)
@@ -49,7 +51,7 @@ class ObjectSetAttributeNode(bpy.types.Node, AnimationNode):
         elif self.dataType == "FLOAT_VECTOR":
             self.newInput(VectorizedSocket("Vector", "useDataList",
             ("Vector", "data"), ("Vectors", "data")))
-        elif self.dataType == "FLOAT_COLOR":
+        elif self.dataType in ["FLOAT_COLOR", "BYTE_COLOR"]:
             self.newInput(VectorizedSocket("Color", "useDataList",
             ("Color", "data"), ("Colors", "data")))
         else:
@@ -63,7 +65,7 @@ class ObjectSetAttributeNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "domain", text = "")
 
     def execute(self, object, attName, data):
-        if object is None: return object
+        if object is None or attName == "": return object
         attribute = object.data.attributes.get(attName)
         if attribute is None:
             attribute = object.data.attributes.new(attName, self.dataType, self.domain)
@@ -75,6 +77,8 @@ class ObjectSetAttributeNode(bpy.types.Node, AnimationNode):
             amount = len(object.data.vertices)
         elif self.domain == "EDGE":
             amount = len(object.data.edges)
+        elif self.domain == "CORNER":
+            amount = len(object.data.loops)
         else:
             amount = len(object.data.polygons)
 
@@ -84,17 +88,17 @@ class ObjectSetAttributeNode(bpy.types.Node, AnimationNode):
             _data = VirtualLongList.create(data, 0).materialize(amount)
         elif self.dataType == "FLOAT_VECTOR":
             _data = VirtualVector3DList.create(data, Vector((0, 0, 0))).materialize(amount)
-        elif self.dataType == "FLOAT_COLOR":
+        elif self.dataType in ["FLOAT_COLOR", "BYTE_COLOR"]:
             _data = VirtualColorList.create(data, Color((0, 0, 0, 0))).materialize(amount)
         else:
             _data = VirtualBooleanList.create(data, False).materialize(amount)
 
-        if self.dataType in["FLOAT", "INT", "BOOLEAN"]:
-            attribute.data.foreach_set("value", _data.asNumpyArray())
+        if self.dataType in ["FLOAT", "INT", "BOOLEAN"]:
+            attribute.data.foreach_set("value", _data.asMemoryView())
         elif self.dataType == "FLOAT_VECTOR":
-            attribute.data.foreach_set("vector", _data.asNumpyArray())
+            attribute.data.foreach_set("vector", _data.asMemoryView())
         else:
-            attribute.data.foreach_set("color", _data.asNumpyArray())
+            attribute.data.foreach_set("color", _data.asMemoryView())
 
         attribute.data.update()
         return object
