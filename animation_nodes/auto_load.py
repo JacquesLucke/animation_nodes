@@ -91,7 +91,7 @@ def iter_my_deps_from_annotations(cls, my_classes):
                 yield dependency
 
 def get_dependency_from_annotation(value):
-    if type(value).__name__ == "bpy_prop_deferred":
+    if isinstance(value, bpy.props._PropertyDeferred):
         return value.keywords.get("type")
     return None
 
