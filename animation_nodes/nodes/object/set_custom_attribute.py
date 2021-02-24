@@ -12,6 +12,13 @@ from ... data_structures import (
     VirtualBooleanList,
 )
 
+domainItems = [
+    ("POINT", "Point", "", "NONE", 0),
+    ("EDGE", "Edge", "", "NONE", 1),
+    ("CORNER", "Corner", "", "NONE", 2),
+    ("POLYGON", "Polygon", "NONE", 3),
+]
+
 dataTypeItems = [
     ("FLOAT", "Float", "", "NONE", 0),
     ("INT", "Integer", "", "NONE", 1),
@@ -20,23 +27,17 @@ dataTypeItems = [
     ("BYTE_COLOR", "Byte Color", "", "NONE", 4),
     ("BOOLEAN", "Boolean", "", "NONE", 5),
 ]
-domainItems = [
-    ("POINT", "Point", "", "NONE", 0),
-    ("EDGE", "Edge", "", "NONE", 1),
-    ("CORNER", "Corner", "", "NONE", 2),
-    ("POLYGON", "Polygon", "NONE", 3),
-]
 
 class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetCustomAttributeNode"
     bl_label = "Set Custom Attribute"
     errorHandlingType = "EXCEPTION"
 
-    dataType: EnumProperty(name = "Data Type", default = "FLOAT",
-        items = dataTypeItems, update = AnimationNode.refresh)
-
     domain: EnumProperty(name = "Domain", default = "POINT",
         items = domainItems, update = AnimationNode.refresh)
+
+    dataType: EnumProperty(name = "Data Type", default = "FLOAT",
+        items = dataTypeItems, update = AnimationNode.refresh)
 
     useDataList: VectorizedSocket.newProperty()
 
@@ -62,8 +63,8 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
         self.newOutput("Object", "Object", "object")
 
     def draw(self, layout):
-        layout.prop(self, "dataType", text = "")
         layout.prop(self, "domain", text = "")
+        layout.prop(self, "dataType", text = "")
 
     def execute(self, object, attName, data):
         if object is None: return object
