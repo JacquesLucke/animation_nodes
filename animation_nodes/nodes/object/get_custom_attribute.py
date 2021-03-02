@@ -8,6 +8,7 @@ from ... data_structures import (
     ColorList,
     DoubleList,
     BooleanList,
+    Vector2DList,
     Vector3DList,
 )
 
@@ -43,6 +44,8 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
             data = DoubleList(length = amount)
         elif attribute.data_type == "INT":
             data = LongList(length = amount)
+        elif attribute.data_type == "FLOAT2":
+            data = Vector2DList(length = amount)
         elif attribute.data_type == "FLOAT_VECTOR":
             data = Vector3DList(length = amount)
         elif attribute.data_type in ["FLOAT_COLOR", "BYTE_COLOR"]:
@@ -52,7 +55,7 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
 
         if attribute.data_type in["FLOAT", "INT", "BOOLEAN"]:
             attribute.data.foreach_get("value", data.asNumpyArray())
-        elif attribute.data_type == "FLOAT_VECTOR":
+        elif attribute.data_type in ["FLOAT2", "FLOAT_VECTOR"]:
             attribute.data.foreach_get("vector", data.asNumpyArray())
         else:
             attribute.data.foreach_get("color", data.asNumpyArray())
