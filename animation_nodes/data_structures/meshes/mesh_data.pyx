@@ -169,7 +169,7 @@ cdef class Mesh:
         elif domain == "EDGE":
             amount = len(self.edges)
         elif domain == "CORNER":
-            amount = len(self.loops)
+            amount = len(self.polygons.indices)
         else:
             amount = len(self.polygons)
         if len(data) == amount:
