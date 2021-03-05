@@ -60,6 +60,7 @@ cdef class Mesh:
         self.derivedMeshDataCache = {}
         self.uvMaps = OrderedDict()
         self.vertexColorLayers = OrderedDict()
+        self.customAttributes = OrderedDict()
 
     def getMeshProperties(self):
         return (
@@ -162,6 +163,29 @@ cdef class Mesh:
     def getVertexColors(self, str colorLayerName):
         return self.vertexColorLayers.get(colorLayerName, None)
 
+    def insertCustomAttribute(self, str name, str domain, str dataType, data):
+        if domain == "POINT":
+            amount = len(self.vertices)
+        elif domain == "EDGE":
+            amount = len(self.edges)
+        elif domain == "CORNER":
+            amount = len(self.loops)
+        else:
+            amount = len(self.polygons)
+        if len(data) == amount:
+            self.customAttributes[name] = (domain, dataType, data)
+        else:
+            raise Exception("invalid length")
+
+    def getCustomAttributes(self):
+        return list(self.customAttributes.items())
+
+    def getCustomAttributeNames(self):
+        return list(self.customAttributes.keys())
+
+    def getCustomAttributeData(self, str name):
+        return self.customAttributes.get(name, None)
+
     def getVertexLinkedVertices(self, long vertexIndex):
         cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
         neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getLinkedVertices()
@@ -212,7 +236,8 @@ cdef class Mesh:
         Edges: {len(self.edges)}
         Polygons: {len(self.polygons)}
         UV Maps: {self.getUVMapNames()}
-        Vertex Colors: {self.getVertexColorLayerNames()}""")
+        Vertex Colors: {self.getVertexColorLayerNames()}
+        Custom Attributes: {self.getCustomAttributeNames()}""")
 
     def replicateMeshProperties(self, Mesh source, long amount):
         for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
