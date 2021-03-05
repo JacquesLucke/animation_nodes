@@ -183,7 +183,7 @@ cdef class Mesh:
     def getCustomAttributeNames(self):
         return list(self.customAttributes.keys())
 
-    def getCustomAttributeData(self, str name):
+    def getCustomAttributeDataSet(self, str name):
         return self.customAttributes.get(name, None)
 
     def getVertexLinkedVertices(self, long vertexIndex):
