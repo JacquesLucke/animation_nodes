@@ -73,6 +73,7 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
 
     def execute(self, object, attName, data):
         if object is None: return object
+        if object.type != "MESH": self.raiseErrorMessage("Object should be Mesh type.")
         if attName == "": self.raiseErrorMessage("Attribute name can't be empty.")
 
         attribute = object.data.attributes.get(attName)
