@@ -66,6 +66,7 @@ cdef class Mesh:
         return (
             (self.uvMaps, Vector2DList),
             (self.vertexColorLayers, ColorList),
+            (self.customAttributes, list),
         )
 
     def verticesTransformed(self):
@@ -173,7 +174,7 @@ cdef class Mesh:
         else:
             amount = len(self.polygons)
         if len(data) == amount:
-            self.customAttributes[name] = (domain, dataType, data)
+            self.customAttributes[name] = [domain, dataType, data]
         else:
             raise Exception("invalid length")
 
@@ -243,7 +244,10 @@ cdef class Mesh:
         for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
                 self.getMeshProperties(), source.getMeshProperties()):
             for name, value in sourceMeshProperty.items():
-                meshProperty[name] = value.repeated(amount = amount)
+                if type(value) is list:
+                    meshProperty[name] = [value[0], value[1], value[2].repeated(amount = amount)]
+                else:
+                    meshProperty[name] = value.repeated(amount = amount)
 
     def appendMeshProperties(self, Mesh source):
         for ((meshProperty, meshPropertyType), (sourceMeshProperty, _)) in zip(
