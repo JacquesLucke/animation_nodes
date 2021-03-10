@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from ... data_structures import DoubleList
+from ... data_structures import DoubleList, Attribute
 
 class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_GetCustomAttributeNode"
@@ -33,12 +33,11 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
         if mesh is None: return None, None, None
         if attributeName == "": self.raiseErrorMessage("Attribute name can't be empty.")
 
-        dataSet = mesh.getCustomAttributeDataSet(attributeName)
-        if dataSet is None:
+        attribute = mesh.getAttribute("CUSTOM", attributeName)
+        if attribute is None:
             self.raiseErrorMessage(f"""Object does not have attribute with name '{attributeName}'.\nAvailable: {mesh.getCustomAttributeNames()}""")
 
-        domain, dataType, data = dataSet
-        self.dataType = dataType
-        if dataType == "FLOAT":
-            return DoubleList.fromValues(data), domain, dataType
-        return data, domain, dataType
+        self.dataType = attribute.dataTypeAsString
+        if self.dataType == "FLOAT":
+            return DoubleList.fromValues(attribute.data), attribute.domainAsString, self.dataType
+        return attribute.data, attribute.domainAsString, self.dataType

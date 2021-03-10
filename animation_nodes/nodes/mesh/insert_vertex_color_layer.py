@@ -41,19 +41,19 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
     def execute_SingleColor(self, mesh, colorLayerName, color):
         if colorLayerName == "":
             self.raiseErrorMessage("Vertex color layer name can't be empty.")
-        elif colorLayerName in mesh.getVertexColorLayerNames():
+        elif colorLayerName in mesh.getAttributeNames("VERTEX_COLOR"):
             self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
 
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(color, defaultColor).materialize(len(mesh.polygons.indices))
 
-        mesh.insertVertexColorLayer(colorLayerName, colorsList)
+        mesh.insertAttribute(colorLayerName, "VERTEX_COLOR", "CORNER", "BYTE_COLOR", colorsList)
         return mesh
 
     def execute_ColorsList(self, mesh, colorLayerName, colors):
         if colorLayerName == "":
             self.raiseErrorMessage("Vertex color layer name can't be empty.")
-        elif colorLayerName in mesh.getVertexColorLayerNames():
+        elif colorLayerName in mesh.getAttributeNames("VERTEX_COLOR"):
             self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
 
         defaultColor = Color((0, 0, 0, 1))
@@ -68,5 +68,5 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
             polygonIndices = mesh.polygons
             colorsList = getLoopColorsFromPolygonColors(polygonIndices, colorsList)
 
-        mesh.insertVertexColorLayer(colorLayerName, colorsList)
+        mesh.insertAttribute(colorLayerName, "VERTEX_COLOR", "CORNER", "BYTE_COLOR", colorsList)
         return mesh

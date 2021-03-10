@@ -16,9 +16,9 @@ class GetUVMapNode(bpy.types.Node, AnimationNode):
         if uvMapName == "":
             self.raiseErrorMessage("UV map name can't be empty.")
 
-        uvMapPositions = mesh.getUVMapPositions(uvMapName)
+        uvMap = mesh.getAttribute("UVMAP", uvMapName)
 
-        if uvMapPositions is None:
+        if uvMap is None:
             self.raiseErrorMessage(f"Mesh doesn't have a uv map with the name '{uvMapName}'.")
 
-        return uvMapPositions
+        return uvMap.data

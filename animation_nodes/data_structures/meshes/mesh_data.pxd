@@ -10,4 +10,4 @@ cdef class Mesh:
         dict derivedMeshDataCache
         object uvMaps
         object vertexColorLayers
-        object customAttributes
+        object attributes

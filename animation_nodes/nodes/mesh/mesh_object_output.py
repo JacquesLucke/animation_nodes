@@ -129,33 +129,35 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         outMesh.polygons.foreach_set("material_index", materialIndices.asMemoryView())
 
         # UV Maps
-        for name, data in mesh.getUVMaps():
+        for name, uvMap in mesh.getAttributes("UVMAP"):
             outMesh.uv_layers.new(name = name)
-            outMesh.uv_layers[name].data.foreach_set("uv", data.asMemoryView())
+            outMesh.uv_layers[name].data.foreach_set("uv", uvMap.data.asMemoryView())
 
         # Vertex Color Layers
-        for name, data in mesh.getVertexColorLayers():
+        for name, vertexColor in mesh.getAttributes("VERTEX_COLOR"):
             outMesh.vertex_colors.new(name = name)
-            outMesh.vertex_colors[name].data.foreach_set("color", data.asMemoryView())
+            outMesh.vertex_colors[name].data.foreach_set("color", vertexColor.data.asMemoryView())
 
         # Custom Attributes
-        for name, dataSet in mesh.getCustomAttributes():
-            attribute = outMesh.attributes.get(name)
+        for name, attribute in mesh.getAttributes("CUSTOM"):
+            attributeOut = outMesh.attributes.get(name)
 
-            domain, dataType, data = dataSet
-            if attribute is None:
-                attribute = outMesh.attributes.new(name, dataType, domain)
-            elif attribute.data_type != dataType or attribute.domain != domain:
-                outMesh.attributes.remove(attribute)
-                attribute = outMesh.attributes.new(name, dataType, domain)
+            domain = attribute.domainAsString
+            dataType = attribute.dataTypeAsString
+            data = attribute.data
+            if attributeOut is None:
+                attributeOut = outMesh.attributes.new(name, dataType, domain)
+            elif attributeOut.data_type != dataType or attributeOut.domain != domain:
+                outMesh.attributes.remove(attributeOut)
+                attributeOut = outMesh.attributes.new(name, dataType, domain)
 
             if dataType in ["FLOAT", "INT", "BOOLEAN"]:
-                attribute.data.foreach_set("value", data.asMemoryView())
+                attributeOut.data.foreach_set("value", data.asMemoryView())
             elif dataType in ["FLOAT2", "FLOAT_VECTOR"]:
-                attribute.data.foreach_set("vector", data.asMemoryView())
+                attributeOut.data.foreach_set("vector", data.asMemoryView())
             else:
-                attribute.data.foreach_set("color", data.asMemoryView())
-            attribute.data.update()
+                attributeOut.data.foreach_set("color", data.asMemoryView())
+            attributeOut.data.update()
 
         if self.validateMesh:
             outMesh.validate(verbose = self.validateMeshVerbose)

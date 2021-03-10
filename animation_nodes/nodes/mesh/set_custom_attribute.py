@@ -45,7 +45,7 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("Text", "Attribute Name", "attName", value = "AN-Att")
+        self.newInput("Text", "Attribute Name", "attributeName", value = "AN-Att")
         if self.dataType == "FLOAT":
             self.newInput(VectorizedSocket("Float", "useDataList",
             ("Value", "data"), ("Values", "data")))
@@ -71,17 +71,17 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "domain", text = "")
         layout.prop(self, "dataType", text = "")
 
-    def execute(self, object, attName, data):
+    def execute(self, object, attributeName, data):
         if object is None: return object
         if object.type != "MESH": self.raiseErrorMessage("Object should be Mesh type.")
-        if attName == "": self.raiseErrorMessage("Attribute name can't be empty.")
+        if attributeName == "": self.raiseErrorMessage("Attribute name can't be empty.")
 
-        attribute = object.data.attributes.get(attName)
+        attribute = object.data.attributes.get(attributeName)
         if attribute is None:
-            attribute = object.data.attributes.new(attName, self.dataType, self.domain)
+            attribute = object.data.attributes.new(attributeName, self.dataType, self.domain)
         elif attribute.data_type != self.dataType or attribute.domain != self.domain:
             object.data.attributes.remove(attribute)
-            attribute = object.data.attributes.new(attName, self.dataType, self.domain)
+            attribute = object.data.attributes.new(attributeName, self.dataType, self.domain)
 
         if self.domain == "POINT":
             amount = len(object.data.vertices)
