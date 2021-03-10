@@ -12,6 +12,8 @@ from . data_structures.splines.base_spline cimport Spline
 from . data_structures.splines.poly_spline cimport PolySpline
 from . data_structures.splines.bezier_spline cimport BezierSpline
 
+from . data_structures.attributes.attribute cimport Attribute
+
 from . data_structures.falloffs.evaluation cimport FalloffEvaluator
 from . data_structures.falloffs.falloff_base cimport Falloff, BaseFalloff, CompoundFalloff
 from . data_structures.interpolation cimport InterpolationFunction, Interpolation
