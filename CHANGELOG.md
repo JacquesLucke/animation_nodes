@@ -18,6 +18,7 @@
 - Added Plane-Axis for *Circle* mode in *Distribute Matrices* node.
 - Added *Material By Name* node.
 - Added *Apply Modifiers* input to the *Splines From Object* node.
+- Added *Copy Animation Nodes Tree* operator.
 
 ### Fixed
 
