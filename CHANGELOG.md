@@ -19,6 +19,7 @@
 - Added *Material By Name* node.
 - Added *Apply Modifiers* input to the *Splines From Object* node.
 - Added *Copy Animation Nodes Tree* operator.
+- Added *Vectorization Type* option to *Set Spline Radius* node.
 
 ### Fixed
 
