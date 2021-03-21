@@ -47,7 +47,7 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(color, defaultColor).materialize(len(mesh.polygons.indices))
 
-        mesh.insertAttribute(colorLayerName, "VERTEX_COLOR", "CORNER", "BYTE_COLOR", colorsList)
+        mesh.insertAttribute(colorLayerName, "CUSTOM", "CORNER", "BYTE_COLOR", colorsList)
         return mesh
 
     def execute_ColorsList(self, mesh, colorLayerName, colors):
@@ -68,5 +68,5 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
             polygonIndices = mesh.polygons
             colorsList = getLoopColorsFromPolygonColors(polygonIndices, colorsList)
 
-        mesh.insertAttribute(colorLayerName, "VERTEX_COLOR", "CORNER", "BYTE_COLOR", colorsList)
+        mesh.insertAttribute(colorLayerName, "CUSTOM", "CORNER", "BYTE_COLOR", colorsList)
         return mesh

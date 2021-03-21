@@ -31,29 +31,16 @@ cdef class Attribute:
     def extend(self, object data):
         self.data.extend(data)
 
-    @property
-    def typeAsString(self):
-        if self.type == UVMAP:
-            return "UVMAP"
+    def getTypeAsString(self):
+        if self.type == UV_MAP:
+            return "UV_MAP"
         elif self.type == MATERIAL_INDEX:
             return "MATERIAL_INDEX"
         elif self.type == VERTEX_COLOR:
             return "VERTEX_COLOR"
         return "CUSTOM"
 
-    @typeAsString.setter
-    def typeAsString(self, type):
-        if type == "UVMAP":
-            self.type = UVMAP
-        elif type == "MATERIAL_INDEX":
-            self.type = MATERIAL_INDEX
-        elif type == "VERTEX_COLOR":
-            self.type = VERTEX_COLOR
-        else:
-            self.type = CUSTOM
-
-    @property
-    def domainAsString(self):
+    def getDomainAsString(self):
         if self.domain == POINT:
             return "POINT"
         elif self.domain == EDGE:
@@ -62,19 +49,7 @@ cdef class Attribute:
             return "POLYGON"
         return "CORNER"
 
-    @domainAsString.setter
-    def domainAsString(self, domain):
-        if domain == "POINT":
-            self.domain = POINT
-        elif domain == "EDGE":
-            self.domain = EDGE
-        elif domain == "POLYGON":
-            self.domain = POLYGON
-        else:
-            self.domain = CORNER
-
-    @property
-    def dataTypeAsString(self):
+    def getDataTypeAsString(self):
         if self.dataType == INT:
             return "INT"
         elif self.dataType == FLOAT:
@@ -88,23 +63,6 @@ cdef class Attribute:
         elif self.dataType == BYTE_COLOR:
             return "BYTE_COLOR"
         return "BOOLEAN"
-
-    @dataTypeAsString.setter
-    def dataTypeAsString(self, dataType):
-        if dataType == "INT":
-            self.dataType = INT
-        elif dataType == "FLOAT":
-            self.dataType = FLOAT
-        elif dataType == "FLOAT2":
-            self.dataType = FLOAT2
-        elif dataType == "FLOAT_VECTOR":
-            self.dataType = FLOAT_VECTOR
-        elif dataType == "FLOAT_COLOR":
-            self.dataType = FLOAT_COLOR
-        elif dataType == "BYTE_COLOR":
-            self.dataType = BYTE_COLOR
-        else:
-            self.dataType = BOOLEAN
 
     def getDataType(self):
         if self.dataType == INT:

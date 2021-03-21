@@ -3,18 +3,31 @@ import textwrap
 import functools
 from collections import OrderedDict
 from . validate import createValidEdgesList
+from .. attributes.attribute cimport Attribute
 from . validate import checkMeshData, calculateLoopEdges
+from .. attributes.attribute import AttributeType, AttributeDomain, AttributeDataType
 from ... algorithms.mesh.triangulate_mesh import (
-    triangulatePolygonsUsingFanSpanMethod, triangulatePolygonsUsingEarClipMethod
+    triangulatePolygonsUsingFanSpanMethod,
+    triangulatePolygonsUsingEarClipMethod
 )
 from .. lists.base_lists cimport (
-    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList
+    LongList,
+    ColorList,
+    EdgeIndices,
+    UIntegerList,
+    Vector2DList,
+    Vector3DList,
+    EdgeIndicesList,
 )
 from ... math cimport (
-    Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
-    Matrix4, toMatrix4
+    Vector3,
+    subVec3,
+    crossVec3,
+    normalizeVec3,
+    addVec3_Inplace,
+    isExactlyZeroVec3,
+    Matrix4, toMatrix4,
 )
-from .. attributes.attribute cimport Attribute
 
 def derivedMeshDataCacheHelper(name, handleNormalization = False):
     def decorator(function):
@@ -59,14 +72,10 @@ cdef class Mesh:
         self.materialIndices = materialIndices
 
         self.derivedMeshDataCache = {}
-        self.uvMaps = OrderedDict()
-        self.vertexColorLayers = OrderedDict()
         self.attributes = OrderedDict()
 
     def getMeshProperties(self):
         return (
-            (self.uvMaps, Attribute),
-            (self.vertexColorLayers, Attribute),
             (self.attributes, Attribute),
         )
 
@@ -137,51 +146,49 @@ cdef class Mesh:
 
     def insertAttribute(self, str name, str type, str domain, str dataType, object data):
         if domain == "POINT":
-            amount = len(self.vertices)
+            referenceAmount = len(self.vertices)
         elif domain == "EDGE":
-            amount = len(self.edges)
+            referenceAmount = len(self.edges)
         elif domain == "POLYGON":
-            amount = len(self.polygons)
+            referenceAmount = len(self.polygons)
         else:
-            amount = len(self.polygons.indices)
+            referenceAmount = len(self.polygons.indices)
 
-        if len(data) == amount:
-            attribute = Attribute()
-            attribute.name = name
-            attribute.typeAsString = type
-            attribute.domainAsString = domain
-            attribute.dataTypeAsString = dataType
-            attribute.data = data
-
-            if type == "UVMAP":
-                self.uvMaps[name] = attribute
-            elif type == "VERTEX_COLOR":
-                self.vertexColorLayers[name] = attribute
-            else:
-                self.attributes[name] = attribute
-        else:
+        if referenceAmount != len(data):
             raise Exception("invalid length")
 
-    def getAttributes(self, str type):
-        if type == "UVMAP":
-            return list(self.uvMaps.items())
-        elif type == "VERTEX_COLOR":
-            return list(self.vertexColorLayers.items())
-        return list(self.attributes.items())
+        self.attributes[name] = Attribute(name, AttributeType[type], AttributeDomain[domain],
+                                              AttributeDataType[dataType], data)
 
-    def getAttributeNames(self, str type):
-        if type == "UVMAP":
-            return list(self.uvMaps.keys())
-        elif type == "VERTEX_COLOR":
-            return list(self.vertexColorLayers.keys())
-        return list(self.attributes.keys())
+    def getAttributes(self, str type = ""):
+        if type == "": return list(self.attributes.items())
 
-    def getAttribute(self, str type, str name):
-        if type == "UVMAP":
-            return self.uvMaps.get(name, None)
-        elif type == "VERTEX_COLOR":
-            return self.vertexColorLayers.get(name, None)
-        return self.attributes.get(name, None)
+        attributes = list()
+        for name, attribute in self.attributes.items():
+            if attribute.getTypeAsString() == type: attributes.append((name, attribute))
+            elif type == "VERTEX_COLOR" and attribute.getDataTypeAsString() == "BYTE_COLOR":
+                attributes.append((name, attribute))
+        return attributes
+
+    def getAttributeNames(self, str type = ""):
+        if type == "": return list(self.attributes.keys())
+
+        attributeNames = list()
+        for name, attribute in self.attributes.items():
+            if attribute.getTypeAsString() == type: attributeNames.append(name)
+            elif type == "VERTEX_COLOR" and attribute.getDataTypeAsString() == "BYTE_COLOR":
+                attributeNames.append(name)
+        return attributeNames
+
+    def getAttribute(self, str name, str type = ""):
+        attribute = self.attributes.get(name, None)
+        if type == "": return attribute
+
+        if attribute is not None:
+            if type == attribute.getTypeAsString(): return attribute
+            elif type == "VERTEX_COLOR" and attribute.getDataTypeAsString() == "BYTE_COLOR":
+                return attribute
+        return None
 
     def getVertexLinkedVertices(self, long vertexIndex):
         cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
@@ -232,7 +239,7 @@ cdef class Mesh:
         Vertices: {len(self.vertices)}
         Edges: {len(self.edges)}
         Polygons: {len(self.polygons)}
-        UV Maps: {self.getAttributeNames("UVMAP")}
+        UV Maps: {self.getAttributeNames("UV_MAP")}
         Vertex Colors: {self.getAttributeNames("VERTEX_COLOR")}
         Custom Attributes: {self.getAttributeNames("CUSTOM")}""")
 

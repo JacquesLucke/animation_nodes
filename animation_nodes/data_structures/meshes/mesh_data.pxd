@@ -8,6 +8,4 @@ cdef class Mesh:
         readonly PolygonIndicesList polygons
         readonly LongList materialIndices
         dict derivedMeshDataCache
-        object uvMaps
-        object vertexColorLayers
         object attributes

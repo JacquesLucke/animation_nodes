@@ -129,21 +129,16 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         outMesh.polygons.foreach_set("material_index", materialIndices.asMemoryView())
 
         # UV Maps
-        for name, uvMap in mesh.getAttributes("UVMAP"):
+        for name, uvMap in mesh.getAttributes("UV_MAP"):
             outMesh.uv_layers.new(name = name)
             outMesh.uv_layers[name].data.foreach_set("uv", uvMap.data.asMemoryView())
-
-        # Vertex Color Layers
-        for name, vertexColor in mesh.getAttributes("VERTEX_COLOR"):
-            outMesh.vertex_colors.new(name = name)
-            outMesh.vertex_colors[name].data.foreach_set("color", vertexColor.data.asMemoryView())
 
         # Custom Attributes
         for name, attribute in mesh.getAttributes("CUSTOM"):
             attributeOut = outMesh.attributes.get(name)
 
-            domain = attribute.domainAsString
-            dataType = attribute.dataTypeAsString
+            domain = attribute.getDomainAsString()
+            dataType = attribute.getDataTypeAsString()
             data = attribute.data
             if attributeOut is None:
                 attributeOut = outMesh.attributes.new(name, dataType, domain)
