@@ -12,7 +12,7 @@ cdef class Attribute:
                         AttributeType type = CUSTOM,
                         AttributeDomain domain = POINT,
                         AttributeDataType dataType = FLOAT,
-                        object data = None):
+                        data = None):
 
         self.name = name
         self.type = type
@@ -24,12 +24,20 @@ cdef class Attribute:
         return Attribute(self.name, self.type, self.domain, self.dataType,
                          self.data.copy())
 
+    def extend(self, data):
+        self.data.extend(data)
+
     def repeated(self, Py_ssize_t amount = -1):
         return Attribute(self.name, self.type, self.domain, self.dataType,
                          self.data.repeated(amount = amount))
 
-    def extend(self, object data):
-        self.data.extend(data)
+    def appendAttribute(self, sourceAttribute = None, Py_ssize_t amount = -1):
+        if sourceAttribute is not None:
+            self.extend(sourceAttribute.data)
+        else:
+            extension = self.getDataType()(length = amount)
+            extension.fill(0)
+            self.extend(extension)
 
     def getTypeAsString(self):
         if self.type == UV_MAP:

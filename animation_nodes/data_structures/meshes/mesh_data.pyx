@@ -246,28 +246,23 @@ cdef class Mesh:
     def replicateMeshProperties(self, Mesh source, long amount):
         for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
                 self.getMeshProperties(), source.getMeshProperties()):
-            for name, value in sourceMeshProperty.items():
-                meshProperty[name] = value.repeated(amount = amount)
+            for name, attribute in sourceMeshProperty.items():
+                meshProperty[name] = attribute.repeated(amount = amount)
 
     def appendMeshProperties(self, Mesh source):
         for ((meshProperty, meshPropertyType), (sourceMeshProperty, _)) in zip(
                 self.getMeshProperties(), source.getMeshProperties()):
             for name in meshProperty.keys():
                 if name in sourceMeshProperty:
-                    meshProperty[name].extend(sourceMeshProperty[name].data)
+                    meshProperty[name].appendAttribute(sourceMeshProperty[name])
                 else:
-                    attribute = meshProperty[name]
-                    extension = attribute.getDataType()(length = source.polygons.indices.length)
-                    extension.fill(0)
-                    meshProperty[name].extend(extension)
+                    meshProperty[name].appendAttribute(amount = source.polygons.indices.length)
 
             for name in sourceMeshProperty.keys():
                 if name not in meshProperty:
-                    attribute = sourceMeshProperty[name]
-                    extension = attribute.getDataType()(length = self.polygons.indices.length)
-                    extension.fill(0)
-                    data = extension + attribute.data
-                    meshProperty[name] = Attribute(name, attribute.type, attribute.domain, attribute.dataType, data)
+                    attribute = sourceMeshProperty[name].copy()
+                    attribute.appendAttribute(amount = self.polygons.indices.length)
+                    meshProperty[name] = attribute
 
     @classmethod
     def join(cls, *meshes):
