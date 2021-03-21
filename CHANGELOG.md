@@ -18,6 +18,8 @@
 - Added Plane-Axis for *Circle* mode in *Distribute Matrices* node.
 - Added *Material By Name* node.
 - Added *Apply Modifiers* input to the *Splines From Object* node.
+- Added *Copy Animation Nodes Tree* operator.
+- Added *Vectorization Type* option to *Set Spline Radius* node.
 
 ### Fixed
 
@@ -37,6 +39,7 @@
 - The output of the *Get Selected Objects* node is no longer ordered.
 - Selection order now need to be recorded for *Integer ID Keys*.
 - Splines can now be computed from Text objects.
+- Support curve objects in *Shade Object Smooth* node.
 
 ## 2.2.1 (13 January 2021)
 

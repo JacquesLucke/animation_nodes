@@ -1,6 +1,13 @@
 import bpy
-from ... data_structures import FloatList
+from bpy.props import *
+from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualFloatList, VirtualDoubleList, FloatList
+
+vectorizationTypeItems = [
+    ("RADIUS_PER_POINT", "Radius Per Point", "Set the radius per point", "NONE", 0),
+    ("RADIUS_PER_SPLINE", "Radius Per Spline", "Set the radius per spline", "NONE", 1),
+]
 
 class SetSplineRadiusNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_SetSplineRadiusNode"
@@ -8,6 +15,10 @@ class SetSplineRadiusNode(bpy.types.Node, AnimationNode):
 
     useSplineList: VectorizedSocket.newProperty()
     useRadiusList: VectorizedSocket.newProperty()
+
+    vectorizationType: EnumProperty(name = "Vectorization Type", default = "RADIUS_PER_POINT",
+        items = vectorizationTypeItems, update = executionCodeChanged
+    )
 
     def create(self):
         socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
@@ -23,10 +34,17 @@ class SetSplineRadiusNode(bpy.types.Node, AnimationNode):
             ("Spline", "spline"),
             ("Splines", "splines")))
 
+    def draw(self, layout):
+        if self.useSplineList and self.useRadiusList:
+            layout.prop(self, "vectorizationType", text = "")
+
     def getExecutionFunctionName(self):
         if self.useSplineList:
             if self.useRadiusList:
-                return "execute_MultipleSplines_MultipleRadii"
+                if self.vectorizationType == "RADIUS_PER_POINT":
+                    return "execute_MultipleSplines_MultipleRadii_PerPoint"
+                else:
+                    return "execute_MultipleSplines_MultipleRadii_PerSpline"
             else:
                 return "execute_MultipleSplines_SingleRadius"
         else:
@@ -35,9 +53,15 @@ class SetSplineRadiusNode(bpy.types.Node, AnimationNode):
             else:
                 return "execute_SingleSpline_SingleRadius"
 
-    def execute_MultipleSplines_MultipleRadii(self, splines, radii):
+    def execute_MultipleSplines_MultipleRadii_PerPoint(self, splines, radii):
         for spline in splines:
             self.execute_SingleSpline_MultipleRadii(spline, radii)
+        return splines
+
+    def execute_MultipleSplines_MultipleRadii_PerSpline(self, splines, radii):
+        virtualRadii = VirtualDoubleList.create(radii, 0)
+        for i, spline in enumerate(splines):
+            self.execute_SingleSpline_SingleRadius(spline, virtualRadii[i])
         return splines
 
     def execute_MultipleSplines_SingleRadius(self, splines, radius):
@@ -50,16 +74,6 @@ class SetSplineRadiusNode(bpy.types.Node, AnimationNode):
         return spline
 
     def execute_SingleSpline_MultipleRadii(self, spline, radii):
-        spline.radii = self.prepareRadiusList(radii, len(spline.points))
+        virtualRadii = VirtualFloatList.create(FloatList.fromValues(radii), 0)
+        spline.radii = virtualRadii.materialize(len(spline.points))
         return spline
-
-    def prepareRadiusList(self, radii, length):
-        if len(radii) == length:
-            return FloatList.fromValues(radii)
-        elif len(radii) < length:
-            if len(radii) == 0:
-                return FloatList.fromValue(0, length = length)
-            else:
-                return FloatList.fromValues(radii).repeated(length = length)
-        else:
-            return FloatList.fromValues(radii[:length])
