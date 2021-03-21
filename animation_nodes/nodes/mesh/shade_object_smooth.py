@@ -37,4 +37,7 @@ class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
 
                 # trigger update
                 mesh.polygons[0].use_smooth = smooth
+        elif getattr(object, "type", "") == "CURVE":
+            for spline in object.data.splines:
+                spline.use_smooth = smooth
         return object

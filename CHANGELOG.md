@@ -39,6 +39,7 @@
 - The output of the *Get Selected Objects* node is no longer ordered.
 - Selection order now need to be recorded for *Integer ID Keys*.
 - Splines can now be computed from Text objects.
+- Support curve objects in *Shade Object Smooth* node.
 
 ## 2.2.1 (13 January 2021)
 
