@@ -6,6 +6,5 @@ cdef class Mesh:
         readonly Vector3DList vertices
         readonly EdgeIndicesList edges
         readonly PolygonIndicesList polygons
-        readonly LongList materialIndices
         dict derivedMeshDataCache
         object attributes

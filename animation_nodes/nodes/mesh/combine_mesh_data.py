@@ -36,7 +36,9 @@ class CombineMeshNode(bpy.types.Node, AnimationNode):
             materialIndices = LongList(length = len(polygonIndices))
             materialIndices.fill(0)
         try:
-            return Mesh(vertexLocations, edgeIndices, polygonIndices,
-                    materialIndices, skipValidation = self.skipValidation)
+            mesh = Mesh(vertexLocations, edgeIndices, polygonIndices, skipValidation = self.skipValidation)
+            mesh.insertAttribute("Material Indices", "MATERIAL_INDEX", "POLYGON", "INT", materialIndices)
+            return mesh
+
         except Exception as e:
             self.raiseErrorMessage(str(e))

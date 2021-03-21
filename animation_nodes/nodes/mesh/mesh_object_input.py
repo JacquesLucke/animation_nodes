@@ -90,6 +90,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             yield "mesh.setVertexNormals(vertexNormals)"
             yield "mesh.setPolygonNormals(polygonNormals)"
             yield "mesh.setLoopEdges(sourceMesh.an.getLoopEdges())"
+            yield "self.loadAttributes('MATERIAL_INDEX', mesh, sourceMesh, evaluatedObject)"
             yield "if loadUVs: self.loadAttributes('UV_MAP', mesh, sourceMesh, object)"
             yield "if loadVertexColors: self.loadAttributes('CUSTOM', mesh, sourceMesh, object)"
             yield "if loadCustomAttributes: self.loadAttributes('CUSTOM', mesh, sourceMesh, evaluatedObject)"
@@ -134,6 +135,12 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
                                          "CORNER",
                                          "BYTE_COLOR",
                                          sourceMesh.an.getVertexColorLayer(colorLayerName))
+            elif type == "MATERIAL_INDEX":
+                mesh.insertAttribute("Material Indices",
+                                     "MATERIAL_INDEX",
+                                     "POLYGON",
+                                     "INT",
+                                     sourceMesh.an.getPolygonMaterialIndices())
             else:
                 attributes = object.data.attributes
                 for customAttributeName in attributes.keys():

@@ -124,9 +124,11 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         outMesh.loops.foreach_set("vertex_index", mesh.polygons.indices.asMemoryView())
         outMesh.loops.foreach_set("edge_index", mesh.getLoopEdges().asMemoryView())
 
-        # Material Indices
-        materialIndices = UShortList.fromValues(mesh.materialIndices)
-        outMesh.polygons.foreach_set("material_index", materialIndices.asMemoryView())
+        # Materials Indices
+        materialIndices = mesh.getMaterialIndices()
+        if len(materialIndices) > 0 and materialIndices.getMaxValue() > 0:
+            materialIndices = UShortList.fromValues(materialIndices)
+            outMesh.polygons.foreach_set("material_index", materialIndices.asMemoryView())
 
         # UV Maps
         for name, uvMap in mesh.getAttributes("UV_MAP"):

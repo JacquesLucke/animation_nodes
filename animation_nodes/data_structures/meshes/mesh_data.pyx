@@ -55,21 +55,18 @@ cdef class Mesh:
     def __cinit__(self, Vector3DList vertices = None,
                         EdgeIndicesList edges = None,
                         PolygonIndicesList polygons = None,
-                        LongList materialIndices = None,
                         bint skipValidation = False):
 
         if vertices is None: vertices = Vector3DList()
         if edges is None: edges = EdgeIndicesList()
         if polygons is None: polygons = PolygonIndicesList()
-        if materialIndices is None: materialIndices = LongList()
 
         if not skipValidation:
-            checkMeshData(vertices, edges, polygons, materialIndices)
+            checkMeshData(vertices, edges, polygons)
 
         self.vertices = vertices
         self.edges = edges
         self.polygons = polygons
-        self.materialIndices = materialIndices
 
         self.derivedMeshDataCache = {}
         self.attributes = OrderedDict()
@@ -190,6 +187,11 @@ cdef class Mesh:
                 return attribute
         return None
 
+    def getMaterialIndices(self):
+        attribute = self.getAttribute("Material Indices", "MATERIAL_INDEX")
+        if attribute is None: return LongList()
+        return attribute.data
+
     def getVertexLinkedVertices(self, long vertexIndex):
         cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
         neighboursAmounts, neighboursStarts, neighbours, neighbourEdges = self.getLinkedVertices()
@@ -203,7 +205,7 @@ cdef class Mesh:
 
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(),
-                    self.polygons.copy(), self.materialIndices.copy())
+                    self.polygons.copy())
         mesh.copyMeshProperties(self)
         return mesh
 
@@ -230,7 +232,6 @@ cdef class Mesh:
             newPolygons = triangulatePolygonsUsingEarClipMethod(self.vertices, polygons)
         self.edges = createValidEdgesList(polygons = newPolygons)
         self.polygons = newPolygons
-        self.materialIndices =  LongList.fromValue(0, length = newPolygons.getLength())
         self.derivedMeshDataCache.clear()
 
     def __repr__(self):
@@ -289,8 +290,6 @@ cdef class Mesh:
         self.polygons.extend(meshData.polygons)
         for i in range(meshData.polygons.indices.length):
             self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
-
-        self.materialIndices.extend(meshData.materialIndices)
 
 
 def calculatePolygonNormals(Vector3DList vertices, PolygonIndicesList polygons):

@@ -1,5 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
+from ... data_structures import LongList
 
 class MeshInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshInfoNode"
@@ -31,7 +32,7 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         if "polygonCenters" in required:
             yield "polygonCenters = mesh.getPolygonCenters()"
         if "materialIndices" in required:
-            yield "materialIndices = mesh.materialIndices"
+            yield "materialIndices = mesh.getMaterialIndices()"
         if "uvMapNames" in required:
             yield "uvMapNames = mesh.getUVMapNames()"
         if "vertexColorLayerNames" in required:
