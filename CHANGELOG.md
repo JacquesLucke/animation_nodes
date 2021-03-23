@@ -20,6 +20,7 @@
 - Added *Apply Modifiers* input to the *Splines From Object* node.
 - Added *Copy Animation Nodes Tree* operator.
 - Added *Vectorization Type* option to *Set Spline Radius* node.
+- Added *Taper Mode* input to *Curve Object Output* node.
 
 ### Fixed
 

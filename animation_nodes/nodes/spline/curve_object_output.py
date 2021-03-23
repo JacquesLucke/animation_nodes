@@ -28,6 +28,7 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         self.newInput("Float", "Offset", "offset")
         self.newInput("Integer", "Preview Resolution", "previewResolution", value = 12)
         self.newInput("Object", "Taper Object", "taperObject")
+        self.newInput("Text", "Taper Mode", "taperMode", value = "MULTIPLY")
         self.newInput("Object", "Bevel Object", "bevelObject")
         self.newInput("Boolean", "Fill Caps", "fillCaps")
         self.newInput("Text", "Fill Mode", "fillMode", value = "FRONT")
@@ -58,6 +59,7 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
         if s["Offset"].isUsed:              yield "    curve.offset = offset"
         if s["Preview Resolution"].isUsed:  yield "    curve.resolution_u = previewResolution"
         if s["Taper Object"].isUsed:        yield "    curve.taper_object = taperObject"
+        if s["Taper Mode"].isUsed:          yield "    self.setTaperMode(curve, taperMode)"
         if s["Bevel Object"].isUsed:        yield "    curve.bevel_object = bevelObject"
         if s["Fill Caps"].isUsed:           yield "    curve.use_fill_caps = fillCaps"
         if s["Fill Mode"].isUsed:           yield "    self.setFillMode(curve, fillMode)"
@@ -65,6 +67,12 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def setSplines(self, object, splines):
         setSplinesOnBlenderObject(object, splines)
+
+    def setTaperMode(self, curve, taperMode):
+        if taperMode in ("OVERRIDE", "MULTIPLY", "ADD"):
+            curve.taper_mode = taperMode
+        else:
+            self.setErrorMessage("The taper mode is invalid. \n\nPossible values for 'Taper Mode' are: 'OVERRIDE', 'MULTIPLY', 'ADD'")
 
     def setFillMode(self, curve, fillMode):
         isCorrectFillMode = fillMode in ("FULL", "BACK", "FRONT", "HALF") if curve.dimensions == "3D" else fillMode in ("NONE", "BACK", "FRONT", "BOTH")
