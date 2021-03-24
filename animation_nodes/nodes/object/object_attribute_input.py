@@ -1,17 +1,20 @@
 import bpy
 from bpy.props import *
 from ... utils.code import isCodeValid
-from ... events import executionCodeChanged
 from ... base_types import AnimationNode
+from ... events import executionCodeChanged
 
 class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_ObjectAttributeInputNode"
     bl_label = "Object Attribute Input"
-    bl_width_default = 160
     errorHandlingType = "MESSAGE"
 
     attribute: StringProperty(name = "Attribute", default = "",
         update = executionCodeChanged)
+    evaluateObject: BoolProperty(name = "Evaluate Object", default = True, update = executionCodeChanged,
+        description = "Evaluate the object at the active depsgraph. Evaluating the object increases "
+                      "execution time but takes into consideration animations, relations, drivers, and"
+                      "so on")
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
@@ -21,6 +24,7 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "attribute", text = "")
 
     def drawAdvanced(self, layout):
+        layout.prop(self, "evaluateObject")
         self.invokeFunction(layout, "createAutoExecutionTrigger", text = "Create Execution Trigger")
 
     def getExecutionCode(self, required):
@@ -32,7 +36,8 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
             return
 
         yield "try:"
-        yield "    evaluatedObject = AN.utils.depsgraph.getEvaluatedID(object)"
+        if self.evaluateObject:
+            yield "    evaluatedObject = AN.utils.depsgraph.getEvaluatedID(object)"
         yield "    " + code
         yield "except:"
         yield "    if object: self.setErrorMessage('Attribute not found')"
@@ -41,9 +46,12 @@ class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
     @property
     def evaluationExpression(self):
         if self.attribute.startswith("["):
-            return "value = evaluatedObject" + self.attribute
+            return f"value = {self.getAttributeSource()}" + self.attribute
         else:
-            return "value = evaluatedObject." + self.attribute
+            return f"value = {self.getAttributeSource()}." + self.attribute
+
+    def getAttributeSource(self):
+        return "evaluatedObject" if self.evaluateObject else "object"
 
     def createAutoExecutionTrigger(self):
         item = self.nodeTree.autoExecution.customTriggers.new("MONITOR_PROPERTY")

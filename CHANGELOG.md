@@ -21,6 +21,7 @@
 - Added *Copy Animation Nodes Tree* operator.
 - Added *Vectorization Type* option to *Set Spline Radius* node.
 - Added *Taper Mode* input to *Curve Object Output* node.
+- Added *Evaluate Object* option to *Object Attribute Input* node.
 
 ### Fixed
 
