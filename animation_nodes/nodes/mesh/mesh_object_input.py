@@ -138,7 +138,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             elif type == "MATERIAL_INDEX":
                 mesh.insertAttribute("Material Indices",
                                      "MATERIAL_INDEX",
-                                     "POLYGON",
+                                     "FACE",
                                      "INT",
                                      sourceMesh.an.getPolygonMaterialIndices())
             else:

@@ -71,11 +71,6 @@ cdef class Mesh:
         self.derivedMeshDataCache = {}
         self.attributes = OrderedDict()
 
-    def getMeshProperties(self):
-        return (
-            (self.attributes, Attribute),
-        )
-
     def verticesTransformed(self):
         self.derivedMeshDataCache.pop("Vertex Normals", None)
         self.derivedMeshDataCache.pop("Polygon Centers", None)
@@ -146,7 +141,7 @@ cdef class Mesh:
             referenceAmount = len(self.vertices)
         elif domain == "EDGE":
             referenceAmount = len(self.edges)
-        elif domain == "POLYGON":
+        elif domain == "FACE":
             referenceAmount = len(self.polygons)
         else:
             referenceAmount = len(self.polygons.indices)
@@ -155,7 +150,7 @@ cdef class Mesh:
             raise Exception("invalid length")
 
         self.attributes[name] = Attribute(name, AttributeType[type], AttributeDomain[domain],
-                                              AttributeDataType[dataType], data)
+                                          AttributeDataType[dataType], data)
 
     def getAttributes(self, str type = ""):
         if type == "": return list(self.attributes.items())
@@ -163,7 +158,7 @@ cdef class Mesh:
         attributes = list()
         for name, attribute in self.attributes.items():
             if attribute.getTypeAsString() == type: attributes.append((name, attribute))
-            elif type == "VERTEX_COLOR" and attribute.getDataTypeAsString() == "BYTE_COLOR":
+            elif type == "VERTEX_COLOR" and attribute.getListTypeAsString() == "BYTE_COLOR":
                 attributes.append((name, attribute))
         return attributes
 
@@ -173,7 +168,7 @@ cdef class Mesh:
         attributeNames = list()
         for name, attribute in self.attributes.items():
             if attribute.getTypeAsString() == type: attributeNames.append(name)
-            elif type == "VERTEX_COLOR" and attribute.getDataTypeAsString() == "BYTE_COLOR":
+            elif type == "VERTEX_COLOR" and attribute.getListTypeAsString() == "BYTE_COLOR":
                 attributeNames.append(name)
         return attributeNames
 
@@ -183,7 +178,7 @@ cdef class Mesh:
 
         if attribute is not None:
             if type == attribute.getTypeAsString(): return attribute
-            elif type == "VERTEX_COLOR" and attribute.getDataTypeAsString() == "BYTE_COLOR":
+            elif type == "VERTEX_COLOR" and attribute.getListTypeAsString() == "BYTE_COLOR":
                 return attribute
         return None
 
@@ -210,10 +205,10 @@ cdef class Mesh:
         return mesh
 
     def copyMeshProperties(self, Mesh source):
-        for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
-                self.getMeshProperties(), source.getMeshProperties()):
-            for name, value in sourceMeshProperty.items():
-                meshProperty[name] = value.copy()
+        meshProperty = self.attributes
+        sourceMeshProperty = source.attributes
+        for name, value in sourceMeshProperty.items():
+            meshProperty[name] = value.copy()
 
     def transform(self, transformation):
         self.vertices.transform(transformation)
@@ -245,25 +240,25 @@ cdef class Mesh:
         Custom Attributes: {self.getAttributeNames("CUSTOM")}""")
 
     def replicateMeshProperties(self, Mesh source, long amount):
-        for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
-                self.getMeshProperties(), source.getMeshProperties()):
-            for name, attribute in sourceMeshProperty.items():
-                meshProperty[name] = attribute.repeated(amount = amount)
+        meshProperty = self.attributes
+        sourceMeshProperty = source.attributes
+        for name, attribute in sourceMeshProperty.items():
+            meshProperty[name] = attribute.replicate(amount)
 
     def appendMeshProperties(self, Mesh source):
-        for ((meshProperty, meshPropertyType), (sourceMeshProperty, _)) in zip(
-                self.getMeshProperties(), source.getMeshProperties()):
-            for name in meshProperty.keys():
-                if name in sourceMeshProperty:
-                    meshProperty[name].appendAttribute(sourceMeshProperty[name])
-                else:
-                    meshProperty[name].appendAttribute(amount = source.polygons.indices.length)
+        meshProperty = self.attributes
+        sourceMeshProperty = source.attributes
+        for name in meshProperty.keys():
+            if name in sourceMeshProperty:
+                meshProperty[name].appendAttribute(sourceMeshProperty[name])
+            else:
+                meshProperty[name].appendAttribute(amount = source.polygons.indices.length)
 
-            for name in sourceMeshProperty.keys():
-                if name not in meshProperty:
-                    attribute = sourceMeshProperty[name].copy()
-                    attribute.appendAttribute(amount = self.polygons.indices.length)
-                    meshProperty[name] = attribute
+        for name in sourceMeshProperty.keys():
+            if name not in meshProperty:
+                attribute = sourceMeshProperty[name].copy()
+                attribute.appendAttribute(amount = self.polygons.indices.length)
+                meshProperty[name] = attribute
 
     @classmethod
     def join(cls, *meshes):

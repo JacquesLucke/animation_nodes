@@ -1,3 +1,4 @@
+from .. lists.clist cimport CList
 from .. lists.base_lists cimport (
     LongList,
     FloatList,
@@ -12,7 +13,7 @@ cdef class Attribute:
                         AttributeType type = CUSTOM,
                         AttributeDomain domain = POINT,
                         AttributeDataType dataType = FLOAT,
-                        data = None):
+                        CList data = None):
 
         self.name = name
         self.type = type
@@ -27,7 +28,7 @@ cdef class Attribute:
     def extend(self, data):
         self.data.extend(data)
 
-    def repeated(self, Py_ssize_t amount = -1):
+    def replicate(self, Py_ssize_t amount):
         return Attribute(self.name, self.type, self.domain, self.dataType,
                          self.data.repeated(amount = amount))
 
@@ -35,7 +36,7 @@ cdef class Attribute:
         if sourceAttribute is not None:
             self.extend(sourceAttribute.data)
         else:
-            extension = self.getDataType()(length = amount)
+            extension = self.getListType()(length = amount)
             extension.fill(0)
             self.extend(extension)
 
@@ -53,11 +54,11 @@ cdef class Attribute:
             return "POINT"
         elif self.domain == EDGE:
             return "EDGE"
-        elif self.domain == POLYGON:
-            return "POLYGON"
+        elif self.domain == FACE:
+            return "FACE"
         return "CORNER"
 
-    def getDataTypeAsString(self):
+    def getListTypeAsString(self):
         if self.dataType == INT:
             return "INT"
         elif self.dataType == FLOAT:
@@ -72,7 +73,7 @@ cdef class Attribute:
             return "BYTE_COLOR"
         return "BOOLEAN"
 
-    def getDataType(self):
+    def getListType(self):
         if self.dataType == INT:
             return LongList
         elif self.dataType == FLOAT:
@@ -81,6 +82,6 @@ cdef class Attribute:
             return Vector2DList
         elif self.dataType == FLOAT_VECTOR:
             return Vector3DList
-        elif self.dataType in [FLOAT_COLOR, BYTE_COLOR]:
+        elif self.dataType in (FLOAT_COLOR, BYTE_COLOR):
             return ColorList
         return BooleanList

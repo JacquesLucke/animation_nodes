@@ -140,7 +140,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             attributeOut = outMesh.attributes.get(name)
 
             domain = attribute.getDomainAsString()
-            dataType = attribute.getDataTypeAsString()
+            dataType = attribute.getListTypeAsString()
             data = attribute.data
             if attributeOut is None:
                 attributeOut = outMesh.attributes.new(name, dataType, domain)

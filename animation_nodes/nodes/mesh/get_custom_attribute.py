@@ -37,7 +37,7 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
         if attribute is None:
             self.raiseErrorMessage(f"""Object does not have attribute with name '{attributeName}'.\nAvailable: {mesh.getAttributeNames()}""")
 
-        self.dataType = attribute.getDataTypeAsString()
+        self.dataType = attribute.getListTypeAsString()
         if self.dataType == "FLOAT":
             return DoubleList.fromValues(attribute.data), attribute.getDomainAsString(), self.dataType
         return attribute.data, attribute.getDomainAsString(), self.dataType

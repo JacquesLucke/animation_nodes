@@ -1,3 +1,5 @@
+from .. lists.clist cimport CList
+
 cpdef enum AttributeType:
     UV_MAP,
     MATERIAL_INDEX,
@@ -7,7 +9,7 @@ cpdef enum AttributeType:
 cpdef enum AttributeDomain:
     POINT,
     EDGE,
-    POLYGON,
+    FACE,
     CORNER
 
 cpdef enum AttributeDataType:
@@ -25,4 +27,4 @@ cdef class Attribute:
         readonly AttributeType type
         readonly AttributeDomain domain
         readonly AttributeDataType dataType
-        readonly data
+        readonly CList data

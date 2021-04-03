@@ -16,8 +16,8 @@ from ... data_structures import (
 domainItems = [
     ("POINT", "Point", "", "NONE", 0),
     ("EDGE", "Edge", "", "NONE", 1),
-    ("CORNER", "Corner", "", "NONE", 2),
-    ("POLYGON", "Polygon", "NONE", 3),
+    ("FACE", "Face", "NONE", 2),
+    ("CORNER", "Corner", "", "NONE", 3),
 ]
 
 dataTypeItems = [
@@ -87,10 +87,10 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
             amount = len(object.data.vertices)
         elif self.domain == "EDGE":
             amount = len(object.data.edges)
-        elif self.domain == "CORNER":
-            amount = len(object.data.loops)
-        else:
+        elif self.domain == "FACE":
             amount = len(object.data.polygons)
+        else:
+            amount = len(object.data.loops)
 
         if self.dataType == "FLOAT":
             _data = FloatList.fromValues(VirtualDoubleList.create(data, 0).materialize(amount))
