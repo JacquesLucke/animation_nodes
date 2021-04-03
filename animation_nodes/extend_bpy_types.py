@@ -101,10 +101,10 @@ class MeshProperties(bpy.types.PropertyGroup):
             amount = len(self.mesh.vertices)
         elif attribute.domain == "EDGE":
             amount = len(self.mesh.edges)
-        elif attribute.domain == "CORNER":
-            amount = len(self.mesh.loops)
-        else:
+        elif attribute.domain == "FACE":
             amount = len(self.mesh.polygons)
+        else:
+            amount = len(self.mesh.loops)
 
         if attribute.data_type == "FLOAT":
             data = DoubleList(length = amount)

@@ -92,7 +92,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             yield "mesh.setLoopEdges(sourceMesh.an.getLoopEdges())"
             yield "self.loadAttributes('MATERIAL_INDEX', mesh, sourceMesh, evaluatedObject)"
             yield "if loadUVs: self.loadAttributes('UV_MAP', mesh, sourceMesh, object)"
-            yield "if loadVertexColors: self.loadAttributes('CUSTOM', mesh, sourceMesh, object)"
+            yield "if loadVertexColors: self.loadAttributes('VERTEX_COLOR', mesh, sourceMesh, object)"
             yield "if loadCustomAttributes: self.loadAttributes('CUSTOM', mesh, sourceMesh, evaluatedObject)"
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
@@ -128,6 +128,12 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
                                          AttributeDomain["CORNER"],
                                          AttributeDataType["FLOAT2"],
                                          sourceMesh.an.getUVMap(uvMapName))
+            elif type == "MATERIAL_INDEX":
+                mesh.insertAttribute("Material Indices",
+                                     AttributeType["MATERIAL_INDEX"],
+                                     AttributeDomain["FACE"],
+                                     AttributeDataType["INT"],
+                                     sourceMesh.an.getPolygonMaterialIndices())
             elif type == "VERTEX_COLOR":
                 for colorLayerName in sourceMesh.vertex_colors.keys():
                     mesh.insertAttribute(colorLayerName,
@@ -135,12 +141,6 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
                                          AttributeDomain["CORNER"],
                                          AttributeDataType["BYTE_COLOR"],
                                          sourceMesh.an.getVertexColorLayer(colorLayerName))
-            elif type == "MATERIAL_INDEX":
-                mesh.insertAttribute("Material Indices",
-                                     AttributeType["MATERIAL_INDEX"],
-                                     AttributeDomain["FACE"],
-                                     AttributeDataType["INT"],
-                                     sourceMesh.an.getPolygonMaterialIndices())
             else:
                 attributes = object.data.attributes
                 for customAttributeName in attributes.keys():
