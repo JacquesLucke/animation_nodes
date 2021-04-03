@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures import Color, ColorList, VirtualColorList
+from ... data_structures import Color, ColorList, VirtualColorList, AttributeType
 from .. color.c_utils import getVertexColorsFromLoopColors, getPolygonColorsFromLoopColors
 
 colorModeItems = [
@@ -34,7 +34,7 @@ class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
 
         defaultColor = Color((0, 0, 0, 1))
 
-        vertexColor = mesh.getAttribute(colorLayerName, "VERTEX_COLOR")
+        vertexColor = mesh.getAttribute(colorLayerName, AttributeType["VERTEX_COLOR"])
         if vertexColor is None:
             self.raiseErrorMessage(f"Mesh doesn't have a vertex color layer with the name '{colorLayerName}'.")
 

@@ -2,8 +2,15 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import Color, ColorList, VirtualColorList
 from .. color.c_utils import getLoopColorsFromVertexColors, getLoopColorsFromPolygonColors
+from ... data_structures import (
+    Color,
+    ColorList,
+    AttributeType,
+    AttributeDomain,
+    VirtualColorList,
+    AttributeDataType,
+)
 
 colorModeItems = [
     ("LOOP", "Loop", "Get color of every loop vertex", "NONE", 0),
@@ -41,19 +48,20 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
     def execute_SingleColor(self, mesh, colorLayerName, color):
         if colorLayerName == "":
             self.raiseErrorMessage("Vertex color layer name can't be empty.")
-        elif colorLayerName in mesh.getAttributeNames("VERTEX_COLOR"):
+        elif colorLayerName in mesh.getAttributeNames(AttributeType["VERTEX_COLOR"]):
             self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
 
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(color, defaultColor).materialize(len(mesh.polygons.indices))
 
-        mesh.insertAttribute(colorLayerName, "CUSTOM", "CORNER", "BYTE_COLOR", colorsList)
+        mesh.insertAttribute(colorLayerName, AttributeType["CUSTOM"], AttributeDomain["CORNER"],
+                             AttributeDataType["BYTE_COLOR"], colorsList)
         return mesh
 
     def execute_ColorsList(self, mesh, colorLayerName, colors):
         if colorLayerName == "":
             self.raiseErrorMessage("Vertex color layer name can't be empty.")
-        elif colorLayerName in mesh.getAttributeNames("VERTEX_COLOR"):
+        elif colorLayerName in mesh.getAttributeNames(AttributeType["VERTEX_COLOR"]):
             self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
 
         defaultColor = Color((0, 0, 0, 1))
@@ -68,5 +76,6 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
             polygonIndices = mesh.polygons
             colorsList = getLoopColorsFromPolygonColors(polygonIndices, colorsList)
 
-        mesh.insertAttribute(colorLayerName, "CUSTOM", "CORNER", "BYTE_COLOR", colorsList)
+        mesh.insertAttribute(colorLayerName, AttributeType["CUSTOM"], AttributeDomain["CORNER"],
+                             AttributeDataType["BYTE_COLOR"], colorsList)
         return mesh

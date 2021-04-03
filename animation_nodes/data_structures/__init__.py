@@ -26,6 +26,9 @@ def importDataStructures():
     from . splines.bezier_spline import BezierSpline
     from . default_lists.c_default_list import CDefaultList
     from . attributes.attribute import Attribute
+    from . attributes.attribute import AttributeType
+    from . attributes.attribute import AttributeDomain
+    from . attributes.attribute import AttributeDataType
     from . interpolation import Interpolation
     from . falloffs.falloff_base import Falloff, BaseFalloff, CompoundFalloff
 

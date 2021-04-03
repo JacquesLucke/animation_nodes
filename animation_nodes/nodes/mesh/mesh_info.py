@@ -16,6 +16,7 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Integer List", "Material Indices", "materialIndices")
         self.newOutput("Text List", "UV Map Names", "uvMapNames")
         self.newOutput("Text List", "Vertex Color Layers", "vertexColorLayerNames")
+        self.newOutput("Text List", "Custom Attribute Names", "customAttributeNames")
 
     def getExecutionCode(self, required):
         if "vertices" in required:
@@ -33,6 +34,8 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         if "materialIndices" in required:
             yield "materialIndices = mesh.getMaterialIndices()"
         if "uvMapNames" in required:
-            yield "uvMapNames = mesh.getUVMapNames()"
+            yield "uvMapNames = mesh.getAttributeNames(AttributeType['UV_MAP'])"
         if "vertexColorLayerNames" in required:
-            yield "vertexColorLayerNames = mesh.getVertexColorLayerNames()"
+            yield "vertexColorLayerNames = mesh.getAttributeNames(AttributeType['VERTEX_COLOR'])"
+        if "customAttributeNames" in required:
+            yield "customAttributeNames = mesh.getAttributeNames(AttributeType['CUSTOM'])"

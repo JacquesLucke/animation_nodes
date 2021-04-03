@@ -26,6 +26,7 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
             self.newOutput("Color List", "Colors", "data")
         else:
             self.newOutput("Boolean List", "Booleans", "data")
+        self.newOutput("Text", "Type", "type", hide = True)
         self.newOutput("Text", "Domain ", "domain", hide = True)
         self.newOutput("Text", "Data Type ", "dataType", hide = True)
 
@@ -33,11 +34,16 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
         if mesh is None: return None, None, None
         if attributeName == "": self.raiseErrorMessage("Attribute name can't be empty.")
 
-        attribute = mesh.getAttribute(attributeName)
+        attributes = mesh.getAllAttributes()
+        attribute = attributes.get(attributeName, None)
         if attribute is None:
-            self.raiseErrorMessage(f"""Object does not have attribute with name '{attributeName}'.\nAvailable: {mesh.getAttributeNames()}""")
+            self.raiseErrorMessage(f"""Object does not have attribute with name '{attributeName}'.\nAvailable: {self.getAttributeNames(attributes)}""")
 
         self.dataType = attribute.getListTypeAsString()
         if self.dataType == "FLOAT":
-            return DoubleList.fromValues(attribute.data), attribute.getDomainAsString(), self.dataType
-        return attribute.data, attribute.getDomainAsString(), self.dataType
+            return DoubleList.fromValues(attribute.data), attribute.getTypeAsString(), attribute.getDomainAsString(), self.dataType
+        return attribute.data, attribute.getTypeAsString(), attribute.getDomainAsString(), self.dataType
+
+    def getAttributeNames(self, attributes):
+        attributesNames = [key for key in attributes.keys()]
+        return attributesNames

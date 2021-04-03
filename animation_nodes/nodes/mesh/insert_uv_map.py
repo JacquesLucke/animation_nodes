@@ -1,7 +1,7 @@
 import bpy
 from ... math import Vector
-from ... data_structures import VirtualVector2DList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualVector2DList, AttributeType, AttributeDomain, AttributeDataType
 
 class InsertUVMapNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_InsertUVMapNode"
@@ -21,9 +21,10 @@ class InsertUVMapNode(bpy.types.Node, AnimationNode):
     def execute(self, mesh, uvMapName, positions):
         if uvMapName == "":
             self.raiseErrorMessage("UV map name can't be empty.")
-        elif uvMapName in mesh.getAttributeNames("UVMAP"):
+        elif uvMapName in mesh.getAttributeNames(AttributeType["UV_MAP"]):
             self.raiseErrorMessage(f"Mesh already has a uv map with the name '{uvMapName}'.")
 
         positions = VirtualVector2DList.create(positions, Vector((0, 0))).materialize(len(mesh.polygons.indices))
-        mesh.insertAttribute(uvMapName, "UV_MAP", "CORNER", "FLOAT2", positions)
+        mesh.insertAttribute(uvMapName, AttributeType["UV_MAP"], AttributeDomain["CORNER"],
+                             AttributeDataType["FLOAT2"], positions)
         return mesh

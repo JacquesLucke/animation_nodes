@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
-from ... data_structures import Mesh, LongList
+from ... data_structures import Mesh, LongList, AttributeType, AttributeDomain, AttributeDataType
 
 class CombineMeshNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_CombineMeshNode"
@@ -37,7 +37,8 @@ class CombineMeshNode(bpy.types.Node, AnimationNode):
             materialIndices.fill(0)
         try:
             mesh = Mesh(vertexLocations, edgeIndices, polygonIndices, skipValidation = self.skipValidation)
-            mesh.insertAttribute("Material Indices", "MATERIAL_INDEX", "FACE", "INT", materialIndices)
+            mesh.insertAttribute("Material Indices", AttributeType["MATERIAL_INDEX"], AttributeDomain["FACE"],
+                                  AttributeDataType["INT"], materialIndices)
             return mesh
 
         except Exception as e:

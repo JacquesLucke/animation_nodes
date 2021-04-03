@@ -5,8 +5,11 @@ from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import (
     Color,
     FloatList,
+    AttributeType,
+    AttributeDomain,
     VirtualLongList,
     VirtualColorList,
+    AttributeDataType,
     VirtualDoubleList,
     VirtualBooleanList,
     VirtualVector2DList,
@@ -73,8 +76,10 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
 
     def execute(self, mesh, attributeName, data):
         if mesh is None: return mesh
-        if attributeName == "": self.raiseErrorMessage("Attribute name can't be empty.")
-        elif attributeName in mesh.getAttributeNames("CUSTOM"):
+
+        if attributeName == "":
+            self.raiseErrorMessage("Attribute name can't be empty.")
+        elif attributeName in mesh.getAttributeNames(AttributeType["CUSTOM"]):
             self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{attributeName}'.")
 
         if self.domain == "POINT":
@@ -99,5 +104,6 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
         else:
             _data = VirtualBooleanList.create(data, False).materialize(amount)
 
-        mesh.insertAttribute(attributeName, "CUSTOM", self.domain, self.dataType, _data)
+        mesh.insertAttribute(attributeName, AttributeType["CUSTOM"], AttributeDomain[self.domain],
+                             AttributeDataType[self.dataType], _data)
         return mesh

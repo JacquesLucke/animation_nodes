@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
-from ... data_structures import Mesh
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import Mesh, AttributeType, AttributeDomain, AttributeDataType
 
 class MeshObjectInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectInputNode"
@@ -124,31 +124,31 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             if type == "UV_MAP":
                 for uvMapName in sourceMesh.uv_layers.keys():
                     mesh.insertAttribute(uvMapName,
-                                         "UV_MAP",
-                                         "CORNER",
-                                         "FLOAT2",
+                                         AttributeType["UV_MAP"],
+                                         AttributeDomain["CORNER"],
+                                         AttributeDataType["FLOAT2"],
                                          sourceMesh.an.getUVMap(uvMapName))
             elif type == "VERTEX_COLOR":
                 for colorLayerName in sourceMesh.vertex_colors.keys():
                     mesh.insertAttribute(colorLayerName,
-                                         "CUSTOM",
-                                         "CORNER",
-                                         "BYTE_COLOR",
+                                         AttributeType["CUSTOM"],
+                                         AttributeDomain["CORNER"],
+                                         AttributeDataType["BYTE_COLOR"],
                                          sourceMesh.an.getVertexColorLayer(colorLayerName))
             elif type == "MATERIAL_INDEX":
                 mesh.insertAttribute("Material Indices",
-                                     "MATERIAL_INDEX",
-                                     "FACE",
-                                     "INT",
+                                     AttributeType["MATERIAL_INDEX"],
+                                     AttributeDomain["FACE"],
+                                     AttributeDataType["INT"],
                                      sourceMesh.an.getPolygonMaterialIndices())
             else:
                 attributes = object.data.attributes
                 for customAttributeName in attributes.keys():
                     attribute = attributes.get(customAttributeName)
                     mesh.insertAttribute(customAttributeName,
-                                         "CUSTOM",
-                                         attribute.domain,
-                                         attribute.data_type,
+                                         AttributeType["CUSTOM"],
+                                         AttributeDomain[attribute.domain],
+                                         AttributeDataType[attribute.data_type],
                                          object.data.an.getCustomAttribute(customAttributeName))
         else:
             self.setErrorMessage("Object is in edit mode.")

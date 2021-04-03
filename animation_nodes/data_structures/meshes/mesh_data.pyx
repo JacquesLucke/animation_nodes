@@ -1,11 +1,11 @@
 # cython: profile=True
 import textwrap
 import functools
+from .. lists.clist cimport CList
 from collections import OrderedDict
-from . validate import createValidEdgesList
-from .. attributes.attribute cimport Attribute
-from . validate import checkMeshData, calculateLoopEdges
+from . validate import createValidEdgesList, checkMeshData, calculateLoopEdges
 from .. attributes.attribute import AttributeType, AttributeDomain, AttributeDataType
+from .. attributes.attribute cimport Attribute, AttributeType, AttributeDomain, AttributeDataType
 from ... algorithms.mesh.triangulate_mesh import (
     triangulatePolygonsUsingFanSpanMethod,
     triangulatePolygonsUsingEarClipMethod
@@ -136,12 +136,13 @@ cdef class Mesh:
         else:
             raise Exception("invalid length")
 
-    def insertAttribute(self, str name, str type, str domain, str dataType, object data):
-        if domain == "POINT":
+    def insertAttribute(self, str name, AttributeType type, AttributeDomain domain,
+                        AttributeDataType dataType, CList data):
+        if domain == AttributeDomain["POINT"]:
             referenceAmount = len(self.vertices)
-        elif domain == "EDGE":
+        elif domain == AttributeDomain["EDGE"]:
             referenceAmount = len(self.edges)
-        elif domain == "FACE":
+        elif domain == AttributeDomain["FACE"]:
             referenceAmount = len(self.polygons)
         else:
             referenceAmount = len(self.polygons.indices)
@@ -149,41 +150,37 @@ cdef class Mesh:
         if referenceAmount != len(data):
             raise Exception("invalid length")
 
-        self.attributes[name] = Attribute(name, AttributeType[type], AttributeDomain[domain],
-                                          AttributeDataType[dataType], data)
+        self.attributes[name] = Attribute(name, type, domain, dataType, data)
 
-    def getAttributes(self, str type = ""):
-        if type == "": return list(self.attributes.items())
-
+    def getAttributes(self, AttributeType type):
         attributes = list()
         for name, attribute in self.attributes.items():
-            if attribute.getTypeAsString() == type: attributes.append((name, attribute))
-            elif type == "VERTEX_COLOR" and attribute.getListTypeAsString() == "BYTE_COLOR":
+            if type == attribute.type: attributes.append((name, attribute))
+            elif type == AttributeType["VERTEX_COLOR"] and attribute.dataType == AttributeDataType["BYTE_COLOR"]:
                 attributes.append((name, attribute))
         return attributes
 
-    def getAttributeNames(self, str type = ""):
-        if type == "": return list(self.attributes.keys())
-
+    def getAttributeNames(self, AttributeType type):
         attributeNames = list()
         for name, attribute in self.attributes.items():
-            if attribute.getTypeAsString() == type: attributeNames.append(name)
-            elif type == "VERTEX_COLOR" and attribute.getListTypeAsString() == "BYTE_COLOR":
+            if type == attribute.type: attributeNames.append(name)
+            elif type == AttributeType["VERTEX_COLOR"] and attribute.dataType == AttributeDataType["BYTE_COLOR"]:
                 attributeNames.append(name)
         return attributeNames
 
-    def getAttribute(self, str name, str type = ""):
+    def getAttribute(self, str name, AttributeType type):
         attribute = self.attributes.get(name, None)
-        if type == "": return attribute
-
         if attribute is not None:
-            if type == attribute.getTypeAsString(): return attribute
-            elif type == "VERTEX_COLOR" and attribute.getListTypeAsString() == "BYTE_COLOR":
+            if type == attribute.type: return attribute
+            elif type == AttributeType["VERTEX_COLOR"] and attribute.dataType == AttributeDataType["BYTE_COLOR"]:
                 return attribute
-        return None
+        return attribute
+
+    def getAllAttributes(self):
+        return self.attributes
 
     def getMaterialIndices(self):
-        attribute = self.getAttribute("Material Indices", "MATERIAL_INDEX")
+        attribute = self.getAttribute("Material Indices", AttributeType["MATERIAL_INDEX"])
         if attribute is None: return LongList()
         return attribute.data
 
@@ -235,9 +232,9 @@ cdef class Mesh:
         Vertices: {len(self.vertices)}
         Edges: {len(self.edges)}
         Polygons: {len(self.polygons)}
-        UV Maps: {self.getAttributeNames("UV_MAP")}
-        Vertex Colors: {self.getAttributeNames("VERTEX_COLOR")}
-        Custom Attributes: {self.getAttributeNames("CUSTOM")}""")
+        UV Maps: {self.getAttributeNames(AttributeType["UV_MAP"])}
+        Vertex Colors: {self.getAttributeNames(AttributeType["VERTEX_COLOR"])}
+        Custom Attributes: {self.getAttributeNames(AttributeType["CUSTOM"])}""")
 
     def replicateMeshProperties(self, Mesh source, long amount):
         meshProperty = self.attributes

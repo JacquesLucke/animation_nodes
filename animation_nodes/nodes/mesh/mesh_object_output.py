@@ -4,7 +4,7 @@ from bpy.props import *
 from ... utils.layout import writeText
 from ... base_types import AnimationNode
 from ... utils.animation import isAnimated
-from ... data_structures import UShortList
+from ... data_structures import UShortList, AttributeType
 from ... events import propertyChanged, executionCodeChanged
 
 meshDataTypeItems = [
@@ -131,12 +131,12 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             outMesh.polygons.foreach_set("material_index", materialIndices.asMemoryView())
 
         # UV Maps
-        for name, uvMap in mesh.getAttributes("UV_MAP"):
+        for name, uvMap in mesh.getAttributes(AttributeType["UV_MAP"]):
             outMesh.uv_layers.new(name = name)
             outMesh.uv_layers[name].data.foreach_set("uv", uvMap.data.asMemoryView())
 
         # Custom Attributes
-        for name, attribute in mesh.getAttributes("CUSTOM"):
+        for name, attribute in mesh.getAttributes(AttributeType["CUSTOM"]):
             attributeOut = outMesh.attributes.get(name)
 
             domain = attribute.getDomainAsString()
