@@ -198,14 +198,14 @@ cdef class Mesh:
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(),
                     self.polygons.copy())
-        mesh.copyMeshProperties(self)
+        mesh.copyAttributes(self)
         return mesh
 
-    def copyMeshProperties(self, Mesh source):
-        meshProperty = self.attributes
-        sourceMeshProperty = source.attributes
-        for name, value in sourceMeshProperty.items():
-            meshProperty[name] = value.copy()
+    def copyAttributes(self, Mesh source):
+        meshAttributes = self.attributes
+        sourceMeshAttributes = source.attributes
+        for name, value in sourceMeshAttributes.items():
+            meshAttributes[name] = value.copy()
 
     def transform(self, transformation):
         self.vertices.transform(transformation)
@@ -236,26 +236,45 @@ cdef class Mesh:
         Vertex Colors: {self.getAttributeNames(AttributeType["VERTEX_COLOR"])}
         Custom Attributes: {self.getAttributeNames(AttributeType["CUSTOM"])}""")
 
-    def replicateMeshProperties(self, Mesh source, long amount):
-        meshProperty = self.attributes
-        sourceMeshProperty = source.attributes
-        for name, attribute in sourceMeshProperty.items():
-            meshProperty[name] = attribute.replicate(amount)
+    def replicateAttributes(self, Mesh source, long amount):
+        meshAttributes = self.attributes
+        sourceMeshAttributes = source.attributes
+        for name, attribute in sourceMeshAttributes.items():
+            meshAttributes[name] = attribute.replicate(amount)
 
-    def appendMeshProperties(self, Mesh source):
-        meshProperty = self.attributes
-        sourceMeshProperty = source.attributes
-        for name in meshProperty.keys():
-            if name in sourceMeshProperty:
-                meshProperty[name].appendAttribute(sourceMeshProperty[name])
+    def appendAttributes(self, Mesh source):
+        meshAttributes = self.attributes
+        sourceMeshAttributes = source.attributes
+        for name in meshAttributes.keys():
+            meshAttribute = meshAttributes[name]
+            if name in sourceMeshAttributes:
+                meshAttribute.appendAttribute(sourceMeshAttributes[name])
             else:
-                meshProperty[name].appendAttribute(amount = source.polygons.indices.length)
+                if meshAttribute.domain == AttributeDomain.POINT:
+                    amount = source.vertices.length
+                elif meshAttribute.domain == AttributeDomain.EDGE:
+                    amount = source.edges.length
+                elif meshAttribute.domain == AttributeDomain.FACE:
+                    amount = source.polygons.getLength()
+                else:
+                    amount = source.polygons.indices.length
 
-        for name in sourceMeshProperty.keys():
-            if name not in meshProperty:
-                attribute = sourceMeshProperty[name].copy()
-                attribute.appendAttribute(amount = self.polygons.indices.length)
-                meshProperty[name] = attribute
+                meshAttribute.appendAttribute(amount = amount)
+
+        for name in sourceMeshAttributes.keys():
+            if name not in meshAttributes:
+                sourceAttribute = sourceMeshAttributes[name].copy()
+                if sourceAttribute.domain == AttributeDomain.POINT:
+                    amount = self.vertices.length
+                elif sourceAttribute.domain == AttributeDomain.EDGE:
+                    amount = self.edges.length
+                elif sourceAttribute.domain == AttributeDomain.FACE:
+                    amount = self.polygons.getLength()
+                else:
+                    amount = self.polygons.indices.length
+
+                sourceAttribute.appendAttribute(amount = amount)
+                meshAttributes[name] = sourceAttribute
 
     @classmethod
     def join(cls, *meshes):
@@ -270,7 +289,7 @@ cdef class Mesh:
         cdef long polygonIndicesOffset = self.polygons.indices.length
         cdef long i
 
-        self.appendMeshProperties(meshData)
+        self.appendAttributes(meshData)
 
         self.vertices.extend(meshData.vertices)
 

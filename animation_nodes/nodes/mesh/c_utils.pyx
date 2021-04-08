@@ -225,7 +225,7 @@ def getIndividualPolygonsMesh(Mesh mesh):
     newMesh = Mesh(newVertices, newEdges, newPolygons, skipValidation = True)
     newMesh.setLoopEdges(newLoopEdges)
 
-    newMesh.copyMeshProperties(mesh)
+    newMesh.copyAttributes(mesh)
 
     return newMesh
 
@@ -563,7 +563,7 @@ def replicateMesh(Mesh source, transformations):
     mesh.setPolygonNormals(newPolygonNormals)
     mesh.setLoopEdges(newLoopEdges)
 
-    mesh.replicateMeshProperties(source, len(transformations))
+    mesh.replicateAttributes(source, len(transformations))
 
     return mesh
 
