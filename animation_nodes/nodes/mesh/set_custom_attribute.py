@@ -58,7 +58,7 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
         elif self.dataType == "FLOAT_VECTOR":
             self.newInput(VectorizedSocket("Vector", "useDataList",
             ("Vector", "data"), ("Vectors", "data")))
-        elif self.dataType in ["FLOAT_COLOR", "BYTE_COLOR"]:
+        elif self.dataType in ("FLOAT_COLOR", "BYTE_COLOR"):
             self.newInput(VectorizedSocket("Color", "useDataList",
             ("Color", "data"), ("Colors", "data")))
         else:
@@ -100,14 +100,14 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
             _data = VirtualVector2DList.create(data, Vector((0, 0))).materialize(amount)
         elif self.dataType == "FLOAT_VECTOR":
             _data = VirtualVector3DList.create(data, Vector((0, 0, 0))).materialize(amount)
-        elif self.dataType in ["FLOAT_COLOR", "BYTE_COLOR"]:
+        elif self.dataType in ("FLOAT_COLOR", "BYTE_COLOR"):
             _data = VirtualColorList.create(data, Color((0, 0, 0, 0))).materialize(amount)
         else:
             _data = VirtualBooleanList.create(data, False).materialize(amount)
 
-        if self.dataType in ["FLOAT", "INT", "BOOLEAN"]:
+        if self.dataType in ("FLOAT", "INT", "BOOLEAN"):
             attribute.data.foreach_set("value", _data.asMemoryView())
-        elif self.dataType in ["FLOAT2", "FLOAT_VECTOR"]:
+        elif self.dataType in ("FLOAT2", "FLOAT_VECTOR"):
             attribute.data.foreach_set("vector", _data.asMemoryView())
         else:
             attribute.data.foreach_set("color", _data.asMemoryView())

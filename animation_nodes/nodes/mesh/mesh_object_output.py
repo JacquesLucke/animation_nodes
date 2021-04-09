@@ -126,17 +126,19 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
 
         # Materials Indices
         materialIndices = mesh.getMaterialIndices()
-        if len(materialIndices) > 0 and materialIndices.getMaxValue() > 0:
-            materialIndices = UShortList.fromValues(materialIndices)
-            outMesh.polygons.foreach_set("material_index", materialIndices.asMemoryView())
+        if materialIndices is not None:
+            indices = materialIndices.data
+            if indices.getMaxValue() > 0 and indices.getMinValue() >= 0:
+                indices = UShortList.fromValues(indices)
+                outMesh.polygons.foreach_set("material_index", indices.asMemoryView())
 
         # UV Maps
-        for name, uvMap in mesh.getAttributes(AttributeType["UV_MAP"]):
+        for name, uvMap in mesh.getAttributes(AttributeType.UV_MAP):
             outMesh.uv_layers.new(name = name)
             outMesh.uv_layers[name].data.foreach_set("uv", uvMap.data.asMemoryView())
 
         # Custom Attributes
-        for name, attribute in mesh.getAttributes(AttributeType["CUSTOM"]):
+        for name, attribute in mesh.getAttributes(AttributeType.CUSTOM):
             attributeOut = outMesh.attributes.get(name)
 
             domain = attribute.getDomainAsString()
@@ -148,9 +150,9 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
                 outMesh.attributes.remove(attributeOut)
                 attributeOut = outMesh.attributes.new(name, dataType, domain)
 
-            if dataType in ["FLOAT", "INT", "BOOLEAN"]:
+            if dataType in ("FLOAT", "INT", "BOOLEAN"):
                 attributeOut.data.foreach_set("value", data.asMemoryView())
-            elif dataType in ["FLOAT2", "FLOAT_VECTOR"]:
+            elif dataType in ("FLOAT2", "FLOAT_VECTOR"):
                 attributeOut.data.foreach_set("vector", data.asMemoryView())
             else:
                 attributeOut.data.foreach_set("color", data.asMemoryView())

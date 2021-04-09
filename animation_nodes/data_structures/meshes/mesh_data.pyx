@@ -136,27 +136,26 @@ cdef class Mesh:
         else:
             raise Exception("invalid length")
 
-    def insertAttribute(self, str name, AttributeType type, AttributeDomain domain,
-                        AttributeDataType dataType, CList data):
-        if domain == AttributeDomain["POINT"]:
+    def insertAttribute(self, Attribute attribute):
+        if attribute.domain == AttributeDomain.POINT:
             referenceAmount = len(self.vertices)
-        elif domain == AttributeDomain["EDGE"]:
+        elif attribute.domain == AttributeDomain.EDGE:
             referenceAmount = len(self.edges)
-        elif domain == AttributeDomain["FACE"]:
+        elif attribute.domain == AttributeDomain.FACE:
             referenceAmount = len(self.polygons)
         else:
             referenceAmount = len(self.polygons.indices)
 
-        if referenceAmount != len(data):
+        if referenceAmount != len(attribute.data):
             raise Exception("invalid length")
 
-        self.attributes[name] = Attribute(name, type, domain, dataType, data)
+        self.attributes[attribute.name] = attribute
 
     def getAttributes(self, AttributeType type):
         attributes = list()
         for name, attribute in self.attributes.items():
             if type == attribute.type: attributes.append((name, attribute))
-            elif type == AttributeType["VERTEX_COLOR"] and attribute.dataType == AttributeDataType["BYTE_COLOR"]:
+            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
                 attributes.append((name, attribute))
         return attributes
 
@@ -164,7 +163,7 @@ cdef class Mesh:
         attributeNames = list()
         for name, attribute in self.attributes.items():
             if type == attribute.type: attributeNames.append(name)
-            elif type == AttributeType["VERTEX_COLOR"] and attribute.dataType == AttributeDataType["BYTE_COLOR"]:
+            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
                 attributeNames.append(name)
         return attributeNames
 
@@ -172,7 +171,7 @@ cdef class Mesh:
         attribute = self.attributes.get(name, None)
         if attribute is not None:
             if type == attribute.type: return attribute
-            elif type == AttributeType["VERTEX_COLOR"] and attribute.dataType == AttributeDataType["BYTE_COLOR"]:
+            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
                 return attribute
         return attribute
 
@@ -180,9 +179,7 @@ cdef class Mesh:
         return self.attributes
 
     def getMaterialIndices(self):
-        attribute = self.getAttribute("Material Indices", AttributeType["MATERIAL_INDEX"])
-        if attribute is None: return LongList()
-        return attribute.data
+        return self.getAttribute("Material Indices", AttributeType.MATERIAL_INDEX)
 
     def getVertexLinkedVertices(self, long vertexIndex):
         cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
@@ -232,9 +229,9 @@ cdef class Mesh:
         Vertices: {len(self.vertices)}
         Edges: {len(self.edges)}
         Polygons: {len(self.polygons)}
-        UV Maps: {self.getAttributeNames(AttributeType["UV_MAP"])}
-        Vertex Colors: {self.getAttributeNames(AttributeType["VERTEX_COLOR"])}
-        Custom Attributes: {self.getAttributeNames(AttributeType["CUSTOM"])}""")
+        UV Maps: {self.getAttributeNames(AttributeType.UV_MAP)}
+        Vertex Colors: {self.getAttributeNames(AttributeType.VERTEX_COLOR)}
+        Custom Attributes: {self.getAttributeNames(AttributeType.CUSTOM)}""")
 
     def replicateAttributes(self, Mesh source, long amount):
         meshAttributes = self.attributes

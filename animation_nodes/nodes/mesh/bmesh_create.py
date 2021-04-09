@@ -34,8 +34,9 @@ def getBMeshFromMesh(meshData):
         bm.edges.new((bm.verts[edgeIndices[0]], bm.verts[edgeIndices[1]]))
 
     materialIndices = meshData.getMaterialIndices()
-    if len(materialIndices) > 0 and materialIndices.getMaxValue() > 0:
-        for polygonIndices, materialIndex in zip(meshData.polygons, materialIndices):
+    if materialIndices is not None:
+        materialIndicesData = materialIndices.data
+        for polygonIndices, materialIndex in zip(meshData.polygons, materialIndicesData):
             face = bm.faces.new(tuple(bm.verts[index] for index in polygonIndices))
             face.material_index = materialIndex
     else:

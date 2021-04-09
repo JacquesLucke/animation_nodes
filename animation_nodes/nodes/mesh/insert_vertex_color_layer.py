@@ -6,6 +6,7 @@ from .. color.c_utils import getLoopColorsFromVertexColors, getLoopColorsFromPol
 from ... data_structures import (
     Color,
     ColorList,
+    Attribute,
     AttributeType,
     AttributeDomain,
     VirtualColorList,
@@ -48,20 +49,20 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
     def execute_SingleColor(self, mesh, colorLayerName, color):
         if colorLayerName == "":
             self.raiseErrorMessage("Vertex color layer name can't be empty.")
-        elif colorLayerName in mesh.getAttributeNames(AttributeType["VERTEX_COLOR"]):
+        elif colorLayerName in mesh.getAttributeNames(AttributeType.VERTEX_COLOR):
             self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
 
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(color, defaultColor).materialize(len(mesh.polygons.indices))
 
-        mesh.insertAttribute(colorLayerName, AttributeType["CUSTOM"], AttributeDomain["CORNER"],
-                             AttributeDataType["BYTE_COLOR"], colorsList)
+        mesh.insertAttribute(colorLayerName, AttributeType.VERTEX_COLOR, AttributeDomain.CORNER,
+                             AttributeDataType.BYTE_COLOR, colorsList)
         return mesh
 
     def execute_ColorsList(self, mesh, colorLayerName, colors):
         if colorLayerName == "":
             self.raiseErrorMessage("Vertex color layer name can't be empty.")
-        elif colorLayerName in mesh.getAttributeNames(AttributeType["VERTEX_COLOR"]):
+        elif colorLayerName in mesh.getAttributeNames(AttributeType.VERTEX_COLOR):
             self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
 
         defaultColor = Color((0, 0, 0, 1))
@@ -76,6 +77,6 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
             polygonIndices = mesh.polygons
             colorsList = getLoopColorsFromPolygonColors(polygonIndices, colorsList)
 
-        mesh.insertAttribute(colorLayerName, AttributeType["CUSTOM"], AttributeDomain["CORNER"],
-                             AttributeDataType["BYTE_COLOR"], colorsList)
+        mesh.insertAttribute(Attribute(colorLayerName, AttributeType.CUSTOM, AttributeDomain.CORNER,
+                                       AttributeDataType.BYTE_COLOR, colorsList))
         return mesh

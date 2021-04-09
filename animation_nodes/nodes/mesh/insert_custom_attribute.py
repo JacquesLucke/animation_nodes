@@ -5,6 +5,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import (
     Color,
     FloatList,
+    Attribute,
     AttributeType,
     AttributeDomain,
     VirtualLongList,
@@ -61,7 +62,7 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
         elif self.dataType == "FLOAT_VECTOR":
             self.newInput(VectorizedSocket("Vector", "useDataList",
             ("Vector", "data"), ("Vectors", "data")))
-        elif self.dataType in ["FLOAT_COLOR", "BYTE_COLOR"]:
+        elif self.dataType in ("FLOAT_COLOR", "BYTE_COLOR"):
             self.newInput(VectorizedSocket("Color", "useDataList",
             ("Color", "data"), ("Colors", "data")))
         else:
@@ -79,7 +80,7 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
 
         if attributeName == "":
             self.raiseErrorMessage("Attribute name can't be empty.")
-        elif attributeName in mesh.getAttributeNames(AttributeType["CUSTOM"]):
+        elif attributeName in mesh.getAttributeNames(AttributeType.CUSTOM):
             self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{attributeName}'.")
 
         if self.domain == "POINT":
@@ -99,11 +100,11 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
             _data = VirtualVector2DList.create(data, Vector((0, 0))).materialize(amount)
         elif self.dataType == "FLOAT_VECTOR":
             _data = VirtualVector3DList.create(data, Vector((0, 0, 0))).materialize(amount)
-        elif self.dataType in ["FLOAT_COLOR", "BYTE_COLOR"]:
+        elif self.dataType in ("FLOAT_COLOR", "BYTE_COLOR"):
             _data = VirtualColorList.create(data, Color((0, 0, 0, 0))).materialize(amount)
         else:
             _data = VirtualBooleanList.create(data, False).materialize(amount)
 
-        mesh.insertAttribute(attributeName, AttributeType["CUSTOM"], AttributeDomain[self.domain],
-                             AttributeDataType[self.dataType], _data)
+        mesh.insertAttribute(Attribute(attributeName, AttributeType.CUSTOM, AttributeDomain[self.domain],
+                                       AttributeDataType[self.dataType], _data))
         return mesh

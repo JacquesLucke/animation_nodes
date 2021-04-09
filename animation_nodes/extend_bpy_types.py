@@ -114,14 +114,14 @@ class MeshProperties(bpy.types.PropertyGroup):
             data = Vector2DList(length = amount)
         elif attribute.data_type == "FLOAT_VECTOR":
             data = Vector3DList(length = amount)
-        elif attribute.data_type in ["FLOAT_COLOR", "BYTE_COLOR"]:
+        elif attribute.data_type in ("FLOAT_COLOR", "BYTE_COLOR"):
             data = ColorList(length = amount)
         else:
             data = BooleanList(False, length = amount)
 
-        if attribute.data_type in["FLOAT", "INT", "BOOLEAN"]:
+        if attribute.data_type in ("FLOAT", "INT", "BOOLEAN"):
             attribute.data.foreach_get("value", data.asNumpyArray())
-        elif attribute.data_type in ["FLOAT2", "FLOAT_VECTOR"]:
+        elif attribute.data_type in ("FLOAT2", "FLOAT_VECTOR"):
             attribute.data.foreach_get("vector", data.asNumpyArray())
         else:
             attribute.data.foreach_get("color", data.asNumpyArray())
