@@ -8,6 +8,10 @@ from .. lists.base_lists cimport (
     Vector3DList,
 )
 
+cListFromDataType = {INT: LongList, FLOAT: FloatList, FLOAT2: Vector2DList,
+                     FLOAT_VECTOR: Vector3DList, FLOAT_COLOR: ColorList,
+                     BYTE_COLOR: ColorList, BOOLEAN: BooleanList}
+
 cdef class Attribute:
     def __cinit__(self, str name = None,
                         AttributeType type = CUSTOM,
@@ -74,14 +78,4 @@ cdef class Attribute:
         return "BOOLEAN"
 
     def getListType(self):
-        if self.dataType == INT:
-            return LongList
-        elif self.dataType == FLOAT:
-            return FloatList
-        elif self.dataType == FLOAT2:
-            return Vector2DList
-        elif self.dataType == FLOAT_VECTOR:
-            return Vector3DList
-        elif self.dataType in (FLOAT_COLOR, BYTE_COLOR):
-            return ColorList
-        return BooleanList
+        return cListFromDataType.get(self.dataType)
