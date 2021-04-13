@@ -1,18 +1,32 @@
 # cython: profile=True
 import textwrap
 import functools
+from .. lists.clist cimport CList
 from collections import OrderedDict
-from . validate import createValidEdgesList
-from . validate import checkMeshData, calculateLoopEdges
+from . validate import createValidEdgesList, checkMeshData, calculateLoopEdges
+from .. attributes.attribute import AttributeType, AttributeDomain, AttributeDataType
+from .. attributes.attribute cimport Attribute, AttributeType, AttributeDomain, AttributeDataType
 from ... algorithms.mesh.triangulate_mesh import (
-    triangulatePolygonsUsingFanSpanMethod, triangulatePolygonsUsingEarClipMethod
+    triangulatePolygonsUsingFanSpanMethod,
+    triangulatePolygonsUsingEarClipMethod
 )
 from .. lists.base_lists cimport (
-    UIntegerList, EdgeIndices, EdgeIndicesList, Vector3DList, Vector2DList, ColorList, LongList
+    LongList,
+    ColorList,
+    EdgeIndices,
+    UIntegerList,
+    Vector2DList,
+    Vector3DList,
+    EdgeIndicesList,
 )
 from ... math cimport (
-    Vector3, crossVec3, subVec3, addVec3_Inplace, isExactlyZeroVec3, normalizeVec3,
-    Matrix4, toMatrix4
+    Vector3,
+    subVec3,
+    crossVec3,
+    normalizeVec3,
+    addVec3_Inplace,
+    isExactlyZeroVec3,
+    Matrix4, toMatrix4,
 )
 
 def derivedMeshDataCacheHelper(name, handleNormalization = False):
@@ -41,31 +55,21 @@ cdef class Mesh:
     def __cinit__(self, Vector3DList vertices = None,
                         EdgeIndicesList edges = None,
                         PolygonIndicesList polygons = None,
-                        LongList materialIndices = None,
                         bint skipValidation = False):
 
         if vertices is None: vertices = Vector3DList()
         if edges is None: edges = EdgeIndicesList()
         if polygons is None: polygons = PolygonIndicesList()
-        if materialIndices is None: materialIndices = LongList()
 
         if not skipValidation:
-            checkMeshData(vertices, edges, polygons, materialIndices)
+            checkMeshData(vertices, edges, polygons)
 
         self.vertices = vertices
         self.edges = edges
         self.polygons = polygons
-        self.materialIndices = materialIndices
 
         self.derivedMeshDataCache = {}
-        self.uvMaps = OrderedDict()
-        self.vertexColorLayers = OrderedDict()
-
-    def getMeshProperties(self):
-        return (
-            (self.uvMaps, Vector2DList),
-            (self.vertexColorLayers, ColorList),
-        )
+        self.attributes = OrderedDict()
 
     def verticesTransformed(self):
         self.derivedMeshDataCache.pop("Vertex Normals", None)
@@ -132,35 +136,50 @@ cdef class Mesh:
         else:
             raise Exception("invalid length")
 
-    def insertUVMap(self, str name, Vector2DList uvs):
-        if len(uvs) == len(self.polygons.indices):
-            self.uvMaps[name] = uvs
+    def insertAttribute(self, Attribute attribute):
+        if attribute.domain == AttributeDomain.POINT:
+            referenceAmount = len(self.vertices)
+        elif attribute.domain == AttributeDomain.EDGE:
+            referenceAmount = len(self.edges)
+        elif attribute.domain == AttributeDomain.FACE:
+            referenceAmount = len(self.polygons)
         else:
+            referenceAmount = len(self.polygons.indices)
+
+        if referenceAmount != len(attribute.data):
             raise Exception("invalid length")
 
-    def getUVMaps(self):
-        return list(self.uvMaps.items())
+        self.attributes[attribute.name] = attribute
 
-    def getUVMapNames(self):
-        return list(self.uvMaps.keys())
+    def getAttributes(self, AttributeType type):
+        attributes = list()
+        for name, attribute in self.attributes.items():
+            if type == attribute.type: attributes.append((name, attribute))
+            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
+                attributes.append((name, attribute))
+        return attributes
 
-    def getUVMapPositions(self, str uvMapName):
-        return self.uvMaps.get(uvMapName, None)
+    def getAttributeNames(self, AttributeType type):
+        attributeNames = list()
+        for name, attribute in self.attributes.items():
+            if type == attribute.type: attributeNames.append(name)
+            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
+                attributeNames.append(name)
+        return attributeNames
 
-    def insertVertexColorLayer(self, str name, ColorList colors):
-        if len(colors) == len(self.polygons.indices):
-            self.vertexColorLayers[name] = colors
-        else:
-            raise Exception("invalid length")
+    def getAttribute(self, str name, AttributeType type):
+        attribute = self.attributes.get(name, None)
+        if attribute is not None:
+            if type == attribute.type: return attribute
+            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
+                return attribute
+        return attribute
 
-    def getVertexColorLayers(self):
-        return list(self.vertexColorLayers.items())
+    def getAllAttributes(self):
+        return self.attributes
 
-    def getVertexColorLayerNames(self):
-        return list(self.vertexColorLayers.keys())
-
-    def getVertexColors(self, str colorLayerName):
-        return self.vertexColorLayers.get(colorLayerName, None)
+    def getMaterialIndices(self):
+        return self.getAttribute("Material Indices", AttributeType.MATERIAL_INDEX)
 
     def getVertexLinkedVertices(self, long vertexIndex):
         cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
@@ -175,15 +194,15 @@ cdef class Mesh:
 
     def copy(self):
         mesh = Mesh(self.vertices.copy(), self.edges.copy(),
-                    self.polygons.copy(), self.materialIndices.copy())
-        mesh.copyMeshProperties(self)
+                    self.polygons.copy())
+        mesh.copyAttributes(self)
         return mesh
 
-    def copyMeshProperties(self, Mesh source):
-        for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
-                self.getMeshProperties(), source.getMeshProperties()):
-            for name, value in sourceMeshProperty.items():
-                meshProperty[name] = value.copy()
+    def copyAttributes(self, Mesh source):
+        meshAttributes = self.attributes
+        sourceMeshAttributes = source.attributes
+        for name, value in sourceMeshAttributes.items():
+            meshAttributes[name] = value.copy()
 
     def transform(self, transformation):
         self.vertices.transform(transformation)
@@ -202,7 +221,6 @@ cdef class Mesh:
             newPolygons = triangulatePolygonsUsingEarClipMethod(self.vertices, polygons)
         self.edges = createValidEdgesList(polygons = newPolygons)
         self.polygons = newPolygons
-        self.materialIndices =  LongList.fromValue(0, length = newPolygons.getLength())
         self.derivedMeshDataCache.clear()
 
     def __repr__(self):
@@ -211,31 +229,49 @@ cdef class Mesh:
         Vertices: {len(self.vertices)}
         Edges: {len(self.edges)}
         Polygons: {len(self.polygons)}
-        UV Maps: {self.getUVMapNames()}
-        Vertex Colors: {self.getVertexColorLayerNames()}""")
+        UV Maps: {self.getAttributeNames(AttributeType.UV_MAP)}
+        Vertex Colors: {self.getAttributeNames(AttributeType.VERTEX_COLOR)}
+        Custom Attributes: {self.getAttributeNames(AttributeType.CUSTOM)}""")
 
-    def replicateMeshProperties(self, Mesh source, long amount):
-        for ((meshProperty, _), (sourceMeshProperty, _)) in zip(
-                self.getMeshProperties(), source.getMeshProperties()):
-            for name, value in sourceMeshProperty.items():
-                meshProperty[name] = value.repeated(amount = amount)
+    def replicateAttributes(self, Mesh source, long amount):
+        meshAttributes = self.attributes
+        sourceMeshAttributes = source.attributes
+        for name, attribute in sourceMeshAttributes.items():
+            meshAttributes[name] = attribute.replicate(amount)
 
-    def appendMeshProperties(self, Mesh source):
-        for ((meshProperty, meshPropertyType), (sourceMeshProperty, _)) in zip(
-                self.getMeshProperties(), source.getMeshProperties()):
-            for name in meshProperty.keys():
-                if name in sourceMeshProperty:
-                    meshProperty[name].extend(sourceMeshProperty[name])
+    def appendAttributes(self, Mesh source):
+        meshAttributes = self.attributes
+        sourceMeshAttributes = source.attributes
+        for name in meshAttributes.keys():
+            meshAttribute = meshAttributes[name]
+            if name in sourceMeshAttributes:
+                meshAttribute.appendAttribute(sourceMeshAttributes[name])
+            else:
+                if meshAttribute.domain == AttributeDomain.POINT:
+                    amount = source.vertices.length
+                elif meshAttribute.domain == AttributeDomain.EDGE:
+                    amount = source.edges.length
+                elif meshAttribute.domain == AttributeDomain.FACE:
+                    amount = source.polygons.getLength()
                 else:
-                    extension = meshPropertyType(length = source.polygons.indices.length)
-                    extension.fill(0)
-                    meshProperty[name].extend(extension)
+                    amount = source.polygons.indices.length
 
-            for name in sourceMeshProperty.keys():
-                if name not in meshProperty:
-                    extension = meshPropertyType(length = self.polygons.indices.length)
-                    extension.fill(0)
-                    meshProperty[name] = extension + sourceMeshProperty[name]
+                meshAttribute.appendAttribute(amount = amount)
+
+        for name in sourceMeshAttributes.keys():
+            if name not in meshAttributes:
+                sourceAttribute = sourceMeshAttributes[name].copy()
+                if sourceAttribute.domain == AttributeDomain.POINT:
+                    amount = self.vertices.length
+                elif sourceAttribute.domain == AttributeDomain.EDGE:
+                    amount = self.edges.length
+                elif sourceAttribute.domain == AttributeDomain.FACE:
+                    amount = self.polygons.getLength()
+                else:
+                    amount = self.polygons.indices.length
+
+                sourceAttribute.appendAttribute(amount = amount)
+                meshAttributes[name] = sourceAttribute
 
     @classmethod
     def join(cls, *meshes):
@@ -250,7 +286,7 @@ cdef class Mesh:
         cdef long polygonIndicesOffset = self.polygons.indices.length
         cdef long i
 
-        self.appendMeshProperties(meshData)
+        self.appendAttributes(meshData)
 
         self.vertices.extend(meshData.vertices)
 
@@ -262,8 +298,6 @@ cdef class Mesh:
         self.polygons.extend(meshData.polygons)
         for i in range(meshData.polygons.indices.length):
             self.polygons.indices.data[polygonIndicesOffset + i] += vertexOffset
-
-        self.materialIndices.extend(meshData.materialIndices)
 
 
 def calculatePolygonNormals(Vector3DList vertices, PolygonIndicesList polygons):

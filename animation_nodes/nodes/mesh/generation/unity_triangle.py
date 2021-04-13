@@ -32,4 +32,4 @@ polygonIndices = PolygonIndicesList.fromValues(
 materialIndices = LongList.fromValues(
     [0]
 )
-mesh = Mesh(vertexLocations, edgeIndices, polygonIndices, materialIndices, skipValidation = True)
+mesh = Mesh(vertexLocations, edgeIndices, polygonIndices, skipValidation = True)

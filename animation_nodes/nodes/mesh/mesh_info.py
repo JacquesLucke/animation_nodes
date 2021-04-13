@@ -1,5 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
+from ... data_structures import LongList
 
 class MeshInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshInfoNode"
@@ -16,6 +17,7 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Integer List", "Material Indices", "materialIndices")
         self.newOutput("Text List", "UV Map Names", "uvMapNames")
         self.newOutput("Text List", "Vertex Color Layers", "vertexColorLayerNames")
+        self.newOutput("Text List", "Custom Attribute Names", "customAttributeNames")
 
     def getExecutionCode(self, required):
         if "vertices" in required:
@@ -31,8 +33,19 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         if "polygonCenters" in required:
             yield "polygonCenters = mesh.getPolygonCenters()"
         if "materialIndices" in required:
-            yield "materialIndices = mesh.materialIndices"
+            yield "materialIndices = self.getMaterialIndices(mesh)"
         if "uvMapNames" in required:
-            yield "uvMapNames = mesh.getUVMapNames()"
+            yield "uvMapNames = mesh.getAttributeNames(AttributeType.UV_MAP)"
         if "vertexColorLayerNames" in required:
-            yield "vertexColorLayerNames = mesh.getVertexColorLayerNames()"
+            yield "vertexColorLayerNames = mesh.getAttributeNames(AttributeType.VERTEX_COLOR)"
+        if "customAttributeNames" in required:
+            yield "customAttributeNames = mesh.getAttributeNames(AttributeType.CUSTOM)"
+
+    def getMaterialIndices(self, mesh):
+        materialIndices = mesh.getMaterialIndices()
+        if materialIndices is None:
+            indices = LongList(length = len(mesh.polygons))
+            indices.fill(0)
+            return indices
+        else:
+            return materialIndices.data
