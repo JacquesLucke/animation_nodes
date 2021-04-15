@@ -70,7 +70,7 @@ class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
 
     def setTaperMode(self, curve, taperMode):
         if taperMode in ("OVERRIDE", "MULTIPLY", "ADD"):
-            curve.taper_mode = taperMode
+            curve.taper_radius_mode = taperMode
         else:
             self.setErrorMessage("The taper mode is invalid. \n\nPossible values for 'Taper Mode' are: 'OVERRIDE', 'MULTIPLY', 'ADD'")
 
