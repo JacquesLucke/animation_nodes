@@ -9,13 +9,10 @@ def getCylinderMesh(float radius, float height, Py_ssize_t resolution, bint caps
         raise Exception("resolution has to be >= 2")
 
     cdef PolygonIndicesList polygonIndices = polygons(resolution, caps)
-    cdef LongList materialIndices = LongList(length = polygonIndices.getLength())
-    materialIndices.fill(0)
     return Mesh(
         vertices(radius, height, resolution),
         edges(resolution),
         polygonIndices,
-        materialIndices,
         skipValidation = True)
 
 # Vertices
