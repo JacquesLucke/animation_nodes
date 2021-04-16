@@ -22,12 +22,14 @@
 - Added *Vectorization Type* option to *Set Spline Radius* node.
 - Added *Taper Mode* input to *Curve Object Output* node.
 - Added *Evaluate Object* option to *Object Attribute Input* node.
+- Added Attribute data type, and *Custom Attribute* nodes.
 
 ### Fixed
 
 - Fixed ID Key distance sorting.
 - Fixed nodetree.execute method in background mode.
 - Fixed wrong types in *Get Struct List Elements* node.
+- Fixed mesh generation methods.
 
 ### Changed
 

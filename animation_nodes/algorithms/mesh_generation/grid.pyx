@@ -6,17 +6,13 @@ def getGridMesh_Step(float xDistance, float yDistance, int xDivisions, int yDivi
     cdef Vector3DList vertices = vertices_Step(xDistance, yDistance, xDivisions, yDivisions)
     cdef EdgeIndicesList edges = innerQuadEdges(xDivisions, yDivisions)
     cdef PolygonIndicesList polygons = innerQuadPolygons(xDivisions, yDivisions)
-    cdef LongList materialIndices = LongList(length = polygons.getLength())
-    materialIndices.fill(0)
-    return Mesh(vertices, edges, polygons, materialIndices, skipValidation = True)
+    return Mesh(vertices, edges, polygons, skipValidation = True)
 
 def getGridMesh_Size(float length, float width, int xDivisions, int yDivisions):
     cdef Vector3DList vertices = vertices_Size(length, width, xDivisions, yDivisions)
     cdef EdgeIndicesList edges = innerQuadEdges(xDivisions, yDivisions)
     cdef PolygonIndicesList polygons = innerQuadPolygons(xDivisions, yDivisions)
-    cdef LongList materialIndices = LongList(length = polygons.getLength())
-    materialIndices.fill(0)
-    return Mesh(vertices, edges, polygons, materialIndices, skipValidation = True)
+    return Mesh(vertices, edges, polygons, skipValidation = True)
 
 
 # Vertices

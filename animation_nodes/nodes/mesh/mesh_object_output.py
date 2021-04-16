@@ -128,7 +128,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         materialIndices = mesh.getMaterialIndices()
         if materialIndices is not None:
             indices = materialIndices.data
-            if indices.getMaxValue() > 0 and indices.getMinValue() >= 0:
+            if len(indices) > 0 and indices.getMaxValue() > 0 and indices.getMinValue() >= 0:
                 indices = UShortList.fromValues(indices)
                 outMesh.polygons.foreach_set("material_index", indices.asMemoryView())
 
