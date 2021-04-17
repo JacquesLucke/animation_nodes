@@ -27,9 +27,7 @@ def updateSelectionSorting(viewLayer):
         if name not in newSortedSelection:
             newSortedSelection.append(name)
 
-        sortedSelectionNames = newSortedSelection
-    else:
-        sortedSelectionNames = selectedNames
+    sortedSelectionNames = newSortedSelection
 
 def getSelectedObjectNames(viewLayer):
     return [obj.name for obj in viewLayer.objects if obj.select_get(view_layer = viewLayer)]
