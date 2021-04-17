@@ -8,16 +8,46 @@ from .. lists.base_lists cimport (
     Vector3DList,
 )
 
-cListFromDataType = {INT: LongList, FLOAT: FloatList, FLOAT2: Vector2DList,
-                     FLOAT_VECTOR: Vector3DList, FLOAT_COLOR: ColorList,
-                     BYTE_COLOR: ColorList, BOOLEAN: BooleanList}
+cListFromDataType = {
+    INT: LongList,
+    FLOAT: FloatList,
+    FLOAT2: Vector2DList,
+    FLOAT_VECTOR: Vector3DList,
+    FLOAT_COLOR: ColorList,
+    BYTE_COLOR: ColorList,
+    BOOLEAN: BooleanList,
+}
+
+stringFromType = {
+    UV_MAP: "UV_MAP",
+    MATERIAL_INDEX: "MATERIAL_INDEX",
+    VERTEX_COLOR: "VERTEX_COLOR",
+    CUSTOM: "CUSTOM",
+}
+
+stringFromDomain = {
+    POINT: "POINT",
+    EDGE: "EDGE",
+    FACE: "FACE",
+    CORNER: "CORNER",
+}
+
+stringFromDataType = {
+    INT: "INT",
+    FLOAT: "FLOAT",
+    FLOAT2: "FLOAT2",
+    FLOAT_VECTOR: "FLOAT_VECTOR",
+    FLOAT_COLOR: "FLOAT_COLOR",
+    BYTE_COLOR: "BYTE_COLOR",
+    BOOLEAN: "BOOLEAN",
+}
 
 cdef class Attribute:
-    def __cinit__(self, str name = None,
-                        AttributeType type = CUSTOM,
-                        AttributeDomain domain = POINT,
-                        AttributeDataType dataType = FLOAT,
-                        CList data = None):
+    def __cinit__(self, str name,
+                        AttributeType type,
+                        AttributeDomain domain,
+                        AttributeDataType dataType,
+                        CList data):
 
         self.name = name
         self.type = type
@@ -25,57 +55,43 @@ cdef class Attribute:
         self.dataType = dataType
         self.data = data
 
+    def similar(self, Attribute other):
+        return all((
+            self.name == other.name,
+            self.type == other.type,
+            self.domain == other.domain,
+            self.dataType == other.dataType
+        ))
+
     def copy(self):
         return Attribute(self.name, self.type, self.domain, self.dataType,
                          self.data.copy())
-
-    def extend(self, data):
-        self.data.extend(data)
 
     def replicate(self, Py_ssize_t amount):
         return Attribute(self.name, self.type, self.domain, self.dataType,
                          self.data.repeated(amount = amount))
 
-    def appendAttribute(self, sourceAttribute = None, Py_ssize_t amount = -1):
-        if sourceAttribute is not None:
-            self.extend(sourceAttribute.data)
-        else:
-            extension = self.getListType()(length = amount)
-            extension.fill(0)
-            self.extend(extension)
+    def append(self, Attribute source):
+        self.data.extend(source.data)
+
+    def appendZeros(self, int length):
+        extension = self.getListType()(length = length)
+        extension.fill(0)
+        self.data.extend(extension)
+
+    def prependZeros(self, int length):
+        extension = self.getListType()(length = length)
+        extension.fill(0)
+        self.data = extension + self.data
 
     def getTypeAsString(self):
-        if self.type == UV_MAP:
-            return "UV_MAP"
-        elif self.type == MATERIAL_INDEX:
-            return "MATERIAL_INDEX"
-        elif self.type == VERTEX_COLOR:
-            return "VERTEX_COLOR"
-        return "CUSTOM"
+        return stringFromType(self.type)
 
     def getDomainAsString(self):
-        if self.domain == POINT:
-            return "POINT"
-        elif self.domain == EDGE:
-            return "EDGE"
-        elif self.domain == FACE:
-            return "FACE"
-        return "CORNER"
+        return stringFromDomain(self.domain)
 
     def getListTypeAsString(self):
-        if self.dataType == INT:
-            return "INT"
-        elif self.dataType == FLOAT:
-            return "FLOAT"
-        elif self.dataType == FLOAT2:
-            return "FLOAT2"
-        elif self.dataType == FLOAT_VECTOR:
-            return "FLOAT_VECTOR"
-        elif self.dataType == FLOAT_COLOR:
-            return "FLOAT_COLOR"
-        elif self.dataType == BYTE_COLOR:
-            return "BYTE_COLOR"
-        return "BOOLEAN"
+        return stringFromDataType(self.dataType)
 
     def getListType(self):
         return cListFromDataType.get(self.dataType)

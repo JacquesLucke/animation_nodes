@@ -137,16 +137,7 @@ cdef class Mesh:
             raise Exception("invalid length")
 
     def insertAttribute(self, Attribute attribute):
-        if attribute.domain == AttributeDomain.POINT:
-            referenceAmount = len(self.vertices)
-        elif attribute.domain == AttributeDomain.EDGE:
-            referenceAmount = len(self.edges)
-        elif attribute.domain == AttributeDomain.FACE:
-            referenceAmount = len(self.polygons)
-        else:
-            referenceAmount = len(self.polygons.indices)
-
-        if referenceAmount != len(attribute.data):
+        if self.getAttributeDomainLength(attribute.domain) != len(attribute.data):
             raise Exception("invalid length")
 
         self.attributes[attribute.name] = attribute
@@ -239,39 +230,32 @@ cdef class Mesh:
         for name, attribute in sourceMeshAttributes.items():
             meshAttributes[name] = attribute.replicate(amount)
 
+    def getAttributeDomainLength(self, AttributeDomain domain):
+        if domain == AttributeDomain.POINT:
+            return self.vertices.length
+        elif domain == AttributeDomain.EDGE:
+            return self.edges.length
+        elif domain == AttributeDomain.FACE:
+            return self.polygons.getLength()
+        elif domain == AttributeDomain.CORNER:
+            return self.polygons.indices.length
+
     def appendAttributes(self, Mesh source):
-        meshAttributes = self.attributes
-        sourceMeshAttributes = source.attributes
-        for name in meshAttributes.keys():
-            meshAttribute = meshAttributes[name]
-            if name in sourceMeshAttributes:
-                meshAttribute.appendAttribute(sourceMeshAttributes[name])
+        for name, attribute in self.attributes.items():
+            sourceAttribute = source.attributes.get(name, None)
+            if sourceAttribute and sourceAttribute.similar(attribute):
+                attribute.append(sourceAttribute)
             else:
-                if meshAttribute.domain == AttributeDomain.POINT:
-                    amount = source.vertices.length
-                elif meshAttribute.domain == AttributeDomain.EDGE:
-                    amount = source.edges.length
-                elif meshAttribute.domain == AttributeDomain.FACE:
-                    amount = source.polygons.getLength()
-                else:
-                    amount = source.polygons.indices.length
+                length = source.getAttributeDomainLength(attribute.domain)
+                attribute.appendZeros(length)
 
-                meshAttribute.appendAttribute(amount = amount)
-
-        for name in sourceMeshAttributes.keys():
-            if name not in meshAttributes:
-                sourceAttribute = sourceMeshAttributes[name].copy()
-                if sourceAttribute.domain == AttributeDomain.POINT:
-                    amount = self.vertices.length
-                elif sourceAttribute.domain == AttributeDomain.EDGE:
-                    amount = self.edges.length
-                elif sourceAttribute.domain == AttributeDomain.FACE:
-                    amount = self.polygons.getLength()
-                else:
-                    amount = self.polygons.indices.length
-
-                sourceAttribute.appendAttribute(amount = amount)
-                meshAttributes[name] = sourceAttribute
+        for name, sourceAttribute in source.attributes.items():
+            attribute = self.attributes.get(name, None)
+            if attribute is None:
+                length = self.getAttributeDomainLength(sourceAttribute.domain)
+                newAttribute = sourceAttribute.copy()
+                newAttribute.prependZeros(length)
+                self.attributes[name] = newAttribute
 
     @classmethod
     def join(cls, *meshes):

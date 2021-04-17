@@ -4,13 +4,13 @@ cpdef enum AttributeType:
     UV_MAP,
     MATERIAL_INDEX,
     VERTEX_COLOR,
-    CUSTOM
+    CUSTOM,
 
 cpdef enum AttributeDomain:
     POINT,
     EDGE,
     FACE,
-    CORNER
+    CORNER,
 
 cpdef enum AttributeDataType:
     INT,
@@ -19,7 +19,7 @@ cpdef enum AttributeDataType:
     FLOAT_VECTOR,
     FLOAT_COLOR,
     BYTE_COLOR,
-    BOOLEAN
+    BOOLEAN,
 
 cdef class Attribute:
     cdef:
