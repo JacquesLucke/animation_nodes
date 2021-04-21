@@ -85,13 +85,13 @@ cdef class Attribute:
         self.data = extension + self.data
 
     def getTypeAsString(self):
-        return stringFromType(self.type)
+        return stringFromType.get((self.type))
 
     def getDomainAsString(self):
-        return stringFromDomain(self.domain)
+        return stringFromDomain.get((self.domain))
 
     def getListTypeAsString(self):
-        return stringFromDataType(self.dataType)
+        return stringFromDataType.get((self.dataType))
 
     def getListType(self):
         return cListFromDataType.get(self.dataType)

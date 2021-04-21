@@ -144,7 +144,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         if object.mode != "EDIT":
             for colorLayerName in sourceMesh.vertex_colors.keys():
                 mesh.insertAttribute(Attribute(colorLayerName,
-                                               AttributeType.CUSTOM,
+                                               AttributeType.VERTEX_COLOR,
                                                AttributeDomain.CORNER,
                                                AttributeDataType.BYTE_COLOR,
                                                sourceMesh.an.getVertexColorLayer(colorLayerName)))

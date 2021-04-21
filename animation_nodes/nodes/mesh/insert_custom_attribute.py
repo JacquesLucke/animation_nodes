@@ -48,7 +48,7 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
     useDataList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Mesh", "Mesh", "mesh")
+        self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
         self.newInput("Text", "Attribute Name", "attributeName", value = "AN-Att")
         if self.dataType == "FLOAT":
             self.newInput(VectorizedSocket("Float", "useDataList",
@@ -80,8 +80,11 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
 
         if attributeName == "":
             self.raiseErrorMessage("Attribute name can't be empty.")
+        elif self.domain == "CORNER" and self.dataType == "BYTE_COLOR":
+            if attributeName in [*mesh.getAttributeNames(AttributeType.CUSTOM), *mesh.getAttributeNames(AttributeType.VERTEX_COLOR)]:
+                self.raiseErrorMessage(f"Mesh has already a custom attribute / vertex color layer with the name '{attributeName}'.")
         elif attributeName in mesh.getAttributeNames(AttributeType.CUSTOM):
-            self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{attributeName}'.")
+            self.raiseErrorMessage(f"Mesh has already a custom attribute with the name '{attributeName}'.")
 
         if self.domain == "POINT":
             amount = len(mesh.vertices)

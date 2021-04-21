@@ -69,7 +69,16 @@ cdef class Mesh:
         self.polygons = polygons
 
         self.derivedMeshDataCache = {}
-        self.attributes = OrderedDict()
+        self.customAttributes = OrderedDict()
+        self.uvMapAttributes = OrderedDict()
+        self.vertexColorAttributes = OrderedDict()
+
+    def getMeshAttributes(self):
+        return (
+            (self.customAttributes, OrderedDict()),
+            (self.uvMapAttributes, OrderedDict()),
+            (self.vertexColorAttributes, OrderedDict()),
+        )
 
     def verticesTransformed(self):
         self.derivedMeshDataCache.pop("Vertex Normals", None)
@@ -140,34 +149,44 @@ cdef class Mesh:
         if self.getAttributeDomainLength(attribute.domain) != len(attribute.data):
             raise Exception("invalid length")
 
-        self.attributes[attribute.name] = attribute
+        if attribute.type == AttributeType.UV_MAP:
+            self.uvMapAttributes[attribute.name] = attribute
+        elif attribute.type == AttributeType.VERTEX_COLOR:
+            self.vertexColorAttributes[attribute.name] = attribute
+        else:
+            self.customAttributes[attribute.name] = attribute
 
     def getAttributes(self, AttributeType type):
-        attributes = list()
-        for name, attribute in self.attributes.items():
-            if type == attribute.type: attributes.append((name, attribute))
-            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
-                attributes.append((name, attribute))
-        return attributes
+        if type == AttributeType.UV_MAP:
+            return list(self.uvMapAttributes.items())
+        elif type == AttributeType.VERTEX_COLOR:
+            return list(self.vertexColorAttributes.items())
+        else:
+            attributes = list()
+            for name, attribute in self.customAttributes.items():
+                if type == attribute.type: attributes.append((name, attribute))
+            return attributes
 
     def getAttributeNames(self, AttributeType type):
-        attributeNames = list()
-        for name, attribute in self.attributes.items():
-            if type == attribute.type: attributeNames.append(name)
-            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
-                attributeNames.append(name)
-        return attributeNames
+        if type == AttributeType.UV_MAP:
+            return list(self.uvMapAttributes.keys())
+        elif type == AttributeType.VERTEX_COLOR:
+            return list(self.vertexColorAttributes.keys())
+        else:
+            attributeNames = list()
+            for name, attribute in self.customAttributes.items():
+                if type == attribute.type: attributeNames.append(name)
+            return attributeNames
 
     def getAttribute(self, str name, AttributeType type):
-        attribute = self.attributes.get(name, None)
-        if attribute is not None:
-            if type == attribute.type: return attribute
-            elif type == AttributeType.VERTEX_COLOR and attribute.dataType == AttributeDataType.BYTE_COLOR:
-                return attribute
-        return attribute
-
-    def getAllAttributes(self):
-        return self.attributes
+        if type == AttributeType.UV_MAP:
+            return self.uvMapAttributes.get(name, None)
+        elif type == AttributeType.VERTEX_COLOR:
+            return self.vertexColorAttributes.get(name, None)
+        else:
+            attribute = self.customAttributes.get(name, None)
+            if attribute is not None and type == attribute.type: return attribute
+            return None
 
     def getMaterialIndices(self):
         return self.getAttribute("Material Indices", AttributeType.MATERIAL_INDEX)
@@ -190,10 +209,10 @@ cdef class Mesh:
         return mesh
 
     def copyAttributes(self, Mesh source):
-        meshAttributes = self.attributes
-        sourceMeshAttributes = source.attributes
-        for name, value in sourceMeshAttributes.items():
-            meshAttributes[name] = value.copy()
+        for ((meshAttributes, _), (sourceMeshAttributes, _)) in zip(
+                self.getMeshAttributes(), source.getMeshAttributes()):
+            for name, value in sourceMeshAttributes.items():
+                meshAttributes[name] = value.copy()
 
     def transform(self, transformation):
         self.vertices.transform(transformation)
@@ -225,10 +244,10 @@ cdef class Mesh:
         Custom Attributes: {self.getAttributeNames(AttributeType.CUSTOM)}""")
 
     def replicateAttributes(self, Mesh source, long amount):
-        meshAttributes = self.attributes
-        sourceMeshAttributes = source.attributes
-        for name, attribute in sourceMeshAttributes.items():
-            meshAttributes[name] = attribute.replicate(amount)
+        for ((meshAttributes, _), (sourceMeshAttributes, _)) in zip(
+                self.getMeshAttributes(), source.getMeshAttributes()):
+            for name, attribute in sourceMeshAttributes.items():
+                meshAttributes[name] = attribute.replicate(amount)
 
     def getAttributeDomainLength(self, AttributeDomain domain):
         if domain == AttributeDomain.POINT:
@@ -241,21 +260,24 @@ cdef class Mesh:
             return self.polygons.indices.length
 
     def appendAttributes(self, Mesh source):
-        for name, attribute in self.attributes.items():
-            sourceAttribute = source.attributes.get(name, None)
-            if sourceAttribute and sourceAttribute.similar(attribute):
-                attribute.append(sourceAttribute)
-            else:
-                length = source.getAttributeDomainLength(attribute.domain)
-                attribute.appendZeros(length)
+        for ((meshAttributes, _), (sourceMeshAttributes, _)) in zip(
+                self.getMeshAttributes(), source.getMeshAttributes()):
 
-        for name, sourceAttribute in source.attributes.items():
-            attribute = self.attributes.get(name, None)
-            if attribute is None:
-                length = self.getAttributeDomainLength(sourceAttribute.domain)
-                newAttribute = sourceAttribute.copy()
-                newAttribute.prependZeros(length)
-                self.attributes[name] = newAttribute
+            for name, attribute in meshAttributes.items():
+                sourceAttribute = sourceMeshAttributes.get(name, None)
+                if sourceAttribute and sourceAttribute.similar(attribute):
+                    attribute.append(sourceAttribute)
+                else:
+                    length = source.getAttributeDomainLength(attribute.domain)
+                    attribute.appendZeros(length)
+
+            for name, sourceAttribute in sourceMeshAttributes.items():
+                attribute = meshAttributes.get(name, None)
+                if attribute is None:
+                    length = self.getAttributeDomainLength(sourceAttribute.domain)
+                    newAttribute = sourceAttribute.copy()
+                    newAttribute.prependZeros(length)
+                    meshAttributes[name] = newAttribute
 
     @classmethod
     def join(cls, *meshes):
