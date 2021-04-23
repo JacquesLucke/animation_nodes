@@ -156,6 +156,8 @@ cdef class Mesh:
             self.uvMapAttributes[attribute.name] = attribute
         elif attribute.type == AttributeType.VERTEX_COLOR:
             self.vertexColorAttributes[attribute.name] = attribute
+        elif attribute.type == AttributeType.MATERIAL_INDEX:
+            self.materialIndices = attribute
         else:
             self.customAttributes[attribute.name] = attribute
 
