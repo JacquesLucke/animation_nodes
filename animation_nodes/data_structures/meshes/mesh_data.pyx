@@ -72,6 +72,7 @@ cdef class Mesh:
         self.customAttributes = OrderedDict()
         self.uvMapAttributes = OrderedDict()
         self.vertexColorAttributes = OrderedDict()
+        self.materialIndices = None
 
     def getMeshAttributes(self):
         return (
@@ -149,7 +150,9 @@ cdef class Mesh:
         if self.getAttributeDomainLength(attribute.domain) != len(attribute.data):
             raise Exception("invalid length")
 
-        if attribute.type == AttributeType.UV_MAP:
+        if attribute.type == AttributeType.MATERIAL_INDEX:
+            self.materialIndices = attribute
+        elif attribute.type == AttributeType.UV_MAP:
             self.uvMapAttributes[attribute.name] = attribute
         elif attribute.type == AttributeType.VERTEX_COLOR:
             self.vertexColorAttributes[attribute.name] = attribute
@@ -189,7 +192,7 @@ cdef class Mesh:
             return None
 
     def getMaterialIndices(self):
-        return self.getAttribute("Material Indices", AttributeType.MATERIAL_INDEX)
+        return self.materialIndices
 
     def getVertexLinkedVertices(self, long vertexIndex):
         cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
@@ -209,6 +212,10 @@ cdef class Mesh:
         return mesh
 
     def copyAttributes(self, Mesh source):
+        sourceMaterialIndices = source.materialIndices
+        if sourceMaterialIndices is not None:
+            self.materialIndices = sourceMaterialIndices.copy()
+
         for ((meshAttributes, _), (sourceMeshAttributes, _)) in zip(
                 self.getMeshAttributes(), source.getMeshAttributes()):
             for name, value in sourceMeshAttributes.items():
@@ -244,6 +251,10 @@ cdef class Mesh:
         Custom Attributes: {self.getAttributeNames(AttributeType.CUSTOM)}""")
 
     def replicateAttributes(self, Mesh source, long amount):
+        sourceMaterialIndices = source.materialIndices
+        if sourceMaterialIndices is not None:
+            self.materialIndices = sourceMaterialIndices.replicate(amount)
+
         for ((meshAttributes, _), (sourceMeshAttributes, _)) in zip(
                 self.getMeshAttributes(), source.getMeshAttributes()):
             for name, attribute in sourceMeshAttributes.items():
@@ -260,6 +271,20 @@ cdef class Mesh:
             return self.polygons.indices.length
 
     def appendAttributes(self, Mesh source):
+        sourceMaterialIndices = source.materialIndices
+        meshMaterialIndices = self.materialIndices
+        if meshMaterialIndices is not None:
+            if sourceMaterialIndices and sourceMaterialIndices.similar(meshMaterialIndices):
+                meshMaterialIndices.append(sourceMaterialIndices)
+            else:
+                length = source.getAttributeDomainLength(meshMaterialIndices.domain)
+                meshMaterialIndices.appendZeros(length)
+        elif sourceMaterialIndices is not None:
+            length = self.getAttributeDomainLength(sourceMaterialIndices.domain)
+            newAttribute = sourceMaterialIndices.copy()
+            newAttribute.prependZeros(length)
+            self.materialIndices = newAttribute
+
         for ((meshAttributes, _), (sourceMeshAttributes, _)) in zip(
                 self.getMeshAttributes(), source.getMeshAttributes()):
 
