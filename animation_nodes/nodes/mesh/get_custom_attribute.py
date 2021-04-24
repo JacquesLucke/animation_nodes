@@ -57,19 +57,22 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
         return attribute.data, attribute.getTypeAsString(), attribute.getDomainAsString(), self.dataType
 
     def getPossibleAttribute(self, attributeName, mesh):
-        attribute = mesh.getAttribute(attributeName, AttributeType.CUSTOM)
+        attribute = mesh.getCustomAttribute(attributeName)
         if attribute is not None: return attribute
 
-        attribute = mesh.getAttribute(attributeName, AttributeType.UV_MAP)
+        attribute = mesh.getBuiltInAttribute(attributeName)
         if attribute is not None: return attribute
 
-        attribute = mesh.getAttribute(attributeName, AttributeType.VERTEX_COLOR)
+        attribute = mesh.getUVMapAttribute(attributeName)
+        if attribute is not None: return attribute
+
+        attribute = mesh.getVertexColorAttribute(attributeName)
         if attribute is not None: return attribute
 
         self.raiseErrorMessage(f"""Object does not have attribute with name '{attributeName}'.\nAvailable: {self.getAttributeNames(mesh)}""")
 
     def getAttributeNames(self, mesh):
         attributeNames = list()
-        for (meshAttributes, _) in mesh.getMeshAttributes():
+        for meshAttributes in mesh.getAttributeDictionaries():
             attributeNames.extend(meshAttributes.keys())
         return attributeNames

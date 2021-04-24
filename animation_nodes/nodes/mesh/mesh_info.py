@@ -42,7 +42,7 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
             yield "customAttributeNames = mesh.getAttributeNames(AttributeType.CUSTOM)"
 
     def getMaterialIndices(self, mesh):
-        materialIndices = mesh.getMaterialIndices()
+        materialIndices = mesh.getBuiltInAttribute("Material Indices")
         if materialIndices is None:
             indices = LongList(length = len(mesh.polygons))
             indices.fill(0)

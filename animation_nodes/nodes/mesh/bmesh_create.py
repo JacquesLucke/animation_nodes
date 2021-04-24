@@ -33,7 +33,7 @@ def getBMeshFromMesh(meshData):
     for edgeIndices in meshData.edges:
         bm.edges.new((bm.verts[edgeIndices[0]], bm.verts[edgeIndices[1]]))
 
-    materialIndices = meshData.getMaterialIndices()
+    materialIndices = meshData.getBuiltInAttribute("Material Indices")
     if materialIndices is not None:
         materialIndicesData = materialIndices.data
         for polygonIndices, materialIndex in zip(meshData.polygons, materialIndicesData):

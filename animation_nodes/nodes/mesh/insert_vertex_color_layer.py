@@ -52,8 +52,8 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
         defaultColor = Color((0, 0, 0, 1))
         colorsList = VirtualColorList.create(color, defaultColor).materialize(len(mesh.polygons.indices))
 
-        mesh.insertAttribute(Attribute(colorLayerName, AttributeType.VERTEX_COLOR, AttributeDomain.CORNER,
-                                       AttributeDataType.BYTE_COLOR, colorsList))
+        mesh.insertVertexColorAttribute(Attribute(colorLayerName, AttributeType.VERTEX_COLOR, AttributeDomain.CORNER,
+                                                  AttributeDataType.BYTE_COLOR, colorsList))
         return mesh
 
     def execute_ColorsList(self, mesh, colorLayerName, colors):
@@ -71,12 +71,12 @@ class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
             polygonIndices = mesh.polygons
             colorsList = getLoopColorsFromPolygonColors(polygonIndices, colorsList)
 
-        mesh.insertAttribute(Attribute(colorLayerName, AttributeType.VERTEX_COLOR, AttributeDomain.CORNER,
-                                       AttributeDataType.BYTE_COLOR, colorsList))
+        mesh.insertVertexColorAttribute(Attribute(colorLayerName, AttributeType.VERTEX_COLOR, AttributeDomain.CORNER,
+                                                  AttributeDataType.BYTE_COLOR, colorsList))
         return mesh
 
-    def checkAttributeName(self, mesh, colorLayerName):
-        if colorLayerName == "":
+    def checkAttributeName(self, mesh, attributeName):
+        if attributeName == "":
             self.raiseErrorMessage("Vertex color layer name can't be empty.")
-        elif colorLayerName in [*mesh.getAttributeNames(AttributeType.CUSTOM), *mesh.getAttributeNames(AttributeType.VERTEX_COLOR)]:
-            self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{colorLayerName}'.")
+        elif attributeName in mesh.getAllVertexColorAttributeNames():
+            self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{attributeName}'.")

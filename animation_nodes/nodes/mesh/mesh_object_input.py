@@ -121,33 +121,33 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
 
     def loadMaterialIndices(self, type, mesh, sourceMesh, object):
         if object.mode != "EDIT":
-            mesh.insertAttribute(Attribute("Material Indices",
-                                           AttributeType.MATERIAL_INDEX,
-                                           AttributeDomain.FACE,
-                                           AttributeDataType.INT,
-                                           sourceMesh.an.getPolygonMaterialIndices()))
+            mesh.insertBuiltInAttribute(Attribute("Material Indices",
+                                                  AttributeType.MATERIAL_INDEX,
+                                                  AttributeDomain.FACE,
+                                                  AttributeDataType.INT,
+                                                  sourceMesh.an.getPolygonMaterialIndices()))
         else:
             self.setErrorMessage("Object is in edit mode.")
 
     def loadUVMaps(self, type, mesh, sourceMesh, object):
         if object.mode != "EDIT":
             for uvMapName in sourceMesh.uv_layers.keys():
-                mesh.insertAttribute(Attribute(uvMapName,
-                                               AttributeType.UV_MAP,
-                                               AttributeDomain.CORNER,
-                                               AttributeDataType.FLOAT2,
-                                               sourceMesh.an.getUVMap(uvMapName)))
+                mesh.insertUVMapAttribute(Attribute(uvMapName,
+                                                    AttributeType.UV_MAP,
+                                                    AttributeDomain.CORNER,
+                                                    AttributeDataType.FLOAT2,
+                                                    sourceMesh.an.getUVMap(uvMapName)))
         else:
             self.setErrorMessage("Object is in edit mode.")
 
     def loadVertexColors(self, type, mesh, sourceMesh, object):
         if object.mode != "EDIT":
             for colorLayerName in sourceMesh.vertex_colors.keys():
-                mesh.insertAttribute(Attribute(colorLayerName,
-                                               AttributeType.VERTEX_COLOR,
-                                               AttributeDomain.CORNER,
-                                               AttributeDataType.BYTE_COLOR,
-                                               sourceMesh.an.getVertexColorLayer(colorLayerName)))
+                mesh.insertVertexColorAttribute(Attribute(colorLayerName,
+                                                          AttributeType.VERTEX_COLOR,
+                                                          AttributeDomain.CORNER,
+                                                          AttributeDataType.BYTE_COLOR,
+                                                          sourceMesh.an.getVertexColorLayer(colorLayerName)))
         else:
             self.setErrorMessage("Object is in edit mode.")
 
@@ -156,10 +156,10 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             attributes = object.data.attributes
             for customAttributeName in attributes.keys():
                 attribute = attributes.get(customAttributeName)
-                mesh.insertAttribute(Attribute(customAttributeName,
-                                               AttributeType.CUSTOM,
-                                               AttributeDomain[attribute.domain],
-                                               AttributeDataType[attribute.data_type],
-                                               object.data.an.getCustomAttribute(customAttributeName)))
+                mesh.insertCustomAttribute(Attribute(customAttributeName,
+                                                     AttributeType.CUSTOM,
+                                                     AttributeDomain[attribute.domain],
+                                                     AttributeDataType[attribute.data_type],
+                                                     object.data.an.getCustomAttribute(customAttributeName)))
         else:
             self.setErrorMessage("Object is in edit mode.")

@@ -21,8 +21,8 @@ domainItems = [
 ]
 
 dataTypeItems = [
-    ("FLOAT", "Float", "", "NONE", 0),
-    ("INT", "Integer", "", "NONE", 1),
+    ("INT", "Integer", "", "NONE", 0),
+    ("FLOAT", "Float", "", "NONE", 1),
     ("FLOAT2", "Float2", "", "NONE", 2),
     ("FLOAT_VECTOR", "Vector", "", "NONE", 3),
     ("FLOAT_COLOR", "Color", "", "NONE", 4),
@@ -45,12 +45,12 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Object", "Object", "object", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("Text", "Attribute Name", "attributeName", value = "AN-Att")
-        if self.dataType == "FLOAT":
-            self.newInput(VectorizedSocket("Float", "useDataList",
-            ("Value", "data"), ("Values", "data")))
-        elif self.dataType == "INT":
+        self.newInput("Text", "Name", "customAttributeName", value = "AN-Att")
+        if self.dataType == "INT":
             self.newInput(VectorizedSocket("Integer", "useDataList",
+            ("Value", "data"), ("Values", "data")))
+        elif self.dataType == "FLOAT":
+            self.newInput(VectorizedSocket("Float", "useDataList",
             ("Value", "data"), ("Values", "data")))
         elif self.dataType == "FLOAT2":
             self.newInput(VectorizedSocket("Vector 2D", "useDataList",
@@ -71,17 +71,17 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "domain", text = "")
         layout.prop(self, "dataType", text = "")
 
-    def execute(self, object, attributeName, data):
+    def execute(self, object, customAttributeName, data):
         if object is None: return object
         if object.type != "MESH": self.raiseErrorMessage("Object should be Mesh type.")
-        if attributeName == "": self.raiseErrorMessage("Attribute name can't be empty.")
+        if customAttributeName == "": self.raiseErrorMessage("Attribute name can't be empty.")
 
-        attribute = object.data.attributes.get(attributeName)
+        attribute = object.data.attributes.get(customAttributeName)
         if attribute is None:
-            attribute = object.data.attributes.new(attributeName, self.dataType, self.domain)
+            attribute = object.data.attributes.new(customAttributeName, self.dataType, self.domain)
         elif attribute.data_type != self.dataType or attribute.domain != self.domain:
             object.data.attributes.remove(attribute)
-            attribute = object.data.attributes.new(attributeName, self.dataType, self.domain)
+            attribute = object.data.attributes.new(customAttributeName, self.dataType, self.domain)
 
         if self.domain == "POINT":
             amount = len(object.data.vertices)
@@ -92,10 +92,10 @@ class SetCustomAttributeNode(bpy.types.Node, AnimationNode):
         else:
             amount = len(object.data.loops)
 
-        if self.dataType == "FLOAT":
-            _data = FloatList.fromValues(VirtualDoubleList.create(data, 0).materialize(amount))
-        elif self.dataType == "INT":
+        if self.dataType == "INT":
             _data = VirtualLongList.create(data, 0).materialize(amount)
+        elif self.dataType == "FLOAT":
+            _data = FloatList.fromValues(VirtualDoubleList.create(data, 0).materialize(amount))
         elif attribute.data_type == "FLOAT2":
             _data = VirtualVector2DList.create(data, Vector((0, 0))).materialize(amount)
         elif self.dataType == "FLOAT_VECTOR":
