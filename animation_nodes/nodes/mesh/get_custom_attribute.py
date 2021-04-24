@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
-from ... data_structures import DoubleList, AttributeType
+from ... data_structures import DoubleList
 
 dataTypeItems = [
     ("INT", "Integer", "", "NONE", 0),
@@ -48,31 +48,13 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
         if mesh is None: return None, None, None, None
         if attributeName == "": self.raiseErrorMessage("Attribute name can't be empty.")
 
-        attribute = self.getPossibleAttribute(attributeName, mesh)
+        attribute = mesh.getCustomAttribute(attributeName)
+        if attribute is None:
+            self.raiseErrorMessage(f"""Object does not have attribute with name '{attributeName}'.\nAvailable: {mesh.getAllCustomAttributeNames()}""")
+
         if self.dataType != attribute.getListTypeAsString():
             self.raiseErrorMessage("Wrong output data type.")
 
         if self.dataType == "FLOAT":
             return DoubleList.fromValues(attribute.data), attribute.getTypeAsString(), attribute.getDomainAsString(), self.dataType
         return attribute.data, attribute.getTypeAsString(), attribute.getDomainAsString(), self.dataType
-
-    def getPossibleAttribute(self, attributeName, mesh):
-        attribute = mesh.getCustomAttribute(attributeName)
-        if attribute is not None: return attribute
-
-        attribute = mesh.getBuiltInAttribute(attributeName)
-        if attribute is not None: return attribute
-
-        attribute = mesh.getUVMapAttribute(attributeName)
-        if attribute is not None: return attribute
-
-        attribute = mesh.getVertexColorAttribute(attributeName)
-        if attribute is not None: return attribute
-
-        self.raiseErrorMessage(f"""Object does not have attribute with name '{attributeName}'.\nAvailable: {self.getAttributeNames(mesh)}""")
-
-    def getAttributeNames(self, mesh):
-        attributeNames = list()
-        for meshAttributes in mesh.getAttributeDictionaries():
-            attributeNames.extend(meshAttributes.keys())
-        return attributeNames
