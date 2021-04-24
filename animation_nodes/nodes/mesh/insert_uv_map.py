@@ -25,12 +25,15 @@ class InsertUVMapNode(bpy.types.Node, AnimationNode):
         self.newOutput("Mesh", "Mesh", "mesh")
 
     def execute(self, mesh, uvMapName, positions):
-        if uvMapName == "":
-            self.raiseErrorMessage("UV map name can't be empty.")
-        elif uvMapName in mesh.getAttributeNames(AttributeType.UV_MAP):
-            self.raiseErrorMessage(f"Mesh already has a uv map with the name '{uvMapName}'.")
+        self.checkAttributeName(mesh, uvMapName)
 
         positions = VirtualVector2DList.create(positions, Vector((0, 0))).materialize(len(mesh.polygons.indices))
-        mesh.insertAttribute(Attribute(uvMapName, AttributeType.UV_MAP, AttributeDomain.CORNER,
-                                       AttributeDataType.FLOAT2, positions))
+        mesh.insertUVMapAttribute(Attribute(uvMapName, AttributeType.UV_MAP, AttributeDomain.CORNER,
+                                            AttributeDataType.FLOAT2, positions))
         return mesh
+
+    def checkAttributeName(self, mesh, attributeName):
+        if attributeName == "":
+            self.raiseErrorMessage("UV map name can't be empty.")
+        elif attributeName in mesh.getAllUVMapAttributeNames():
+            self.raiseErrorMessage(f"Mesh has already a uv map with the name '{attributeName}'.")

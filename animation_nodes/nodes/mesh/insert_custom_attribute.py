@@ -25,8 +25,8 @@ domainItems = [
 ]
 
 dataTypeItems = [
-    ("FLOAT", "Float", "", "NONE", 0),
-    ("INT", "Integer", "", "NONE", 1),
+    ("INT", "Integer", "", "NONE", 0),
+    ("FLOAT", "Float", "", "NONE", 1),
     ("FLOAT2", "Float2", "", "NONE", 2),
     ("FLOAT_VECTOR", "Vector", "", "NONE", 3),
     ("FLOAT_COLOR", "Color", "", "NONE", 4),
@@ -48,13 +48,13 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
     useDataList: VectorizedSocket.newProperty()
 
     def create(self):
-        self.newInput("Mesh", "Mesh", "mesh")
-        self.newInput("Text", "Attribute Name", "attributeName", value = "AN-Att")
-        if self.dataType == "FLOAT":
-            self.newInput(VectorizedSocket("Float", "useDataList",
-            ("Value", "data"), ("Values", "data")))
-        elif self.dataType == "INT":
+        self.newInput("Mesh", "Mesh", "mesh", dataIsModified = True)
+        self.newInput("Text", "Name", "customAttributeName", value = "AN-Att")
+        if self.dataType == "INT":
             self.newInput(VectorizedSocket("Integer", "useDataList",
+            ("Value", "data"), ("Values", "data")))
+        elif self.dataType == "FLOAT":
+            self.newInput(VectorizedSocket("Float", "useDataList",
             ("Value", "data"), ("Values", "data")))
         elif self.dataType == "FLOAT2":
             self.newInput(VectorizedSocket("Vector 2D", "useDataList",
@@ -75,13 +75,8 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "domain", text = "")
         layout.prop(self, "dataType", text = "")
 
-    def execute(self, mesh, attributeName, data):
-        if mesh is None: return mesh
-
-        if attributeName == "":
-            self.raiseErrorMessage("Attribute name can't be empty.")
-        elif attributeName in mesh.getAttributeNames(AttributeType.CUSTOM):
-            self.raiseErrorMessage(f"Mesh has already a vertex color layer with the name '{attributeName}'.")
+    def execute(self, mesh, customAttributeName, data):
+        self.checkAttributeName(mesh, customAttributeName)
 
         if self.domain == "POINT":
             amount = len(mesh.vertices)
@@ -92,10 +87,10 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
         else:
             amount = len(mesh.polygons.indices)
 
-        if self.dataType == "FLOAT":
-            _data = FloatList.fromValues(VirtualDoubleList.create(data, 0).materialize(amount))
-        elif self.dataType == "INT":
+        if self.dataType == "INT":
             _data = VirtualLongList.create(data, 0).materialize(amount)
+        elif self.dataType == "FLOAT":
+            _data = FloatList.fromValues(VirtualDoubleList.create(data, 0).materialize(amount))
         elif self.dataType == "FLOAT2":
             _data = VirtualVector2DList.create(data, Vector((0, 0))).materialize(amount)
         elif self.dataType == "FLOAT_VECTOR":
@@ -105,6 +100,12 @@ class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
         else:
             _data = VirtualBooleanList.create(data, False).materialize(amount)
 
-        mesh.insertAttribute(Attribute(attributeName, AttributeType.CUSTOM, AttributeDomain[self.domain],
-                                       AttributeDataType[self.dataType], _data))
+        mesh.insertCustomAttribute(Attribute(customAttributeName, AttributeType.CUSTOM, AttributeDomain[self.domain],
+                                             AttributeDataType[self.dataType], _data))
         return mesh
+
+    def checkAttributeName(self, mesh, attributeName):
+        if attributeName == "":
+            self.raiseErrorMessage("Custom attribute name can't be empty.")
+        elif attributeName in mesh.getAllCustomAttributeNames():
+            self.raiseErrorMessage(f"Mesh has already a custom attribute with the name '{attributeName}'.")

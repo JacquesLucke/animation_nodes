@@ -19,8 +19,8 @@ cListFromDataType = {
 }
 
 stringFromType = {
-    UV_MAP: "UV_MAP",
     MATERIAL_INDEX: "MATERIAL_INDEX",
+    UV_MAP: "UV_MAP",
     VERTEX_COLOR: "VERTEX_COLOR",
     CUSTOM: "CUSTOM",
 }
@@ -85,13 +85,13 @@ cdef class Attribute:
         self.data = extension + self.data
 
     def getTypeAsString(self):
-        return stringFromType(self.type)
+        return stringFromType[self.type]
 
     def getDomainAsString(self):
-        return stringFromDomain(self.domain)
+        return stringFromDomain[self.domain]
 
     def getListTypeAsString(self):
-        return stringFromDataType(self.dataType)
+        return stringFromDataType[self.dataType]
 
     def getListType(self):
-        return cListFromDataType.get(self.dataType)
+        return cListFromDataType[self.dataType]

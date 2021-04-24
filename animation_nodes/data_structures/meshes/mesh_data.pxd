@@ -1,3 +1,4 @@
+from .. attributes.attribute cimport Attribute
 from .. lists.polygon_indices_list cimport PolygonIndicesList
 from .. lists.base_lists cimport Vector3DList, EdgeIndicesList, LongList
 
@@ -7,4 +8,7 @@ cdef class Mesh:
         readonly EdgeIndicesList edges
         readonly PolygonIndicesList polygons
         dict derivedMeshDataCache
-        object attributes
+        object builtInAttributes
+        object customAttributes
+        object uvMapAttributes
+        object vertexColorAttributes

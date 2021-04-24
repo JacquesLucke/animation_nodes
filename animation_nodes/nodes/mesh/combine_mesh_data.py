@@ -43,9 +43,9 @@ class CombineMeshNode(bpy.types.Node, AnimationNode):
             mesh = Mesh(vertexLocations, edgeIndices, polygonIndices, skipValidation = self.skipValidation)
             if self.inputs["Material Indices"].isUsed:
                 if len(materialIndices) == len(polygonIndices) and materialIndices.getMinValue() >= 0:
-                    mesh.insertAttribute(Attribute("Material Indices", AttributeType.MATERIAL_INDEX,
-                                                   AttributeDomain.FACE, AttributeDataType.INT,
-                                                   materialIndices))
+                    mesh.insertBuiltInAttribute(Attribute("Material Indices", AttributeType.MATERIAL_INDEX,
+                                                          AttributeDomain.FACE, AttributeDataType.INT,
+                                                          materialIndices))
                 else:
                     self.raiseErrorMessage("Invalid material indices.")
             return mesh
