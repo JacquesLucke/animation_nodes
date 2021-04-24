@@ -208,9 +208,6 @@ cdef class Mesh:
     def getCustomAttribute(self, str name):
         return self.customAttributes.get(name, None)
 
-    def getMaterialIndices(self):
-        return self.getBuiltInAttribute("Material Indices")
-
 
     def getVertexLinkedVertices(self, long vertexIndex):
         cdef LongList neighboursAmounts, neighboursStarts, neighbours, neighbourEdges
@@ -253,7 +250,6 @@ cdef class Mesh:
         self.polygons = newPolygons
         self.derivedMeshDataCache.clear()
         self.builtInAttributes.clear()
-        self.customAttributes.clear()
         self.customAttributes.clear()
         self.uvMapAttributes.clear()
         self.vertexColorAttributes.clear()
