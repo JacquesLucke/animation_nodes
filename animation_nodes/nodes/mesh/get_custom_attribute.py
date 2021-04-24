@@ -23,7 +23,7 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Mesh", "Mesh", "mesh")
-        self.newInput("Text", "Attribute Name", "attributeName", value = "")
+        self.newInput("Text", "Name", "attributeName", value = "")
 
         if self.dataType == "FLOAT":
             self.newOutput("Float List", "Values", "data")
@@ -50,10 +50,14 @@ class GetCustomAttributeNode(bpy.types.Node, AnimationNode):
 
         attribute = mesh.getCustomAttribute(attributeName)
         if attribute is None:
-            self.raiseErrorMessage(f"""Object does not have attribute with name '{attributeName}'.\nAvailable: {mesh.getAllCustomAttributeNames()}""")
+            self.raiseErrorMessage(
+                    f"Object does not have attribute with name '{attributeName}'."
+                    f"\nAvailable: {mesh.getAllCustomAttributeNames()}"
+            )
 
         if self.dataType != attribute.getListTypeAsString():
-            self.raiseErrorMessage("Wrong output data type.")
+            self.raiseErrorMessage(
+                f"Wrong output data type. Attribute is of type '{attribute.getListTypeAsString()}'.")
 
         if self.dataType == "FLOAT":
             return DoubleList.fromValues(attribute.data), attribute.getTypeAsString(), attribute.getDomainAsString(), self.dataType
