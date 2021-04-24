@@ -133,27 +133,22 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
                 outMesh.polygons.foreach_set("material_index", indices.asMemoryView())
 
         # UV Maps
-        for name, uvMap in mesh.getAllUVMapAttributes():
-            outMesh.uv_layers.new(name = name)
-            outMesh.uv_layers[name].data.foreach_set("uv", uvMap.data.asMemoryView())
+        for attribute in mesh.iterUVMapAttributes():
+            uvLayer = outMesh.uv_layers.new(name = attribute.name, do_init = False)
+            uvLayer.data.foreach_set("uv", attribute.data.asMemoryView())
 
         # Vertex Color Layers
-        for name, vertexColors in mesh.getAllVertexColorAttributes():
-            outMesh.vertex_colors.new(name = name)
-            outMesh.vertex_colors[name].data.foreach_set("color", vertexColors.data.asMemoryView())
+        for attribute in mesh.iterVertexColorAttributes():
+            vertexColorLayer = outMesh.vertex_colors.new(name = attribute.name, do_init = False)
+            vertexColorLayer.data.foreach_set("color", attribute.data.asMemoryView())
 
         # Custom Attributes
-        for name, attribute in mesh.getAllCustomAttributes():
-            attributeOut = outMesh.attributes.get(name)
-
+        for attribute in mesh.iterCustomAttributes():
             domain = attribute.getDomainAsString()
             dataType = attribute.getListTypeAsString()
             data = attribute.data
-            if attributeOut is None:
-                attributeOut = outMesh.attributes.new(name, dataType, domain)
-            elif attributeOut.data_type != dataType or attributeOut.domain != domain:
-                outMesh.attributes.remove(attributeOut)
-                attributeOut = outMesh.attributes.new(name, dataType, domain)
+
+            attributeOut = outMesh.attributes.new(attribute.name, dataType, domain)
 
             if dataType in ("FLOAT", "INT", "BOOLEAN"):
                 attributeOut.data.foreach_set("value", data.asMemoryView())
@@ -161,7 +156,6 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
                 attributeOut.data.foreach_set("vector", data.asMemoryView())
             else:
                 attributeOut.data.foreach_set("color", data.asMemoryView())
-            attributeOut.data.update()
 
         if self.validateMesh:
             outMesh.validate(verbose = self.validateMeshVerbose)

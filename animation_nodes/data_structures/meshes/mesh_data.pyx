@@ -170,17 +170,17 @@ cdef class Mesh:
         self.customAttributes[attribute.name] = attribute
 
 
-    def getAllBuiltInAttributes(self):
-        return list(self.builtInAttributes.items())
+    def iterBuiltInAttributes(self):
+        return self.builtInAttributes.values()
 
-    def getAllUVMapAttributes(self):
-        return list(self.uvMapAttributes.items())
+    def iterUVMapAttributes(self):
+        return self.uvMapAttributes.values()
 
-    def getAllVertexColorAttributes(self):
-        return list(self.vertexColorAttributes.items())
+    def iterVertexColorAttributes(self):
+        return self.vertexColorAttributes.values()
 
-    def getAllCustomAttributes(self):
-        return list(self.customAttributes.items())
+    def iterCustomAttributes(self):
+        return self.customAttributes.values()
 
 
     def getAllBuiltInAttributeNames(self):
