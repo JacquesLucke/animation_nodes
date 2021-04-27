@@ -25,7 +25,7 @@ from ... math cimport (
     scaleVec3, subVec3, crossVec3, distanceVec3, lengthVec3, dotVec3,
     transformVec3AsPoint_InPlace, normalizeVec3_InPlace, scaleVec3_Inplace,
     normalizeLengthVec3_Inplace, transformVec3AsPoint, transformVec3AsDirection,
-    matrixFromNormalizedAxisData,
+    matrixFromNormalizedAxisData, sqrt
 )
 
 # Edge Operations
@@ -707,3 +707,24 @@ def getReplicatedLoopEdges(UIntegerList loopEdges, Py_ssize_t amount, Py_ssize_t
             _newLoopEdges[index] = _loopEdges[j] + offset
             index += 1
     return newLoopEdges
+
+def generateHexagonGrid(Py_ssize_t xDivisions, Py_ssize_t yDivisions, float radius):
+    cdef Py_ssize_t i, j, index
+    cdef float x, y
+    cdef float xDistance = radius * 1.5
+    cdef float yDistance = radius * sqrt(3)
+    cdef float xOffset = xDistance * (xDivisions - 1) / 2
+    cdef float yOffset = yDistance * (yDivisions - 1) / 2
+    cdef Vector3DList grid = Vector3DList(length = xDivisions * yDivisions)
+    for i in range(xDivisions):
+        x = i * xDistance
+        for j in range(yDivisions):
+            if (i % 2) == 0:
+                y = j * yDistance
+            else:
+                y = (j + 0.5) * yDistance
+            index = i * yDivisions + j
+            grid.data[index].x = x - xOffset
+            grid.data[index].y = y - yOffset
+            grid.data[index].z = 0
+    return grid
