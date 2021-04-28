@@ -35,11 +35,11 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         if "materialIndices" in required:
             yield "materialIndices = self.getMaterialIndices(mesh)"
         if "uvMapNames" in required:
-            yield "uvMapNames = mesh.getAttributeNames(AttributeType.UV_MAP)"
+            yield "uvMapNames = mesh.getAllUVMapAttributeNames()"
         if "vertexColorLayerNames" in required:
-            yield "vertexColorLayerNames = mesh.getAttributeNames(AttributeType.VERTEX_COLOR)"
+            yield "vertexColorLayerNames = mesh.getAllVertexColorAttributeNames()"
         if "customAttributeNames" in required:
-            yield "customAttributeNames = mesh.getAttributeNames(AttributeType.CUSTOM)"
+            yield "customAttributeNames = mesh.getAllCustomAttributeNames()"
 
     def getMaterialIndices(self, mesh):
         materialIndices = mesh.getBuiltInAttribute("Material Indices")
