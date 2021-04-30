@@ -23,6 +23,7 @@
 - Added *Taper Mode* input to *Curve Object Output* node.
 - Added *Evaluate Object* option to *Object Attribute Input* node.
 - Added Attribute data type, and *Custom Attribute* nodes.
+- Added *Bevel Spline* node.
 
 ### Fixed
 

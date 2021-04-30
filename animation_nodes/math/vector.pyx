@@ -129,10 +129,19 @@ cdef float angleVec3(Vector3 *a, Vector3 *b):
     elif val < -1: val = -1
     return acos(val)
 
+@cython.cdivision(True)
+cdef float angleVec3Normalized(Vector3 *a, Vector3 *b):
+    cdef float denominator = lengthVec3(a) * lengthVec3(b)
+    if denominator == 0: return 0
+
+    cdef float dot = dotVec3(a, b)
+    cdef float val = dot / denominator
+    if val > 1: val = 1
+    elif val < -1: val = -1
+    return acos(val)
+
 cdef float angleNormalizedVec3(Vector3 *a, Vector3 *b):
     cdef float dot = dotVec3(a, b)
-    if dot > 1: dot = 1
-    elif dot < -1: dot = -1
     return acos(dot)
 
 cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b):

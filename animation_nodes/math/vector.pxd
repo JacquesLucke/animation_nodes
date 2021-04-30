@@ -25,6 +25,7 @@ cdef void divideVec3(Vector3* target, Vector3* a, Vector3* b)
 
 cdef float dotVec3(Vector3* a, Vector3* b)
 cdef float angleVec3(Vector3 *a, Vector3 *b)
+cdef float angleVec3Normalized(Vector3 *a, Vector3 *b)
 cdef void crossVec3(Vector3* result, Vector3* a, Vector3* b)
 cdef float scalarTripleProduct(Vector3 *a, Vector3 *b, Vector3 *c)
 cdef float angleNormalizedVec3(Vector3 *a, Vector3 *b)
