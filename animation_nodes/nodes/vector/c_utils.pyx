@@ -1,7 +1,7 @@
-from ... math cimport Vector3, distanceVec3, lengthVec3, dotVec3
+from ... math cimport Vector3, distanceVec3, lengthVec3, dotVec3, transformVec3AsPoint
 from ... data_structures cimport (
     DoubleList, Vector3DList, CDefaultList, Vector2DList,
-    VirtualDoubleList, VirtualVector3DList, FloatList)
+    VirtualDoubleList, VirtualVector3DList, VirtualMatrix4x4List, FloatList)
 
 def combineVectorList(Py_ssize_t amount,
                       VirtualDoubleList x, VirtualDoubleList y, VirtualDoubleList z):
@@ -114,3 +114,12 @@ def calculateVectorDotProducts(Py_ssize_t amount,
     for i in range(amount):
         dotProducts.data[i] = dotVec3(vectors1.get(i), vectors2.get(i))
     return dotProducts
+
+def transformVirtualVectorList(Py_ssize_t amount,
+                               VirtualVector3DList vectors,
+                               VirtualMatrix4x4List matrices):
+    cdef Py_ssize_t i
+    cdef Vector3DList output = Vector3DList(length = amount)
+    for i in range(amount):
+        transformVec3AsPoint(output.data + i, vectors.get(i), matrices.get(i))
+    return output

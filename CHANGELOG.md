@@ -45,6 +45,7 @@
 - Selection order now need to be recorded for *Integer ID Keys*.
 - Splines can now be computed from Text objects.
 - Support curve objects in *Shade Object Smooth* node.
+- Vectorized Matrix input of *Transform Vector* node.
 
 ## 2.2.1 (13 January 2021)
 
