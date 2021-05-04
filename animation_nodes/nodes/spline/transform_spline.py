@@ -1,7 +1,7 @@
 import bpy
 from mathutils import Matrix
-from ... data_structures import VirtualPyList, Spline
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualPyList, VirtualMatrix4x4List, Spline
 
 class TransformSplineNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_TransformSplineNode"
@@ -13,7 +13,7 @@ class TransformSplineNode(bpy.types.Node, AnimationNode):
     def create(self):
         socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline"), ("Splines", "splines")))
-        socket.dataIsModified = True
+        socket.dataIsModified = not self.useMatrixList
         socket.defaultDrawType = "PROPERTY_ONLY"
 
         self.newInput(VectorizedSocket("Matrix", "useMatrixList",
@@ -53,7 +53,7 @@ class TransformSplineNode(bpy.types.Node, AnimationNode):
 
     def execute_MultipleSpline_MultipleMatrix(self, splines, matrices):
         _splines = VirtualPyList.create(splines, Spline())
-        _matrices = VirtualPyList.create(list(matrices), Matrix())
+        _matrices = VirtualMatrix4x4List.create(matrices, Matrix.Identity(4))
         amount = VirtualPyList.getMaxRealLength(_splines, _matrices)
         outSplines = []
         for i in range(amount):
