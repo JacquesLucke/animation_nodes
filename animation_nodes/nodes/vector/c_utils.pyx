@@ -116,8 +116,8 @@ def calculateVectorDotProducts(Py_ssize_t amount,
     return dotProducts
 
 def transformVirtualVectorList(Py_ssize_t amount,
-                        VirtualVector3DList vectors,
-                        VirtualMatrix4x4List matrices):
+                               VirtualVector3DList vectors,
+                               VirtualMatrix4x4List matrices):
     cdef Py_ssize_t i
     cdef Vector3DList output = Vector3DList(length = amount)
     for i in range(amount):
