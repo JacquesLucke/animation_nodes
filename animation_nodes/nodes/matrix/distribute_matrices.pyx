@@ -1,13 +1,13 @@
 import bpy
 from bpy.props import *
 from math import pi as _pi
-from libc.math cimport sin, cos
+from libc.math cimport sin, cos, sqrt
 from ... utils.limits cimport INT_MAX
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList, Spline, Interpolation
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
-from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
+from ... math cimport (Matrix4, Vector3, setTranslationMatrix, setTranslationScaleMatrix,
     setMatrixTranslation, setRotationZMatrix, toVector3, scaleMatrix3x3Part)
 cdef double PI = _pi # cimporting pi does not work for some reason...
 
@@ -18,6 +18,7 @@ modeItems = [
     ("MESH", "Mesh", "", "NONE", 3),
     ("SPIRAL", "Spiral", "", "NONE", 4),
     ("SPLINE", "Spline", "", "NONE", 5),
+    ("HEXAGON", "Hexagon", "", "NONE", 6),
 ]
 
 distanceModeItems = [
@@ -44,6 +45,7 @@ searchItems = {
     "Distribute Mesh" : "MESH",
     "Distribute Spiral" : "SPIRAL",
     "Distribute Spline" : "SPLINE",
+    "Distribute Hexagon" : "HEXAGON",
 }
 
 directionAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
@@ -139,6 +141,16 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             if self.splineDistributionMethod != "VERTICES":
                 self.newInput("Float", "Start", "start", value = 0.0).setRange(0.0, 1.0)
                 self.newInput("Float", "End", "end", value = 1.0).setRange(0.0, 1.0)
+        elif self.mode == "HEXAGON":
+            self.newInput("Integer", "X Divisions", "xDiv", value = 6, minValue = 0)
+            self.newInput("Integer", "Y Divisions", "yDiv", value = 6, minValue = 0)
+            if self.distanceMode == "STEP":
+                self.newInput("Float", "X Distance", "size1", value = 1)
+                self.newInput("Float", "Y Distance", "size2", value = 1)
+            elif self.distanceMode == "SIZE":
+                self.newInput("Float", "Width", "size1", value = 5)
+                self.newInput("Float", "Length", "size2", value = 5)
+            self.newInput("Float", "Z Scale", "size3", value = 1)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Vector List", "Vectors", "vectors")
@@ -146,7 +158,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
     def draw(self, layout):
         col = layout.column()
         col.prop(self, "mode", text = "")
-        if self.mode in ("LINEAR", "GRID"):
+        if self.mode in ("LINEAR", "GRID", "HEXAGON"):
             col.prop(self, "distanceMode", text = "")
         if self.mode == "LINEAR":
             layout.prop(self, "directionAxis", expand = True)
@@ -200,6 +212,9 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
                 yield "matrices = self.execute_SplineCount(spline, count, start, end)"
             else:
                 yield "matrices = self.execute_SplineVertices(spline)"
+
+        elif self.mode == "HEXAGON":
+            yield "matrices = self.execute_HexagonGrid(xDiv, yDiv, size1, size2, size3)"
 
         if "vectors" in required:
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
@@ -384,6 +399,34 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         spline.ensureNormals()
         count = len(spline.points)
         return spline.getDistributedMatrices(count, 0, 1, "RESOLUTION")
+
+    def execute_HexagonGrid(self, int xDiv, int yDiv, float size1, float size2, float size3):
+        cdef Py_ssize_t i, j, index
+        cdef float x, y
+        cdef float xDistance = size1 * 1.5
+        cdef float yDistance = size2 * sqrt(3)
+        if self.distanceMode == "SIZE":
+            xDistance /= max(xDiv - 1, 1)
+            yDistance /= max(yDiv - 1, 1)
+        cdef float xOffset = xDistance * (xDiv - 1) / 2
+        cdef float yOffset = yDistance * (yDiv - 1) / 2
+        cdef Matrix4x4List matrices = Matrix4x4List(length = xDiv * yDiv)
+        cdef Vector3 translation = toVector3((0, 0, 0))
+        cdef Vector3 scale = toVector3((1, 1, size3))
+        for i in range(xDiv):
+            x = i * xDistance
+            for j in range(yDiv):
+                if (i % 2) == 0:
+                    y = j * yDistance
+                else:
+                    y = (j + 0.5) * yDistance
+                index = i * yDiv + j
+                translation.x = x - xOffset
+                translation.y = y - yOffset
+                scale.x = size1
+                scale.y = size2
+                setTranslationScaleMatrix(matrices.data + index, &translation, &scale)
+        return matrices
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)
