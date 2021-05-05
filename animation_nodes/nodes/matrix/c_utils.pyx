@@ -1,6 +1,6 @@
 from ... data_structures cimport (
     DoubleList, FloatList,
-    Vector3DList, EulerList, Matrix4x4List,
+    Vector3DList, EulerList, Matrix4x4List, VirtualMatrix4x4List,
     VirtualVector3DList, VirtualEulerList, VirtualFloatList,
     Action, ActionEvaluator, PathIndexActionChannel,
     BoundedAction, BoundedActionEvaluator
@@ -259,6 +259,14 @@ def multiplyMatrixLists(Matrix4x4List listA, Matrix4x4List listB):
         multMatrix4(outMatrices.data + i, listA.data + i, listB.data + i)
     return outMatrices
 
+def transformVirtualMatrix4x4List(Py_ssize_t amount,
+                                 VirtualMatrix4x4List mA,
+                                 VirtualMatrix4x4List mB):
+    cdef Py_ssize_t i
+    cdef Matrix4x4List outMatrices = Matrix4x4List(length = amount)
+    for i in range(amount):
+        multMatrix4(outMatrices.data + i, mB.get(i), mA.get(i))
+    return outMatrices
 
 # Various
 ###########################################
