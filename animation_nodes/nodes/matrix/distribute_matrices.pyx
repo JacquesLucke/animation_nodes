@@ -7,7 +7,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures cimport Mesh, Matrix4x4List, Vector3DList, Spline, Interpolation
 from ... algorithms.rotations.rotation_and_direction cimport directionToMatrix_LowLevel
-from ... math cimport (Matrix4, Vector3, setTranslationMatrix, setTranslationScaleMatrix,
+from ... math cimport (Matrix4, Vector3, setTranslationMatrix,
     setMatrixTranslation, setRotationZMatrix, toVector3, scaleMatrix3x3Part)
 cdef double PI = _pi # cimporting pi does not work for some reason...
 
@@ -22,6 +22,11 @@ modeItems = [
 ]
 
 distanceModeItems = [
+    ("STEP", "Step", "Define the distance between two points", "NONE", 0),
+    ("SIZE", "Size", "Define how large the grid will be in total", "NONE", 1)
+]
+
+hexagonalDistanceModeItems = [
     ("STEP", "Step", "Define the distance between two points", "NONE", 0),
     ("SIZE", "Size", "Define how large the grid will be in total", "NONE", 1)
 ]
@@ -96,6 +101,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         description = "Increase to have a more accurate evaluation if the type is set to Uniform",
         update = propertyChanged)
 
+    __annotations__["hexagonalDistanceMode"] = EnumProperty(name = "Distance Mode", default = "SIZE",
+        items = hexagonalDistanceModeItems, update = AnimationNode.refresh)
     __annotations__["hexGridCenterX"] = BoolProperty(name = "Center Along X", default = True,
         description = "Center hexagonal grid along the x axis", update = propertyChanged)
     __annotations__["hexGridCenterY"] = BoolProperty(name = "Center Along Y", default = True,
@@ -149,9 +156,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         elif self.mode == "HEXAGONAL_GRID":
             self.newInput("Integer", "X Divisions", "xDivisions", value = 6, minValue = 0)
             self.newInput("Integer", "Y Divisions", "yDivisions", value = 6, minValue = 0)
-            self.newInput("Float", "X Size", "xSize", value = 1)
-            self.newInput("Float", "Y Size", "ySize", value = 1)
-            self.newInput("Float", "Z Size", "zSize", value = 1)
+            self.newInput("Float", "X Size", "xSize", value = 5)
+            self.newInput("Float", "Y Size", "ySize", value = 5)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Vector List", "Vectors", "vectors")
@@ -178,6 +184,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         if self.mode == "SPLINE":
             col.prop(self, "splineDistributionMethod", text = "")
         if self.mode == "HEXAGONAL_GRID":
+            col.prop(self, "hexagonalDistanceMode", text = "")
             row = col.row(align = True)
             row.prop(self, "hexGridCenterX", text = "X", toggle = True)
             row.prop(self, "hexGridCenterY", text = "Y", toggle = True)
@@ -218,7 +225,7 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             else:
                 yield "matrices = self.execute_SplineVertices(spline)"
         elif self.mode == "HEXAGONAL_GRID":
-            yield "matrices = self.execute_HexagonalGrid(xDivisions, yDivisions, xSize, ySize, zSize)"
+            yield "matrices = self.execute_HexagonalGrid(xDivisions, yDivisions, xSize, ySize)"
 
         if "vectors" in required:
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
@@ -404,9 +411,14 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         count = len(spline.points)
         return spline.getDistributedMatrices(count, 0, 1, "RESOLUTION")
 
-    def execute_HexagonalGrid(self, int xDivisions, int yDivisions, float xSize, float ySize, float zSize):
+    def execute_HexagonalGrid(self, int xDivisions, int yDivisions, float xSize, float ySize):
         cdef float xDistance = xSize * 1.5
         cdef float yDistance = ySize * sqrt(3)
+
+        if self.hexagonalDistanceMode == "SIZE":
+            xDistance /= max(xDivisions - 1, 1)
+            yDistance /= max(yDivisions - 1, 1)
+
         cdef float xOffset = 0
         cdef float yOffset = 0
 
@@ -416,7 +428,6 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             yOffset = yDistance * (yDivisions - 1) / 2
 
         cdef Vector3 translation = toVector3((0, 0, 0))
-        cdef Vector3 scale = toVector3((1, 1, zSize))
         cdef Matrix4x4List matrices = Matrix4x4List(length = xDivisions * yDivisions)
         cdef Py_ssize_t i, j, index
         cdef float x, y
@@ -432,11 +443,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
 
                 translation.x = x - xOffset
                 translation.y = y - yOffset
-                scale.x = xSize
-                scale.y = ySize
-
                 index = i * yDivisions + j
-                setTranslationScaleMatrix(matrices.data + index, &translation, &scale)
+                setTranslationMatrix(matrices.data + index, &translation)
 
         return matrices
 
