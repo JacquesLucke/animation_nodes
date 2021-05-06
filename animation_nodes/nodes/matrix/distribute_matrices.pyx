@@ -409,28 +409,35 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         cdef float yDistance = ySize * sqrt(3)
         cdef float xOffset = 0
         cdef float yOffset = 0
+
         if self.hexGridCenterX:
             xOffset = xDistance * (xDivisions - 1) / 2
         if self.hexGridCenterY:
             yOffset = yDistance * (yDivisions - 1) / 2
+
         cdef Vector3 translation = toVector3((0, 0, 0))
         cdef Vector3 scale = toVector3((1, 1, zSize))
         cdef Matrix4x4List matrices = Matrix4x4List(length = xDivisions * yDivisions)
         cdef Py_ssize_t i, j, index
         cdef float x, y
+
         for i in range(xDivisions):
             x = i * xDistance
+
             for j in range(yDivisions):
                 if (i % 2) == 0:
                     y = j * yDistance
                 else:
                     y = (j + 0.5) * yDistance
-                index = i * yDivisions + j
+
                 translation.x = x - xOffset
                 translation.y = y - yOffset
                 scale.x = xSize
                 scale.y = ySize
+
+                index = i * yDivisions + j
                 setTranslationScaleMatrix(matrices.data + index, &translation, &scale)
+
         return matrices
 
 cdef int limitAmount(n):
