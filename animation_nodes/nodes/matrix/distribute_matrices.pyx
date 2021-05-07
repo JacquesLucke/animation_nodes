@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from math import pi as _pi
-from libc.math cimport sin, cos
+from libc.math cimport sin, cos, sqrt
 from ... utils.limits cimport INT_MAX
 from ... events import propertyChanged
 from ... base_types import AnimationNode
@@ -18,9 +18,15 @@ modeItems = [
     ("MESH", "Mesh", "", "NONE", 3),
     ("SPIRAL", "Spiral", "", "NONE", 4),
     ("SPLINE", "Spline", "", "NONE", 5),
+    ("HEXAGONAL_GRID", "Hexagonal Grid", "", "NONE", 6),
 ]
 
 distanceModeItems = [
+    ("STEP", "Step", "Define the distance between two points", "NONE", 0),
+    ("SIZE", "Size", "Define how large the grid will be in total", "NONE", 1)
+]
+
+hexagonalDistanceModeItems = [
     ("STEP", "Step", "Define the distance between two points", "NONE", 0),
     ("SIZE", "Size", "Define how large the grid will be in total", "NONE", 1)
 ]
@@ -44,6 +50,7 @@ searchItems = {
     "Distribute Mesh" : "MESH",
     "Distribute Spiral" : "SPIRAL",
     "Distribute Spline" : "SPLINE",
+    "Distribute Hexagonal Grid" : "HEXAGONAL_GRID",
 }
 
 directionAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
@@ -94,6 +101,13 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         description = "Increase to have a more accurate evaluation if the type is set to Uniform",
         update = propertyChanged)
 
+    __annotations__["hexagonalDistanceMode"] = EnumProperty(name = "Distance Mode", default = "SIZE",
+        items = hexagonalDistanceModeItems, update = AnimationNode.refresh)
+    __annotations__["hexGridCenterX"] = BoolProperty(name = "Center Along X", default = True,
+        description = "Center hexagonal grid along the x axis", update = propertyChanged)
+    __annotations__["hexGridCenterY"] = BoolProperty(name = "Center Along Y", default = True,
+        description = "Center hexagonal grid along the y axis", update = propertyChanged)
+
     def create(self):
         if self.mode == "LINEAR":
             self.newInput("Integer", "Amount", "amount", value = 5)
@@ -139,6 +153,11 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             if self.splineDistributionMethod != "VERTICES":
                 self.newInput("Float", "Start", "start", value = 0.0).setRange(0.0, 1.0)
                 self.newInput("Float", "End", "end", value = 1.0).setRange(0.0, 1.0)
+        elif self.mode == "HEXAGONAL_GRID":
+            self.newInput("Integer", "X Divisions", "xDivisions", value = 6, minValue = 0)
+            self.newInput("Integer", "Y Divisions", "yDivisions", value = 6, minValue = 0)
+            self.newInput("Float", "X Size", "xSize", value = 5)
+            self.newInput("Float", "Y Size", "ySize", value = 5)
 
         self.newOutput("Matrix List", "Matrices", "matrices")
         self.newOutput("Vector List", "Vectors", "vectors")
@@ -164,6 +183,11 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
             layout.prop(self, "centerSpiral", toggle = True)
         if self.mode == "SPLINE":
             col.prop(self, "splineDistributionMethod", text = "")
+        if self.mode == "HEXAGONAL_GRID":
+            col.prop(self, "hexagonalDistanceMode", text = "")
+            row = col.row(align = True)
+            row.prop(self, "hexGridCenterX", text = "X", toggle = True)
+            row.prop(self, "hexGridCenterY", text = "Y", toggle = True)
 
     def drawAdvanced(self, layout):
         if self.mode == "CIRCLE":
@@ -200,6 +224,8 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
                 yield "matrices = self.execute_SplineCount(spline, count, start, end)"
             else:
                 yield "matrices = self.execute_SplineVertices(spline)"
+        elif self.mode == "HEXAGONAL_GRID":
+            yield "matrices = self.execute_HexagonalGrid(xDivisions, yDivisions, xSize, ySize)"
 
         if "vectors" in required:
             yield "vectors = AN.nodes.matrix.c_utils.extractMatrixTranslations(matrices)"
@@ -384,6 +410,35 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         spline.ensureNormals()
         count = len(spline.points)
         return spline.getDistributedMatrices(count, 0, 1, "RESOLUTION")
+
+    def execute_HexagonalGrid(self, int xDivisions, int yDivisions, float xSize, float ySize):
+        cdef float xDistance = xSize * 1.5
+        cdef float yDistance = ySize * sqrt(3)
+
+        if self.hexagonalDistanceMode == "SIZE":
+            xDistance /= max(xDivisions - 1, 1)
+            yDistance /= max(yDivisions - 1, 1)
+
+        cdef float xOffset = 0
+        cdef float yOffset = 0
+
+        if self.hexGridCenterX:
+            xOffset = xDistance * (xDivisions - 1) / 2
+        if self.hexGridCenterY:
+            yOffset = yDistance * (yDivisions - 1) / 2
+
+        cdef Vector3 translation = toVector3((0, 0, 0))
+        cdef Matrix4x4List matrices = Matrix4x4List(length = xDivisions * yDivisions)
+        cdef Py_ssize_t i, j, index
+
+        for j in range(yDivisions):
+            for i in range(xDivisions):
+                index = j * xDivisions + i
+                translation.x = i * xDistance - xOffset
+                translation.y = (j + 0.5 * (i % 2)) * yDistance - yOffset
+                setTranslationMatrix(matrices.data + index, &translation)
+
+        return matrices
 
 cdef int limitAmount(n):
     return max(min(n, INT_MAX), 0)
