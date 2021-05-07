@@ -24,6 +24,7 @@
 - Added *Evaluate Object* option to *Object Attribute Input* node.
 - Added Attribute data type, and *Custom Attribute* nodes.
 - Added *Bevel Spline* node.
+- Added *Hexagonal Grid* in *Distribute Matrices* node.
 
 ### Fixed
 
@@ -46,6 +47,8 @@
 - Splines can now be computed from Text objects.
 - Support curve objects in *Shade Object Smooth* node.
 - Vectorized Matrix input of *Transform Vector* node.
+- Vectorized *Transform Spline* node.
+- Vectorized *Transform Matrix* node.
 
 ## 2.2.1 (13 January 2021)
 
