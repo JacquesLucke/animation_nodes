@@ -430,20 +430,12 @@ class DistributeMatricesNode(bpy.types.Node, AnimationNode):
         cdef Vector3 translation = toVector3((0, 0, 0))
         cdef Matrix4x4List matrices = Matrix4x4List(length = xDivisions * yDivisions)
         cdef Py_ssize_t i, j, index
-        cdef float x, y
 
-        for i in range(xDivisions):
-            x = i * xDistance
-
-            for j in range(yDivisions):
-                if (i % 2) == 0:
-                    y = j * yDistance
-                else:
-                    y = (j + 0.5) * yDistance
-
-                translation.x = x - xOffset
-                translation.y = y - yOffset
-                index = i * yDivisions + j
+        for j in range(yDivisions):
+            for i in range(xDivisions):
+                index = j * xDivisions + i
+                translation.x = i * xDistance - xOffset
+                translation.y = (j + 0.5 * (i % 2)) * yDistance - yOffset
                 setTranslationMatrix(matrices.data + index, &translation)
 
         return matrices
