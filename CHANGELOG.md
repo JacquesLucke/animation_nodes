@@ -25,6 +25,8 @@
 - Added Attribute data type, and *Custom Attribute* nodes.
 - Added *Bevel Spline* node.
 - Added *Hexagonal Grid* in *Distribute Matrices* node.
+- Added Index output to Max and Min operatins in *Numbers List Math* node.
+- Added search aliases for *Numbers List Math* node operations.
 
 ### Fixed
 

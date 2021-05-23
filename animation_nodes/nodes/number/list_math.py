@@ -13,6 +13,7 @@ operationItems = [
 class NumberListMathNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_NumberListMathNode"
     bl_label = "Number List Math"
+    searchTags = [(item[1] + " List Numbers", {"operation" : repr(item[0])}) for item in operationItems]
 
     operation: EnumProperty(name = "Operation", default = "ADD",
         items = operationItems, update = executionCodeChanged)
@@ -20,6 +21,8 @@ class NumberListMathNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput("Float List", "Number List", "numbers")
         self.newOutput("Float", "Result", "result")
+        if self.operation in ("MIN", "MAX"):
+            self.newOutput("Integer", "Index", "index", hide = True)
 
     def draw(self, layout):
         layout.prop(self, "operation", text = "")
@@ -30,8 +33,13 @@ class NumberListMathNode(bpy.types.Node, AnimationNode):
         elif self.operation == "MULTIPLY":
             yield "result = numbers.getProductOfElements()"
         elif self.operation == "MIN":
-            yield "result = numbers.getMinValue() if len(numbers) > 0 else 0"
+            yield "index = int(numpy.argmin(numbers.asNumpyArray())) if len(numbers) > 0 else 0"
+            yield "result = numbers[index] if len(numbers) > 0 else 0"
         elif self.operation == "MAX":
-            yield "result = numbers.getMaxValue() if len(numbers) > 0 else 0"
+            yield "index = int(numpy.argmax(numbers.asNumpyArray())) if len(numbers) > 0 else 0"
+            yield "result = numbers[index] if len(numbers) > 0 else 0"
         elif self.operation == "AVERAGE":
             yield "result = numbers.getAverageOfElements() if len(numbers) > 0 else 0"
+
+    def getUsedModules(self):
+        return ["numpy"]
