@@ -34,6 +34,7 @@
 - Fixed nodetree.execute method in background mode.
 - Fixed wrong types in *Get Struct List Elements* node.
 - Fixed mesh generation methods.
+- Fixed Mix Data node for zero length lists.
 
 ### Changed
 
