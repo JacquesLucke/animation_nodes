@@ -32,6 +32,12 @@ class ShapeKeySocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if object:
             self.object = object
 
+    def setProperty(self, object):
+        self.object = object
+
+    def getProperty(self):
+        return self.object
+
     @classmethod
     def getDefaultValue(cls):
         return None
