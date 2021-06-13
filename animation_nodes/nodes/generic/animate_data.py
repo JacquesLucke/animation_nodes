@@ -63,7 +63,7 @@ class AnimateDataNode(bpy.types.Node, AnimationNode):
             "useListEnd", "useListDuration"], ("Time", "outTime"), ("Times", "outTimes")))
 
     def drawLabel(self):
-        return "Animate " + self.inputs[1].dataType
+        return "Animate " + self.inputs[2].dataType
 
     def getExecutionCode(self, required):
         if any([self.useListTime, self.useListStartTime, self.useListStart, self.useListEnd, self.useListDuration]):
