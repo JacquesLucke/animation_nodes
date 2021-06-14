@@ -82,7 +82,7 @@ class SplineFalloffNode(bpy.types.Node, AnimationNode):
         falloffs = []
         for spline in splines:
             if spline.isEvaluable():
-                falloffs.append(self.falloffFromSpline(spline, useSplineRadiusForDistance, distance, useSplineRadiusForWidth, width))
+                falloffs.append(self.distanceFalloffFromSpline(spline, useSplineRadiusForDistance, distance, useSplineRadiusForWidth, width))
 
         if self.mixListType == "ADD":
             interpolatedFalloffs = [InterpolateFalloff(f, interpolation) for f in falloffs]

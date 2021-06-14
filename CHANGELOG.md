@@ -37,6 +37,7 @@
 - Fixed Mix Data node for zero length lists.
 - Fixed conflicts with the Node Wrangler add-on keymap.
 - Fixed incorrect file loading of Shape Key sockets.
+- Fixed vectorized *Spline Falloff* node.
 
 ### Changed
 
