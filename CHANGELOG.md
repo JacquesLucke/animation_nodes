@@ -55,6 +55,7 @@
 - Vectorized Matrix input of *Transform Vector* node.
 - Vectorized *Transform Spline* node.
 - Vectorized *Transform Matrix* node.
+- Remove clamping from the inputs of the *Random Falloff* node.
 
 ## 2.2.1 (13 January 2021)
 

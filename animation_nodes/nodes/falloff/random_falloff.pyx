@@ -9,8 +9,8 @@ class RandomFalloffNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Integer", "Seed", "seed")
-        self.newInput("Float", "Min", "minValue", value = 0).setRange(0, 1)
-        self.newInput("Float", "Max", "maxValue", value = 1).setRange(0, 1)
+        self.newInput("Float", "Min", "minValue", value = 0)
+        self.newInput("Float", "Max", "maxValue", value = 1)
         self.newOutput("Falloff", "Falloff", "falloff")
 
     def execute(self, seed, minValue, maxValue):
