@@ -66,16 +66,12 @@ class TestGetTrimmedCopy(TestCase):
     def testSingleSegmentSameParameter(self):
         spline = self.getSingleSegmentSpline()
         newSpline = spline.getTrimmedCopy(0.3, 0.3)
-        self.assertTrue(len(newSpline.points) >= 1)
-        for point in newSpline.points + newSpline.leftHandles + newSpline.rightHandles:
-            testEqual(self, point, (-0.3205, 0.6255, 0.189))
+        self.assertTrue(len(newSpline.points) == 0)
 
     def testSingleSegmentBothParametersZero(self):
         spline = self.getSingleSegmentSpline()
         newSpline = spline.getTrimmedCopy(0, 0)
-        self.assertTrue(len(newSpline.points) >= 1)
-        for point in newSpline.points + newSpline.leftHandles + newSpline.rightHandles:
-            testEqual(self, point, (-1, 0, 0))
+        self.assertTrue(len(newSpline.points) == 0)
 
     def testGetSingleSegmentFromMultipleSegments(self):
         spline = self.getMultiSegmentSpline()
