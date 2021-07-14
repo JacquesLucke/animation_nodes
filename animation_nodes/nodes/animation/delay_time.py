@@ -23,6 +23,7 @@ class DelayTimeNode(bpy.types.Node, AnimationNode):
             ("Time", "outTime"), ("Times", "outTimes")))
 
     def drawLabel(self):
+        if self.useListB: return "Delay Time"
         delaySocket = self.inputs["Delay"]
         if delaySocket.isUnlinked:
             value = delaySocket.value
