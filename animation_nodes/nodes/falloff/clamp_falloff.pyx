@@ -25,7 +25,6 @@ cdef class ClampFalloff(CompoundFalloff):
         self.falloff = falloff
         self.minValue = minValue
         self.maxValue = maxValue
-        self.clamped = 0 <= min(minValue, maxValue) <= max(minValue, maxValue) <= 1
 
     cdef list getDependencies(self):
         return [self.falloff]
