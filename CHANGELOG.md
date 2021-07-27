@@ -27,6 +27,7 @@
 - Added *Hexagonal Grid* in *Distribute Matrices* node.
 - Added Index output to Max and Min operatins in *Numbers List Math* node.
 - Added search aliases for *Numbers List Math* node operations.
+- Added *Clamp Falloff* node.
 
 ### Fixed
 
