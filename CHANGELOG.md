@@ -58,6 +58,7 @@
 - Vectorized *Transform Matrix* node.
 - Remove clamping from the inputs of the *Random Falloff* node.
 - Support FLIP particle systems in the *Particles Data* node.
+- Vectorized *Point Distance Falloff* node.
 
 ## 2.2.1 (13 January 2021)
 
