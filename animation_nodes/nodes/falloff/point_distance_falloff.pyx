@@ -1,19 +1,56 @@
 import bpy
+from bpy.props import *
 from ... data_structures cimport BaseFalloff
-from ... base_types import AnimationNode
 from ... math cimport Vector3, setVector3, distanceVec3
+from ... base_types import AnimationNode, VectorizedSocket
+
+mixListTypeItems = [
+    ("MAX", "Max", "", "NONE", 0),
+    ("ADD", "Add", "", "NONE", 1),
+]
 
 class PointDistanceFalloffNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_PointDistanceFalloffNode"
     bl_label = "Point Distance Falloff"
 
+    __annotations__ = {}
+
+    __annotations__["mixListType"] = EnumProperty(name = "Mix List Type", default = "MAX",
+        items = mixListTypeItems, update = AnimationNode.refresh)
+
+    __annotations__["useOriginList"] = VectorizedSocket.newProperty()
+
+    __annotations__["useSizeList"] = VectorizedSocket.newProperty()
+
+    __annotations__["useFalloffWidthList"] = VectorizedSocket.newProperty()
+
     def create(self):
-        self.newInput("Vector", "Origin", "origin")
-        self.newInput("Float", "Size", "size")
-        self.newInput("Float", "Falloff Width", "falloffWidth", value = 4)
+        self.newInput(VectorizedSocket("Vector", "useOriginList",
+            ("Origin", "origin"), ("Origins", "origin")))
+        self.newInput(VectorizedSocket("Float", "useSizeList",
+            ("Size", "size"), ("Sizes", "size")))
+        self.newInput(VectorizedSocket("Float", "useFalloffWidthList",
+            ("Falloff Width", "falloffWidth", dict(value = 4)),
+            ("Falloff Widths", "falloffWidth")))
+
         self.newOutput("Falloff", "Falloff", "falloff")
 
-    def execute(self, origin, size, falloffWidth):
+    def draw(self, layout):
+        if any([self.useOriginList, self.useSizeList, self.useFalloffWidthList]):
+            layout.prop(self, "mixListType", text = "")
+
+    def getExecutionCode(self, required):
+        if any([self.useOriginList, self.useSizeList, self.useFalloffWidthList]):
+            yield "_origins = VirtualVector3DList.create(origin, (0,0,0))"
+            yield "_sizes = VirtualDoubleList.create(size, 0)"
+            yield "_widths = VirtualDoubleList.create(falloffWidth, 0)"
+            yield "amount = VirtualVector3DList.getMaxRealLength(_origins, _sizes, _widths)"
+            yield "falloffs = [self.executeSingle(_origins[i], _sizes[i], _widths[i]) for i in range(amount)]"
+            yield f"falloff = AN.nodes.falloff.mix_falloffs.MixFalloffs(falloffs, '{self.mixListType}')"
+        else:
+            yield "falloff = self.executeSingle(origin, size, falloffWidth)"
+
+    def executeSingle(self, origin, size, falloffWidth):
         return PointDistanceFalloff(origin, size, falloffWidth)
 
 
