@@ -1,11 +1,8 @@
 import bpy
 from bpy.props import *
-from ... events import propertyChanged
 from ... data_structures cimport BaseFalloff
-from .. falloff . mix_falloffs import MixFalloffs
 from ... math cimport Vector3, setVector3, distanceVec3
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import VirtualVector3DList, VirtualDoubleList
 
 mixListTypeItems = [
     ("MAX", "Max", "", "NONE", 0),
@@ -19,7 +16,7 @@ class PointDistanceFalloffNode(bpy.types.Node, AnimationNode):
     __annotations__ = {}
 
     __annotations__["mixListType"] = EnumProperty(name = "Mix List Type", default = "MAX",
-        items = mixListTypeItems, update = propertyChanged)
+        items = mixListTypeItems, update = AnimationNode.refresh)
 
     __annotations__["useOriginList"] = VectorizedSocket.newProperty()
 
@@ -42,11 +39,16 @@ class PointDistanceFalloffNode(bpy.types.Node, AnimationNode):
         if any([self.useOriginList, self.useSizeList, self.useFalloffWidthList]):
             layout.prop(self, "mixListType", text = "")
 
-    def getExecutionFunctionName(self):
+    def getExecutionCode(self, required):
         if any([self.useOriginList, self.useSizeList, self.useFalloffWidthList]):
-            return "executeList"
+            yield "_origins = VirtualVector3DList.create(origin, (0,0,0))"
+            yield "_sizes = VirtualDoubleList.create(size, 0)"
+            yield "_widths = VirtualDoubleList.create(falloffWidth, 0)"
+            yield "amount = VirtualVector3DList.getMaxRealLength(_origins, _sizes, _widths)"
+            yield "falloffs = [self.executeSingle(_origins[i], _sizes[i], _widths[i]) for i in range(amount)]"
+            yield f"falloff = AN.nodes.falloff.mix_falloffs.MixFalloffs(falloffs, '{self.mixListType}')"
         else:
-            return "executeSingle"
+            yield "falloff = self.executeSingle(origin, size, falloffWidth)"
 
     def executeSingle(self, origin, size, falloffWidth):
         return PointDistanceFalloff(origin, size, falloffWidth)
