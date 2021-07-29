@@ -31,6 +31,8 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
             ("Objects", "objects")))
 
+        self.inputs[1].useIsUsedProperty = True
+
     def draw(self, layout):
         col = layout.column()
         col.prop(self, "attribute", text = "")
@@ -44,6 +46,7 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
             yield "self.setErrorMessage('Invalid Syntax', show = len(self.attribute.strip()) > 0)"
             return
 
+        if not self.inputs[1].isUsed: return
         yield "try:"
         if self.useObjectList:
             if self.useValueList:
