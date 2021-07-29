@@ -76,20 +76,30 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         layout.prop(self, "calculateLooseEdges")
 
     def getExecutionCode(self, required):
+        if not self.isInputUsed(): return
+
         yield "if self.isValidObject(object):"
         yield "    mesh = object.data"
 
-        s = self.inputs
-
         if self.meshDataType == "MESH_DATA":
-            if s["Mesh"].isUsed:    yield "    self.setMesh(mesh, meshData)"
+            yield "    self.setMesh(mesh, meshData)"
         elif self.meshDataType == "BMESH":
-            if s["BMesh"].isUsed:        yield "    self.setBMesh(mesh, bm)"
+            yield "    self.setBMesh(mesh, bm)"
         elif self.meshDataType == "VERTICES":
-            if s["Vertices"].isUsed:     yield "    self.setVertices(mesh, vertices)"
+            yield "    self.setVertices(mesh, vertices)"
 
         yield "    if self.ensureAnimationData:"
         yield "        self.ensureThatMeshHasAnimationData(mesh)"
+
+    def isInputUsed(self):
+        if self.meshDataType == "MESH_DATA":
+            return self.inputs["Mesh"].isUsed
+        elif self.meshDataType == "BMESH":
+            return self.inputs["BMesh"].isUsed
+        elif self.meshDataType == "VERTICES":
+            return self.inputs["Vertices"].isUsed
+        else:
+            return False
 
     def isValidObject(self, object):
         if object is None: return False

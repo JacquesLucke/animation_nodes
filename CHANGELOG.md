@@ -39,6 +39,7 @@
 - Fixed conflicts with the Node Wrangler add-on keymap.
 - Fixed incorrect file loading of Shape Key sockets.
 - Fixed vectorized *Spline Falloff* node.
+- Fixed random crashes in *Mesh Object Output* node.
 
 ### Changed
 
