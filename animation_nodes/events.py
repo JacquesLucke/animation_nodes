@@ -39,6 +39,13 @@ def frameChanged(scene, depsgraph):
     event_handler.update(event.getActives().union({"Frame"}))
     evaluatedDepsgraph = None
 
+@eventHandler("DEPSGRAPH_UPDATE_POST")
+def sceneChanged(scene, depsgraph):
+    global evaluatedDepsgraph
+    evaluatedDepsgraph = depsgraph
+    event_handler.update(event.getActives().union({"Scene"}))
+    evaluatedDepsgraph = None
+
 def propertyChanged(self = None, context = None):
     event.propertyChanged = True
     resetMeasurements()

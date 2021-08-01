@@ -17,6 +17,7 @@ fileSavePreHandlers = []
 fileLoadPostHandlers = []
 addonLoadPostHandlers = []
 frameChangePostHandlers = []
+depsgraphUpdatePostHandlers = []
 
 renderPreHandlers = []
 renderInitHandlers = []
@@ -30,6 +31,7 @@ def eventHandler(event):
         if event == "FILE_LOAD_POST": fileLoadPostHandlers.append(function)
         if event == "ADDON_LOAD_POST": addonLoadPostHandlers.append(function)
         if event == "FRAME_CHANGE_POST": frameChangePostHandlers.append(function)
+        if event == "DEPSGRAPH_UPDATE_POST": depsgraphUpdatePostHandlers.append(function)
 
         if event == "RENDER_INIT": renderInitHandlers.append(function)
         if event == "RENDER_PRE": renderPreHandlers.append(function)
@@ -71,6 +73,11 @@ def frameChangedPost(scene, depsgraph):
         handler(scene, depsgraph)
 
 @persistent
+def depsgraphUpdatePost(scene, depsgraph):
+    for handler in depsgraphUpdatePostHandlers:
+        handler(scene, depsgraph)
+
+@persistent
 def renderInitialized(scene):
     for handler in renderInitHandlers:
         handler()
@@ -87,6 +94,7 @@ def renderCompleted(scene):
 
 def register():
     bpy.app.handlers.frame_change_post.append(frameChangedPost)
+    bpy.app.handlers.depsgraph_update_post.append(frameChangedPost)
     bpy.app.timers.register(always, persistent = True)
     bpy.app.handlers.load_post.append(loadPost)
     bpy.app.handlers.save_pre.append(savePre)
@@ -101,6 +109,7 @@ def register():
 
 def unregister():
     bpy.app.handlers.frame_change_post.remove(frameChangedPost)
+    bpy.app.handlers.depsgraph_update_post.remove(frameChangedPost)
     bpy.app.handlers.load_post.remove(loadPost)
     bpy.app.handlers.save_pre.remove(savePre)
     bpy.app.timers.unregister(always)
