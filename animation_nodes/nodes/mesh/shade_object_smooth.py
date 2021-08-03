@@ -19,7 +19,7 @@ class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
             ("Smooth", "smooth"), ("Smooth", "smooth")))
         socket = self.inputs[1]
         socket.useIsUsedProperty = True
-        socket.isUsed = False
+        socket.isUsed = True
 
         self.newOutput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object"), ("Objects", "objects")))
