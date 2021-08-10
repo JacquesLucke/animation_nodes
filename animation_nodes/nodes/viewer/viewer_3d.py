@@ -7,8 +7,9 @@ from ... tree_info import getNodesByType
 from ... utils.blender_ui import redrawAll
 
 from mathutils import Vector, Matrix
-from ... data_structures import Vector3DList, Vector2DList, Matrix4x4List, Spline
+from ... nodes.spline.spline_evaluation_base import SplineEvaluationBase
 from ... nodes.vector.c_utils import convert_Vector2DList_to_Vector3DList
+from ... data_structures import Vector3DList, Vector2DList, Matrix4x4List, Spline, BezierSpline
 
 import gpu
 from bgl import *
@@ -25,7 +26,7 @@ class DrawData:
 
 drawableDataTypes = (Vector3DList, Vector2DList, Matrix4x4List, Vector, Matrix, Spline)
 
-class Viewer3DNode(bpy.types.Node, AnimationNode):
+class Viewer3DNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_Viewer3DNode"
     bl_label = "3D Viewer"
 
@@ -47,6 +48,8 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
         soft_min = 0.0, soft_max = 1.0,
         update = drawPropertyChanged)
 
+    pointAmount: IntProperty(name = "Amount", default = 50, update = drawPropertyChanged)
+
     def create(self):
         self.newInput("Generic", "Data", "data")
 
@@ -61,10 +64,19 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
         icon = "LAYER_ACTIVE" if self.enabled else "LAYER_USED"
         row.prop(self, "enabled", text = "", icon = icon)
 
-        if isinstance(data, (Vector, Vector3DList, Spline)):
+        if isinstance(data, (Vector, Vector3DList)):
             col.prop(self, "drawColor", text = "")
         elif isinstance(data, (Matrix, Matrix4x4List)):
             col.prop(self, "matrixScale", text = "Scale")
+        elif isinstance(data, Spline):
+            col.prop(self, "drawColor", text = "")
+            if isinstance(data, BezierSpline):
+                col.prop(self, "pointAmount")
+
+    def drawAdvanced(self, layout):
+        col = layout.column()
+        col.active = self.parameterType == "UNIFORM"
+        col.prop(self, "resolution")
 
     def execute(self, data):
         self.freeDrawingData()
@@ -112,6 +124,9 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
 
     def drawSpline(self, spline):
         vectors = spline.points
+        if isinstance(spline, BezierSpline):
+            spline.ensureUniformConverter(self.resolution)
+            vectors = spline.getDistributedPoints(self.pointAmount, 0, 1, 'UNIFORM')
         if spline.cyclic: vectors.append(vectors[0])
 
         shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
