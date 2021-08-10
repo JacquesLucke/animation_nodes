@@ -68,9 +68,9 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
         elif isinstance(data, (Matrix, Matrix4x4List)):
             col.prop(self, "matrixScale", text = "Scale")
         elif isinstance(data, Spline):
-            col.prop(self, "drawColor", text = "")
             if isinstance(data, BezierSpline):
                 col.prop(self, "pointAmount")
+            col.prop(self, "drawColor", text = "")
 
     def execute(self, data):
         self.freeDrawingData()
@@ -118,12 +118,12 @@ class Viewer3DNode(bpy.types.Node, AnimationNode):
 
     def drawSpline(self, spline):
         vectors = spline.points
-        if isinstance(spline, BezierSpline):
+        if spline.isEvaluable() and isinstance(spline, BezierSpline):
             vectors = spline.getDistributedPoints(self.pointAmount, 0, 1, 'RESOLUTION')
-        if spline.cyclic: vectors.append(vectors[0])
+        lineType = 'LINE_LOOP' if spline.cyclic else 'LINE_STRIP'
 
         shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-        batch = batch_for_shader(shader, 'LINE_STRIP', {"pos": vectors.asNumpyArray().reshape(-1, 3)})
+        batch = batch_for_shader(shader, lineType, {"pos": vectors.asNumpyArray().reshape(-1, 3)})
 
         shader.bind()
         shader.uniform_float("color", (*self.drawColor, 1))
