@@ -2,6 +2,17 @@
 
 ### Added
 
+
+### Fixed
+
+
+### Changed
+
+
+## 2.2.2 (16 August 2021)
+
+### Added
+
 - Added MIDI parser library.
 - Added MIDI Track data structure.
 - Added MIDI Note data structure.

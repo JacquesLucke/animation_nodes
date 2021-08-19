@@ -1,5 +1,5 @@
 '''
-Copyright (C) 2017 Jacques Lucke
+Copyright (C) 2021 Jacques Lucke
 mail@jlucke.com
 
 Created by Jacques Lucke
@@ -23,7 +23,7 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node based visual scripting system designed for motion graphics in Blender.",
     "author":      "Jacques Lucke, Omar Emara",
-    "version":     (2, 2, 2),
+    "version":     (2, 3, 0),
     "blender":     (2, 93, 0),
     "location":    "Animation Nodes Editor",
     "category":    "Node",

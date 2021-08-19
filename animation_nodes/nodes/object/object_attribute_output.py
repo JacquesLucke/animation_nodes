@@ -32,7 +32,6 @@ class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
             ("Objects", "objects")))
 
         self.inputs[1].useIsUsedProperty = True
-        self.inputs[1].isUsed = True
 
     def draw(self, layout):
         col = layout.column()
