@@ -2,6 +2,7 @@
 
 ### Added
 
+- Added support for splines in *3D Viewer* node.
 
 ### Fixed
 
