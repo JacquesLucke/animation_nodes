@@ -9,6 +9,8 @@
 
 ### Changed
 
+- Vectorized *Float To Text* node.
+
 
 ## 2.2.2 (16 August 2021)
 
