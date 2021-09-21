@@ -1,9 +1,12 @@
 from .. lists.clist cimport CList
 
 cpdef enum AttributeType:
-    UV_MAP,
     MATERIAL_INDEX,
+    UV_MAP,
     VERTEX_COLOR,
+    BEVEL_VERTEX_WEIGHT,
+    BEVEL_EDGE_WEIGHT,
+    EDGE_CREASE,
     CUSTOM,
 
 cpdef enum AttributeDomain:
