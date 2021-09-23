@@ -94,6 +94,21 @@ class MeshProperties(bpy.types.PropertyGroup):
         vertexColorLayer.data.foreach_get("color", vertexColors.asNumpyArray())
         return vertexColors
 
+    def getEdgeCreases(self):
+        edgeCreases = DoubleList(length = len(self.mesh.edges))
+        self.mesh.edges.foreach_get("crease", edgeCreases.asNumpyArray())
+        return edgeCreases
+
+    def getBevelEdgeWeights(self):
+        bevelEdgeWeights = DoubleList(length = len(self.mesh.edges))
+        self.mesh.edges.foreach_get("bevel_weight", bevelEdgeWeights.asNumpyArray())
+        return bevelEdgeWeights
+
+    def getBevelVertexWeights(self):
+        bevelVertexWeights = DoubleList(length = len(self.mesh.vertices))
+        self.mesh.vertices.foreach_get("bevel_weight", bevelVertexWeights.asNumpyArray())
+        return bevelVertexWeights       
+
     def getCustomAttribute(self, name):
         attribute = self.mesh.attributes.get(name)
 

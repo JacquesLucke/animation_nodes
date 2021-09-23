@@ -1,6 +1,6 @@
 import bpy
 from ... base_types import AnimationNode
-from ... data_structures import LongList
+from ... data_structures import LongList, DoubleList
 
 class MeshInfoNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshInfoNode"
@@ -15,6 +15,9 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Vector List", "Polygon Centers", "polygonCenters")
         self.newOutput("Vector List", "Polygon Normals", "polygonNormals")
         self.newOutput("Integer List", "Material Indices", "materialIndices")
+        self.newOutput("Float List", "Bevel Vertex Weights", "bevelVertexWeights")
+        self.newOutput("Float List", "Bevel Edge Weights", "bevelEdgeWeights")
+        self.newOutput("Float List", "Edge Creases", "edgeCreases")
         self.newOutput("Text List", "UV Map Names", "uvMapNames")
         self.newOutput("Text List", "Vertex Color Layers", "vertexColorLayerNames")
         self.newOutput("Text List", "Custom Attribute Names", "customAttributeNames")
@@ -33,7 +36,13 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         if "polygonCenters" in required:
             yield "polygonCenters = mesh.getPolygonCenters()"
         if "materialIndices" in required:
-            yield "materialIndices = self.getMaterialIndices(mesh)"
+            yield "materialIndices = self.getBuiltInAttributes('Material Indices', mesh)"
+        if "bevelVertexWeights" in required:
+            yield "bevelVertexWeights = self.getBuiltInAttributes('Bevel Vertex Weights', mesh)"
+        if "bevelEdgeWeights" in required:
+            yield "bevelEdgeWeights = self.getBuiltInAttributes('Bevel Edge Weights', mesh)"
+        if "edgeCreases" in required:
+            yield "edgeCreases = self.getBuiltInAttributes('Edge Creases', mesh)"
         if "uvMapNames" in required:
             yield "uvMapNames = mesh.getAllUVMapAttributeNames()"
         if "vertexColorLayerNames" in required:
@@ -41,11 +50,17 @@ class MeshInfoNode(bpy.types.Node, AnimationNode):
         if "customAttributeNames" in required:
             yield "customAttributeNames = mesh.getAllCustomAttributeNames()"
 
-    def getMaterialIndices(self, mesh):
-        materialIndices = mesh.getBuiltInAttribute("Material Indices")
-        if materialIndices is None:
-            indices = LongList(length = len(mesh.polygons))
-            indices.fill(0)
-            return indices
+    def getBuiltInAttributes(self, name, mesh):
+        builtInAttribute = mesh.getBuiltInAttribute(name)
+        if builtInAttribute is None:
+            if name == "Material Indices":
+                data = LongList(length = len(mesh.polygons))
+            elif name == "Bevel Vertex Weights":
+                data = DoubleList(length = len(mesh.vertices))
+            else:
+                data = DoubleList(length = len(mesh.edges))
+            
+            data.fill(0)
+            return data
         else:
-            return materialIndices.data
+            return builtInAttribute.data
