@@ -151,17 +151,16 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         for attribute in mesh.iterVertexColorAttributes():
             vertexColorLayer = outMesh.vertex_colors.new(name = attribute.name, do_init = False)
             vertexColorLayer.data.foreach_set("color", attribute.data.asMemoryView())
-        
+
         # Vertex Groups
         vertexAmount = len(outMesh.vertices)
         for attribute in mesh.iterVertexWeightAttributes():
-            try:
-                vertexGroup = object.vertex_groups[attribute.name]
-            except:
+            vertexGroup = object.vertex_groups.get(attribute.name)
+            if vertexGroup is None:
                 vertexGroup = object.vertex_groups.new(name = attribute.name)
             weights = attribute.data
             for i in range(vertexAmount):
-                vertexGroup.add([i], weights[i], "REPLACE") 
+                vertexGroup.add([i], weights[i], "REPLACE")
         object.data.update()
 
         # Custom Attributes

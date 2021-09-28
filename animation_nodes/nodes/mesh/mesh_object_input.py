@@ -153,7 +153,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
                                                   AttributeDomain.POINT,
                                                   AttributeDataType.FLOAT,
                                                   sourceMesh.an.getBevelVertexWeights()))
-            
+
             mesh.insertBuiltInAttribute(Attribute("Edge Creases",
                                                   AttributeType.EDGE_CREASE,
                                                   AttributeDomain.EDGE,
@@ -190,9 +190,10 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             vertexGroups = object.vertex_groups
             for vertexGroupName in vertexGroups.keys():
                 if useModifiers:
-                    weights = self.execute_All_WithModifiers(object, vertexGroups[vertexGroupName], scene)
+                    weights = DoubleList(length = len(mesh.vertices))
+                    weights.fill(0)
                 else:
-                    weights = self.execute_All_WithoutModifiers(object, vertexGroups[vertexGroupName])
+                    weights = self.execute_All_WithoutModifiers(mesh, vertexGroups[vertexGroupName])
                 mesh.insertVertexWeightAttribute(Attribute(vertexGroupName,
                                                            AttributeType.VERTEX_WEIGHT,
                                                            AttributeDomain.POINT,
@@ -214,31 +215,12 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         else:
             self.setErrorMessage("Object is in edit mode.")
 
-    def execute_All_WithoutModifiers(self, object, vertexGroup):
-        vertexAmount = len(object.data.vertices)
+    def execute_All_WithoutModifiers(self, mesh, vertexGroup):
+        vertexAmount = len(mesh.vertices)
         weights = DoubleList(length = vertexAmount)
         getWeight = vertexGroup.weight
 
         for i in range(vertexAmount):
             try: weights[i] = getWeight(i)
             except: weights[i] = 0
-        return weights
-
-    def execute_All_WithModifiers(self, object, vertexGroup, scene):
-        pass
-        if scene is None:
-            self.raiseErrorMessage("scene required")
-
-        mesh = object.an.getMesh(applyModifiers = True)
-        index = vertexGroup.index
-        weights = DoubleList(length = len(mesh.vertices))
-        weights.fill(0)
-        for i, vertex in enumerate(mesh.vertices):
-            for vertexGroupElement in vertex.groups:
-                if vertexGroupElement.group == index:
-                    weights[i] = vertexGroupElement.weight
-                    break
-
-        if mesh.users == 0: object.to_mesh_clear()
-
         return weights

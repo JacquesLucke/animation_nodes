@@ -9,17 +9,17 @@ class GetVertexGroupNode(bpy.types.Node, AnimationNode):
 
     def create(self):
         self.newInput("Mesh", "Mesh", "mesh")
-        self.newInput("Text", "Name", "groupName")
+        self.newInput("Text", "Name", "vertexWeightName")
         self.newOutput("Float List", "Weights", "weights")
 
-    def execute(self, mesh, attributeName):
+    def execute(self, mesh, vertexWeightName):
         if mesh is None: return None
-        if attributeName == "": self.raiseErrorMessage("Attribute name can't be empty.")
+        if vertexWeightName == "": self.raiseErrorMessage("Vertex group name can't be empty.")
 
-        attribute = mesh.getVertexWeightAttribute(attributeName)
+        attribute = mesh.getVertexWeightAttribute(vertexWeightName)
         if attribute is None:
             self.raiseErrorMessage(
-                    f"mesh does not have attribute with name '{attributeName}'."
+                    f"Mesh does not have vertex group with name '{vertexWeightName}'."
                     f"\nAvailable: {mesh.getAllVertexWeightAttributeNames()}"
             )
 

@@ -165,7 +165,7 @@ cdef class Mesh:
         if self.getAttributeDomainLength(attribute.domain) != len(attribute.data):
             raise Exception("invalid length")
         self.vertexColorAttributes[attribute.name] = attribute
-    
+
     def insertVertexWeightAttribute(self, Attribute attribute):
         if self.getAttributeDomainLength(attribute.domain) != len(attribute.data):
             raise Exception("invalid length")
@@ -185,7 +185,7 @@ cdef class Mesh:
 
     def iterVertexColorAttributes(self):
         return self.vertexColorAttributes.values()
-    
+
     def iterVertexWeightAttributes(self):
         return self.vertexWeightAttributes.values()
 
@@ -201,7 +201,7 @@ cdef class Mesh:
 
     def getAllVertexColorAttributeNames(self):
         return list(self.vertexColorAttributes.keys())
-    
+
     def getAllVertexWeightAttributeNames(self):
         return list(self.vertexWeightAttributes.keys())
 
@@ -217,7 +217,7 @@ cdef class Mesh:
 
     def getVertexColorAttribute(self, str name):
         return self.vertexColorAttributes.get(name)
-    
+
     def getVertexWeightAttribute(self, str name):
         return self.vertexWeightAttributes.get(name)
 
