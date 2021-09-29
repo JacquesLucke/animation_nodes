@@ -4,6 +4,7 @@ cpdef enum AttributeType:
     MATERIAL_INDEX,
     UV_MAP,
     VERTEX_COLOR,
+    VERTEX_WEIGHT,
     BEVEL_VERTEX_WEIGHT,
     BEVEL_EDGE_WEIGHT,
     EDGE_CREASE,

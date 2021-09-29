@@ -4,6 +4,7 @@
 
 - Added support for splines in *3D Viewer* node.
 - Added built-in attributes for Mesh object.
+- Added Vertex Group as attribute for Mesh object.
 
 ### Fixed
 

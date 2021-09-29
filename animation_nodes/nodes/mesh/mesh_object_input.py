@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import Mesh, Attribute, AttributeType, AttributeDomain, AttributeDataType
+from ... data_structures import Mesh, Attribute, AttributeType, AttributeDomain, AttributeDataType, DoubleList
 
 class MeshObjectInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_MeshObjectInputNode"
@@ -15,6 +15,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         self.newInput("Boolean", "Use Modifiers", "useModifiers", value = False)
         self.newInput("Boolean", "Load UVs", "loadUVs", value = False, hide = True)
         self.newInput("Boolean", "Load Vertex Colors", "loadVertexColors", value = False, hide = True)
+        self.newInput("Boolean", "Load Vertex Weights", "loadVertexWeights", value = False, hide = True)
         self.newInput("Boolean", "Load Custom Attributes", "loadCustomAttributes", value = False, hide = True)
         self.newInput("Scene", "Scene", "scene", hide = True)
 
@@ -106,6 +107,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
             yield "self.loadBuiltInAttributes(mesh, sourceMesh, evaluatedObject)"
             yield "if loadUVs: self.loadUVMaps(mesh, sourceMesh, object)"
             yield "if loadVertexColors: self.loadVertexColors(mesh, sourceMesh, object)"
+            yield "if loadVertexWeights: self.loadVertexWeights(mesh, sourceMesh, object, useModifiers, scene)"
             yield "if loadCustomAttributes: self.loadCustomAttributes(mesh, sourceMesh, evaluatedObject)"
 
     def getVertexLocations(self, mesh, object, useWorldSpace):
@@ -151,7 +153,7 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
                                                   AttributeDomain.POINT,
                                                   AttributeDataType.FLOAT,
                                                   sourceMesh.an.getBevelVertexWeights()))
-            
+
             mesh.insertBuiltInAttribute(Attribute("Edge Creases",
                                                   AttributeType.EDGE_CREASE,
                                                   AttributeDomain.EDGE,
@@ -183,6 +185,23 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
         else:
             self.setErrorMessage("Object is in edit mode.")
 
+    def loadVertexWeights(self, mesh, sourceMesh, object, useModifiers, scene):
+        if object.mode != "EDIT":
+            vertexGroups = object.vertex_groups
+            for vertexGroupName in vertexGroups.keys():
+                if useModifiers:
+                    weights = DoubleList(length = len(mesh.vertices))
+                    weights.fill(0)
+                else:
+                    weights = self.execute_All_WithoutModifiers(mesh, vertexGroups[vertexGroupName])
+                mesh.insertVertexWeightAttribute(Attribute(vertexGroupName,
+                                                           AttributeType.VERTEX_WEIGHT,
+                                                           AttributeDomain.POINT,
+                                                           AttributeDataType.FLOAT,
+                                                           weights))
+        else:
+            self.setErrorMessage("Object is in edit mode.")
+
     def loadCustomAttributes(self, mesh, sourceMesh, object):
         if object.mode != "EDIT":
             attributes = object.data.attributes
@@ -195,3 +214,13 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
                                                      object.data.an.getCustomAttribute(customAttributeName)))
         else:
             self.setErrorMessage("Object is in edit mode.")
+
+    def execute_All_WithoutModifiers(self, mesh, vertexGroup):
+        vertexAmount = len(mesh.vertices)
+        weights = DoubleList(length = vertexAmount)
+        getWeight = vertexGroup.weight
+
+        for i in range(vertexAmount):
+            try: weights[i] = getWeight(i)
+            except: weights[i] = 0
+        return weights

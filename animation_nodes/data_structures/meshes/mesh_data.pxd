@@ -12,3 +12,4 @@ cdef class Mesh:
         object customAttributes
         object uvMapAttributes
         object vertexColorAttributes
+        object vertexWeightAttributes

@@ -82,7 +82,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         yield "    mesh = object.data"
 
         if self.meshDataType == "MESH_DATA":
-            yield "    self.setMesh(mesh, meshData)"
+            yield "    self.setMesh(mesh, meshData, object)"
         elif self.meshDataType == "BMESH":
             yield "    self.setBMesh(mesh, bm)"
         elif self.meshDataType == "VERTICES":
@@ -111,7 +111,7 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
             return False
         return True
 
-    def setMesh(self, outMesh, mesh):
+    def setMesh(self, outMesh, mesh, object):
         # clear existing mesh
         bmesh.new().to_mesh(outMesh)
 
@@ -151,6 +151,17 @@ class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
         for attribute in mesh.iterVertexColorAttributes():
             vertexColorLayer = outMesh.vertex_colors.new(name = attribute.name, do_init = False)
             vertexColorLayer.data.foreach_set("color", attribute.data.asMemoryView())
+
+        # Vertex Groups
+        vertexAmount = len(outMesh.vertices)
+        for attribute in mesh.iterVertexWeightAttributes():
+            vertexGroup = object.vertex_groups.get(attribute.name)
+            if vertexGroup is None:
+                vertexGroup = object.vertex_groups.new(name = attribute.name)
+            weights = attribute.data
+            for i in range(vertexAmount):
+                vertexGroup.add([i], weights[i], "REPLACE")
+        object.data.update()
 
         # Custom Attributes
         for attribute in mesh.iterCustomAttributes():

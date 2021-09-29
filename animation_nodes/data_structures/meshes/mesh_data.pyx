@@ -74,6 +74,7 @@ cdef class Mesh:
         self.customAttributes = OrderedDict()
         self.uvMapAttributes = OrderedDict()
         self.vertexColorAttributes = OrderedDict()
+        self.vertexWeightAttributes = OrderedDict()
 
     def getAttributeDictionaries(self):
         return (
@@ -81,6 +82,7 @@ cdef class Mesh:
             self.customAttributes,
             self.uvMapAttributes,
             self.vertexColorAttributes,
+            self.vertexWeightAttributes,
         )
 
     def verticesTransformed(self):
@@ -164,6 +166,11 @@ cdef class Mesh:
             raise Exception("invalid length")
         self.vertexColorAttributes[attribute.name] = attribute
 
+    def insertVertexWeightAttribute(self, Attribute attribute):
+        if self.getAttributeDomainLength(attribute.domain) != len(attribute.data):
+            raise Exception("invalid length")
+        self.vertexWeightAttributes[attribute.name] = attribute
+
     def insertCustomAttribute(self, Attribute attribute):
         if self.getAttributeDomainLength(attribute.domain) != len(attribute.data):
             raise Exception("invalid length")
@@ -179,6 +186,9 @@ cdef class Mesh:
     def iterVertexColorAttributes(self):
         return self.vertexColorAttributes.values()
 
+    def iterVertexWeightAttributes(self):
+        return self.vertexWeightAttributes.values()
+
     def iterCustomAttributes(self):
         return self.customAttributes.values()
 
@@ -192,6 +202,9 @@ cdef class Mesh:
     def getAllVertexColorAttributeNames(self):
         return list(self.vertexColorAttributes.keys())
 
+    def getAllVertexWeightAttributeNames(self):
+        return list(self.vertexWeightAttributes.keys())
+
     def getAllCustomAttributeNames(self):
         return list(self.customAttributes.keys())
 
@@ -204,6 +217,9 @@ cdef class Mesh:
 
     def getVertexColorAttribute(self, str name):
         return self.vertexColorAttributes.get(name)
+
+    def getVertexWeightAttribute(self, str name):
+        return self.vertexWeightAttributes.get(name)
 
     def getCustomAttribute(self, str name):
         return self.customAttributes.get(name, None)
@@ -262,6 +278,7 @@ cdef class Mesh:
         Polygons: {len(self.polygons)}
         UV Maps: {self.getAllUVMapAttributeNames()}
         Vertex Colors: {self.getAllVertexColorAttributeNames()}
+        Vertex Groups: {self.getAllVertexWeightAttributeNames()}
         Built-In Attributes: {self.getAllBuiltInAttributeNames()}
         Custom Attributes: {self.getAllCustomAttributeNames()}""")
 
