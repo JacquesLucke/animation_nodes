@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Fixed *Mesh Object Input* node custom attribute reading with enabled modifiers.
 
 ### Changed
 
