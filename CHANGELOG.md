@@ -1,4 +1,8 @@
-## Unreleased
+## LTS Fixes
+
+- Fixed Mesh Object Input node custom attribute reading with enabled modifiers.
+
+## v2.2 (16 August 2021)
 
 ### Added
 

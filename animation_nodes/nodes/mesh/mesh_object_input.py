@@ -153,13 +153,13 @@ class MeshObjectInputNode(bpy.types.Node, AnimationNode):
 
     def loadCustomAttributes(self, type, mesh, sourceMesh, object):
         if object.mode != "EDIT":
-            attributes = object.data.attributes
+            attributes = sourceMesh.attributes
             for customAttributeName in attributes.keys():
                 attribute = attributes.get(customAttributeName)
                 mesh.insertCustomAttribute(Attribute(customAttributeName,
                                                      AttributeType.CUSTOM,
                                                      AttributeDomain[attribute.domain],
                                                      AttributeDataType[attribute.data_type],
-                                                     object.data.an.getCustomAttribute(customAttributeName)))
+                                                     sourceMesh.an.getCustomAttribute(customAttributeName)))
         else:
             self.setErrorMessage("Object is in edit mode.")
