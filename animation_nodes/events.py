@@ -39,6 +39,13 @@ def frameChanged(scene, depsgraph):
     event_handler.update(event.getActives().union({"Frame"}))
     evaluatedDepsgraph = None
 
+@eventHandler("DEPSGRAPH_UPDATE_POST")
+def sceneChanged(scene, depsgraph):
+    global evaluatedDepsgraph
+    evaluatedDepsgraph = depsgraph
+    event_handler.update(event.getActives().union({"Scene"}))
+    evaluatedDepsgraph = None
+
 def propertyChanged(self = None, context = None):
     event.propertyChanged = True
     resetMeasurements()
@@ -62,6 +69,11 @@ def fileLoaded():
 def addonChanged():
     event.addonChanged = True
     treeChanged()
+
+@eventHandler("VERSION_UPDATE")
+def versioningDone():
+    from . base_types.update_file import runVersioning
+    runVersioning()
 
 def executionCodeChanged(self = None, context = None):
     treeChanged()

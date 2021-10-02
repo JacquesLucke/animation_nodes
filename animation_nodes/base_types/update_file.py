@@ -118,3 +118,22 @@ def getSocketByIdentifier(sockets, identifier):
     for socket in sockets:
         if socket.identifier == identifier:
             return socket
+
+############
+# Versioning
+############
+
+def runVersioning():
+    runVersioningSceneChanged()
+
+# The "sceneUpdate" property of AutoExecutionProperties was deprecated, its function was identical
+# to that of the newly added "always" property. For files where the "always" property is not set,
+# that is, files that were saved before this change, we set the value of the "always" property to
+# that of the deprecated "sceneUpdate" property. Additionally, since the newly added "sceneChanged"
+# property is functionally somewhat similar to the "always" property, we also set its value to that
+# of the deprecated "sceneUpdate" property.
+def runVersioningSceneChanged():
+    for tree in getAnimationNodeTrees():
+        if tree.autoExecution.is_property_set("always"): continue
+        tree.autoExecution.always = tree.autoExecution.sceneUpdate
+        tree.autoExecution.sceneChanged = tree.autoExecution.sceneUpdate

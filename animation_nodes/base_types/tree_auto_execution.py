@@ -130,16 +130,19 @@ class AutoExecutionProperties(bpy.types.PropertyGroup):
     enabled: BoolProperty(default = True, name = "Enabled",
         description = "Enable auto execution for this node tree")
 
-    sceneUpdate: BoolProperty(default = True, name = "Scene Update",
+    always: BoolProperty(default = False, name = "Always",
         description = "Execute many times per second to react on all changes in real time (deactivated during preview rendering)")
 
-    frameChanged: BoolProperty(default = False, name = "Frame Changed",
+    sceneChanged: BoolProperty(default = True, name = "Scene Changed",
+        description = "Execute after anything in the scene changed")
+
+    frameChanged: BoolProperty(default = True, name = "Frame Changed",
         description = "Execute after the frame changed")
 
-    propertyChanged: BoolProperty(default = False, name = "Property Changed",
+    propertyChanged: BoolProperty(default = True, name = "Property Changed",
         description = "Execute when a attribute in a animation node tree changed")
 
-    treeChanged: BoolProperty(default = False, name = "Tree Changed",
+    treeChanged: BoolProperty(default = True, name = "Tree Changed",
         description = "Execute when the node tree changes (create/remove links and nodes)")
 
     minTimeDifference: FloatProperty(name = "Min Time Difference",
@@ -147,6 +150,9 @@ class AutoExecutionProperties(bpy.types.PropertyGroup):
         default = 0.0, min = 0.0, soft_max = 1.0)
 
     lastExecutionTimestamp: FloatProperty(default = 0.0)
+
+    # Deprecated. Only kept for versioning.
+    sceneUpdate: BoolProperty(default = True, name = "Scene Update", description = "Deprecated. Only kept for versioning")
 
 
 class AddAutoExecutionTrigger(bpy.types.Operator):

@@ -63,7 +63,9 @@ class AnimationNodeTree(bpy.types.NodeTree):
         if not a.enabled: return False
         if not self.hasMainExecutionUnits: return False
 
-        if "Frame" in events and (a.sceneUpdate or a.frameChanged): return True
+        if "Scene" in events and (a.always or a.sceneChanged): return True
+
+        if "Frame" in events and (a.always or a.sceneChanged or a.frameChanged): return True
 
         if not (isRendering() or isInterfaceLocked()):
             if self.timeSinceLastAutoExecution < a.minTimeDifference: return False
@@ -71,10 +73,10 @@ class AnimationNodeTree(bpy.types.NodeTree):
             if "Property" in events and a.propertyChanged: return True
             if "Tree" in events and a.treeChanged: return True
             if events.intersection({"File", "Addon"}) and any(
-                (a.sceneUpdate, a.frameChanged, a.propertyChanged, a.treeChanged)): return True
+                (a.always, a.sceneChanged, a.frameChanged, a.propertyChanged, a.treeChanged)): return True
 
             if not isViewportRendering() or isAnimationPlaying():
-                if a.sceneUpdate: return True
+                if a.always: return True
 
         return customTriggerHasBeenActivated
 

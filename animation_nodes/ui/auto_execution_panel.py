@@ -37,10 +37,13 @@ class AutoExecutionPanel(bpy.types.Panel):
         col = layout.column()
         col.active = not isRendering
         text = "Always" if not isRendering else "Always (deactivated)"
-        col.prop(autoExecution, "sceneUpdate", text = text)
+        col.prop(autoExecution, "always", text = text)
 
         col = layout.column()
-        col.active = not autoExecution.sceneUpdate or isRendering
+        col.active = not autoExecution.always or isRendering
+        col.prop(autoExecution, "sceneChanged", text = "Scene Changed")
+        col = col.column()
+        col.active = not autoExecution.sceneChanged
         col.prop(autoExecution, "treeChanged", text = "Tree Changed")
         col.prop(autoExecution, "frameChanged", text = "Frame Changed")
         col.prop(autoExecution, "propertyChanged", text = "Property Changed")
