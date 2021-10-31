@@ -14,7 +14,7 @@ class NodeColorProperties(bpy.types.PropertyGroup):
 
     mainNetwork: FloatVectorProperty(name = "Main Network",
         description = "Color for all networks that are not in a subprogram",
-        default = [0.7, 0.7, 0.7], subtype = "COLOR",
+        default = [0.5, 0.5, 0.5], subtype = "COLOR",
         soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
 
@@ -26,7 +26,7 @@ class NodeColorProperties(bpy.types.PropertyGroup):
 
     subprogramValue: FloatProperty(name = "Subprogram Value",
         description = "Lightness of random subnetwork colors",
-        default = 0.7, soft_min = 0.0, soft_max = 1.0,
+        default = 0.5, soft_min = 0.0, soft_max = 1.0,
         update = changeNodeColors)
 
     subprogramSaturation: FloatProperty(name = "Subprogram Saturation",
