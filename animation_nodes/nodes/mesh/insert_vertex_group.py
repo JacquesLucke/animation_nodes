@@ -1,11 +1,12 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import (
+    FloatList,
     Attribute,
     AttributeType,
     AttributeDomain,
     AttributeDataType,
-    VirtualFloatList,
+    VirtualDoubleList,
 )
 
 class InsertVertexGroupNode(bpy.types.Node, AnimationNode):
@@ -26,7 +27,7 @@ class InsertVertexGroupNode(bpy.types.Node, AnimationNode):
     def execute(self, mesh, vertexWeightName, weights):
         self.checkAttributeName(mesh, vertexWeightName)
 
-        weights = VirtualFloatList.create(weights, 0).materialize(len(mesh.vertices))
+        weights = FloatList.fromValues(VirtualDoubleList.create(weights, 0).materialize(len(mesh.vertices)))
         mesh.insertVertexWeightAttribute(Attribute(vertexWeightName, AttributeType.VERTEX_WEIGHT,
                                          AttributeDomain.POINT, AttributeDataType.FLOAT, weights))
         return mesh
