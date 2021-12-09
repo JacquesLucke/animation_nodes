@@ -12,6 +12,7 @@
 - Fixed *Mesh Object Input* node custom attribute reading with enabled modifiers.
 - Fixed *Insert Vertex Group* node.
 - Fixed *Convert* node when converting to Action.
+- Fixed *Object Action Output* node for Actions with named attributes.
 
 ### Changed
 
