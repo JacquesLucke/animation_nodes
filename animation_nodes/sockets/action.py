@@ -1,4 +1,5 @@
 import bpy
+from .. data_structures import Action
 from .. base_types import AnimationNodeSocket, PythonListSocket
 
 class ActionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
@@ -18,7 +19,6 @@ class ActionSocket(bpy.types.NodeSocket, AnimationNodeSocket):
 
     @classmethod
     def correctValue(cls, value):
-        # TODO: use real Action class
         if isinstance(value, Action):
             return value, 0
         return cls.getDefaultValue(), 2
