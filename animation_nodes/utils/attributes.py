@@ -20,19 +20,24 @@ def getAttributeGetter(propName):
 def getMultiAttibuteSetter(propNames):
     code = "def setter(owner, values):\n"
     for i, prop in enumerate(propNames):
-        line = getAttributeSetterLine("owner", prop, "values[{}]".format(i))
-        code += "    " + line + "\n"
+        lines = getAttributeSetterLines("owner", prop, "values[{}]".format(i))
+        code += ''.join("    " + line + "\n" for line in lines)
     code += "    pass"
     variables = {}
     exec(code, variables)
     return variables["setter"]
 
-def getAttributeSetterLine(objectName, propName, valueName):
-    if propName.startswith('["'):
+def getAttributeSetterLines(objectName, propName, valueName):
+    if propName.startswith('['):
         # Path is a named attribute
-        return '{}{} = {}'.format(objectName, propName, valueName)
+        path = "{}{}".format(objectName, propName)
     else:
-        return '{}.{} = {}'.format(objectName, propName, valueName)
+        path = "{}.{}".format(objectName, propName)
+
+    return (
+        'try: {} = type({})({}) # Try to cast to existing property type'.format(path, path, valueName),
+        'except: {} = {} # Property does not exist; default to new float'.format(path, valueName)
+    )
 
 def hasEvaluableRepr(value):
     try: return eval(repr(value)) == value
