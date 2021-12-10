@@ -28,7 +28,11 @@ def getMultiAttibuteSetter(propNames):
     return variables["setter"]
 
 def getAttributeSetterLine(objectName, propName, valueName):
-    return "{}.{} = {}".format(objectName, propName, valueName)
+    if propName.startswith('["'):
+        # Path is a named attribute
+        return '{}{} = {}'.format(objectName, propName, valueName)
+    else:
+        return '{}.{} = {}'.format(objectName, propName, valueName)
 
 def hasEvaluableRepr(value):
     try: return eval(repr(value)) == value
