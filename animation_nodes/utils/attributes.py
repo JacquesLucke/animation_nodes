@@ -48,16 +48,14 @@ def pathBelongsToArray(object, dataPath):
     return pathArrayCache.get(inputHash, None)
 
 def _pathBelongsToArray(object, dataPath):
-    if "." in dataPath:
-        pathToProperty, propertyName = dataPath.rsplit(".", 1)
-        pathToProperty = "." + pathToProperty
-    else:
-        pathToProperty = ""
-        propertyName = dataPath
+    if not dataPath.startswith("[") and not dataPath.startswith("."):
+        dataPath = "." + dataPath
 
     try:
-        amount = eval("object{}.bl_rna.properties[{}].array_length".format(pathToProperty, repr(propertyName)))
-        return amount > 0
+        data = eval("object{}".format(dataPath))
+        if isinstance(data, str):
+            return False # Strings have len() but aren't arrays
+        return len(data) > 0
     except:
         # Path not found
         return None
