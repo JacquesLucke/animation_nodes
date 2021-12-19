@@ -69,7 +69,7 @@ class IDKeysFromSortedObjects(bpy.types.Operator):
         items = locationModeItems)
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 250 * getDpiFactor())
+        return context.window_manager.invoke_props_dialog(self, width = int(250 * getDpiFactor()))
 
     def draw(self, context):
         layout = self.layout
