@@ -14,7 +14,7 @@ class RenameDatablockPopupOperator(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.newName = self.oldName
-        return context.window_manager.invoke_props_dialog(self, width = 200 * getDpiFactor())
+        return context.window_manager.invoke_props_dialog(self, width = int(200 * getDpiFactor()))
 
     def check(self, context):
         return True

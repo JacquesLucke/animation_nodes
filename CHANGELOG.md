@@ -10,6 +10,7 @@
 ### Fixed
 
 - Fixed *Mesh Object Input* node custom attribute reading with enabled modifiers.
+- Fixed failing dialogs after recent API change.
 
 ### Changed
 
