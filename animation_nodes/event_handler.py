@@ -16,13 +16,15 @@ def update(events):
     if didNameChange() or events.intersection({"File", "Addon", "Tree"}):
         updateEverything()
 
-    if problems.canAutoExecute():
-        nodeTrees = list(iterAutoExecutionNodeTrees(events))
-        if len(nodeTrees) > 0:
-            setupExecutionUnits()
-            executeNodeTrees(nodeTrees)
-            afterExecution()
-            finishExecutionUnits()
+    if not problems.canAutoExecute(): return
+
+    nodeTrees = list(iterAutoExecutionNodeTrees(events))
+    if len(nodeTrees) == 0: return
+
+    setupExecutionUnits(nodeTrees)
+    executeNodeTrees(nodeTrees)
+    afterExecution()
+    finishExecutionUnits(nodeTrees)
 
 
 def failsToWriteToIDClasses():
