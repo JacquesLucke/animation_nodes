@@ -27,7 +27,7 @@ class FloatingNodeSettingsPanel(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.nodeIdentifier = context.active_node.identifier
-        return context.window_manager.invoke_props_dialog(self, width = 250 * getDpiFactor())
+        return context.window_manager.invoke_props_dialog(self, width = int(250 * getDpiFactor()))
 
     def draw(self, context):
         try:

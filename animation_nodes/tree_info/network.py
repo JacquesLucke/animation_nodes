@@ -13,7 +13,7 @@ class NodeNetwork:
         self.analyse(nodeByID)
 
     def analyse(self, nodeByID):
-        self.findSystemNodes()
+        self.findSystemNodes(nodeByID)
 
         groupNodeAmount = self.groupInAmount + self.groupOutAmount
         loopNodeAmount = self.loopInAmount + self.generatorAmount + self.reassignParameterAmount + self.breakAmount
@@ -54,10 +54,10 @@ class NodeNetwork:
             self.description = owner.subprogramDescription
 
             # check if a subprogram invokes itself
-            if self.identifier in self.getInvokedSubprogramIdentifiers(nodeByID):
+            if self.identifier in self.referencedSubprogramIDs:
                 self.type = "Invalid"
 
-    def findSystemNodes(self):
+    def findSystemNodes(self, nodeByID):
         self.groupInputIDs = []
         self.groupOutputIDs = []
         self.loopInputIDs = []
@@ -66,6 +66,8 @@ class NodeNetwork:
         self.breakIDs = []
         self.scriptIDs = []
         self.invokeSubprogramIDs = []
+
+        self.referencedSubprogramIDs = set()
 
         appendToList = {
             "an_GroupInputNode" :            self.groupInputIDs.append,
@@ -83,6 +85,11 @@ class NodeNetwork:
             if typeByNode[nodeID] in appendToList:
                 appendToList[typeByNode[nodeID]](nodeID)
 
+            if typeByNode[nodeID] == "an_InvokeSubprogramNode":
+                subprogramID = nodeByID[nodeID].subprogramIdentifier;
+                if subprogramID != "":
+                    self.referencedSubprogramIDs.add(subprogramID)
+
         self.groupInAmount = len(self.groupInputIDs)
         self.groupOutAmount = len(self.groupOutputIDs)
         self.loopInAmount = len(self.loopInputIDs)
@@ -90,9 +97,6 @@ class NodeNetwork:
         self.reassignParameterAmount = len(self.reassignParameterIDs)
         self.breakAmount = len(self.breakIDs)
         self.scriptAmount = len(self.scriptIDs)
-
-    def getInvokedSubprogramIdentifiers(self, nodeByID):
-        return {nodeByID[nodeID].subprogramIdentifier for nodeID in self.invokeSubprogramIDs}
 
     @staticmethod
     def join(networks, nodeByID):

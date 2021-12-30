@@ -7,9 +7,9 @@ from . main_execution_unit import MainExecutionUnit
 from . loop_execution_unit import LoopExecutionUnit
 from . group_execution_unit import GroupExecutionUnit
 from . script_execution_unit import ScriptExecutionUnit
-from .. tree_info import getNetworksByType, getSubprogramNetworks
 from .. utils.nodes import getAnimationNodeTrees, iterAnimationNodes
 from .. problems import ExceptionDuringCodeCreation, CouldNotSetupExecutionUnits
+from .. tree_info import getNetworksByType, getSubprogramNetworks, getNetworkByIdentifier
 
 _mainUnitsByNodeTree = defaultdict(list)
 _subprogramUnitsByIdentifier = {}
@@ -49,27 +49,29 @@ def createSubprogramUnits(nodeByID):
         _subprogramUnitsByIdentifier[network.identifier] = unit
 
 
-def setupExecutionUnits():
+def setupExecutionUnits(nodeTrees):
     try:
-        if len(getAnimationNodeTrees()) == 0: return
+        if len(nodeTrees) == 0: return
         if not problems.canExecute(): return
 
-        for unit in getExecutionUnits():
+        executionUnits = getExecutionUnits(nodeTrees)
+
+        for unit in executionUnits:
             unit.setup()
 
         subprograms = {}
         for identifier, unit in _subprogramUnitsByIdentifier.items():
             subprograms["_subprogram" + identifier] = unit.execute
 
-        for unit in getExecutionUnits():
+        for unit in executionUnits:
             unit.insertSubprogramFunctions(subprograms)
     except:
         print("\n"*5)
         traceback.print_exc()
         CouldNotSetupExecutionUnits().report()
 
-def finishExecutionUnits():
-    for unit in getExecutionUnits():
+def finishExecutionUnits(nodeTrees):
+    for unit in getExecutionUnits(nodeTrees):
         unit.finish()
 
     clearExecutionCache()
@@ -89,13 +91,22 @@ def getSubprogramUnitsByName(name):
     return programs
 
 def getExecutionUnitByNetwork(network):
-    for unit in getExecutionUnits():
+    for unit in getExecutionUnits([network.nodeTree]):
         if unit.network == network: return unit
 
-def getExecutionUnits():
+def getExecutionUnits(nodeTrees):
     units = []
-    for mainUnits in _mainUnitsByNodeTree.values():
-        units.extend(mainUnits)
-    for subprogramUnit in _subprogramUnitsByIdentifier.values():
-        units.append(subprogramUnit)
+    for nodeTree in nodeTrees:
+        units.extend(_mainUnitsByNodeTree[nodeTree.name])
+
+        for network in nodeTree.networks:
+            for subprogramID in getNeededSubprogramIDs(network):
+                units.append(_subprogramUnitsByIdentifier[subprogramID])
     return units
+
+def getNeededSubprogramIDs(network):
+    subprogramIDs = network.referencedSubprogramIDs.copy()
+    for subprogramID in network.referencedSubprogramIDs:
+        subNetwork = getNetworkByIdentifier(subprogramID)
+        subprogramIDs.update(getNeededSubprogramIDs(subNetwork))
+    return subprogramIDs

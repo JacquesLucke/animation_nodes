@@ -85,9 +85,9 @@ class AnimationNodeTree(bpy.types.NodeTree):
         self.autoExecution.lastExecutionTimestamp = time.process_time()
 
     def execute(self):
-        setupExecutionUnits()
+        setupExecutionUnits([self])
         self._execute()
-        finishExecutionUnits()
+        finishExecutionUnits([self])
 
     def _execute(self):
         units = self.mainUnits

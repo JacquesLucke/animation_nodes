@@ -14,7 +14,7 @@ class NodePopup(bpy.types.Operator):
     executeFunctionName: StringProperty(default = "")
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = self.width * getDpiFactor())
+        return context.window_manager.invoke_props_dialog(self, width = int(self.width * getDpiFactor()))
 
     def draw(self, context):
         try: node = getNodeByIdentifier(self.nodeIdentifier)
