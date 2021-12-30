@@ -23,7 +23,7 @@ def getMultiAttibuteSetter(propNames):
     code = "def setter(owner, values):\n"
     for i, prop in enumerate(propNames):
         lines = getAttributeSetterLines("owner", prop, "values[{}]".format(i))
-        code += "".join("    " + line + "\n" for line in lines)
+        code += "".join(f"    {line}\n" for line in lines)
     code += "    pass"
     variables = {}
     exec(code, variables)
