@@ -21,23 +21,19 @@ def getMultiAttibuteSetter(propNames):
     code = "def setter(owner, values):\n"
     for i, prop in enumerate(propNames):
         lines = getAttributeSetterLines("owner", prop, "values[{}]".format(i))
-        code += ''.join("    " + line + "\n" for line in lines)
+        code += "".join("    " + line + "\n" for line in lines)
     code += "    pass"
     variables = {}
     exec(code, variables)
     return variables["setter"]
 
 def getAttributeSetterLines(objectName, propName, valueName):
-    if propName.startswith('['):
-        # Path is a named attribute
-        path = "{}{}".format(objectName, propName)
-    else:
-        path = "{}.{}".format(objectName, propName)
+    propPath = getPropertyPath(objectName, propName)
+    # Try to cast to existing property type
+    yield f"try: {propPath} = type({propPath})({valueName})"
+    # Property does not exist; default to new float
+    yield f"except: {propPath} = {valueName}"
 
-    return (
-        'try: {} = type({})({}) # Try to cast to existing property type'.format(path, path, valueName),
-        'except: {} = {} # Property does not exist; default to new float'.format(path, valueName)
-    )
 
 def hasEvaluableRepr(value):
     try: return eval(repr(value)) == value
@@ -57,9 +53,10 @@ def _pathBelongsToArray(object, dataPath):
         dataPath = "." + dataPath
 
     try:
-        data = eval("object{}".format(dataPath))
+        data = eval(f"object{dataPath}")
         if isinstance(data, str):
-            return False # Strings have len() but aren't arrays
+            # Strings have len() but aren't arrays
+            return False
         return len(data) > 0
     except:
         # Path not found
