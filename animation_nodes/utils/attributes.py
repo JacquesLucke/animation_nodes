@@ -35,6 +35,8 @@ def getAttributeSetterLines(objectName, propName, valueName):
     yield f"try: {propPath} = type({propPath})({valueName})"
     # Property does not exist; default to new float
     yield f"except: {propPath} = {valueName}"
+    # Force dependency graph update. See https://developer.blender.org/T63793#881438
+    yield f"{objectName}.update_tag()"
 
 def getPropertyPath(objectName, propName):
     if propName.startswith("["):
