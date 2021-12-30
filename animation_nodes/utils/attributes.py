@@ -8,13 +8,15 @@ def getattrRecursive(owner, propName):
 
 @functools.lru_cache(maxsize = 1024)
 def getAttributeSetter(propName):
+    propPath = getPropertyPath("owner", propName)
     variables = {}
-    exec("def attrSetter(owner, value): owner.{} = value".format(propName), variables)
+    exec(f"def attrSetter(owner, value): {propPath} = value", variables)
     return variables["attrSetter"]
 
 @functools.lru_cache(maxsize = 1024)
 def getAttributeGetter(propName):
-    return eval("lambda owner: owner.{}".format(propName))
+    propPath = getPropertyPath("owner", propName)
+    return eval(f"lambda owner: {propPath}")
 
 @functools.lru_cache(maxsize = 1024)
 def getMultiAttibuteSetter(propNames):
@@ -34,6 +36,12 @@ def getAttributeSetterLines(objectName, propName, valueName):
     # Property does not exist; default to new float
     yield f"except: {propPath} = {valueName}"
 
+def getPropertyPath(objectName, propName):
+    if propName.startswith("["):
+        # Property is a named attribute
+        return f"{objectName}{propName}"
+    else:
+        return f"{objectName}.{propName}"
 
 def hasEvaluableRepr(value):
     try: return eval(repr(value)) == value
