@@ -13,6 +13,7 @@
 - Fixed *Insert Vertex Group* node.
 - Fixed *Convert* node when converting to Action.
 - Fixed *Object Action Output* node for Actions with named attributes.
+- Fixed *Object Action Output* nodes overwriting Custom Property types.
 - Fixed failing dialogs after recent API change.
 
 ### Changed
