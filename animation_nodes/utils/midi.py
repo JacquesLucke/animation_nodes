@@ -26,40 +26,40 @@ readMIDIFile.cache_clear = lambda: readMIDIFileCached.cache_clear()
 
 @dataclass
 class TempoEventRecord:
-    time: int
-    tempo: int = 500_000
+    timeInTicks: int
+    timeInSeconds: int
+    tempo: int
 
 class TempoMap:
-    def __init__(self, midiFormat, ppqn, tempoTracks):
-        self.ppqn = ppqn
-        self.midiFormat = midiFormat
-        self.tempoTracks = tempoTracks
+    def __init__(self, midiFile):
+        self.ppqn = midiFile.ppqn
+        self.midiFormat = midiFile.midiFormat
+        self.computeTempoTracks(midiFile)
 
-    @classmethod
-    def fromFile(cls, midiFile):
-        tempoTracks = []
-        fileTracks = midiFile.tracks if midiFile.midiFormat != 1 else midiFile.tracks[0:1]
-        for track in fileTracks:
-            time = 0
-            tempoEvents = []
+    def computeTempoTracks(self, midiFile):
+        tracks = midiFile.tracks
+        if midiFile.midiFormat == 1: tracks = tracks[0:1]
+        self.tempoTracks = [[] * len(tracks)]
+        for trackIndex, track in enumerate(tracks):
+            timeInTicks = 0
+            timeInSeconds = 0
+            tempoEvents = self.tempoTracks[trackIndex]
             for event in track.events:
-                time += event.deltaTime
+                timeInTicks += event.deltaTime
+                timeInSeconds = self.timeInTicksToSeconds(trackIndex, timeInTicks)
                 if not isinstance(event, TempoEvent): continue
-                tempoEvents.append(TempoEventRecord(time, event.tempo))
-            if len(tempoEvents) == 0 or tempoEvents[0].time != 0:
-                tempoEvents.append(TempoEventRecord(0))
-            tempoTracks.append(tempoEvents)
-        return TempoMap(midiFile.midiFormat, midiFile.ppqn, tempoTracks)
+                tempoEvents.append(TempoEventRecord(timeInTicks, timeInSeconds, event.tempo))
 
-    def ticksToSeconds(self, trackIndex, timeInTicks, ticks):
+    def timeInTicksToSeconds(self, trackIndex, timeInTicks):
         trackIndex = trackIndex if self.midiFormat != 1 else 0
         tempoEvents = self.tempoTracks[trackIndex]
-        filteredEvents = filter(lambda e: e.time <= timeInTicks, reversed(tempoEvents))
-        tempo = next(filteredEvents).tempo
-        microSecondsPerTick = tempo / self.ppqn
+        matchFunction = lambda event: event.timeInTicks <= timeInTicks
+        matchedEvents = filter(matchFunction, reversed(tempoEvents))
+        tempoEvent = next(matchedEvents, TempoEventRecord(0, 0, 500_000))
+        microSecondsPerTick = tempoEvent.tempo / self.ppqn
         secondsPerTick = microSecondsPerTick / 1_000_000
-        seconds = ticks * secondsPerTick
-        return seconds
+        elapsedSeconds = (timeInTicks - tempoEvent.timeInTicks) * secondsPerTick
+        return tempoEvent.timeInSeconds + elapsedSeconds
 
 # Notes:
 # - It is possible for multiple consecutive Note On Events to happen on the same
@@ -83,7 +83,7 @@ class TrackState:
 
     def updateTime(self, trackIndex, tempoMap, deltaTime):
         self.timeInTicks += deltaTime
-        self.timeInSeconds += tempoMap.ticksToSeconds(trackIndex, self.timeInTicks, deltaTime)
+        self.timeInSeconds = tempoMap.timeInTicksToSeconds(trackIndex, self.timeInTicks)
 
     def recordNoteOn(self, event):
         key = (event.channel, event.note)
@@ -105,7 +105,7 @@ class TrackState:
 @lru_cache(maxsize = 32)
 def readMIDIFileCached(path, lastModification):
     midiFile = MidiFile.fromFile(path)
-    tempoMap = TempoMap.fromFile(midiFile)
+    tempoMap = TempoMap(midiFile)
     tracks = []
     fileTracks = midiFile.tracks if midiFile.midiFormat != 1 else midiFile.tracks[1:]
     for trackIndex, track in enumerate(fileTracks):

@@ -15,6 +15,7 @@
 - Fixed *Object Action Output* node for Actions with named attributes.
 - Fixed *Object Action Output* nodes overwriting Custom Property types.
 - Fixed failing dialogs after recent API change.
+- Fixed wrong MIDI tempo map computation.
 
 ### Changed
 
