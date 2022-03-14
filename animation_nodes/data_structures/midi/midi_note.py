@@ -1,5 +1,23 @@
 from dataclasses import dataclass
 
+def evaluateEnvelope(time, timeOn, timeOff, attackTime, attackInterpolation, decayTime, decayInterpolation, sustainLevel):
+    # find either point in time for envelope or where in envelope the timeOff happened
+    relativeTime = min(time, timeOff) - timeOn
+
+    if relativeTime <= 0.0:
+        return 0.0
+
+    if relativeTime < attackTime:
+        return attackInterpolation(relativeTime / attackTime)
+
+    relativeTime = relativeTime - attackTime
+
+    if relativeTime < decayTime:
+        decayNormalized = decayInterpolation(1 - relativeTime/ decayTime)
+        return decayNormalized * (1 - sustainLevel) + sustainLevel
+
+    return sustainLevel
+
 @dataclass
 class MIDINote:
     channel: int = 0
@@ -11,25 +29,7 @@ class MIDINote:
     def evaluate(self, time, attackTime, attackInterpolation, decayTime, decayInterpolation, sustainLevel, 
         releaseTime, releaseInterpolation, velocitySensitivity):
 
-        def valueInEnvelope():
-            # find either point in time for envelope or where in envelope the timeOff happened
-            relativeTime = min(time, self.timeOff) - self.timeOn
-
-            if relativeTime <= 0.0:
-                return 0.0
-
-            if relativeTime < attackTime:
-                return attackInterpolation(relativeTime / attackTime)
-
-            relativeTime = relativeTime - attackTime
-
-            if relativeTime < decayTime:
-                decayNormalized = decayInterpolation(1 - relativeTime/ decayTime)
-                return decayNormalized * (1 - sustainLevel) + sustainLevel
-
-            return sustainLevel
-
-        value = valueInEnvelope()
+        value = evaluateEnvelope(time, self.timeOn, self.timeOff, attackTime, attackInterpolation, decayTime, decayInterpolation, sustainLevel)
 
         if time > self.timeOff:
             value = value * releaseInterpolation(1 - ((time - self.timeOff) / releaseTime))
