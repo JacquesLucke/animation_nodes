@@ -6,6 +6,8 @@
 - Added built-in attributes for Mesh object.
 - Added Vertex Group as attribute for Mesh object.
 - Added *Scene Changed* auto execution option.
+- Added full ADSR (Attack, Delay, Sustain, Release) envelope to Evaluate Midi Track Node
+- Added velocity sensitivity to Evaluate Midi Track Node
 
 ### Fixed
 
