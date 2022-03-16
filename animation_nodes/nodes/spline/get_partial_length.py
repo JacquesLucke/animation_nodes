@@ -1,7 +1,7 @@
 import bpy
 from . spline_evaluation_base import SplineEvaluationBase
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import VirtualDoubleList, VirtualPyList, DoubleList
+from ... data_structures import VirtualDoubleList, VirtualPyList, DoubleList, PolySpline
 
 class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_GetSplineLengthNode"
@@ -15,7 +15,6 @@ class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
             ("Spline", "spline"), ("Splines", "spline")))
         socket.defaultDrawType = "PROPERTY_ONLY"
-        socket.dataIsModified = True
 
         self.newInput(VectorizedSocket("Float", "useStartList",
             ("Start", "start"),
@@ -43,7 +42,7 @@ class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
             return "execute_SingleSpline_SingleStart_SingleEnd"
 
     def execute_MultipleSplines_MultipleStarts_MultipleEnds(self, spline, start, end):
-        splines = VirtualPyList.create(spline, None)
+        splines = VirtualPyList.create(spline, PolySpline())
         starts, ends = VirtualDoubleList.createMultiple((start, 0), (end, 0))
         amount = VirtualDoubleList.getMaxRealLength(splines, starts, ends)
 
