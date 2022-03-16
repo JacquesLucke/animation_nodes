@@ -1,16 +1,31 @@
 import bpy
-from ... base_types import AnimationNode
 from . spline_evaluation_base import SplineEvaluationBase
+from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import VirtualDoubleList, VirtualPyList, DoubleList, PolySpline
 
 class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_GetSplineLengthNode"
     bl_label = "Get Spline Length"
 
+    useSplineList: VectorizedSocket.newProperty()
+    useStartList: VectorizedSocket.newProperty()
+    useEndList: VectorizedSocket.newProperty()
+
     def create(self):
-        self.newInput("Spline", "Spline", "spline", defaultDrawType = "PROPERTY_ONLY")
-        self.newInput("Float", "Start", "start").setRange(0, 1)
-        self.newInput("Float", "End", "end", value = 1.0).setRange(0, 1)
-        self.newOutput("Float", "Length", "length")
+        socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
+            ("Spline", "spline"), ("Splines", "spline")))
+        socket.defaultDrawType = "PROPERTY_ONLY"
+
+        self.newInput(VectorizedSocket("Float", "useStartList",
+            ("Start", "start"),
+            ("Starts", "start")))
+        self.newInput(VectorizedSocket("Float", "useEndList",
+            ("End", "end"),
+            ("Ends", "end")))
+
+        self.newOutput(VectorizedSocket("Float", ["useSplineList", "useStartList", "useEndList"],
+            ("Length", "length"),
+            ("Lengths", "lengths")))
 
     def draw(self, layout):
         layout.prop(self, "parameterType", text = "")
@@ -20,7 +35,23 @@ class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.active = self.parameterType == "UNIFORM"
         col.prop(self, "resolution")
 
-    def execute(self, spline, start, end):
+    def getExecutionFunctionName(self):
+        if any([self.useSplineList, self.useStartList, self.useEndList]):
+            return "execute_MultipleSplines_MultipleStarts_MultipleEnds"
+        else:
+            return "execute_SingleSpline_SingleStart_SingleEnd"
+
+    def execute_MultipleSplines_MultipleStarts_MultipleEnds(self, spline, start, end):
+        splines = VirtualPyList.create(spline, PolySpline())
+        starts, ends = VirtualDoubleList.createMultiple((start, 0), (end, 0))
+        amount = VirtualDoubleList.getMaxRealLength(splines, starts, ends)
+
+        lengths = DoubleList(amount, 0)
+        for i in range(amount):
+            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(splines[i], starts[i], ends[i])
+        return lengths
+
+    def execute_SingleSpline_SingleStart_SingleEnd(self, spline, start, end):
         if spline.isEvaluable():
             start = min(max(start, 0), 1)
             end = min(max(end, 0), 1)
