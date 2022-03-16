@@ -1,7 +1,7 @@
 import bpy
 from . spline_evaluation_base import SplineEvaluationBase
 from ... base_types import AnimationNode, VectorizedSocket
-from ... data_structures import VirtualDoubleList, DoubleList
+from ... data_structures import VirtualDoubleList, VirtualPyList, DoubleList
 
 class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
     bl_idname = "an_GetSplineLengthNode"
@@ -13,16 +13,16 @@ class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
 
     def create(self):
         socket = self.newInput(VectorizedSocket("Spline", "useSplineList",
-            ("Spline", "spline"), ("Splines", "splines")))
+            ("Spline", "spline"), ("Splines", "spline")))
         socket.defaultDrawType = "PROPERTY_ONLY"
         socket.dataIsModified = True
 
         self.newInput(VectorizedSocket("Float", "useStartList",
             ("Start", "start"),
-            ("Starts", "starts")))
+            ("Starts", "start")))
         self.newInput(VectorizedSocket("Float", "useEndList",
             ("End", "end"),
-            ("Ends", "ends")))
+            ("Ends", "end")))
 
         self.newOutput(VectorizedSocket("Float", ["useSplineList", "useStartList", "useEndList"],
             ("Length", "length"),
@@ -37,79 +37,19 @@ class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
         col.prop(self, "resolution")
 
     def getExecutionFunctionName(self):
-        if self.useSplineList:
-            if self.useStartList and self.useEndList:
-                return "execute_MultipleSplines_MultipleStarts_MultipleEnds"
-            elif self.useStartList:
-                return "execute_MultipleSplines_MultipleStarts"
-            elif self.useEndList:
-                return "execute_MultipleSplines_MultipleEnds"
-            else:
-                return "execute_MultipleSplines_SingleStart_SingleEnd"
+        if any([self.useSplineList, self.useStartList, self.useEndList]):
+            return "execute_MultipleSplines_MultipleStarts_MultipleEnds"
         else:
-            if self.useStartList and self.useEndList:
-                return "execute_SingleSpline_MultipleStarts_MultipleEnds"
-            elif self.useStartList:
-                return "execute_SingleSpline_MultipleStarts"
-            elif self.useEndList:
-                return "execute_SingleSpline_MultipleEnds"
-            else:
-                return "execute_SingleSpline_SingleStart_SingleEnd"
+            return "execute_SingleSpline_SingleStart_SingleEnd"
 
-    def execute_MultipleSplines_MultipleStarts_MultipleEnds(self, splines, starts, ends):
-        amount = len(splines)
-        starts = VirtualDoubleList.create(starts, 0)
-        ends = VirtualDoubleList.create(ends, 0)
-        lengths = DoubleList(amount, 0)
-        for i, spline in enumerate(splines):
-            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(spline, starts[i], ends[i])
-        return lengths
+    def execute_MultipleSplines_MultipleStarts_MultipleEnds(self, spline, start, end):
+        splines = VirtualPyList.create(spline, None)
+        starts, ends = VirtualDoubleList.createMultiple((start, 0), (end, 0))
+        amount = VirtualDoubleList.getMaxRealLength(splines, starts, ends)
 
-    def execute_MultipleSplines_MultipleStarts(self, splines, starts, end):
-        amount = len(splines)
-        starts = VirtualDoubleList.create(starts, 0)
-        lengths = DoubleList(amount, 0)
-        for i, spline in enumerate(splines):
-            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(spline, starts[i], end)
-        return lengths
-
-    def execute_MultipleSplines_MultipleEnds(self, splines, start, ends):
-        amount = len(splines)
-        ends = VirtualDoubleList.create(ends, 0)
-        lengths = DoubleList(amount, 0)
-        for i, spline in enumerate(splines):
-            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(spline, start, ends[i])
-        return lengths
-
-    def execute_MultipleSplines_SingleStart_SingleEnd(self, splines, start, end):
-        amount = len(splines)
-        lengths = DoubleList(amount, 0)
-        for i, spline in enumerate(splines):
-            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(spline, start, end)
-        return lengths
-
-
-    def execute_SingleSpline_MultipleStarts_MultipleEnds(self, spline, starts, ends):
-        amount = max(len(starts), len(ends))
-        starts = VirtualDoubleList.create(starts, 0)
-        ends = VirtualDoubleList.create(ends, 0)
         lengths = DoubleList(amount, 0)
         for i in range(amount):
-            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(spline, starts[i], ends[i])
-        return lengths
-
-    def execute_SingleSpline_MultipleStarts(self, spline, starts, end):
-        amount = len(starts)
-        lengths = DoubleList(amount, 0)
-        for i in range(amount):
-            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(spline, starts[i], end)
-        return lengths
-
-    def execute_SingleSpline_MultipleEnds(self, spline, start, ends):
-        amount = len(ends)
-        lengths = DoubleList(amount, 0)
-        for i in range(amount):
-            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(spline, start, ends[i])
+            lengths[i] = self.execute_SingleSpline_SingleStart_SingleEnd(splines[i], starts[i], ends[i])
         return lengths
 
     def execute_SingleSpline_SingleStart_SingleEnd(self, spline, start, end):
