@@ -24,6 +24,7 @@
 - Vectorized *Float To Text* node.
 - Adjust default colors of nodes to match the new default theme.
 - Optimize execution unit setup time.
+- Vectorized *Get Spline Length* node.
 
 
 ## 2.2.2 (16 August 2021)
