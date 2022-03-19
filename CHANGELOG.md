@@ -6,8 +6,8 @@
 - Added built-in attributes for Mesh object.
 - Added Vertex Group as attribute for Mesh object.
 - Added *Scene Changed* auto execution option.
-- Added full ADSR (Attack, Delay, Sustain, Release) envelope to Evaluate Midi Track Node
-- Added velocity sensitivity to Evaluate Midi Track Node
+- Added full ADSR (Attack, Delay, Sustain, Release) envelope to Evaluate MIDI Track node.
+- Added velocity sensitivity to Evaluate MIDI Track node.
 
 ### Fixed
 
@@ -18,6 +18,7 @@
 - Fixed *Object Action Output* nodes overwriting Custom Property types.
 - Fixed failing dialogs after recent API change.
 - Fixed wrong MIDI tempo map computation.
+- Fixed exception due to outdated invoke nodes of removed subprograms.
 
 ### Changed
 

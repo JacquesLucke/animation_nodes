@@ -1,6 +1,7 @@
 import traceback
 from .. import tree_info
 from .. utils.timing import measureTime
+from .. tree_info import getNodesByType, getNetworkByIdentifier
 from .. utils.nodes import (
     iterAnimationNodes,
     getAnimationNodeTrees,
@@ -9,6 +10,10 @@ from .. utils.nodes import (
 
 @measureTime
 def updateFile():
+    tree_info.updateIfNecessary()
+
+    resetOutdatedInvokeNodes()
+
     removeUndefinedSockets()
 
     socketProperties = getSocketProperties()
@@ -29,6 +34,17 @@ def updateFile():
     for node in iterAnimationNodes():
         node.updateNode()
         tree_info.updateIfNecessary()
+
+
+# Reset Outdated Invoke Nodes
+##############################################
+
+# It is possible that an invoke node have a subprogram identifier of a
+# subprogram that no longer exists. So reset those nodes.
+def resetOutdatedInvokeNodes():
+    for node in getNodesByType("an_InvokeSubprogramNode"):
+        if getNetworkByIdentifier(node.subprogramIdentifier) is None:
+            node.subprogramIdentifier = ""
 
 
 # Undefined Sockets
