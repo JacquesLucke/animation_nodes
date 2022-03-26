@@ -49,7 +49,7 @@ class GPLayerInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Boolean", "Use Lights", "useLights", hide = True)
         self.newOutput("Color", "Tint Color", "tintColor", hide = True)
         self.newOutput("Float", "Tint Factor", "tintFactor", hide = True)
-        self.newOutput("Float", "Stroke Thickness", "lineChange", hide = True)
+        self.newOutput("Integer", "Stroke Thickness", "lineChange", hide = True)
         self.newOutput("Integer", "Pass Index", "passIndex", hide = True)
         self.newOutput("GPLayer List", "Mask Layers", "maskLayers", hide = True)
         self.newOutput("Boolean List", "Invert Mask Layers", "invertMaskLayers", hide = True)

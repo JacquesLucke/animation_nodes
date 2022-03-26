@@ -14,7 +14,7 @@ class GPStrokeInfoNode(bpy.types.Node, AnimationNode):
         self.newOutput("Float List", "Pressures", "pressures")
         self.newOutput("Float List", "UV-Rotations", "uvRotations", hide = True)
         self.newOutput("Color List", "Vertex Colors", "vertexColors")
-        self.newOutput("Float", "Line Width", "lineWidth")
+        self.newOutput("Integer", "Line Width", "lineWidth")
         self.newOutput("Float", "Hardness", "hardness")
         self.newOutput("Boolean", "Cyclic", "useCyclic", hide = True)
         self.newOutput("Text", "Start Cap Mode", "startCapMode", hide = True)

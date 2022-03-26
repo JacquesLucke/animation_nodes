@@ -22,7 +22,7 @@ class GPLayerFromFramesNode(bpy.types.Node, AnimationNode):
         self.newInput("Boolean", "Use Lights", "useLights", value = True, hide = True)
         self.newInput("Color", "Tint Color", "tintColor", hide = True)
         self.newInput("Float", "Tint Factor", "tintFactor", value = 0, minValue = 0, maxValue = 1, hide = True)
-        self.newInput("Float", "Stroke Thickness", "lineChange", hide = True)
+        self.newInput("Integer", "Stroke Thickness", "lineChange", hide = True)
         self.newInput("Integer", "Pass Index", "passIndex", value = 0, minValue = 0, hide = True)
         self.newInput(VectorizedSocket("GPLayer", "useMaskLayerList",
             ("Mask Layer", "maskLayer"), ("Mask Layers", "maskLayers")), hide = True)

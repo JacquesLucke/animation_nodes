@@ -16,7 +16,7 @@ class GPFrameFromStrokesNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "stroke"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Float", ["useStrokeList", "useNumberList"],
+        self.newInput(VectorizedSocket("Integer", ["useStrokeList", "useNumberList"],
             ("Frame Number", "frameNumber"), ("Frame Numbers", "frameNumbers")), value = 1)
         self.newOutput(VectorizedSocket("GPFrame", "useNumberList",
             ("Frame", "frame"), ("Frames", "frames")))
