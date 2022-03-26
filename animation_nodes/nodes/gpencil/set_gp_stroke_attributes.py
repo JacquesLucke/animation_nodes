@@ -21,7 +21,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
     def create(self):
         self.newInput(VectorizedSocket("GPStroke", "useStrokeList",
             ("Stroke", "strokes"), ("Strokes", "strokes")), dataIsModified = True)
-        self.newInput(VectorizedSocket("Float", "useLineWidthList",
+        self.newInput(VectorizedSocket("Integer", "useLineWidthList",
             ("Line Width", "lineWidths"), ("Line Widths", "lineWidths")), value = 250, minValue = 0)
         self.newInput(VectorizedSocket("Float", "useHardnessList",
             ("Hardness", "hardnesses"), ("Hardnesses", "hardnesses")), value = 1, minValue = 0, maxValue = 1)
@@ -63,7 +63,7 @@ class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
                 self.useMaterialIndexList, self.useDisplayModeList]):
             if any([isLineWidth, isHardness, isCylic, isStartCapMode, isEndCapMode, isVertexColorFill,
                     isMaterialIndex, isDisplayMode]):
-                if isLineWidth:       yield "_lineWidths = VirtualDoubleList.create(lineWidths, 0)"
+                if isLineWidth:       yield "_lineWidths = VirtualIntegerList.create(lineWidths, 0)"
                 if isHardness:        yield "_hardnesses = VirtualDoubleList.create(hardnesses, 0)"
                 if isCylic:           yield "_cyclics = VirtualBooleanList.create(cyclics, False)"
                 if isStartCapMode:    yield "_startCapModes = VirtualPyList.create(startCapModes, 'ROUND')"

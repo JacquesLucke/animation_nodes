@@ -22,7 +22,7 @@ class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
             ("UV-Rotation", "uvRotation"), ("UV-Rotations", "uvRotations")), hide = True)
         self.newInput(VectorizedSocket("Color", "useVertexColorList",
             ("Vertex Color", "vertexColor", dict(value = (0, 0, 0, 0))), ("Vertex Colors", "vertexColors")))
-        self.newInput("Float", "Line Width", "lineWidth", value = 250)
+        self.newInput("Integer", "Line Width", "lineWidth", value = 250)
         self.newInput("Float", "Hardness", "hardness", value = 1)
         self.newInput("Boolean", "Cyclic", "useCyclic", value = False, hide = True)
         self.newInput("Text", "Start Cap Mode", "startCapMode", value = 'ROUND', hide = True)

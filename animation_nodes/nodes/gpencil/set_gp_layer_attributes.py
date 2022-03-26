@@ -37,7 +37,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
             ("Tint Color", "tintColors"), ("Tint Colors", "tintColors")), hide = True)
         self.newInput(VectorizedSocket("Float", "useTintFactorList",
             ("Tint Factor", "tintFactors"), ("Tint Factors", "tintFactors")), value = 0, minValue = 0, maxValue = 1, hide = True)
-        self.newInput(VectorizedSocket("Float", "useLineChangeList",
+        self.newInput(VectorizedSocket("Integer", "useLineChangeList",
             ("Stroke Thickness", "lineChanges"), ("Stroke Thicknesses", "lineChanges")), hide = True)
         self.newInput(VectorizedSocket("Integer", "usePassIndexList",
             ("Pass Index", "passIndices"), ("Pass Indices", "passIndices")), value = 0, minValue = 0)
@@ -78,7 +78,7 @@ class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
                 if isUseLights:       yield "_useLights = VirtualBooleanList.create(useLights, False)"
                 if isTintColor:       yield "_tintColors = VirtualColorList.create(tintColors, Color((0, 0, 0, 0)))"
                 if isTintFactor:      yield "_tintFactors = VirtualDoubleList.create(tintFactors, 0)"
-                if isLineChange:      yield "_lineChanges = VirtualDoubleList.create(lineChanges, 0)"
+                if isLineChange:      yield "_lineChanges = VirtualLongList.create(lineChanges, 0)"
                 if isPassIndex:       yield "_passIndices = VirtualLongList.create(passIndices, 0)"
 
                 yield                       "_layers = VirtualPyList.create(layers, GPLayer())"

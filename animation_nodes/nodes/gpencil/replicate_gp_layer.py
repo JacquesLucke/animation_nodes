@@ -29,13 +29,13 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
             self.newInput("Matrix List", "Transformations", "transformations")
         else:
             self.newInput("Vector List", "Transformations", "transformations")
-        self.newInput(VectorizedSocket("Float", "useOffsetList",
+        self.newInput(VectorizedSocket("Integer", "useOffsetList",
             ("Offset Frame", "offsets"), ("Offset Frames", "offsets")), value = 0, hide = True)
         self.newInput(VectorizedSocket("Color", "useTintColorList",
             ("Tint Color", "tintColors"), ("Tint Colors", "tintColors")), hide = True)
         self.newInput(VectorizedSocket("Float", "useTintFactorList",
             ("Tint Factor", "tintFactors"), ("Tint Factors", "tintFactors")), value = 0, hide = True)
-        self.newInput(VectorizedSocket("Float", "useLineChangeList",
+        self.newInput(VectorizedSocket("Integer", "useLineChangeList",
             ("Stroke Thickness", "lineChanges"), ("Stroke Thicknesses", "lineChanges")), value = 0, hide = True)
 
         self.newOutput("GPLayer List", "Layers", "outLayers")
@@ -53,10 +53,10 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
         if isinstance(layers, GPLayer):
             layers = [layers]
 
-        _offsets = VirtualDoubleList.create(offsets, 0)
+        _offsets = VirtualLongList.create(offsets, 0)
         _tintColors = VirtualColorList.create(tintColors, Color((0, 0, 0, 0)))
         _tintFactors = VirtualDoubleList.create(tintFactors, 0)
-        _lineChanges = VirtualDoubleList.create(lineChanges, 0)
+        _lineChanges = VirtualLongList.create(lineChanges, 0)
 
         outLayers = []
         for i, matrix in enumerate(matrices):
@@ -74,10 +74,10 @@ class ReplicateGPLayerNode(bpy.types.Node, AnimationNode):
         if isinstance(layers, GPLayer):
             layers = [layers]
 
-        _offsets = VirtualDoubleList.create(offsets, 0)
+        _offsets = VirtualLongList.create(offsets, 0)
         _tintColors = VirtualColorList.create(tintColors, Color((0, 0, 0, 0)))
         _tintFactors = VirtualDoubleList.create(tintFactors, 0)
-        _lineChanges = VirtualDoubleList.create(lineChanges, 0)
+        _lineChanges = VirtualLongList.create(lineChanges, 0)
 
         outLayers = []
         for i, vector in enumerate(vectors):
