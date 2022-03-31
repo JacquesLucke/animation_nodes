@@ -19,6 +19,7 @@
 - Fixed failing dialogs after recent API change.
 - Fixed wrong MIDI tempo map computation.
 - Fixed exception due to outdated invoke nodes of removed subprograms.
+- Fixed missing output for input list nodes.
 
 ### Changed
 

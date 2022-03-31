@@ -19,10 +19,6 @@ class PythonListSocket(ListSocket):
         return []
 
     @classmethod
-    def getDefaultValueCode(cls):
-        return "[]"
-
-    @classmethod
     def getFromValuesCode(cls):
         return "value"
 
@@ -36,10 +32,6 @@ class CListSocket(ListSocket):
     @classmethod
     def getDefaultValue(cls):
         return cls.listClass()
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return cls.listClass.__name__ + "()"
 
     @classmethod
     def getCopyExpression(cls):
