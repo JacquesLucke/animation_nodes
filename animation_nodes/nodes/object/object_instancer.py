@@ -13,7 +13,7 @@ from ... utils.names import (getPossibleMeshName,
                              getPossibleGreasePencilName)
 
 lastSourceHashes = {}
-lastSceneHashes = {}
+lastContainerHashes = {}
 
 objectTypeItems = [
     ("MESH", "Mesh", "", "MESH_DATA", 0),
@@ -25,6 +25,13 @@ objectTypeItems = [
     ("EMPTY", "Empty", "", "EMPTY_DATA", 6),
     ("GREASE_PENCIL", "Grease Pencil", "", "OUTLINER_DATA_GREASEPENCIL", 7),
 ]
+
+containerTypeItems = (
+    ("COLLECTIONS", "Collections", "Link the objects to all input collections", 0),
+    ("SCENES", "Scenes", "Link the objects to the scene collection of all input scenes", 1),
+    ("MAIN_CONTAINER", "Main Container", "Link the objects to a collection created by "
+        "Animation Nodes in all input scenes", 2),
+)
 
 emptyDisplayTypeItems = []
 for item in bpy.types.Object.bl_rna.properties["empty_display_type"].enum_items:
@@ -48,6 +55,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         self.resetInstances = True
         propertyChanged()
 
+    def resetInstancesEventAndRefresh(self, context):
+        self.resetInstancesEvent(context)
+        self.refresh()
+
     linkedObjects: CollectionProperty(type = ObjectPropertyGroup)
     resetInstances: BoolProperty(default = False, update = propertyChanged)
 
@@ -68,8 +79,8 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         description = "Remove the active action on the instance; This is useful when you want to animate the object yourself",
         update = resetInstancesEvent)
 
-    addToMainContainer: BoolProperty(name = "Add To Main Container",
-        default = True, update = resetInstancesEvent)
+    containerType: EnumProperty(name = "Container Type", description = "The type of container the objects will be linked to",
+        items = containerTypeItems, default = "MAIN_CONTAINER", update = resetInstancesEventAndRefresh)
 
     emptyDisplayType: EnumProperty(name = "Empty Draw Type", default = "PLAIN_AXES",
         items = emptyDisplayTypeItems, update = resetInstancesEvent)
@@ -79,7 +90,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if self.copyFromSource:
             self.newInput("Object", "Source", "sourceObject",
                 defaultDrawType = "PROPERTY_ONLY", showHideToggle = True)
-        self.newInput("Scene List", "Scenes", "scenes", hide = True)
+        if self.containerType in ("SCENES", "MAIN_CONTAINER"):
+            self.newInput("Scene List", "Scenes", "scenes", hide = True)
+        elif self.containerType == "COLLECTIONS":
+            self.newInput("Collection List", "Collections", "collections", hide = True)
 
         self.newOutput("an_ObjectListSocket", "Objects", "objects")
 
@@ -94,7 +108,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                 layout.prop(self, "emptyDisplayType", text = "")
 
     def drawAdvanced(self, layout):
-        layout.prop(self, "addToMainContainer")
+        layout.prop(self, "containerType")
         layout.prop(self, "removeAnimationData")
 
         self.invokeFunction(layout, "resetObjectDataOnAllInstances",
@@ -105,22 +119,16 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
             text = "Unlink Instances from Node",
             description = "This will make sure that the objects won't be removed if you remove the Instancer Node")
 
-        layout.separator()
-        self.invokeFunction(layout, "toggleRelationshipLines",
-            text = "Toggle Relationship Lines",
-            icon = "RESTRICT_VIEW_OFF")
-
     def getExecutionCode(self, required):
-        # support for older nodes which didn't have a scene list input
-        if "Scenes" in self.inputs: yield "_scenes = set(scenes)"
-        else: yield "_scenes = {scene}"
+        if self.containerType in ("SCENES", "MAIN_CONTAINER"): yield "containers = set(scenes)"
+        elif self.containerType == "COLLECTIONS": yield "containers = set(collections)"
 
         if self.copyFromSource:
-            yield "objects = self.getInstances_WithSource(instancesAmount, sourceObject, _scenes)"
+            yield "objects = self.getInstances_WithSource(instancesAmount, sourceObject, containers)"
         else:
-            yield "objects = self.getInstances_WithoutSource(instancesAmount, _scenes)"
+            yield "objects = self.getInstances_WithoutSource(instancesAmount, containers)"
 
-    def getInstances_WithSource(self, instancesAmount, sourceObject, scenes):
+    def getInstances_WithSource(self, instancesAmount, sourceObject, containers):
         if sourceObject is None:
             self.removeAllObjects()
             return []
@@ -131,23 +139,23 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
                     self.removeAllObjects()
             lastSourceHashes[self.identifier] = sourceHash
 
-        return self.getInstances_Base(instancesAmount, sourceObject, scenes)
+        return self.getInstances_Base(instancesAmount, sourceObject, containers)
 
-    def getInstances_WithoutSource(self, instancesAmount, scenes):
-        return self.getInstances_Base(instancesAmount, None, scenes)
+    def getInstances_WithoutSource(self, instancesAmount, containers):
+        return self.getInstances_Base(instancesAmount, None, containers)
 
-    def getInstances_Base(self, instancesAmount, sourceObject, scenes):
+    def getInstances_Base(self, instancesAmount, sourceObject, containers):
         instancesAmount = max(instancesAmount, 0)
 
-        if not any(scenes):
+        if not any(containers):
             self.removeAllObjects()
             return []
         else:
-            sceneHash = set(hash(scene) for scene in scenes)
-            if self.identifier in lastSceneHashes:
-                if lastSceneHashes[self.identifier] != sceneHash:
+            containerHashes = set(hash(container) for container in containers)
+            if self.identifier in lastContainerHashes:
+                if lastContainerHashes[self.identifier] != containerHashes:
                     self.removeAllObjects()
-            lastSceneHashes[self.identifier] = sceneHash
+            lastContainerHashes[self.identifier] = containerHashes
 
         if self.resetInstances:
             self.removeAllObjects()
@@ -155,10 +163,10 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
         self.removeObjectsInRange(instancesAmount, len(self.linkedObjects))
 
-        return self.getOutputObjects(instancesAmount, sourceObject, scenes)
+        return self.getOutputObjects(instancesAmount, sourceObject, containers)
 
 
-    def getOutputObjects(self, instancesAmount, sourceObject, scenes):
+    def getOutputObjects(self, instancesAmount, sourceObject, containers):
         objects = []
 
         for i, objectGroup in enumerate(self.linkedObjects):
@@ -172,7 +180,7 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         if missingAmount == 0:
             return objects
 
-        newObjects = self.createNewObjects(missingAmount, sourceObject, scenes)
+        newObjects = self.createNewObjects(missingAmount, sourceObject, containers)
         objects.extend(newObjects)
 
         return objects
@@ -217,34 +225,45 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
         while object.active_shape_key is not None:
             object.shape_key_remove(object.active_shape_key)
 
-    def createNewObjects(self, amount, sourceObject, scenes):
+    def createNewObjects(self, amount, sourceObject, containers):
         objects = []
         nameSuffix = "instance_{}_".format(getRandomString(5))
         for i in range(amount):
             name = nameSuffix + str(i)
-            newObject = self.appendNewObject(name, sourceObject, scenes)
+            newObject = self.appendNewObject(name, sourceObject, containers)
             objects.append(newObject)
         return objects
 
-    def appendNewObject(self, name, sourceObject, scenes):
-        object = self.newInstance(name, sourceObject, scenes)
-        self.linkObject(object, scenes)
+    def appendNewObject(self, name, sourceObject, containers):
+        object = self.newInstance(name, sourceObject)
+        self.linkObject(object, containers)
         self.linkedObjects.add().object = object
         return object
 
-    def linkObject(self, object, scenes):
-        if self.addToMainContainer:
-            for scene in scenes:
-                if scene is not None:
-                    getMainObjectContainer(scene).objects.link(object)
-                    break
+    def linkObject(self, object, containers):
+        if self.containerType == "MAIN_CONTAINER":
+            self.linkObjectToMainContainer(object, containers)
+        elif self.containerType == "SCENES":
+            self.linkObjectToScenes(object, containers)
         else:
-            for scene in scenes:
-                if scene is not None:
-                    scene.collection.objects.link(object)
-                    break
+            self.linkObjectToCollections(object, containers)
 
-    def newInstance(self, name, sourceObject, scenes):
+    def linkObjectToMainContainer(self, object, scenes):
+        for scene in scenes:
+            if scene is None: continue
+            getMainObjectContainer(scene).objects.link(object)
+
+    def linkObjectToScenes(self, object, scenes):
+        for scene in scenes:
+            if scene is None: continue
+            scene.collection.objects.link(object)
+
+    def linkObjectToCollections(self, object, collections):
+        for collection in collections:
+            if collection is None: continue
+            collection.objects.link(object)
+
+    def newInstance(self, name, sourceObject):
         instanceData = self.getSourceObjectData(sourceObject)
         if self.copyObjectProperties and self.copyFromSource:
             newObject = sourceObject.copy()
@@ -299,7 +318,3 @@ class ObjectInstancerNode(bpy.types.Node, AnimationNode):
 
     def duplicate(self, sourceNode):
         self.linkedObjects.clear()
-
-    def toggleRelationshipLines(self):
-        for space in iterActiveSpacesByType("VIEW_3D"):
-            space.overlay.show_relationship_lines = not space.overlay.show_relationship_lines
