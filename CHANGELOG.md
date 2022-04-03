@@ -9,6 +9,7 @@
 - Added full ADSR (Attack, Delay, Sustain, Release) envelope to Evaluate MIDI Track node.
 - Added velocity sensitivity to Evaluate MIDI Track node.
 - Added Container Type advanced option to object instancer node.
+- Added Evaluate FCurves Transforms node.
 
 ### Fixed
 

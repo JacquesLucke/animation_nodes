@@ -684,6 +684,7 @@ class FCurveMenu(bpy.types.Menu):
         layout = self.layout
         insertNode(layout, "an_FCurvesFromObjectNode", "From Object")
         insertNode(layout, "an_EvaluateFCurveNode", "Evaluate")
+        insertNode(layout, "an_EvaluateFCurvesTransformsNode", "Evaluate Transforms")
         insertNode(layout, "an_FCurveInfoNode", "Info")
         insertNode(layout, "an_FCurveKeyframesNode", "Keyframes")
 
