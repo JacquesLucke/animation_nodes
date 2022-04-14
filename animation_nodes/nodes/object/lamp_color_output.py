@@ -8,6 +8,7 @@ class LampColorOutputNode(bpy.types.Node, AnimationNode):
 
     useObjectList: VectorizedSocket.newProperty()
     useColorList: VectorizedSocket.newProperty()
+    useFloatList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",
@@ -17,10 +18,12 @@ class LampColorOutputNode(bpy.types.Node, AnimationNode):
 
         self.newInput(VectorizedSocket("Color", "useColorList",
             ("Color", "color"), ("Colors", "colors")))
+        self.newInput(VectorizedSocket("Float", "useFloatList",
+            ("Energy", "energy"), ("Energies", "energies")))
 
         self.newOutput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
             ("Objects", "objects")))
 
     def getExecutionCode(self, required):
-        return "if object is not None: object.data.color = color[:3]"
+        return "if object is not None and object.type == 'LIGHT': object.data.color = color[:3]; object.data.energy = energy"

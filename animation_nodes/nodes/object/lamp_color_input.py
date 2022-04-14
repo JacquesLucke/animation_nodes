@@ -1,35 +1,38 @@
 import bpy
-from ... data_structures import Color, ColorList
 from ... base_types import AnimationNode, VectorizedSocket
+from ... data_structures import Color, ColorList, DoubleList
 
 class LampColorInputNode(bpy.types.Node, AnimationNode):
     bl_idname = "an_LampColorInputNode"
     bl_label = "Lamp Color Input"
+
     useObjectList: VectorizedSocket.newProperty()
 
     def create(self):
         self.newInput(VectorizedSocket("Object", "useObjectList",
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
-            ("Objects", "objects"),
-            codeProperties = dict(allowListExtension = False)))
+            ("Objects", "objects")))
 
         self.newOutput(VectorizedSocket("Color", "useObjectList",
-            ("Color", "color"), ("Colors", "color")))
+            ("Color", "color"), ("Colors", "colors")))
+        self.newOutput(VectorizedSocket("Float", "useObjectList",
+            ("Energy", "energy"), ("Energies", "energies")))
 
     def getExecutionFunctionName(self):
         if self.useObjectList:
-            return "execute_LampColors"
+            return "execute_List"
         else:
-            return "execute_LampColor"
+            return "execute_Single"
 
-    def execute_LampColor(self, object):
-        if object is None: return Color((0, 0, 0, 0))
+    def execute_Single(self, object):
+        if object is None or object.type != 'LIGHT': return Color((0, 0, 0, 0)), 0
         color = object.data.color
-        return Color(tuple([color[0], color[1], color[2], 0]))
+        return Color(tuple([color[0], color[1], color[2], 0])), object.data.energy
 
-    def execute_LampColors(self, objects):
+    def execute_List(self, objects):
         amount = len(objects)
         colors = ColorList(length = amount)
+        energies = DoubleList(length = amount)
         for i, object in enumerate(objects):
-            colors[i] = self.execute_LampColor(object)
-        return colors
+            colors[i], energies[i] = self.execute_Single(object)
+        return colors, energies
