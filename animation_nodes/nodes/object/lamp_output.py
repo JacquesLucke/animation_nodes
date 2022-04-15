@@ -1,9 +1,9 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class LampColorOutputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_LampColorOutputNode"
-    bl_label = "Lamp Color Output"
+class LampOutputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_LampOutputNode"
+    bl_label = "Lamp Output"
     codeEffects = [VectorizedSocket.CodeEffect]
 
     useObjectList: VectorizedSocket.newProperty()
@@ -25,5 +25,16 @@ class LampColorOutputNode(bpy.types.Node, AnimationNode):
             ("Object", "object", dict(defaultDrawType = "PROPERTY_ONLY")),
             ("Objects", "objects")))
 
+        for socket in self.inputs[1:]:
+            socket.useIsUsedProperty = True
+            socket.isUsed = False
+
     def getExecutionCode(self, required):
-        return "if object is not None and object.type == 'LIGHT': object.data.color = color[:3]; object.data.energy = energy"
+        s = self.inputs
+        isColor = s[1].isUsed
+        isEnergy = s[2].isUsed
+
+        if any([isColor, isEnergy]):
+            yield "if object is not None and object.type == 'LIGHT':"
+            if isColor:    yield "        object.data.color = color[:3]"
+            if isEnergy:   yield "        object.data.energy = energy"

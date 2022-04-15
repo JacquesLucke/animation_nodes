@@ -10,7 +10,7 @@
 - Added velocity sensitivity to Evaluate MIDI Track node.
 - Added Container Type advanced option to object instancer node.
 - Added Evaluate FCurves Transforms node.
-- Added *Lamp Color Input* and *Lamp Color Output* nodes.
+- Added *Lamp Input* and *Lamp Output* nodes.
 
 ### Fixed
 

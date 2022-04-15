@@ -2,9 +2,9 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import Color, ColorList, DoubleList
 
-class LampColorInputNode(bpy.types.Node, AnimationNode):
-    bl_idname = "an_LampColorInputNode"
-    bl_label = "Lamp Color Input"
+class LampInputNode(bpy.types.Node, AnimationNode):
+    bl_idname = "an_LampInputNode"
+    bl_label = "Lamp Input"
 
     useObjectList: VectorizedSocket.newProperty()
 
