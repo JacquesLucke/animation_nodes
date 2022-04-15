@@ -10,6 +10,7 @@
 - Added velocity sensitivity to Evaluate MIDI Track node.
 - Added Container Type advanced option to object instancer node.
 - Added Evaluate FCurves Transforms node.
+- Added *Lamp Input* and *Lamp Output* nodes.
 
 ### Fixed
 
@@ -21,6 +22,7 @@
 - Fixed failing dialogs after recent API change.
 - Fixed wrong MIDI tempo map computation.
 - Fixed exception due to outdated invoke nodes of removed subprograms.
+- Fixed Grease Pencil Nodes for API changes.
 - Fixed missing output for input list nodes.
 
 ### Changed
