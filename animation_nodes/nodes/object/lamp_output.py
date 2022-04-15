@@ -30,11 +30,10 @@ class LampOutputNode(bpy.types.Node, AnimationNode):
             socket.isUsed = False
 
     def getExecutionCode(self, required):
-        s = self.inputs
-        isColor = s[1].isUsed
-        isEnergy = s[2].isUsed
+        useColor = self.inputs[1].isUsed
+        useEnergy = self.inputs[2].isUsed
 
-        if any([isColor, isEnergy]):
+        if any([useColor, useEnergy]):
             yield "if object is not None and object.type == 'LIGHT':"
-            if isColor:    yield "        object.data.color = color[:3]"
-            if isEnergy:   yield "        object.data.energy = energy"
+            if useColor:    yield "        object.data.color = color[:3]"
+            if useEnergy:   yield "        object.data.energy = energy"
