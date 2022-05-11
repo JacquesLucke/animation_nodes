@@ -46,7 +46,7 @@ class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
         yield "if object is not None:"
         for name, identifier, attr, _ in attributes:
             if self.inputs[name].isUsed:
-                yield "    object.{} = {}".format(attr, identifier)
+                yield f"    if object.{attr} != {identifier}: object.{attr} = {identifier}"
         yield "    pass"
 
     def getBakeCode(self):
