@@ -109,11 +109,13 @@ class ViewerNode(bpy.types.Node, AnimationNode):
             yield "{}: {}".format(str(i).rjust(indexWidth), toString(element))
 
     def setViewData(self, nodeText, drawText, minWidth = None):
-        self.inputs[0].name = nodeText
+        # Only set view data if it is different to avoid unnecessary updates,
+        # the same applies to the preferred width below.
+        if self.inputs[0].name != nodeText: self.inputs[0].name = nodeText
         drawTextByIdentifier[self.identifier] = drawText
 
-        if minWidth is not None:
-            self.width = max(self.width, minWidth)
+        preferredWidth = max(self.width, minWidth) if minWidth is not None else self.width
+        if self.width != preferredWidth: self.width = preferredWidth
 
         if self.outputConsole:
             print("Viewer: '{}'".format(self.name))
