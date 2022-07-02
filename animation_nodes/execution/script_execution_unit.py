@@ -17,6 +17,7 @@ class ScriptExecutionUnit:
     def scriptUpdated(self, nodeByID = None):
         self.generateScript(nodeByID)
         self.compileScript()
+        self.execute = self.raiseNotSetupException
 
     def setup(self):
         self.executionData = {}

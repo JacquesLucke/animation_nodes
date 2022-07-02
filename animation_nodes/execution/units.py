@@ -56,12 +56,11 @@ def setupExecutionUnits(nodeTrees):
 
         executionUnits = getExecutionUnits(nodeTrees)
 
+        subprograms = {}
         for unit in executionUnits:
             unit.setup()
-
-        subprograms = {}
-        for identifier, unit in _subprogramUnitsByIdentifier.items():
-            subprograms["_subprogram" + identifier] = unit.execute
+            if unit.network.isSubnetwork:
+                subprograms["_subprogram" + unit.network.identifier] = unit.execute
 
         for unit in executionUnits:
             unit.insertSubprogramFunctions(subprograms)

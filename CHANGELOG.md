@@ -24,6 +24,7 @@
 - Fixed exception due to outdated invoke nodes of removed subprograms.
 - Fixed Grease Pencil Nodes for API changes.
 - Fixed missing output for input list nodes.
+- Fixed error when using multiple subprogram nodes.
 
 ### Changed
 
