@@ -1,7 +1,7 @@
 import bpy
 
 def newNodeAtCursor(type):
-    bpy.ops.node.add_and_link_node(type = type)
+    bpy.ops.node.add_node(type = type)
     return bpy.context.space_data.node_tree.nodes[-1]
 
 def invokeTranslation():
