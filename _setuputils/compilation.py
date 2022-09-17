@@ -121,6 +121,6 @@ def getSetupOptions(path):
 def getExtensionArgsFromSetupOptions(options):
     args = {}
     if "c++11" in options:
-        if onLinux or onMacOS:
+        if onLinux or onMacOS or onOpenBSD:
             args["extra_compile_args"] = ["-std=c++11"]
     return args
