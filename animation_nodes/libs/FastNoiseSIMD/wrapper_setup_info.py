@@ -38,4 +38,8 @@ def getCompileInfo(utils):
         return ("libFastNoiseSIMD_macos.a",
                 ["sh", os.path.join(sourceDir, "compile_macos.sh")],
                 {"libraries" : ["FastNoiseSIMD_macos"]})
+    if utils.onOpenBSD:
+        return ("libFastNoiseSIMD_openbsd.a",
+                ["sh", os.path.join(sourceDir, "compile_openbsd.sh")],
+                {"libraries" : ["FastNoiseSIMD_openbsd"]})
     raise Exception("unknown platform")
