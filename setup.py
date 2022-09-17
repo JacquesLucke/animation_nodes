@@ -35,6 +35,7 @@ initPath = os.path.join(currentDirectory, addonName, "__init__.py")
 if onLinux: currentOS = "linux"
 elif onWindows: currentOS = "windows"
 elif onMacOS: currentOS = "macOS"
+elif onOpenBSD: currentOS = "openbsd"
 addonVersion = getAddonVersion(initPath)
 exportName = "{}_v{}_{}_{}_py{}{}".format(
     addonName, *addonVersion[:2], currentOS, *sys.version_info[:2])
