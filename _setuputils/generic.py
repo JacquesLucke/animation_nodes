@@ -12,8 +12,9 @@ _globals = set(globals().keys())
 onLinux = sys.platform.startswith("linux")
 onWindows = sys.platform.startswith("win")
 onMacOS = sys.platform == "darwin"
+onOpenBSD = sys.platform.startswith("openbsd")
 
-if not (onLinux or onWindows or onMacOS):
+if not (onLinux or onWindows or onMacOS or onOpenBSD):
     raise Exception("unknown OS")
 
 def getPlatformSummary():
