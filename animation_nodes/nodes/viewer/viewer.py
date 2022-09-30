@@ -7,7 +7,7 @@ from ... base_types import AnimationNode, TextUIExtension
 
 drawTextByIdentifier = {}
 
-class ViewerNode(bpy.types.Node, AnimationNode):
+class ViewerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ViewerNode"
     bl_label = "Viewer"
     bl_width_default = 180

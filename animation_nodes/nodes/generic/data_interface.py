@@ -10,7 +10,7 @@ dataDirectionItems = {
     ("IMPORT", "Import", "Receive the data from somewhere else", "IMPORT", 0),
     ("EXPORT", "Export", "Another script can read the data from this node", "EXPORT", 1) }
 
-class DataInterfaceNode(bpy.types.Node, AnimationNode):
+class DataInterfaceNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DataInterfaceNode"
     bl_label = "Data Interface"
 

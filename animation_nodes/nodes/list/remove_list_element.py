@@ -9,7 +9,7 @@ removeTypeItems = [
     ("ALL_OCCURRENCES", "All Occurrences", "", "", 1),
     ("INDEX", "Index", "", "", 2) ]
 
-class RemoveListElementNode(bpy.types.Node, AnimationNode):
+class RemoveListElementNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RemoveListElementNode"
     bl_label = "Remove List Element"
 

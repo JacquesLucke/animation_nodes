@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... utils.attributes import pathBelongsToArray
 
-class ObjectDataPathOutputNode(bpy.types.Node, AnimationNode):
+class ObjectDataPathOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectDataPathOutputNode"
     bl_label = "Object Data Path Output"
     errorHandlingType = "MESSAGE"

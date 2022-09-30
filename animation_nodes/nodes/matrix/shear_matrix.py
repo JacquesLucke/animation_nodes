@@ -7,7 +7,7 @@ planeItems = [
     ("XZ", "XZ", "", "NONE", 1),
     ("YZ", "YZ", "", "NONE", 2)]
 
-class ShearMatrixNode(bpy.types.Node, AnimationNode):
+class ShearMatrixNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ShearMatrixNode"
     bl_label = "Shear Matrix"
 

@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures import AttributeType
 
-class GetUVMapNode(bpy.types.Node, AnimationNode):
+class GetUVMapNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetUVMapNode"
     bl_label = "Get UV Map"
     errorHandlingType = "EXCEPTION"

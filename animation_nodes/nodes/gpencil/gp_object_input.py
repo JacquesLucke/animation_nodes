@@ -10,7 +10,7 @@ importTypeItems = [
     ("SINGLE", "Single", "Get a specific grease pencil layer", "NONE", 1)
 ]
 
-class GPObjectInputNode(bpy.types.Node, AnimationNode):
+class GPObjectInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GPObjectInputNode"
     bl_label = "GP Object Input"
     errorHandlingType = "EXCEPTION"

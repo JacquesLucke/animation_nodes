@@ -2,7 +2,7 @@ import bpy
 from . remap_falloff import RemapFalloff
 from ... base_types import AnimationNode
 
-class InvertFalloffNode(bpy.types.Node, AnimationNode):
+class InvertFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InvertFalloffNode"
     bl_label = "Invert Falloff"
 

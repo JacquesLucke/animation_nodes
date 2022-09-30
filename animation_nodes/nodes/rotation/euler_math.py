@@ -28,7 +28,7 @@ operationsWithSecondEuler = ["ADD", "SUBTRACT"]
 operationsWithVector = ["MULTIPLY", "DIVIDE"]
 operationsWithStepEuler = ["SNAP"]
 
-class EulerMathNode(bpy.types.Node, AnimationNode):
+class EulerMathNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EulerMathNode"
     bl_label = "Euler Math"
     dynamicLabelType = "HIDDEN_ONLY"

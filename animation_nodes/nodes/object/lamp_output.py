@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class LampOutputNode(bpy.types.Node, AnimationNode):
+class LampOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_LampOutputNode"
     bl_label = "Lamp Output"
     codeEffects = [VectorizedSocket.CodeEffect]

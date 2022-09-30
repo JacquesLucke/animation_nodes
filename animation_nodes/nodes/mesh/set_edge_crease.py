@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SetEdgeCreaseNode(bpy.types.Node, AnimationNode):
+class SetEdgeCreaseNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetEdgeCreaseNode"
     bl_label = "Set Edge Crease"
     errorHandlingType = "EXCEPTION"

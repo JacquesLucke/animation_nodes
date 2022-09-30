@@ -18,7 +18,7 @@ groupNotFoundMessage = "group not found"
 noMeshMessage = "no mesh object"
 noSceneMessage = "scene required"
 
-class VertexGroupInputNode(bpy.types.Node, AnimationNode):
+class VertexGroupInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VertexGroupInputNode"
     bl_label = "Vertex Group Input"
     errorHandlingType = "EXCEPTION"

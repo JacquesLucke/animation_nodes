@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class FindPointsInRadiusInKDTreeNode(bpy.types.Node, AnimationNode):
+class FindPointsInRadiusInKDTreeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FindPointsInRadiusInKDTreeNode"
     bl_label = "Find Points in Radius"
 

@@ -26,7 +26,7 @@ originTypeItems = [
     ("ORIGIN_CURSOR", "Origin to Cursor", "", "NONE", 2),
     ("ORIGIN_CENTER_OF_MASS", "Origin to Center of Mass", "", "NONE", 3) ]
 
-class SeparateTextObjectNode(bpy.types.Node, AnimationNode):
+class SeparateTextObjectNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SeparateTextObjectNode"
     bl_label = "Separate Text Object"
     bl_width_default = 200

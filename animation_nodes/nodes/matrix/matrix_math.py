@@ -7,7 +7,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 
 operationItems = [("MULTIPLY", "Multiply", "", "NONE", 0)]
 
-class MatrixMathNode(bpy.types.Node, AnimationNode):
+class MatrixMathNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MatrixMathNode"
     bl_label = "Matrix Math"
     errorHandlingType = "MESSAGE"

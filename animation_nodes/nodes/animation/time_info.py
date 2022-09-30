@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class TimeInfoNode(bpy.types.Node, AnimationNode):
+class TimeInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TimeInfoNode"
     bl_label = "Time Info"
     searchTags = ["Frame"]

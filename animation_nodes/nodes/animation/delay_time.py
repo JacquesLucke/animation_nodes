@@ -3,7 +3,7 @@ from . c_utils import executeSubtract_A_B
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualDoubleList, DoubleList
 
-class DelayTimeNode(bpy.types.Node, AnimationNode):
+class DelayTimeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DelayTimeNode"
     bl_label = "Delay Time"
     dynamicLabelType = "HIDDEN_ONLY"

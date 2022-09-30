@@ -10,7 +10,7 @@ splineTypeItems = [
     ("POLY", "Poly", "Linear interpolation between the spline points", "NOCURVE", 1)
 ]
 
-class ParticleSystemHairDataNode(bpy.types.Node, AnimationNode):
+class ParticleSystemHairDataNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ParticleSystemHairDataNode"
     bl_label = "Hair Data"
 

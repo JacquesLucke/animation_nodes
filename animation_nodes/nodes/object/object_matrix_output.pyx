@@ -12,7 +12,7 @@ outputItems = [	("BASIS", "Basis", "", "NONE", 0),
                 ("WORLD", "World", "", "NONE", 3) ]
 
 
-class ObjectMatrixOutputNode(bpy.types.Node, AnimationNode):
+class ObjectMatrixOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectMatrixOutputNode"
     bl_label = "Object Matrix Output"
 

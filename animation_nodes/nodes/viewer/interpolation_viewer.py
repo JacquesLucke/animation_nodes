@@ -4,7 +4,7 @@ from ... base_types import AnimationNode, InterpolationUIExtension
 
 interpolationByNode = {}
 
-class InterpolationViewerNode(bpy.types.Node, AnimationNode):
+class InterpolationViewerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InterpolationViewerNode"
     bl_label = "Interpolation Viewer"
     bl_width_default = 160

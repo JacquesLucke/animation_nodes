@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class FloatToTextNode(bpy.types.Node, AnimationNode):
+class FloatToTextNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FloatToTextNode"
     bl_label = "Float to Text"
 

@@ -8,7 +8,7 @@ modeItems = [
     ("END", "at End", "", "TRIA_RIGHT", 1)
 ]
 
-class RepeatTextNode(bpy.types.Node, AnimationNode):
+class RepeatTextNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RepeatTextNode"
     bl_label = "Repeat Text"
 

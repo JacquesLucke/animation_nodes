@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class TextSequenceOutputNode(bpy.types.Node, AnimationNode):
+class TextSequenceOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TextSequenceOutputNode"
     bl_label = "Text Sequence Output"
     bl_width_default = 160

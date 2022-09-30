@@ -8,7 +8,7 @@ from .... data_structures import (
     PolygonIndicesList,
 )
 
-class UnityTriangleMeshNode(bpy.types.Node, AnimationNode):
+class UnityTriangleMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_UnityTriangleMeshNode"
     bl_label = "Unity Triangle Mesh"
 

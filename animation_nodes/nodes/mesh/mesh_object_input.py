@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import Mesh, Attribute, AttributeType, AttributeDomain, AttributeDataType, DoubleList
 
-class MeshObjectInputNode(bpy.types.Node, AnimationNode):
+class MeshObjectInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MeshObjectInputNode"
     bl_label = "Mesh Object Input"
     errorHandlingType = "MESSAGE"

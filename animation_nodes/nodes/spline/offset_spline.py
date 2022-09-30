@@ -6,7 +6,7 @@ from .. vector.c_utils import offset3DVectors
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList, VirtualDoubleList
 
-class OffsetSplineNode(bpy.types.Node, AnimationNode):
+class OffsetSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_OffsetSplineNode"
     bl_label = "Offset Spline"
     errorHandlingType = "EXCEPTION"

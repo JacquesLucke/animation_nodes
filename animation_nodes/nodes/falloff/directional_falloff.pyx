@@ -6,7 +6,7 @@ from . constant_falloff import ConstantFalloff
 from ... math cimport Vector3, setVector3, normalizeVec3_InPlace
 from ... math cimport signedDistancePointToPlane_Normalized as signedDistance
 
-class DirectionalFalloffNode(bpy.types.Node, AnimationNode):
+class DirectionalFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DirectionalFalloffNode"
     bl_label = "Directional Falloff"
 

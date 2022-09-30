@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... algorithms.interpolations import Linear, FCurveMapping
 
-class InterpolationFromFCurveNode(bpy.types.Node, AnimationNode):
+class InterpolationFromFCurveNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InterpolationFromFCurveNode"
     bl_label = "Interpolation from FCurve"
 

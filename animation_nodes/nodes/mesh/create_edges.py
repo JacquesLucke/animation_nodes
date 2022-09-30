@@ -2,7 +2,7 @@ import bpy
 from . c_utils import createEdges
 from ... base_types import AnimationNode
 
-class CreateEdgesNode(bpy.types.Node, AnimationNode):
+class CreateEdgesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CreateEdgesNode"
     bl_label = "Create Edges"
     bl_width_default = 140

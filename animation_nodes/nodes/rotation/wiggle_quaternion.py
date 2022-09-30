@@ -5,7 +5,7 @@ from mathutils import Quaternion
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class QuaternionWiggleNode(bpy.types.Node, AnimationNode):
+class QuaternionWiggleNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_QuaternionWiggleNode"
     bl_label = "Quaternion Wiggle"
 

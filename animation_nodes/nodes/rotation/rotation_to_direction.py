@@ -6,7 +6,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 directionAxisItems = [(axis, axis, "", "", i)
                       for i, axis in enumerate(("X", "Y", "Z", "-X", "-Y", "-Z"))]
 
-class RotationToDirectionNode(bpy.types.Node, AnimationNode):
+class RotationToDirectionNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RotationToDirectionNode"
     bl_label = "Rotation to Direction"
     bl_width_default = 160

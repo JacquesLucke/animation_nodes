@@ -71,7 +71,7 @@ class ActionChannelsNodeBase:
                     return channel.property
         return None
 
-class WiggleActionNode(bpy.types.Node, AnimationNode, ActionChannelsNodeBase):
+class WiggleActionNode(AnimationNode, bpy.types.Node, ActionChannelsNodeBase):
     bl_idname = "an_WiggleActionNode"
     bl_label = "Wiggle Action"
     errorHandlingType = "EXCEPTION"

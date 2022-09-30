@@ -6,7 +6,7 @@ from mathutils import Euler
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class EulerWiggleNode(bpy.types.Node, AnimationNode):
+class EulerWiggleNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EulerWiggleNode"
     bl_label = "Euler Wiggle"
 

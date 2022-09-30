@@ -10,7 +10,7 @@ mapIdentifierTypeItems = [
     ("NAME", "Name", "Get uv map based on the name", "NONE", 1)
 ]
 
-class SetUVMapNode(bpy.types.Node, AnimationNode):
+class SetUVMapNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetUVMapNode"
     bl_label = "Set UV Map"
     errorHandlingType = "EXCEPTION"

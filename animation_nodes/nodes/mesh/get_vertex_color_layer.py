@@ -11,7 +11,7 @@ colorModeItems = [
     ("POLYGON", "Polygon", "Get color of every polygon", "NONE", 2)
 ]
 
-class GetVertexColorLayerNode(bpy.types.Node, AnimationNode):
+class GetVertexColorLayerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetVertexColorLayerNode"
     bl_label = "Get Vertex Color Layer"
     errorHandlingType = "EXCEPTION"

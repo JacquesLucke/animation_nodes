@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import GPStroke, FloatList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPStrokeFromSplineNode(bpy.types.Node, AnimationNode):
+class GPStrokeFromSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GPStrokeFromSplineNode"
     bl_label = "GP Stroke From Spline"
     codeEffects = [VectorizedSocket.CodeEffect]

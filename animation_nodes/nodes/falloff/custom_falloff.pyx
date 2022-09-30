@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures cimport BaseFalloff, FloatList
 
-class CustomFalloffNode(bpy.types.Node, AnimationNode):
+class CustomFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CustomFalloffNode"
     bl_label = "Custom Falloff"
 

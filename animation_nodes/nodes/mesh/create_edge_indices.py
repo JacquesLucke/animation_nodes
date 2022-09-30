@@ -3,7 +3,7 @@ from . c_utils import createEdgeIndices
 from ... data_structures import VirtualLongList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class CreateEdgeIndicesNode(bpy.types.Node, AnimationNode):
+class CreateEdgeIndicesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CreateEdgeIndicesNode"
     bl_label = "Create Edge Indices"
 

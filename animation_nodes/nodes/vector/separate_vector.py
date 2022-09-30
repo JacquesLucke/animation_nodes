@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import getAxisListOfVectorList
 
-class SeparateVectorNode(bpy.types.Node, AnimationNode):
+class SeparateVectorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SeparateVectorNode"
     bl_label = "Separate Vector"
 

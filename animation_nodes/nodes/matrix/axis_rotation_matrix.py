@@ -10,7 +10,7 @@ axisItems = [
     ("Z", "Z", "", "", 2)
 ]
 
-class AxisRotationMatrixNode(bpy.types.Node, AnimationNode):
+class AxisRotationMatrixNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_AxisRotationMatrixNode"
     bl_label = "Axis Rotation Matrix"
 

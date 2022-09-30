@@ -11,7 +11,7 @@ maskTypeItems = [
     ("RANDOM", "Random", "", "NONE", 1)
 ]
 
-class IndexMaskFalloffNode(bpy.types.Node, AnimationNode):
+class IndexMaskFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_IndexMaskFalloffNode"
     bl_label = "Index Mask Falloff"
     bl_width_default = 160

@@ -156,7 +156,7 @@ searchItems = {
 
 justCopiedIdentifiers = set()
 
-class FloatMathNode(bpy.types.Node, AnimationNode):
+class FloatMathNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FloatMathNode"
     bl_label = "Float Math"
     dynamicLabelType = "ALWAYS"

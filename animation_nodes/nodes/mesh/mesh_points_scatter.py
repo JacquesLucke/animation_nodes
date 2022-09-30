@@ -17,7 +17,7 @@ modeItems = [
     ("POLYGONS", "Polygons", "Scatter points on polygons", "NONE", 1)
 ]
 
-class MeshPointsScatterNode(bpy.types.Node, AnimationNode):
+class MeshPointsScatterNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MeshPointsScatterNode"
     bl_label = "Mesh Points Scatter"
 

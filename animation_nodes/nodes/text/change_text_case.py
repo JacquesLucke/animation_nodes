@@ -11,7 +11,7 @@ caseTypeItems = [("UPPER", "To Upper Case", ""),
 
 caseTypeCode = { item[0] : item[0].lower() for item in caseTypeItems }
 
-class ChangeTextCaseNode(bpy.types.Node, AnimationNode):
+class ChangeTextCaseNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ChangeTextCaseNode"
     bl_label = "Change Text Case"
 

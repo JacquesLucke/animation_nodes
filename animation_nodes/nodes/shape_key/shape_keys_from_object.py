@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class ShapeKeysFromObjectNode(bpy.types.Node, AnimationNode):
+class ShapeKeysFromObjectNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ShapeKeysFromObjectNode"
     bl_label = "Shape Keys from Object"
 

@@ -20,7 +20,7 @@ modeItems = [
     ("TRANSFORMS", "Transforms", "Handle transform channels specifically", "NONE", 1)
 ]
 
-class ObjectActionOutputNode(bpy.types.Node, AnimationNode):
+class ObjectActionOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectActionOutputNode"
     bl_label = "Object Action Output"
     errorHandlingType = "MESSAGE"

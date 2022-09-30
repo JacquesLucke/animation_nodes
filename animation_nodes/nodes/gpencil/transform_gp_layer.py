@@ -3,7 +3,7 @@ from ... math import Matrix
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualMatrix4x4List, VirtualPyList, GPLayer
 
-class TransformGPLayerNode(bpy.types.Node, AnimationNode):
+class TransformGPLayerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TransformGPLayerNode"
     bl_label = "Transform GP Layer"
 

@@ -11,7 +11,7 @@ basisAxisItems = [
     ("Z", "Z", "", "NONE", 2)
 ]
 
-class ExtractMatrixBasisNode(bpy.types.Node, AnimationNode):
+class ExtractMatrixBasisNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ExtractMatrixBasisNode"
     bl_label = "Extract Matrix Basis"
 

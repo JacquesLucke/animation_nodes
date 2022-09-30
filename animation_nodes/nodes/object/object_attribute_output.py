@@ -4,7 +4,7 @@ from ... utils.code import isCodeValid
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectAttributeOutputNode(bpy.types.Node, AnimationNode):
+class ObjectAttributeOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectAttributeOutputNode"
     bl_label = "Object Attribute Output"
     bl_width_default = 180

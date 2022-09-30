@@ -9,7 +9,7 @@ transformationTypeItems = [
     ("VECTOR_LIST", "Vectors", "", "NONE", 1)
 ]
 
-class ReplicateSplineNode(bpy.types.Node, AnimationNode):
+class ReplicateSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ReplicateSplineNode"
     bl_label = "Replicate Spline"
 

@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class TransformVectorNode(bpy.types.Node, AnimationNode):
+class TransformVectorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TransformVectorNode"
     bl_label = "Transform Vector"
 

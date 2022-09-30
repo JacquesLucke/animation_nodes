@@ -9,7 +9,7 @@ modeItems = [
     ("VERTEX_AMOUNT", "Vertex Amount", "NONE", 1)
 ]
 
-class CreatePolygonIndicesNode(bpy.types.Node, AnimationNode):
+class CreatePolygonIndicesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CreatePolygonIndicesNode"
     bl_label = "Create Polygon Indices"
     bl_width_default = 160

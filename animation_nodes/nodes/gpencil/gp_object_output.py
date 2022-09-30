@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPObjectOutputNode(bpy.types.Node, AnimationNode):
+class GPObjectOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GPObjectOutputNode"
     bl_label = "GP Object Output"
     errorHandlingType = "EXCEPTION"

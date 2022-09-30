@@ -6,7 +6,7 @@ from ... tree_info import getNodeByIdentifier
 from ... base_types import AnimationNode, VectorizedSocket
 from . subprogram_sockets import subprogramInterfaceChanged
 
-class LoopGeneratorOutputNode(bpy.types.Node, AnimationNode):
+class LoopGeneratorOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_LoopGeneratorOutputNode"
     bl_label = "Loop Generator Output"
     dynamicLabelType = "ALWAYS"

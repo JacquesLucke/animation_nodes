@@ -19,7 +19,7 @@ oneTimeCache = {}
 frameBasedCache = {}
 inputBasedCache = {}
 
-class InvokeSubprogramNode(bpy.types.Node, AnimationNode):
+class InvokeSubprogramNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InvokeSubprogramNode"
     bl_label = "Invoke Subprogram"
     bl_width_default = 160

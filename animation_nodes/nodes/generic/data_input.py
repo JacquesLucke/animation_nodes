@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... sockets.info import getSocketClasses
 
-class DataInputNode(bpy.types.Node, AnimationNode):
+class DataInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DataInputNode"
     bl_label = "Data Input"
     dynamicLabelType = "ALWAYS"

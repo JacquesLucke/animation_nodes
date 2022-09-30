@@ -7,7 +7,7 @@ operationItems = [
     ("ADD", "Add", "", "", 0),
     ("AVERAGE", "Average", "", "", 1) ]
 
-class VectorListMathNode(bpy.types.Node, AnimationNode):
+class VectorListMathNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VectorListMathNode"
     bl_label = "Vector List Math"
 

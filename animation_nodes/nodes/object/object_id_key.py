@@ -5,7 +5,7 @@ from ... tree_info import getNodesByType
 from ... base_types import AnimationNode, VectorizedSocket
 from ... id_keys import keyDataTypeItems, IDKey, findsIDKeys, updateIdKeysList
 
-class ObjectIDKeyNode(bpy.types.Node, AnimationNode):
+class ObjectIDKeyNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectIDKeyNode"
     bl_label = "Object ID Key"
     bl_width_default = 160

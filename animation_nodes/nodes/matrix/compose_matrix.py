@@ -20,7 +20,7 @@ from . c_utils import (
     rotationsFromVirtualEulers
 )
 
-class ComposeMatrixNode(bpy.types.Node, AnimationNode):
+class ComposeMatrixNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ComposeMatrixNode"
     bl_label = "Compose Matrix"
     bl_width_default = 180

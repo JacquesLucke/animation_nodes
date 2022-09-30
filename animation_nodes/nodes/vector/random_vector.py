@@ -5,7 +5,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... algorithms.lists.random import generateRandomVectors
 
-class RandomVectorNode(bpy.types.Node, AnimationNode):
+class RandomVectorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RandomVectorNode"
     bl_label = "Random Vector"
 

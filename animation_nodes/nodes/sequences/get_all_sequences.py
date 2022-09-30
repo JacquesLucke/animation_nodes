@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class GetAllSequencesNode(bpy.types.Node, AnimationNode):
+class GetAllSequencesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetAllSequencesNode"
     bl_label = "Get All Sequences"
 

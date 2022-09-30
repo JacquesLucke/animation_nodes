@@ -26,7 +26,7 @@ mixListTypeItems = [
 
 axisDirectionItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
 
-class ObjectControllerFalloffNode(bpy.types.Node, AnimationNode):
+class ObjectControllerFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectControllerFalloffNode"
     bl_label = "Object Controller Falloff"
     bl_width_default = 160

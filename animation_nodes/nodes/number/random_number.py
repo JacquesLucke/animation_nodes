@@ -5,7 +5,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from . c_utils import random_DoubleList
 
-class RandomNumberNode(bpy.types.Node, AnimationNode):
+class RandomNumberNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RandomNumberNode"
     bl_label = "Random Number"
     bl_width_default = 160

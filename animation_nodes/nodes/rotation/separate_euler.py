@@ -4,7 +4,7 @@ from ... events import executionCodeChanged
 from . c_utils import getAxisListOfEulerList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SeparateEulerNode(bpy.types.Node, AnimationNode):
+class SeparateEulerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SeparateEulerNode"
     bl_label = "Separate Euler"
 

@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures cimport CompoundFalloff, Falloff, Interpolation
 
-class InterpolateFalloffNode(bpy.types.Node, AnimationNode):
+class InterpolateFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InterpolateFalloffNode"
     bl_label = "Interpolate Falloff"
 

@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class FindNearestPointInKDTreeNode(bpy.types.Node, AnimationNode):
+class FindNearestPointInKDTreeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FindNearestPointInKDTreeNode"
     bl_label = "Find Nearest Point"
     codeEffects = [VectorizedSocket.CodeEffect]

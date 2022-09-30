@@ -4,7 +4,7 @@ from ... events import executionCodeChanged
 from ... sockets.info import toBaseDataType, isBase
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 
-class SetListElementNode(bpy.types.Node, AnimationNode):
+class SetListElementNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetListElementNode"
     bl_label = "Set List Element"
     errorHandlingType = "MESSAGE"

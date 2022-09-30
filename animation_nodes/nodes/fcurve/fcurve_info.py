@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class FCurveInfoNode(bpy.types.Node, AnimationNode):
+class FCurveInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FCurveInfoNode"
     bl_label = "FCurve Info"
 

@@ -4,7 +4,7 @@ from ... events import propertyChanged
 from ... utils.data_blocks import removeNotUsedDataBlock
 from ... base_types import AnimationNode, VectorizedSocket
 
-class CopyObjectDataNode(bpy.types.Node, AnimationNode):
+class CopyObjectDataNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CopyObjectDataNode"
     bl_label = "Copy Object Data"
     codeEffects = [VectorizedSocket.CodeEffect]

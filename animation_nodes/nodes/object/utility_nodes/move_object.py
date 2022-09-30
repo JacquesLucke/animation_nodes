@@ -2,7 +2,7 @@ import bpy
 from .... base_types import AnimationNode
 from .... utils.depsgraph import getEvaluatedID
 
-class MoveObjectNode(bpy.types.Node, AnimationNode):
+class MoveObjectNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MoveObjectNode"
     bl_label = "Move Object"
 

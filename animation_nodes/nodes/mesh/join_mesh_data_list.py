@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import Mesh
 from ... base_types import AnimationNode
 
-class JoinMeshListNode(bpy.types.Node, AnimationNode):
+class JoinMeshListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_JoinMeshListNode"
     bl_label = "Join Mesh List"
 

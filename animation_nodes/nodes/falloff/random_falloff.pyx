@@ -3,7 +3,7 @@ from ... data_structures cimport BaseFalloff
 from ... base_types import AnimationNode
 from ... algorithms.random cimport randomDouble_Range
 
-class RandomFalloffNode(bpy.types.Node, AnimationNode):
+class RandomFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RandomFalloffNode"
     bl_label = "Random Falloff"
 

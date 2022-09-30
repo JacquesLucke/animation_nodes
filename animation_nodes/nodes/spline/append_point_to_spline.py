@@ -7,7 +7,7 @@ pointTypeItems = [
     ("POINT", "Point", "Add a normal point to the spline", "NONE", 0),
     ("BEZIER_POINT", "Bezier Point", "Add a point with handles", "NONE", 1)]
 
-class AppendPointToSplineNode(bpy.types.Node, AnimationNode):
+class AppendPointToSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_AppendPointToSplineNode"
     bl_label = "Append Point to Spline"
 

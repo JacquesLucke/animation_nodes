@@ -3,7 +3,7 @@ from . c_utils import calculateVectorDistancesVirtual
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList
 
-class VectorDistanceNode(bpy.types.Node, AnimationNode):
+class VectorDistanceNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VectorDistanceNode"
     bl_label = "Vector Distance"
 

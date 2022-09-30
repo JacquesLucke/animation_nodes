@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class ConvertToTextNode(bpy.types.Node, AnimationNode):
+class ConvertToTextNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConvertToTextNode"
     bl_label = "Convert to Text"
 

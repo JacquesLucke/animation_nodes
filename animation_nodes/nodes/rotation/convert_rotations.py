@@ -15,7 +15,7 @@ conversionTypeItems = [
     ("QUATERNION_TO_AXIS_ANGLE", "Quaternion to Axis Angle", "", "NONE", 6),
     ("AXIS_ANGLE_TO_QUATERNION", "Axis Angle to Quaternion", "", "NONE", 7) ]
 
-class ConvertRotationsNode(bpy.types.Node, AnimationNode):
+class ConvertRotationsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConvertRotationsNode"
     bl_label = "Convert Rotations"
     bl_width_default = 160

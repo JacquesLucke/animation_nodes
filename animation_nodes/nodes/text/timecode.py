@@ -2,7 +2,7 @@ import bpy
 from bpy.utils import smpte_from_frame
 from ... base_types import AnimationNode
 
-class TimecodeGeneratorNode(bpy.types.Node, AnimationNode):
+class TimecodeGeneratorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TimecodeGeneratorNode"
     bl_label = "Timecode Generator"
 

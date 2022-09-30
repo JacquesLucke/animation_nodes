@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures.splines.connect import connectSplines
 
-class ConnectSplinesNode(bpy.types.Node, AnimationNode):
+class ConnectSplinesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConnectSplinesNode"
     bl_label = "Connect Splines"
 

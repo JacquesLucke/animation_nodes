@@ -4,7 +4,7 @@ from . c_utils import edgesToTubes
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
 
-class EdgeToTubeNode(bpy.types.Node, AnimationNode):
+class EdgeToTubeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EdgeToTubeNode"
     bl_label = "Edge to Tube"
     errorHandlingType = "EXCEPTION"

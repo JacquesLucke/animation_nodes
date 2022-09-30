@@ -41,7 +41,7 @@ class ObjectPropertyGroup(bpy.types.PropertyGroup):
     bl_idname = "an_ObjectPropertyGroup"
     object: PointerProperty(type = bpy.types.Object, name = "Object")
 
-class ObjectInstancerNode(bpy.types.Node, AnimationNode):
+class ObjectInstancerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectInstancerNode"
     bl_label = "Object Instancer"
     bl_width_default = 160

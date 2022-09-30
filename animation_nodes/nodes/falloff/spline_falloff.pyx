@@ -19,7 +19,7 @@ falloffTypeItems = [
     ("PARAMETER", "Parameter", "", "NONE", 1),
 ]
 
-class SplineFalloffNode(bpy.types.Node, AnimationNode):
+class SplineFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SplineFalloffNode"
     bl_label = "Spline Falloff"
     bl_width_default = 160

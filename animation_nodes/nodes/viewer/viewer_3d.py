@@ -25,7 +25,7 @@ class DrawData:
 
 drawableDataTypes = (Vector3DList, Vector2DList, Matrix4x4List, Vector, Matrix, Spline)
 
-class Viewer3DNode(bpy.types.Node, AnimationNode):
+class Viewer3DNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_Viewer3DNode"
     bl_label = "3D Viewer"
 

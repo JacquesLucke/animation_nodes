@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import DoubleList, Vector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class GPStrokeInfoNode(bpy.types.Node, AnimationNode):
+class GPStrokeInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GPStrokeInfoNode"
     bl_label = "GP Stroke Info"
 

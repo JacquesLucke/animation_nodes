@@ -6,7 +6,7 @@ from ... base_types import AnimationNode
 from ... utils.depsgraph import getEvaluatedID
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList
 
-class ObjectBoundingBoxNode(bpy.types.Node, AnimationNode):
+class ObjectBoundingBoxNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectBoundingBoxNode"
     bl_label = "Object Bounding Box"
 

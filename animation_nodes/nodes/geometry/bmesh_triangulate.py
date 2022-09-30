@@ -15,7 +15,7 @@ ngonMethodItems = [
     ("EAR_CLIP", "Ear Clip", "NONE", 1),
 ]
 
-class BMeshTriangulateNode(bpy.types.Node, AnimationNode):
+class BMeshTriangulateNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_BMeshTriangulateNode"
     bl_label = "Triangulate BMesh"
     bl_width_default = 160

@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectVisibilityInputNode(bpy.types.Node, AnimationNode):
+class ObjectVisibilityInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectVisibilityInputNode"
     bl_label = "Object Visibility Input"
     codeEffects = [VectorizedSocket.CodeEffect]

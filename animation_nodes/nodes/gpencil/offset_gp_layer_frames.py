@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualDoubleList, VirtualPyList, GPLayer
 
-class OffsetGPLayerFramesNode(bpy.types.Node, AnimationNode):
+class OffsetGPLayerFramesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_OffsetGPLayerFramesNode"
     bl_label = "Offset GP Layer Frames"
 

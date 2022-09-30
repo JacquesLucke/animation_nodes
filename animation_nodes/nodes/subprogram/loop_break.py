@@ -4,7 +4,7 @@ from ... base_types import AnimationNode
 from ... tree_info import getNodeByIdentifier
 from ... events import treeChanged, propertyChanged
 
-class LoopBreakNode(bpy.types.Node, AnimationNode):
+class LoopBreakNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_LoopBreakNode"
     bl_label = "Loop Break"
     onlySearchTags = True

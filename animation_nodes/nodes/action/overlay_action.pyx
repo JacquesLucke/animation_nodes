@@ -9,7 +9,7 @@ from ... data_structures cimport (
     UnboundedAction, UnboundedActionEvaluator
 )
 
-class OverlayActionNode(bpy.types.Node, AnimationNode):
+class OverlayActionNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_OverlayActionNode"
     bl_label = "Overlay Action"
 

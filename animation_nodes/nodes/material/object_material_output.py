@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectMaterialOutputNode(bpy.types.Node, AnimationNode):
+class ObjectMaterialOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectMaterialOutputNode"
     bl_label = "Object Material Output"
 

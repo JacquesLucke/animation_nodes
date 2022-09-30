@@ -21,7 +21,7 @@ reductionFunctions = {
     "MAX" : numpy.max
 }
 
-class SoundSpectrumNode(bpy.types.Node, AnimationNode):
+class SoundSpectrumNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SoundSpectrumNode"
     bl_label = "Sound Spectrum"
     errorHandlingType = "EXCEPTION"

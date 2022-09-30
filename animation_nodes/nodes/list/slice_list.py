@@ -7,7 +7,7 @@ sliceEndType = [
     ("END_INDEX", "Index", "", "NONE", 0),
     ("OUTPUT_LENGTH", "Length", "", "NONE", 1)]
 
-class SliceListNode(bpy.types.Node, AnimationNode):
+class SliceListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SliceListNode"
     bl_label = "Slice List"
     bl_width_default = 180

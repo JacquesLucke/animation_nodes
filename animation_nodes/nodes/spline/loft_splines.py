@@ -13,7 +13,7 @@ sampleDistributionTypeItems = [
     ("RESOLUTION", "Resolution", "", "NONE", 0),
     ("UNIFORM", "Uniform", "", "NONE", 1)]
 
-class LoftSplinesNode(bpy.types.Node, AnimationNode):
+class LoftSplinesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_LoftSplinesNode"
     bl_label = "Loft Splines"
     bl_width_default = 160

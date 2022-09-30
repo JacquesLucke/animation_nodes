@@ -7,7 +7,7 @@ from ... utils.names import getRandomString
 from . subprogram_sockets import subprogramInterfaceChanged
 from ... utils.nodes import newNodeAtCursor, invokeTranslation
 
-class GroupOutputNode(bpy.types.Node, AnimationNode):
+class GroupOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GroupOutputNode"
     bl_label = "Group Output"
     bl_width_default = 180

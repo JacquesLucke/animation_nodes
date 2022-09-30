@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures import LongList, DoubleList
 
-class MeshInfoNode(bpy.types.Node, AnimationNode):
+class MeshInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MeshInfoNode"
     bl_label = "Mesh Info"
 

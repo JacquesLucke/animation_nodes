@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ShadeObjectSmooth(bpy.types.Node, AnimationNode):
+class ShadeObjectSmooth(AnimationNode, bpy.types.Node):
     bl_idname = "an_ShadeObjectSmoothNode"
     bl_label = "Shade Object Smooth"
     codeEffects = [VectorizedSocket.CodeEffect]

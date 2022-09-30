@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import calculateVectorLengths
 
-class VectorLengthNode(bpy.types.Node, AnimationNode):
+class VectorLengthNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VectorLengthNode"
     bl_label = "Vector Length"
 

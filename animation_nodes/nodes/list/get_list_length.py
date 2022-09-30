@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class GetListLengthNode(bpy.types.Node, AnimationNode):
+class GetListLengthNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetListLengthNode"
     bl_label = "Get List Length"
     dynamicLabelType = "HIDDEN_ONLY"

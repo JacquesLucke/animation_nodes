@@ -9,7 +9,7 @@ dataTypes = ["Object", "Scene", "Text Block", "Collection", "Material"]
 filterTypeItems = [("STARTS_WITH", "Starts With", "All Objects with names starting with"),
                    ("ENDS_WITH", "Ends With", "All Objects with names ending with")]
 
-class FilterBlendDataListByNameNode(bpy.types.Node, AnimationNode):
+class FilterBlendDataListByNameNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FilterBlendDataListByNameNode"
     bl_label = "Filter Blend Data List By Name"
     bl_width_default = 180

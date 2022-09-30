@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
 
-class RayCastBVHTreeNode(bpy.types.Node, AnimationNode):
+class RayCastBVHTreeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RayCastBVHTreeNode"
     bl_label = "Ray Cast BVHTree"
     bl_width_default = 160

@@ -17,7 +17,7 @@ particleAttributes = [
 outputsData = [(type, name, identifier) for name, identifier, _, type, *_ in particleAttributes]
 executionData = [(identifier, attribute, CListType) for _, identifier, attribute, _, CListType in particleAttributes]
 
-class ParticleSystemParticlesDataNode(bpy.types.Node, AnimationNode):
+class ParticleSystemParticlesDataNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ParticleSystemParticlesDataNode"
     bl_label = "Particles Data"
 

@@ -11,7 +11,7 @@ variableNames = list("xyzabcdefghijklmnopqrstuvw")
 
 expressionByIdentifier = {}
 
-class ExpressionNode(bpy.types.Node, AnimationNode):
+class ExpressionNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ExpressionNode"
     bl_label = "Expression"
     bl_width_default = 200

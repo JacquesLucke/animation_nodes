@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectMatrixInputNode(bpy.types.Node, AnimationNode):
+class ObjectMatrixInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectMatrixInputNode"
     bl_label = "Object Matrix Input"
     codeEffects = [VectorizedSocket.CodeEffect]

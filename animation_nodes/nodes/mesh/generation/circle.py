@@ -12,7 +12,7 @@ regularPolygons = [
     ("Regular Octagon", 8),
 ]
 
-class CircleMeshNode(bpy.types.Node, AnimationNode):
+class CircleMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CircleMeshNode"
     bl_label = "Circle Mesh"
     bl_width_default = 160

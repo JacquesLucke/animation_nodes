@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, DataTypeSelectorSocket
 
-class ConvertNode(bpy.types.Node, AnimationNode):
+class ConvertNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConvertNode"
     bl_label = "Convert"
     bl_width = 100

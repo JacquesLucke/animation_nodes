@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import Color, ColorList, DoubleList
 
-class LampInputNode(bpy.types.Node, AnimationNode):
+class LampInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_LampInputNode"
     bl_label = "Lamp Input"
 

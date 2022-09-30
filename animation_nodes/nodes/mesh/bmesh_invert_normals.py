@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class BMeshInvertNormalsNode(bpy.types.Node, AnimationNode):
+class BMeshInvertNormalsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_BMeshInvertNormalsNode"
     bl_label = "BMesh Invert Normals"
 

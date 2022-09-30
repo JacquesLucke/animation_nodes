@@ -11,7 +11,7 @@ modeItems = [
     ("END_AMOUNT", "End / Amount", "", "NONE", 2)
 ]
 
-class FadeFalloffNode(bpy.types.Node, AnimationNode):
+class FadeFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FadeFalloffNode"
     bl_label = "Fade Falloff"
     bl_width_default = 160

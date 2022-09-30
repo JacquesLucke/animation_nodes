@@ -19,7 +19,7 @@ colorModeItems = [
     ("POLYGON", "Polygon", "Get color of every polygon", "NONE", 2)
 ]
 
-class InsertVertexColorLayerNode(bpy.types.Node, AnimationNode):
+class InsertVertexColorLayerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InsertVertexColorLayerNode"
     bl_label = "Insert Vertex Color Layer"
     errorHandlingType = "EXCEPTION"

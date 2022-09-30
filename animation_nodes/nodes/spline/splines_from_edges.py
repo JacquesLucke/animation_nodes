@@ -14,7 +14,7 @@ radiusTypeItems = [
     ("VERTEX", "Radius per Vertex", "", "NONE", 1)
 ]
 
-class SplinesFromEdgesNode(bpy.types.Node, AnimationNode):
+class SplinesFromEdgesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SplinesFromEdgesNode"
     bl_label = "Splines from Edges"
     errorHandlingType = "EXCEPTION"

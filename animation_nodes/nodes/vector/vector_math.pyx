@@ -127,7 +127,7 @@ searchItems = {
     "Multiply Vectors" : "Multiply",
     "Normalize Vector" : "Normalize"}
 
-class VectorMathNode(bpy.types.Node, AnimationNode):
+class VectorMathNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VectorMathNode"
     bl_label = "Vector Math"
     dynamicLabelType = "HIDDEN_ONLY"

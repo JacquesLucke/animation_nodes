@@ -4,7 +4,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... data_structures.meshes.validate import checkMeshData
 
-class TriangulateMeshNode(bpy.types.Node, AnimationNode):
+class TriangulateMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TriangulateMeshNode"
     bl_label = "Triangulate Mesh"
     errorHandlingType = "EXCEPTION"

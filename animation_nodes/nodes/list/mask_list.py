@@ -2,7 +2,7 @@ import bpy
 from ... algorithms.lists import mask as maskList
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 
-class MaskListNode(bpy.types.Node, AnimationNode):
+class MaskListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MaskListNode"
     bl_label = "Mask List"
 

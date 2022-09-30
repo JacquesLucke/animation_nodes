@@ -4,7 +4,7 @@ from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import intersect_PlanePlane_List, intersect_PlanePlane_Single
 
-class IntersectPlanePlaneNode(bpy.types.Node, AnimationNode):
+class IntersectPlanePlaneNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_IntersectPlanePlaneNode"
     bl_label = "Intersect Plane Plane"
     bl_width_default = 160

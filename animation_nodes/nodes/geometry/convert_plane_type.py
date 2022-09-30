@@ -6,7 +6,7 @@ conversionTypeItems = [
     ("POINT_NORMAL_TO_MATRIX", "Point/Normal to Matrix", "", "NONE", 0),
     ("MATRIX_TO_POINT_NORMAL", "Matrix to Point/Normal", "", "NONE", 1)]
 
-class ConvertPlaneTypeNode(bpy.types.Node, AnimationNode):
+class ConvertPlaneTypeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConvertPlaneTypeNode"
     bl_label = "Convert Plane Type"
     bl_width_default = 180

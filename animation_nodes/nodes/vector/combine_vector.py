@@ -4,7 +4,7 @@ from . c_utils import combineVectorList
 from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class CombineVectorNode(bpy.types.Node, AnimationNode):
+class CombineVectorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CombineVectorNode"
     bl_label = "Combine Vector"
     dynamicLabelType = "HIDDEN_ONLY"

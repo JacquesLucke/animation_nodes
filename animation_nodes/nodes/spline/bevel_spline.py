@@ -3,7 +3,7 @@ from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 from ... algorithms.spline.bevel_poly_spline import bevelPolySpline
 
-class BevelSplineNode(bpy.types.Node, AnimationNode):
+class BevelSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_BevelSplineNode"
     bl_label = "Bevel Spline"
     errorHandlingType = "EXCEPTION"

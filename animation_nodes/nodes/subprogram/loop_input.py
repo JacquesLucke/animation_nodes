@@ -12,7 +12,7 @@ from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from ... sockets.info import toListDataType, toIdName, isBase, toListIdName, toBaseDataType
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged, NoDefaultValue
 
-class LoopInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
+class LoopInputNode(AnimationNode, bpy.types.Node, SubprogramBaseNode):
     bl_idname = "an_LoopInputNode"
     bl_label = "Loop Input"
     bl_width_default = 180

@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import GPStroke
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ChangeGPStrokeDirectionNode(bpy.types.Node, AnimationNode):
+class ChangeGPStrokeDirectionNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ChangeGPStrokeDirectionNode"
     bl_label = "Change GP Stroke Direction"
     codeEffects = [VectorizedSocket.CodeEffect]

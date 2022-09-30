@@ -14,7 +14,7 @@ attributes = (
     Attribute("Boolean", "SSS Translucency", "use_sss_translucency"),
 )
 
-class MaterialOutputNode(bpy.types.Node, AnimationNode):
+class MaterialOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MaterialOutputNode"
     bl_label = "Material Output"
 

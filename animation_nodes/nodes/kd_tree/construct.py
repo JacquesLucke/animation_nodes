@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class ConstructKDTreeNode(bpy.types.Node, AnimationNode):
+class ConstructKDTreeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConstructKDTreeNode"
     bl_label = "Construct KDTree"
 

@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from . transformation_base_node import MatrixTransformationBase
 
-class OffsetMatrixNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
+class OffsetMatrixNode(AnimationNode, bpy.types.Node, MatrixTransformationBase):
     bl_idname = "an_OffsetMatrixNode"
     bl_label = "Offset Matrix"
     bl_width_default = 200

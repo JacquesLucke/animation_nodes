@@ -15,7 +15,7 @@ class CurveMapCache(bpy.types.PropertyGroup):
     points: CollectionProperty(type = CurveMapPointCache)
     dirty: BoolProperty(default = True)
 
-class CurveInterpolationNode(bpy.types.Node, AnimationNode):
+class CurveInterpolationNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InterpolationFromCurveNode"
     bl_label = "Curve Interpolation"
     bl_width_default = 200

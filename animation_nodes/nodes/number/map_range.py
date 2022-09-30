@@ -7,7 +7,7 @@ from . c_utils import (
     mapRange_DoubleList_Interpolated
 )
 
-class MapRangeNode(bpy.types.Node, AnimationNode):
+class MapRangeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MapRangeNode"
     bl_label = "Map Range"
     bl_width_default = 200

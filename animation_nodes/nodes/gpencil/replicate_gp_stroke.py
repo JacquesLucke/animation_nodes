@@ -9,7 +9,7 @@ transformationTypeItems = [
     ("VECTOR_LIST", "Vectors", "", "NONE", 1)
 ]
 
-class ReplicateGPStrokeNode(bpy.types.Node, AnimationNode):
+class ReplicateGPStrokeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ReplicateGPStrokeNode"
     bl_label = "Replicate GP Stroke"
 

@@ -8,7 +8,7 @@ modeItems = [
     ("SIZE", "Size", "Define how large the grid will be in total", 1)
 ]
 
-class GridMeshNode(bpy.types.Node, AnimationNode):
+class GridMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GridMeshNode"
     bl_label = "Grid Mesh"
     bl_width_default = 160

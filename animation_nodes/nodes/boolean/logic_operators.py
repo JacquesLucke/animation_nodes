@@ -12,7 +12,7 @@ operationItems = [
 
 operationLabels = {item[0] : item[1] for item in operationItems}
 
-class LogicOperatorsNode(bpy.types.Node, AnimationNode):
+class LogicOperatorsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_LogicOperatorsNode"
     bl_label = "Logic Operators"
     dynamicLabelType = "HIDDEN_ONLY"

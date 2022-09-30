@@ -5,7 +5,7 @@ from .... events import propertyChanged
 from .... base_types import AnimationNode
 from .... utils.depsgraph import getEvaluatedID
 
-class TransformObjectNode(bpy.types.Node, AnimationNode):
+class TransformObjectNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TransformObjectNode"
     bl_label = "Transform Object"
 

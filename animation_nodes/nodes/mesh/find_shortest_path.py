@@ -15,7 +15,7 @@ pathTypeItems = [
     ("STROKE", "Stroke", "Output paths as gp strokes", 2)
 ]
 
-class FindShortestPathNode(bpy.types.Node, AnimationNode):
+class FindShortestPathNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FindShortestPathNode"
     bl_label = "Find Shortest Path"
     errorHandlingType = "EXCEPTION"

@@ -10,7 +10,7 @@ falloffTypeItems = [
     ("TRANSFORMATION_MATRIX", "Transformation Matrix", "", "", 2)
 ]
 
-class EvaluateFalloffNode(bpy.types.Node, AnimationNode):
+class EvaluateFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EvaluateFalloffNode"
     bl_label = "Evaluate Falloff"
     errorHandlingType = "EXCEPTION"

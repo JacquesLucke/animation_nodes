@@ -10,7 +10,7 @@ modeItems = [
     ("DISTANCE", "Distance", "Find all points in a specific distance", "NONE", 1)
 ]
 
-class FindClosePointsNode(bpy.types.Node, AnimationNode):
+class FindClosePointsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FindClosePointsNode"
     bl_label = "Find Close Points"
 

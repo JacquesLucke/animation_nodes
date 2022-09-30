@@ -22,7 +22,7 @@ categoryItems = [
     ("BOUNCE", "Bounce", "", "IPO_BOUNCE", 6),
     ("ELASTIC", "Elastic", "", "IPO_ELASTIC", 7)]
 
-class ConstructInterpolationNode(bpy.types.Node, AnimationNode):
+class ConstructInterpolationNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConstructInterpolationNode"
     bl_label = "Construct Interpolation"
     bl_width_default = 160

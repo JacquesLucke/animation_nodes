@@ -2,7 +2,7 @@ import bpy
 import string
 from ... base_types import AnimationNode
 
-class CharactersNode(bpy.types.Node, AnimationNode):
+class CharactersNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CharactersNode"
     bl_label = "Characters"
 

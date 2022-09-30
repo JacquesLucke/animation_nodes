@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class BMeshRecalculateFaceNormalsNode(bpy.types.Node, AnimationNode):
+class BMeshRecalculateFaceNormalsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_BMeshRecalculateFaceNormalsNode"
     bl_label = "BMesh Recalculate Normals"
 

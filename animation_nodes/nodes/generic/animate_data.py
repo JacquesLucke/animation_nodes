@@ -21,7 +21,7 @@ dataTypeToMixDataListMapping = {
     "Quaternion" : "mixQuaternionLists"
 }
 
-class AnimateDataNode(bpy.types.Node, AnimationNode):
+class AnimateDataNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_AnimateDataNode"
     bl_label = "Animate Data"
     bl_width_default = 160

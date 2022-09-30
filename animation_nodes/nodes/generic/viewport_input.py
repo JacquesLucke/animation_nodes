@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... utils.names import getRandomString
 
-class ViewportInputNode(bpy.types.Node, AnimationNode):
+class ViewportInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ViewportInputNode"
     bl_label = "Viewport Input"
 

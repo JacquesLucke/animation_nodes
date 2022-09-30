@@ -14,7 +14,7 @@ decomposeTypeItems = [
     ("WORD", "Word", "", "NONE", 1),
 ]
 
-class DecomposeTextNode(bpy.types.Node, AnimationNode):
+class DecomposeTextNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DecomposeTextNode"
     bl_label = "Decompose Text"
     errorHandlingType = "EXCEPTION"

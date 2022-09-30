@@ -15,7 +15,7 @@ methodTypeItems = [
     ("DIVIDE", "Divide", "Divide vertex colors", "NONE", 4)
 ]
 
-class OffsetGPStrokeNode(bpy.types.Node, AnimationNode):
+class OffsetGPStrokeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_OffsetGPStrokeNode"
     bl_label = "Offset GP Stroke"
     errorHandlingType = "EXCEPTION"

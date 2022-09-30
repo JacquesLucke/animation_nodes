@@ -5,7 +5,7 @@ from ... data_structures import Color
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class RandomColor(bpy.types.Node, AnimationNode):
+class RandomColor(AnimationNode, bpy.types.Node):
     bl_idname = "an_RandomColorNode"
     bl_label = "Random Color"
 

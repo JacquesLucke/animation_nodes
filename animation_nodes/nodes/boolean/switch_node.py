@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, DataTypeSelectorSocket
 
-class SwitchNode(bpy.types.Node, AnimationNode):
+class SwitchNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SwitchNode"
     bl_label = "Switch"
 

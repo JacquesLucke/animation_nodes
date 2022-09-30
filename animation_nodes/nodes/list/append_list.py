@@ -2,7 +2,7 @@ import bpy
 from ... sockets.info import isBase, toBaseDataType
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 
-class AppendListNode(bpy.types.Node, AnimationNode):
+class AppendListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_AppendListNode"
     bl_label = "Append to List"
 

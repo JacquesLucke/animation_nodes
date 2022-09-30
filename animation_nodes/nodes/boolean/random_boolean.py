@@ -4,7 +4,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class RandomBooleanNode(bpy.types.Node, AnimationNode):
+class RandomBooleanNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RandomBooleanNode"
     bl_label = "Random Boolean"
 

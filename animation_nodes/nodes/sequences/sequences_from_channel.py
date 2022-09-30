@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class SequencesFromChannelNode(bpy.types.Node, AnimationNode):
+class SequencesFromChannelNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SequencesFromChannelNode"
     bl_label = "Sequences from Channel"
 

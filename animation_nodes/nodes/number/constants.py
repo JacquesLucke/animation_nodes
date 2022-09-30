@@ -12,7 +12,7 @@ constantItems = [
 factors = ["1/4", "1/3", "1/2", "1", "2", "3", "4"]
 factorItems = [(c, c, "", "NONE", i) for i, c in enumerate(factors)]
 
-class NumberConstantsNode(bpy.types.Node, AnimationNode):
+class NumberConstantsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_NumberConstantsNode"
     bl_label = "Constants"
     dynamicLabelType = "HIDDEN_ONLY"

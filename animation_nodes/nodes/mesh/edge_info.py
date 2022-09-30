@@ -6,7 +6,7 @@ from . c_utils import (
     getEdgeStartPoints, getEdgeEndPoints
 )
 
-class EdgeInfoNode(bpy.types.Node, AnimationNode):
+class EdgeInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EdgeInfoNode"
     bl_label = "Edge Info"
     errorHandlingType = "MESSAGE"

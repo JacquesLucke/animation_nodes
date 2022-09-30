@@ -4,7 +4,7 @@ from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import project_PointOnLine_List, project_PointOnLine_Single
 
-class ProjectPointOnLineNode(bpy.types.Node, AnimationNode):
+class ProjectPointOnLineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ProjectPointOnLineNode"
     bl_label = "Project Point on Line"
     bl_width_default = 160

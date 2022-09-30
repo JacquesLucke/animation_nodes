@@ -3,7 +3,7 @@ from ... data_structures import VirtualVector3DList
 from .. vector.offset_vector import offsetVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class OffsetVerticesNode(bpy.types.Node, AnimationNode):
+class OffsetVerticesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_OffsetVerticesNode"
     bl_label = "Offset Vertices"
     errorHandlingType = "EXCEPTION"

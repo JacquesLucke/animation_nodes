@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class TextLengthNode(bpy.types.Node, AnimationNode):
+class TextLengthNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TextLengthNode"
     bl_label = "Text Length"
     codeEffects = [VectorizedSocket.CodeEffect]

@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SetGPStrokeAttributesNode(bpy.types.Node, AnimationNode):
+class SetGPStrokeAttributesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetGPStrokeAttributesNode"
     bl_label = "Set GP Stroke Attributes"
     errorHandlingType = "EXCEPTION"

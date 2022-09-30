@@ -9,7 +9,7 @@ vectorizationTypeItems = [
     ("RADIUS_PER_SPLINE", "Radius Per Spline", "Set the radius per spline", "NONE", 1),
 ]
 
-class SetSplineRadiusNode(bpy.types.Node, AnimationNode):
+class SetSplineRadiusNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetSplineRadiusNode"
     bl_label = "Set Spline Radius"
 

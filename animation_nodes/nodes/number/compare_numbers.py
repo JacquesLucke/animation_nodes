@@ -21,7 +21,7 @@ compareTypeItems = (
     ("A>=B", "A >= B", "", "NONE", 5),
 )
 
-class CompareNumbersNode(bpy.types.Node, AnimationNode):
+class CompareNumbersNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CompareNumbersNode"
     bl_label = "Compare Numbers"
     dynamicLabelType = "HIDDEN_ONLY"

@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode
 
-class CharacterPropertiesOutputNode(bpy.types.Node, AnimationNode):
+class CharacterPropertiesOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CharacterPropertiesOutputNode"
     bl_label = "Character Properties Output"
 

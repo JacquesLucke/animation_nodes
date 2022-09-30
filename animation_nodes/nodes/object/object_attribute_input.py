@@ -4,7 +4,7 @@ from ... utils.code import isCodeValid
 from ... base_types import AnimationNode
 from ... events import executionCodeChanged
 
-class ObjectAttributeInputNode(bpy.types.Node, AnimationNode):
+class ObjectAttributeInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectAttributeInputNode"
     bl_label = "Object Attribute Input"
     errorHandlingType = "MESSAGE"

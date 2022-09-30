@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class PointListNormalNode(bpy.types.Node, AnimationNode):
+class PointListNormalNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_PointListNormalNode"
     bl_label = "Point List Normal"
     bl_width_default = 160

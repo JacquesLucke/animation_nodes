@@ -11,7 +11,7 @@ attributes = [
     ("Show In Front", "showInFront", "show_in_front", "useShowInFrontList")
 ]
 
-class ObjectVisibilityOutputNode(bpy.types.Node, AnimationNode):
+class ObjectVisibilityOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectVisibilityOutputNode"
     bl_label = "Object Visibility Output"
     codeEffects = [VectorizedSocket.CodeEffect]

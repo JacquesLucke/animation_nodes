@@ -4,7 +4,7 @@ from ... base_types import AnimationNode
 from ... utils.selection import getSelectedObjects
 from ... sockets.info import getListDataTypes, toBaseDataType, toListDataType
 
-class CreateListNode(bpy.types.Node, AnimationNode):
+class CreateListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CreateListNode"
     bl_label = "Create List"
     dynamicLabelType = "ALWAYS"

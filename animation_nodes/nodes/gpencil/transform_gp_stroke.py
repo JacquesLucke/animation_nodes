@@ -3,7 +3,7 @@ from ... math import Matrix
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualMatrix4x4List, VirtualPyList, GPStroke
 
-class TransformGPStrokeNode(bpy.types.Node, AnimationNode):
+class TransformGPStrokeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TransformGPStrokeNode"
     bl_label = "Transform GP Stroke"
 

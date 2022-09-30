@@ -4,7 +4,7 @@ from ... base_types import AnimationNode
 from ... sockets.info import isBase, toListDataType
 from ... events import executionCodeChanged, propertyChanged
 
-class GetStructListElementsNode(bpy.types.Node, AnimationNode):
+class GetStructListElementsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetStructListElementsNode"
     bl_label = "Get Struct List Elements"
     bl_width_default = 160

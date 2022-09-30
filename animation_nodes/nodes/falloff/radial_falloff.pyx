@@ -9,7 +9,7 @@ from ... math cimport (
     dotVec3, scaleVec3, addVec3, angleVec3,
 )
 
-class RadialFalloffNode(bpy.types.Node, AnimationNode):
+class RadialFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RadialFalloffNode"
     bl_label = "Radial Falloff"
 

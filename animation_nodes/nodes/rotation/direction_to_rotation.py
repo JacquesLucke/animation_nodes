@@ -6,7 +6,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 trackAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z", "-X", "-Y", "-Z")]
 guideAxisItems  = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 
-class DirectionToRotationNode(bpy.types.Node, AnimationNode):
+class DirectionToRotationNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DirectionToRotationNode"
     bl_label = "Direction to Rotation"
     bl_width_default = 160

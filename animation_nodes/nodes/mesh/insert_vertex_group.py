@@ -9,7 +9,7 @@ from ... data_structures import (
     VirtualDoubleList,
 )
 
-class InsertVertexGroupNode(bpy.types.Node, AnimationNode):
+class InsertVertexGroupNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InsertVertexGroupNode"
     bl_label = "Insert Vertex Group"
     errorHandlingType = "EXCEPTION"

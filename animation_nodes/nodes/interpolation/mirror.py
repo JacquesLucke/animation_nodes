@@ -8,7 +8,7 @@ from ... algorithms.interpolations import (
     MirroredAndChainedInterpolation
 )
 
-class MirrorInterpolationNode(bpy.types.Node, AnimationNode):
+class MirrorInterpolationNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MirrorInterpolationNode"
     bl_label = "Mirror Interpolation"
 

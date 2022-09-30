@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures.splines.to_blender import setSplinesOnBlenderObject
 
-class CurveObjectOutputNode(bpy.types.Node, AnimationNode):
+class CurveObjectOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CurveObjectOutputNode"
     bl_label = "Curve Object Output"
     bl_width_default = 180

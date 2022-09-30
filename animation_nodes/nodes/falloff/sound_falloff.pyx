@@ -24,7 +24,7 @@ indexFrequencyExtensionItems = [
     ("EXTEND", "Extend Last", "NONE", 2)
 ]
 
-class SoundFalloffNode(bpy.types.Node, AnimationNode):
+class SoundFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SoundFalloffNode"
     bl_label = "Sound Falloff"
     errorHandlingType = "EXCEPTION"

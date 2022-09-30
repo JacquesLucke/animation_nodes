@@ -9,7 +9,7 @@ dataTypes = {
     "Text Block" : "texts",
     "Material" : "materials" }
 
-class BlendDataByNameNode(bpy.types.Node, AnimationNode):
+class BlendDataByNameNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_BlendDataByNameNode"
     bl_label = "Data by Name"
     dynamicLabelType = "ALWAYS"

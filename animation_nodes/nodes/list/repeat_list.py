@@ -14,7 +14,7 @@ amountTypeItems = [
     ("LENGTH_FLOOR", "Below Length", "Repeat up to Length, needs fill till length", "NONE", 2),
     ("LENGTH_CEIL", "Above Length", "Repeat over Length, needs slice down to length", "NONE", 3)]
 
-class RepeatListNode(bpy.types.Node, AnimationNode):
+class RepeatListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RepeatListNode"
     bl_label = "Repeat List"
 

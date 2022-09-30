@@ -11,7 +11,7 @@ from ... data_structures import (
     AttributeDataType,
 )
 
-class CombineMeshNode(bpy.types.Node, AnimationNode):
+class CombineMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CombineMeshNode"
     bl_label = "Combine Mesh"
     errorHandlingType = "EXCEPTION"

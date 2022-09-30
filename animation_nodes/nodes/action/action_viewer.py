@@ -4,7 +4,7 @@ from ... graphics.rectangle import Rectangle
 
 a = None
 
-class ActionViewerNode(bpy.types.Node, AnimationNode):
+class ActionViewerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ActionViewerNode"
     bl_label = "Action Viewer"
 

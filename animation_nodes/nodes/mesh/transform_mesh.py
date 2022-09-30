@@ -10,7 +10,7 @@ transformationTypeItems = [
     ("VECTOR", "Vector", "", "NONE", 1)
 ]
 
-class TransformMeshNode(bpy.types.Node, AnimationNode):
+class TransformMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TransformMeshNode"
     bl_label = "Transform Mesh"
 

@@ -9,7 +9,7 @@ sourceTypeItems = [
     ("BMESH", "BMesh", "", "NONE", 1),
     ("OBJECT", "Object", "", "NONE", 2) ]
 
-class ConstructBVHTreeNode(bpy.types.Node, AnimationNode):
+class ConstructBVHTreeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConstructBVHTreeNode"
     bl_label = "Construct BVHTree"
     bl_width_default = 160

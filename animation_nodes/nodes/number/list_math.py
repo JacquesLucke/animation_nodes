@@ -10,7 +10,7 @@ operationItems = [
     ("MAX", "Max", "", "", 3),
     ("AVERAGE", "Average", "", "", 4) ]
 
-class NumberListMathNode(bpy.types.Node, AnimationNode):
+class NumberListMathNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_NumberListMathNode"
     bl_label = "Number List Math"
     searchTags = [(item[1] + " List Numbers", {"operation" : repr(item[0])}) for item in operationItems]

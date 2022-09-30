@@ -7,7 +7,7 @@ frameTypeItems = [
     ("OFFSET", "Offset", ""),
     ("ABSOLUTE", "Absolute", "") ]
 
-class EvaluateFCurveNode(bpy.types.Node, AnimationNode):
+class EvaluateFCurveNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EvaluateFCurveNode"
     bl_label = "Evaluate FCurve"
 

@@ -10,7 +10,7 @@ from . subprogram_base import SubprogramBaseNode
 from ... execution.units import getSubprogramUnitByIdentifier
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
-class ScriptNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
+class ScriptNode(AnimationNode, bpy.types.Node, SubprogramBaseNode):
     bl_idname = "an_ScriptNode"
     bl_label = "Script"
     bl_width_default = 200

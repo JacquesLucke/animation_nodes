@@ -8,7 +8,7 @@ fillModeItems = [
     ("LEFT", "Left", "", "TRIA_LEFT", 0),
     ("RIGHT", "Right", "", "TRIA_RIGHT", 1) ]
 
-class FillListNode(bpy.types.Node, AnimationNode):
+class FillListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FillListNode"
     bl_label = "Fill List"
 

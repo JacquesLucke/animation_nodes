@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class ObjectMaterialInputNode(bpy.types.Node, AnimationNode):
+class ObjectMaterialInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectMaterialInputNode"
     bl_label = "Object Material Input"
 

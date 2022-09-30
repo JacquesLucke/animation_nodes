@@ -11,7 +11,7 @@ splitTypeItems = [
     ("N_CHARACTERS", "N Characters", "", "NONE", 4),
     ("SEPARATOR", "Separator", "", "NONE", 5) ]
 
-class SplitTextNode(bpy.types.Node, AnimationNode):
+class SplitTextNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SplitTextNode"
     bl_label = "Split Text"
     bl_width_default = 180

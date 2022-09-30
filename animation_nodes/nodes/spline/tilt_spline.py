@@ -5,7 +5,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualFloatList, FloatList
 
-class TiltSplineNode(bpy.types.Node, AnimationNode):
+class TiltSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TiltSplineNode"
     bl_label = "Tilt Spline"
 

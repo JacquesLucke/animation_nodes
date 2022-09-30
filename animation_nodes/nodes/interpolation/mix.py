@@ -9,7 +9,7 @@ modeItems = [
     ("CHAIN", "Chain", "Chain two interpolations", "NONE", 1)
 ]
 
-class MixInterpolationNode(bpy.types.Node, AnimationNode):
+class MixInterpolationNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MixInterpolationNode"
     bl_label = "Mix Interpolation"
     bl_width_default = 180

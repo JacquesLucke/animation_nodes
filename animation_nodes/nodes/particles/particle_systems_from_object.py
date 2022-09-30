@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... utils.depsgraph import getEvaluatedID
 
-class ParticleSystemsInputNode(bpy.types.Node, AnimationNode):
+class ParticleSystemsInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ParticleSystemsFromObjectNode"
     bl_label = "Particle Systems from Object"
     bl_width_default = 160

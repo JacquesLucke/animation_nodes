@@ -11,7 +11,7 @@ evaluationTypeItems = [
     ("RANGE_STEP", "Range Step", "", "NONE", 2),
 ]
 
-class EvaluateSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+class EvaluateSplineNode(AnimationNode, bpy.types.Node, SplineEvaluationBase):
     bl_idname = "an_EvaluateSplineNode"
     bl_label = "Evaluate Spline"
 

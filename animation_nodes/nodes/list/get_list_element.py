@@ -4,7 +4,7 @@ from ... events import executionCodeChanged
 from ... sockets.info import isBase, toBaseDataType
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 
-class GetListElementNode(bpy.types.Node, AnimationNode):
+class GetListElementNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetListElementNode"
     bl_label = "Get List Element"
     bl_width_default = 180

@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures cimport CompoundFalloff, Falloff
 
-class ClampFalloffNode(bpy.types.Node, AnimationNode):
+class ClampFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ClampFalloffNode"
     bl_label = "Clamp Falloff"
 

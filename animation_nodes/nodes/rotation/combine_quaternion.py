@@ -5,7 +5,7 @@ from ... events import executionCodeChanged
 from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class CombineQuaternionNode(bpy.types.Node, AnimationNode):
+class CombineQuaternionNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CombineQuaternionNode"
     bl_label = "Combine Quaternion"
 

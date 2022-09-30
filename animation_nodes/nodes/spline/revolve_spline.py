@@ -9,7 +9,7 @@ projectionTypeItems = [
     ("PARAMETER", "Same Parameter", "", "NONE", 0),
     ("PROJECT", "Project", "", "NONE", 1) ]
 
-class RevolveSplineNode(bpy.types.Node, AnimationNode):
+class RevolveSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RevolveSplineNode"
     bl_label = "Revolve Spline"
     bl_width_default = 160

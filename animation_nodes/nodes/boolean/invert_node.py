@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class InvertBooleanNode(bpy.types.Node, AnimationNode):
+class InvertBooleanNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InvertBooleanNode"
     bl_label = "Invert Boolean"
 

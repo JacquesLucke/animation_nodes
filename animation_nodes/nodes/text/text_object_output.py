@@ -3,7 +3,7 @@ from bpy.props import *
 from ... events import executionCodeChanged
 from ... base_types import AnimationNode, VectorizedSocket
 
-class TextObjectOutputNode(bpy.types.Node, AnimationNode):
+class TextObjectOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TextObjectOutputNode"
     bl_label = "Text Object Output"
     bl_width_default = 160

@@ -47,7 +47,7 @@ distanceTypeItems = [
     ("FURTHEST", "Furthest", "", "NONE", 1)
 ]
 
-class ExtractPolygonTransformsNode(bpy.types.Node, AnimationNode):
+class ExtractPolygonTransformsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ExtractPolygonTransformsNode"
     bl_label = "Extract Polygon Transforms"
     errorHandlingType = "EXCEPTION"

@@ -8,7 +8,7 @@ conversionTypeItems = [
     ("VECTOR_TO_EULER", "Vector to Euler", "", "NONE", 0),
     ("EULER_TO_VECTOR", "Euler to Vector", "", "NONE", 1)]
 
-class ConvertVectorAndEulerNode(bpy.types.Node, AnimationNode):
+class ConvertVectorAndEulerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConvertVectorAndEulerNode"
     bl_label = "Convert Vector and Euler"
     dynamicLabelType = "ALWAYS"

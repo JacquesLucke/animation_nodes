@@ -4,7 +4,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class VectorWiggleNode(bpy.types.Node, AnimationNode):
+class VectorWiggleNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VectorWiggleNode"
     bl_label = "Vector Wiggle"
 

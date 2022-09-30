@@ -7,7 +7,7 @@ from ... base_types import AnimationNode
 from ... data_structures cimport BaseFalloff
 from . constant_falloff import ConstantFalloff
 
-class MeshFalloffNode(bpy.types.Node, AnimationNode):
+class MeshFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MeshFalloffNode"
     bl_label = "Mesh Falloff"
 

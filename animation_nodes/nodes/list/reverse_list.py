@@ -2,7 +2,7 @@ import bpy
 from ... sockets.info import isList
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 
-class ReverseListNode(bpy.types.Node, AnimationNode):
+class ReverseListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ReverseListNode"
     bl_label = "Reverse List"
 

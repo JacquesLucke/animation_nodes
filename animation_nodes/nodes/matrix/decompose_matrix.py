@@ -6,7 +6,7 @@ from . c_utils import (
     extractMatrixScales
 )
 
-class DecomposeMatrixNode(bpy.types.Node, AnimationNode):
+class DecomposeMatrixNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DecomposeMatrixNode"
     bl_label = "Decompose Matrix"
 

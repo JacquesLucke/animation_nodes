@@ -11,7 +11,7 @@ compareTypeItems = [
 
 compareLabels = {t[0] : t[1] for t in compareTypeItems}
 
-class BooleanListLogicNode(bpy.types.Node, AnimationNode):
+class BooleanListLogicNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_BooleanListLogicNode"
     bl_label = "Boolean List Logic"
     dynamicLabelType = "HIDDEN_ONLY"

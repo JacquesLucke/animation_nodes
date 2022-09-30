@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class EvaluateInterpolationNode(bpy.types.Node, AnimationNode):
+class EvaluateInterpolationNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EvaluateInterpolationNode"
     bl_label = "Evaluate Interpolation"
     bl_width_default = 160

@@ -9,7 +9,7 @@ targetTypeItems = [
     ("POLY", "Poly", "Linear interpolation between the spline points", "NOCURVE", 1)
 ]
 
-class ChangeSplineTypeNode(bpy.types.Node, AnimationNode):
+class ChangeSplineTypeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ChangeSplineTypeNode"
     bl_label = "Change Spline Type"
     codeEffects = [VectorizedSocket.CodeEffect]

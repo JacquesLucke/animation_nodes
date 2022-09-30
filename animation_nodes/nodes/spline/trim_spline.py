@@ -2,7 +2,7 @@ import bpy
 from . spline_evaluation_base import SplineEvaluationBase
 from ... base_types import AnimationNode, VectorizedSocket
 
-class TrimSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+class TrimSplineNode(AnimationNode, bpy.types.Node, SplineEvaluationBase):
     bl_idname = "an_TrimSplineNode"
     bl_label = "Trim Spline"
     codeEffects = [VectorizedSocket.CodeEffect]

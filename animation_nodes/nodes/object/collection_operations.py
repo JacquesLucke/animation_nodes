@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class CollectionOperationsNode(bpy.types.Node, AnimationNode):
+class CollectionOperationsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CollectionOperationsNode"
     bl_label = "Collection Operations"
     codeEffects = [VectorizedSocket.CodeEffect]

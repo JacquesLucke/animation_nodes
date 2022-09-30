@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import DoubleList
 from ... base_types import AnimationNode
 
-class GetVertexGroupNode(bpy.types.Node, AnimationNode):
+class GetVertexGroupNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetVertexGroupNode"
     bl_label = "Get Vertex Group"
     errorHandlingType = "EXCEPTION"

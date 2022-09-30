@@ -2,7 +2,7 @@ import bpy
 from .... base_types import AnimationNode
 from .... algorithms.mesh_generation.cylinder import getCylinderMesh
 
-class CylinderMeshNode(bpy.types.Node, AnimationNode):
+class CylinderMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CylinderMeshNode"
     bl_label = "Cylinder Mesh"
 

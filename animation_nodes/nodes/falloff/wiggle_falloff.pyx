@@ -4,7 +4,7 @@ from ... base_types import AnimationNode
 from ... data_structures cimport BaseFalloff
 from ... algorithms.perlin_noise cimport perlinNoise1D
 
-class WiggleFalloffNode(bpy.types.Node, AnimationNode):
+class WiggleFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_WiggleFalloffNode"
     bl_label = "Wiggle Falloff"
 

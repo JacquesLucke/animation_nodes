@@ -9,7 +9,7 @@ from ... data_structures import (
     VirtualVector2DList,
 )
 
-class InsertUVMapNode(bpy.types.Node, AnimationNode):
+class InsertUVMapNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InsertUVMapNode"
     bl_label = "Insert UV Map"
     errorHandlingType = "EXCEPTION"

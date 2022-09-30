@@ -34,7 +34,7 @@ dataTypeItems = [
     ("BOOLEAN", "Boolean", "", "NONE", 6),
 ]
 
-class InsertCustomAttributeNode(bpy.types.Node, AnimationNode):
+class InsertCustomAttributeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InsertCustomAttributeNode"
     bl_label = "Insert Custom Attribute"
     errorHandlingType = "EXCEPTION"

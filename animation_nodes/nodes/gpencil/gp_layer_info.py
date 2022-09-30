@@ -11,7 +11,7 @@ frameTypeItems = [
     ("ALL", "All Frames", "Get all frames", "NONE", 3)
 ]
 
-class GPLayerInfoNode(bpy.types.Node, AnimationNode):
+class GPLayerInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GPLayerInfoNode"
     bl_label = "GP Layer Info"
     errorHandlingType = "EXCEPTION"

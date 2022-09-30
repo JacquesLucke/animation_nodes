@@ -4,7 +4,7 @@ from .... base_types import AnimationNode
 from .... utils.depsgraph import getActiveDepsgraph
 from .... utils.selection import getSelectedObjects, getActiveObject
 
-class GetSelectedObjectsNode(bpy.types.Node, AnimationNode):
+class GetSelectedObjectsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetSelectedObjectsNode"
     bl_label = "Get Selected Objects"
     searchTags = ["Get Active Object"]

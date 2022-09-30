@@ -8,7 +8,7 @@ from ... base_types import AnimationNode
 # path, encoding : last modification, content
 cache = {}
 
-class TextFileReaderNode(bpy.types.Node, AnimationNode):
+class TextFileReaderNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TextFileReaderNode"
     bl_label = "Text File Reader"
     bl_width_default = 180

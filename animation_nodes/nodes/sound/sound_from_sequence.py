@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import Sound, SoundSequence
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SoundFromSequenceNode(bpy.types.Node, AnimationNode):
+class SoundFromSequenceNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SoundFromSequenceNode"
     bl_label = "Sound From Sequence"
 

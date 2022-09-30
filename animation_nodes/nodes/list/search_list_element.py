@@ -2,7 +2,7 @@ import bpy
 from ... sockets.info import isBase, toBaseDataType
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 
-class SearchListElementNode(bpy.types.Node, AnimationNode):
+class SearchListElementNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SearchListElementNode"
     bl_label = "Search List Element"
 

@@ -9,7 +9,7 @@ from ... data_structures cimport (
     SimpleBoundedAction
 )
 
-class FollowSplineActionNode(bpy.types.Node, AnimationNode):
+class FollowSplineActionNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FollowSplineActionNode"
     bl_label = "Follow Spline Action"
 

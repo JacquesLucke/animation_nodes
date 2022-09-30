@@ -16,7 +16,7 @@ colorLayerIdentifierTypeItems = [
     ("NAME", "Name", "Get vertex color layer based on the name", "NONE", 1)
 ]
 
-class SetVertexColorNode(bpy.types.Node, AnimationNode):
+class SetVertexColorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetVertexColorNode"
     bl_label = "Set Vertex Color"
     errorHandlingType = "EXCEPTION"

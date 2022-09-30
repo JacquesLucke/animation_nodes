@@ -6,7 +6,7 @@ from ... algorithms.lists import repeatElements
 from ... data_structures import VirtualLongList
 from ... base_types import AnimationNode, VectorizedSocket, ListTypeSelectorSocket
 
-class RepeatListElementsNode(bpy.types.Node, AnimationNode):
+class RepeatListElementsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RepeatListElementsNode"
     bl_label = "Repeat List Elements"
     errorHandlingType = "EXCEPTION"

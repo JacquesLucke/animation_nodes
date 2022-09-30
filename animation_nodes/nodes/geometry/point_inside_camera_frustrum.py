@@ -4,7 +4,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... utils.depsgraph import getEvaluatedID
 
-class PointInCameraFrustrumNode(bpy.types.Node, AnimationNode):
+class PointInCameraFrustrumNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_PointInCameraFrustrumNode"
     bl_label = "Point in Camera Frustrum"
 

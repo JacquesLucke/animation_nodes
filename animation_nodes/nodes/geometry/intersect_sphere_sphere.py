@@ -4,7 +4,7 @@ from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualVector3DList, VirtualDoubleList
 from . c_utils import intersect_SphereSphere_List, intersect_SphereSphere_Single
 
-class IntersectSphereSphereNode(bpy.types.Node, AnimationNode):
+class IntersectSphereSphereNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_IntersectSphereSphereNode"
     bl_label = "Intersect Sphere Sphere"
     bl_width_default = 160

@@ -9,7 +9,7 @@ strokeTypeItems = [
     ("INDEX", "Index Stroke ", "Get a specific stroke", "NONE", 1)
 ]
 
-class GPFrameInfoNode(bpy.types.Node, AnimationNode):
+class GPFrameInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GPFrameInfoNode"
     bl_label = "GP Frame Info"
     errorHandlingType = "EXCEPTION"

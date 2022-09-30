@@ -57,7 +57,7 @@ directionAxisItems = [(axis, axis, "") for axis in ("X", "Y", "Z")]
 
 planeAxisItems = [(axis, axis, "") for axis in ("XY", "YZ", "ZX")]
 
-class DistributeMatricesNode(bpy.types.Node, AnimationNode):
+class DistributeMatricesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DistributeMatricesNode"
     bl_label = "Distribute Matrices"
     searchTags = [(name, {"mode" : repr(op)}) for name, op in searchItems.items()]

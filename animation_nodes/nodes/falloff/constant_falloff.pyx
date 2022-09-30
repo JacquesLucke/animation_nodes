@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures cimport BaseFalloff
 
-class ConstantFalloffNode(bpy.types.Node, AnimationNode):
+class ConstantFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ConstantFalloffNode"
     bl_label = "Constant Falloff"
 

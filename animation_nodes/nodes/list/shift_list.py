@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 
-class ShiftListNode(bpy.types.Node, AnimationNode):
+class ShiftListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ShiftListNode"
     bl_label = "Shift List"
 

@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class VectorDotProductNode(bpy.types.Node, AnimationNode):
+class VectorDotProductNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VectorDotProductNode"
     bl_label = "Vector Dot Product"
 

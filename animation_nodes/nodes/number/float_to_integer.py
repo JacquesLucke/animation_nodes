@@ -7,7 +7,7 @@ items = [("ROUND", "Round", ""),
          ("CEILING", "Ceiling", "The smallest integer that is larger than the input (4.3 -> 5)"),
          ("FLOOR", "Floor", "The largest integer that is smaller than the input (5.8 -> 5)")]
 
-class FloatToIntegerNode(bpy.types.Node, AnimationNode):
+class FloatToIntegerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FloatToIntegerNode"
     bl_label = "Float to Integer"
     dynamicLabelType = "ALWAYS"

@@ -5,7 +5,7 @@ from ... base_types import AnimationNode
 
 outputLinesByIdentifier = defaultdict(list)
 
-class LoopViewerNode(bpy.types.Node, AnimationNode):
+class LoopViewerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_LoopViewerNode"
     bl_label = "Loop Viewer"
     bl_width_default = 160

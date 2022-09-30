@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ParseNumberNode(bpy.types.Node, AnimationNode):
+class ParseNumberNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ParseNumberNode"
     bl_label = "Parse Number"
 

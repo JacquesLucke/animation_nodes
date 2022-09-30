@@ -5,7 +5,7 @@ from ... events import executionCodeChanged
 from ... data_structures import VirtualDoubleList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class CombineEulerNode(bpy.types.Node, AnimationNode):
+class CombineEulerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CombineEulerNode"
     bl_label = "Combine Euler"
 

@@ -14,7 +14,7 @@ groupIdentifierTypeItems = [
     ("NAME", "Name", "Get vertex group based on the name", "NONE", 1)
 ]
 
-class SetVertexWeightNode(bpy.types.Node, AnimationNode):
+class SetVertexWeightNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetVertexWeightNode"
     bl_label = "Set Vertex Weight"
     errorHandlingType = "EXCEPTION"

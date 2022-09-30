@@ -3,7 +3,7 @@ import bmesh
 from ... base_types import AnimationNode
 from ... utils.depsgraph import getActiveDepsgraph, getEvaluatedID
 
-class BMeshFromObjectNode(bpy.types.Node, AnimationNode):
+class BMeshFromObjectNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_BMeshFromObjectNode"
     bl_label = "BMesh from Object"
 

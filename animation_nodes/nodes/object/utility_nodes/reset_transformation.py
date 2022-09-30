@@ -1,7 +1,7 @@
 import bpy
 from .... base_types import AnimationNode
 
-class ResetObjectTransformsNode(bpy.types.Node, AnimationNode):
+class ResetObjectTransformsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ResetObjectTransformsNode"
     bl_label = "Reset Object Transforms"
 

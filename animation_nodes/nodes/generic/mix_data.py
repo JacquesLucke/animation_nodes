@@ -30,7 +30,7 @@ nodeTypes = {
     "Euler" : "Mix Eulers",
     "Quaternion" : "Mix Quaternions" }
 
-class MixDataNode(bpy.types.Node, AnimationNode):
+class MixDataNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MixDataNode"
     bl_label = "Mix"
     dynamicLabelType = "ALWAYS"

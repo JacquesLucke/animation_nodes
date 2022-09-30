@@ -2,7 +2,7 @@ import bpy
 from . c_utils import vectorsFromValues
 from ... base_types import AnimationNode, VectorizedSocket
 
-class VectorFromValueNode(bpy.types.Node, AnimationNode):
+class VectorFromValueNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VectorFromValueNode"
     bl_label = "Vector from Value"
 

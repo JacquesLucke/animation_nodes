@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class SequenceInfoNode(bpy.types.Node, AnimationNode):
+class SequenceInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SequenceInfoNode"
     bl_label = "Sequence Info"
 

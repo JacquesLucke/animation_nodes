@@ -4,7 +4,7 @@ from ... events import propertyChanged
 from ... data_structures import GPLayer, VirtualBooleanList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SetGPLayerAttributesNode(bpy.types.Node, AnimationNode):
+class SetGPLayerAttributesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetGPLayerAttributesNode"
     bl_label = "Set GP Layer Attributes"
     errorHandlingType = "EXCEPTION"

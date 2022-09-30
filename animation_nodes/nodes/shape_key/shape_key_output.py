@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ShapeKeyOutputNode(bpy.types.Node, AnimationNode):
+class ShapeKeyOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ShapeKeyOutputNode"
     bl_label = "Shape Key Output"
     bl_width_default = 160

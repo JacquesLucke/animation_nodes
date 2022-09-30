@@ -4,7 +4,7 @@ from ... data_structures import VirtualVector3DList
 from ... base_types import AnimationNode, VectorizedSocket
 from . c_utils import intersect_LineLine_List, intersect_LineLine_Single
 
-class IntersectLineLineNode(bpy.types.Node, AnimationNode):
+class IntersectLineLineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_IntersectLineLineNode"
     bl_label = "Intersect Line Line"
     bl_width_default = 160

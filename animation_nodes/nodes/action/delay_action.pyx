@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... data_structures import DelayAction
 
-class DelayActionNode(bpy.types.Node, AnimationNode):
+class DelayActionNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DelayActionNode"
     bl_label = "Delay Action"
 

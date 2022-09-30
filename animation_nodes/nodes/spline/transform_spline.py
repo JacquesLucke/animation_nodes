@@ -3,7 +3,7 @@ from mathutils import Matrix
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualPyList, VirtualMatrix4x4List, Spline
 
-class TransformSplineNode(bpy.types.Node, AnimationNode):
+class TransformSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_TransformSplineNode"
     bl_label = "Transform Spline"
 

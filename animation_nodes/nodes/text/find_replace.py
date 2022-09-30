@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ReplaceTextNode(bpy.types.Node, AnimationNode):
+class ReplaceTextNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ReplaceTextNode"
     bl_label = "Replace Text"
     codeEffects = [VectorizedSocket.CodeEffect]

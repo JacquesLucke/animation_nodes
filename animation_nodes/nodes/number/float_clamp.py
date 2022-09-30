@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class FloatClampNode(bpy.types.Node, AnimationNode):
+class FloatClampNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FloatClampNode"
     bl_label = "Clamp"
     dynamicLabelType = "HIDDEN_ONLY"

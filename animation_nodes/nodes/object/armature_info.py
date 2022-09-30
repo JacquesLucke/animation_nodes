@@ -10,7 +10,7 @@ stateItems = [
     ("REST", "Rest", "Return information in rest position.", "NONE", 0),
     ("POSE", "Pose", "Return information in pose position.", "NONE", 1) ]
 
-class ArmatureInfoNode(bpy.types.Node, AnimationNode):
+class ArmatureInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ArmatureInfoNode"
     bl_label = "Armature Info"
 

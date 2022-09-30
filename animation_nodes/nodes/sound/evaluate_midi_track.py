@@ -7,7 +7,7 @@ evaluationTypeItems = (
     ("ALL", "All", "", "NONE", 1),
 )
 
-class EvaluateMIDITrackNode(bpy.types.Node, AnimationNode):
+class EvaluateMIDITrackNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EvaluateMIDITrackNode"
     bl_label = "Evaluate MIDI Track"
 

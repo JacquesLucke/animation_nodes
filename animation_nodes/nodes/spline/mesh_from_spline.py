@@ -8,7 +8,7 @@ from . spline_evaluation_base import SplineEvaluationBase
 from ... algorithms.mesh_generation.circle import getPointsOnCircle
 from ... algorithms.mesh_generation.grid import quadEdges, quadPolygons
 
-class MeshFromSplineNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+class MeshFromSplineNode(AnimationNode, bpy.types.Node, SplineEvaluationBase):
     bl_idname = "an_MeshFromSplineNode"
     bl_label = "Mesh from Spline"
     bl_width_default = 160

@@ -12,7 +12,7 @@ class KeyframePath(bpy.types.PropertyGroup):
     path: StringProperty(default = "", update = propertyChanged, description = "Path to the property")
     index: IntProperty(default = -1, update = propertyChanged, min = -1, soft_max = 2, description = "Used index if the path points to an array (-1 will set a keyframe on every index)")
 
-class SetKeyframesNode(bpy.types.Node, AnimationNode):
+class SetKeyframesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetKeyframesNode"
     bl_label = "Set Keyframes"
     bl_width_default = 200

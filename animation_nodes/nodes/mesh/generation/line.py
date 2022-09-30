@@ -8,7 +8,7 @@ lineModeItems = [
     ("POINTS", "Points", "Line from vector list", "NONE", 1)
 ]
 
-class LineMeshNode(bpy.types.Node, AnimationNode):
+class LineMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_LineMeshNode"
     bl_label = "Line Mesh"
     errorHandlingType = "EXCEPTION"

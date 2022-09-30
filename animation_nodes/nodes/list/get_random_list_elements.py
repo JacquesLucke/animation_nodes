@@ -9,7 +9,7 @@ selectionTypeItems = [
     ("SINGLE", "Single", "Select only one random element from the list", "NONE", 0),
     ("MULTIPLE", "Multiple", "Select multiple random elements from the list", "NONE", 1)]
 
-class GetRandomListElementsNode(bpy.types.Node, AnimationNode):
+class GetRandomListElementsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetRandomListElementsNode"
     bl_label = "Get Random List Elements"
 

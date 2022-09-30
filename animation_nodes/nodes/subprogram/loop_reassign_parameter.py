@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... tree_info import getNodeByIdentifier
 
-class ReassignLoopParameterNode(bpy.types.Node, AnimationNode):
+class ReassignLoopParameterNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ReassignLoopParameterNode"
     bl_label = "Reassign Loop Parameter"
     bl_width_default = 180

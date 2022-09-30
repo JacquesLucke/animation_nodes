@@ -3,7 +3,7 @@ from . spline_evaluation_base import SplineEvaluationBase
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import VirtualDoubleList, VirtualPyList, DoubleList, PolySpline
 
-class GetSplineLengthNode(bpy.types.Node, AnimationNode, SplineEvaluationBase):
+class GetSplineLengthNode(AnimationNode, bpy.types.Node, SplineEvaluationBase):
     bl_idname = "an_GetSplineLengthNode"
     bl_label = "Get Spline Length"
 

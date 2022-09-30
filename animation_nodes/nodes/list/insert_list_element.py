@@ -2,7 +2,7 @@ import bpy
 from ... sockets.info import isBase, toBaseDataType
 from ... base_types import AnimationNode, ListTypeSelectorSocket, VectorizedSocket
 
-class InsertListElementNode(bpy.types.Node, AnimationNode):
+class InsertListElementNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_InsertListElementNode"
     bl_label = "Insert List Element"
 

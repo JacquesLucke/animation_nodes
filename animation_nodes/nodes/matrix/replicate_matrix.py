@@ -13,7 +13,7 @@ transformationTypeItems = [
     ("VECTOR_LIST", "Vectors", "", "NONE", 1)
 ]
 
-class ReplicateMatrixNode(bpy.types.Node, AnimationNode):
+class ReplicateMatrixNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ReplicateMatrixNode"
     bl_label = "Replicate Matrix"
 

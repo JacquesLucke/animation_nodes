@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SmoothBezierSplineNode(bpy.types.Node, AnimationNode):
+class SmoothBezierSplineNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SmoothBezierSplineNode"
     bl_label = "Smooth Bezier Spline"
     codeEffects = [VectorizedSocket.CodeEffect]

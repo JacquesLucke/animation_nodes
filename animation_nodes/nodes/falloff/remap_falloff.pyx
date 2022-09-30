@@ -5,7 +5,7 @@ from . constant_falloff import ConstantFalloff
 from ... algorithms.interpolations import Linear as LinearInterpolation
 from ... data_structures cimport Falloff, CompoundFalloff, Interpolation
 
-class RemapFalloffNode(bpy.types.Node, AnimationNode):
+class RemapFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RemapFalloffNode"
     bl_label = "Remap Falloff"
 

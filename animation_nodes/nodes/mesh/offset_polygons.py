@@ -21,7 +21,7 @@ pivotSourceItems = [
     ("CUSTOM_MATRICES", "Custom Matrices", "Provide a transformation matrix for each polygon that represents it. The rotation part of the matrices has to be orthogonal", "NONE", 2)
 ]
 
-class OffsetPolygonsNode(bpy.types.Node, AnimationNode, MatrixTransformationBase):
+class OffsetPolygonsNode(AnimationNode, bpy.types.Node, MatrixTransformationBase):
     bl_idname = "an_OffsetPolygonsNode"
     bl_label = "Offset Polygons"
     bl_width_default = 200

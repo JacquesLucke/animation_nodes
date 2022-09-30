@@ -1,7 +1,7 @@
 import bpy
 from .... base_types import AnimationNode
 
-class GetActiveCameraNode(bpy.types.Node, AnimationNode):
+class GetActiveCameraNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetActiveCameraNode"
     bl_label = "Get Active Camera"
 

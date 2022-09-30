@@ -16,7 +16,7 @@ mixTypeItems = [
 # Types that don't support list mixing.
 onlyTwoTypes = ["SUBTRACT", "OVERLAY"]
 
-class MixFalloffsNode(bpy.types.Node, AnimationNode):
+class MixFalloffsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MixFalloffsNode"
     bl_label = "Mix Falloffs"
     errorHandlingType = "EXCEPTION"

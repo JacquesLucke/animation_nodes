@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class MIDITrackInfoNode(bpy.types.Node, AnimationNode):
+class MIDITrackInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MIDITrackInfoNode"
     bl_label = "MIDI Track Info"
 

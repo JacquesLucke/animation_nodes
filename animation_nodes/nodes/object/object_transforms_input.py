@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ObjectTransformsInputNode(bpy.types.Node, AnimationNode):
+class ObjectTransformsInputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ObjectTransformsInputNode"
     bl_label = "Object Transforms Input"
     bl_width_default = 160

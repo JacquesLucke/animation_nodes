@@ -8,7 +8,7 @@ from . subprogram_base import SubprogramBaseNode
 from ... utils.nodes import newNodeAtCursor, invokeTranslation
 from . subprogram_sockets import SubprogramData, subprogramInterfaceChanged
 
-class GroupInputNode(bpy.types.Node, AnimationNode, SubprogramBaseNode):
+class GroupInputNode(AnimationNode, bpy.types.Node, SubprogramBaseNode):
     bl_idname = "an_GroupInputNode"
     bl_label = "Group Input"
     bl_width_default = 180

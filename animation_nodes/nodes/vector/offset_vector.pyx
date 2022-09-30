@@ -12,7 +12,7 @@ specifiedStateItems = [
     ("END", "End", "Given vector(s) set the end state", "NONE", 1)
 ]
 
-class OffsetVectorNode(bpy.types.Node, AnimationNode):
+class OffsetVectorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_OffsetVectorNode"
     bl_label = "Offset Vector"
     onlySearchTags = True

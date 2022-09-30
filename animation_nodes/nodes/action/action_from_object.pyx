@@ -6,7 +6,7 @@ from ... data_structures cimport (
     PathActionChannel, PathIndexActionChannel
 )
 
-class ActionFromObjectNode(bpy.types.Node, AnimationNode):
+class ActionFromObjectNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ActionFromObjectNode"
     bl_label = "Action from Object"
 

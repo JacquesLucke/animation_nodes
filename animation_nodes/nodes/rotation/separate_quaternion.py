@@ -4,7 +4,7 @@ from ... events import executionCodeChanged
 from . c_utils import getAxisListOfQuaternionList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SeparateQuaternionNode(bpy.types.Node, AnimationNode):
+class SeparateQuaternionNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SeparateQuaternionNode"
     bl_label = "Separate Quaternion"
 

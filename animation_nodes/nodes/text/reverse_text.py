@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class ReverseTextNode(bpy.types.Node, AnimationNode):
+class ReverseTextNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ReverseTextNode"
     bl_label = "Reverse Text"
 

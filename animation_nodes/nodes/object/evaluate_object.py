@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class EvaluateObjectNode(bpy.types.Node, AnimationNode):
+class EvaluateObjectNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_EvaluateObjectNode"
     bl_label = "Evaluate Object"
 

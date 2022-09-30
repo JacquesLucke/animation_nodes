@@ -12,7 +12,7 @@ mixListTypeItems = [
     ("ADD", "Add", "", "NONE", 1),
 ]
 
-class PointDistanceFalloffNode(bpy.types.Node, AnimationNode):
+class PointDistanceFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_PointDistanceFalloffNode"
     bl_label = "Point Distance Falloff"
 

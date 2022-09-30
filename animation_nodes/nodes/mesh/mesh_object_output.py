@@ -12,7 +12,7 @@ meshDataTypeItems = [
     ("BMESH", "BMesh", "BMesh object", "", 1),
     ("VERTICES", "Vertices", "A list of vertex locations; The length of this list has to be equal to the amount of vertices the mesh already has", "", 2) ]
 
-class MeshObjectOutputNode(bpy.types.Node, AnimationNode):
+class MeshObjectOutputNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_MeshObjectOutputNode"
     bl_label = "Mesh Object Output"
     bl_width_default = 180

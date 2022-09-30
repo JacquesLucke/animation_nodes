@@ -2,7 +2,7 @@ import bpy
 from ... data_structures import VirtualLongList
 from ... base_types import AnimationNode, VectorizedSocket
 
-class SetPolygonMaterialIndexNode(bpy.types.Node, AnimationNode):
+class SetPolygonMaterialIndexNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SetPolygonMaterialIndexNode"
     bl_label = "Set Polygon Material Index"
     errorHandlingType = "EXCEPTION"

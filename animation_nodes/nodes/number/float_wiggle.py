@@ -4,7 +4,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class FloatWiggleNode(bpy.types.Node, AnimationNode):
+class FloatWiggleNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_FloatWiggleNode"
     bl_label = "Number Wiggle"
 

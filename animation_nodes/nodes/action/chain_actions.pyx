@@ -9,7 +9,7 @@ from ... data_structures cimport (
     FloatList, BooleanList
 )
 
-class ChainActionsNode(bpy.types.Node, AnimationNode):
+class ChainActionsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ChainActionsNode"
     bl_label = "Chain Actions"
     errorHandlingType = "EXCEPTION"

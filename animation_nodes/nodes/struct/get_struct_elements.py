@@ -4,7 +4,7 @@ from ... events import executionCodeChanged
 from ... base_types import AnimationNode
 from ... utils.layout import splitAlignment, writeText
 
-class GetStructElementsNode(bpy.types.Node, AnimationNode):
+class GetStructElementsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetStructElementsNode"
     bl_label = "Get Struct Elements"
     errorHandlingType = "EXCEPTION"

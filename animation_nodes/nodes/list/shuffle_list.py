@@ -4,7 +4,7 @@ from bpy.props import *
 from ... events import propertyChanged
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 
-class ShuffleListNode(bpy.types.Node, AnimationNode):
+class ShuffleListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ShuffleListNode"
     bl_label = "Shuffle List"
 

@@ -13,7 +13,7 @@ importTypeItems = [
     ("ALL", "All", "Load all splines from the object", "", 1),
 ]
 
-class SplinesFromObjectNode(bpy.types.Node, AnimationNode):
+class SplinesFromObjectNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SplinesFromObjectNode"
     bl_label = "Splines from Object"
     errorHandlingType = "EXCEPTION"

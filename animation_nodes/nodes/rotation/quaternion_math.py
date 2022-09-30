@@ -36,7 +36,7 @@ operationsWithFloat = ["NORMALIZE", "SCALE"]
 operationsWithSecondQuaternion = ["ADD","SUBTRACT", "COMBINE", "ROTATION_DIFFERENCE", "MULTIPLY", "DIVIDE", "CROSS"]
 operationsWithStepQuaternion = ["SNAP"]
 
-class QuaternionMathNode(bpy.types.Node, AnimationNode):
+class QuaternionMathNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_QuaternionMathNode"
     bl_label = "Quaternion Math"
     dynamicLabelType = "HIDDEN_ONLY"

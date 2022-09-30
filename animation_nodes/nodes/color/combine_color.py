@@ -21,7 +21,7 @@ sourceTypeItems = [
     ("HSL", "HSL", "Hue, Saturation, Lightness"),
     ("YIQ", "YIQ", "Luma, Chrominance")]
 
-class CombineColorNode(bpy.types.Node, AnimationNode):
+class CombineColorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CombineColorNode"
     bl_label = "Combine Color"
     dynamicLabelType = "HIDDEN_ONLY"

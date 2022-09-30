@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class CopyObjectModifiersNode(bpy.types.Node, AnimationNode):
+class CopyObjectModifiersNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CopyObjectModifiersNode"
     bl_label = "Copy Object Modifiers"
     codeEffects = [VectorizedSocket.CodeEffect]

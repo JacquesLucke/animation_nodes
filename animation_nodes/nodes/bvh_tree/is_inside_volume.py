@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class IsInsideVolumeBVHTreeNode(bpy.types.Node, AnimationNode):
+class IsInsideVolumeBVHTreeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_IsInsideVolumeBVHTreeNode"
     bl_label = "Is Inside Volume"
     codeEffects = [VectorizedSocket.CodeEffect]

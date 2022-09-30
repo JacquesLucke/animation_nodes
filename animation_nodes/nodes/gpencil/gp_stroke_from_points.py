@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import GPStroke, FloatList, VirtualDoubleList, Color, ColorList, VirtualColorList
 
-class GPStrokeFromPointsNode(bpy.types.Node, AnimationNode):
+class GPStrokeFromPointsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GPStrokeFromPointsNode"
     bl_label = "GP Stroke From Points"
     errorHandlingType = "EXCEPTION"

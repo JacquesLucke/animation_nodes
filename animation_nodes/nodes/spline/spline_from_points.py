@@ -9,7 +9,7 @@ splineTypeItems = [
     ("POLY", "Poly", "Linear interpolation between the spline points", "NOCURVE", 1)
 ]
 
-class SplineFromPointsNode(bpy.types.Node, AnimationNode):
+class SplineFromPointsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SplineFromPointsNode"
     bl_label = "Spline from Points"
 

@@ -9,7 +9,7 @@ from ... math cimport Vector3
 from ... data_structures cimport BaseFalloff
 from ... libs.FastNoiseSIMD cimport PyNoise
 
-class NoiseFalloffNode(bpy.types.Node, AnimationNode, Noise3DNodeBase):
+class NoiseFalloffNode(AnimationNode, bpy.types.Node, Noise3DNodeBase):
     bl_idname = "an_NoiseFalloffNode"
     bl_label = "Noise Falloff"
 

@@ -3,7 +3,7 @@ import bmesh
 from bpy.props import *
 from ... base_types import AnimationNode
 
-class CreateBMeshFromMesh(bpy.types.Node, AnimationNode):
+class CreateBMeshFromMesh(AnimationNode, bpy.types.Node):
     bl_idname = "an_CreateBMeshFromMeshNode"
     bl_label = "Create BMesh"
     errorHandlingType = "EXCEPTION"

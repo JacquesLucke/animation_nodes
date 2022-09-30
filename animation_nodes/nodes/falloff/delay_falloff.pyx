@@ -3,7 +3,7 @@ from ... base_types import AnimationNode
 from ... data_structures cimport BaseFalloff, FloatList
 from . interpolate_falloff import InterpolateFalloff
 
-class DelayFalloffNode(bpy.types.Node, AnimationNode):
+class DelayFalloffNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_DelayFalloffNode"
     bl_label = "Delay Falloff"
 

@@ -3,7 +3,7 @@ import bpy
 from ... utils.midi import readMIDIFile
 from ... base_types import AnimationNode
 
-class ReadMIDIFileNode(bpy.types.Node, AnimationNode):
+class ReadMIDIFileNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ReadMIDIFileNode"
     bl_label = "Read MIDI File"
     errorHandlingType = "EXCEPTION"

@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... data_structures import Vector3DList, EdgeIndicesList, PolygonIndicesList, LongList
 
-class BMeshMeshNode(bpy.types.Node, AnimationNode):
+class BMeshMeshNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_BMeshMeshNode"
     bl_label = "BMesh Mesh"
 

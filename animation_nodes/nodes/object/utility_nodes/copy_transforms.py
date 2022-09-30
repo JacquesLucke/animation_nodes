@@ -7,7 +7,7 @@ frameTypeItems = [
     ("OFFSET", "Offset", ""),
     ("ABSOLUTE", "Absolute", "") ]
 
-class CopyTransformsNode(bpy.types.Node, AnimationNode):
+class CopyTransformsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CopyTransformsNode"
     bl_label = "Copy Transforms"
     bl_width_default = 160

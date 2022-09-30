@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class SortNumbersNode(bpy.types.Node, AnimationNode):
+class SortNumbersNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SortNumbersNode"
     bl_label = "Sort Numbers"
 

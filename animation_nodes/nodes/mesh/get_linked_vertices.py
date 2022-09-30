@@ -2,7 +2,7 @@ import bpy
 from ... base_types import AnimationNode
 from ... data_structures import LongList
 
-class GetLinkedVerticesNode(bpy.types.Node, AnimationNode):
+class GetLinkedVerticesNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_GetLinkedVerticesNode"
     bl_label = "Get Linked Vertices"
     errorHandlingType = "EXCEPTION"

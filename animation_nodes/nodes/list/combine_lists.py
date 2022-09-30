@@ -3,7 +3,7 @@ from bpy.props import *
 from ... base_types import AnimationNode
 from ... sockets.info import getListDataTypes, toBaseDataType, toListDataType
 
-class CombineListsNode(bpy.types.Node, AnimationNode):
+class CombineListsNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CombineListsNode"
     bl_label = "Combine Lists"
     dynamicLabelType = "ALWAYS"

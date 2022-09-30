@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode
 
-class CollectionInfoNode(bpy.types.Node, AnimationNode):
+class CollectionInfoNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_CollectionInfoNode"
     bl_label = "Collection Info"
 

@@ -13,7 +13,7 @@ targetTypeItems = [
     ("HSL", "HSL", "Hue, Saturation, Lightness"),
     ("YIQ", "YIQ", "Luma, Chrominance")]
 
-class SeparateColorNode(bpy.types.Node, AnimationNode):
+class SeparateColorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_SeparateColorNode"
     bl_label = "Separate Color"
     dynamicLabelType = "HIDDEN_ONLY"

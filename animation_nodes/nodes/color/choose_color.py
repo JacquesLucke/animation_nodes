@@ -4,7 +4,7 @@ from ... data_structures import Color
 from ... events import propertyChanged
 from ... base_types import AnimationNode
 
-class ChooseColorNode(bpy.types.Node, AnimationNode):
+class ChooseColorNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_ChooseColorNode"
     bl_label = "Choose Color"
 

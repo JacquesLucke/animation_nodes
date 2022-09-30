@@ -7,7 +7,7 @@ repetitionTypeItems = [
     ("LOOP", "Loop", ""),
     ("PING_PONG", "Ping Pong", "")]
 
-class RepeatTimeNode(bpy.types.Node, AnimationNode):
+class RepeatTimeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RepeatTimeNode"
     bl_label = "Repeat Time"
 

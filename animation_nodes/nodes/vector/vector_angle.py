@@ -1,7 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, VectorizedSocket
 
-class VectorAngleNode(bpy.types.Node, AnimationNode):
+class VectorAngleNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_VectorAngleNode"
     bl_label = "Vector Angle"
     codeEffects = [VectorizedSocket.CodeEffect]

@@ -17,7 +17,7 @@ floatStepTypeItems = [
     ("START_STOP", "Start / Stop", "", "NONE", 1)
 ]
 
-class NumberRangeNode(bpy.types.Node, AnimationNode):
+class NumberRangeNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_NumberRangeNode"
     bl_label = "Number Range"
     dynamicLabelType = "ALWAYS"

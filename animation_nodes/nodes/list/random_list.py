@@ -4,7 +4,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode, ListTypeSelectorSocket
 from ... algorithms.lists import getRepeatFunction, getShuffleFunction
 
-class RandomListNode(bpy.types.Node, AnimationNode):
+class RandomListNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RandomListNode"
     bl_label = "Random List"
 

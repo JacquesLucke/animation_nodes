@@ -6,7 +6,7 @@ from ... events import propertyChanged
 from ... base_types import AnimationNode
 from ... algorithms.lists.random import generateRandomEulers
 
-class RandomEulerNode(bpy.types.Node, AnimationNode):
+class RandomEulerNode(AnimationNode, bpy.types.Node):
     bl_idname = "an_RandomEulerNode"
     bl_label = "Random Euler"
 
