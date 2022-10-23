@@ -27,6 +27,7 @@ readMIDIFile.cache_clear = lambda: readMIDIFileCached.cache_clear()
 @dataclass
 class TempoEventRecord:
     timeInTicks: int
+    timeInQuarterNotes: float
     timeInSeconds: int
     tempo: int
 
@@ -42,13 +43,16 @@ class TempoMap:
         self.tempoTracks = [[] * len(tracks)]
         for trackIndex, track in enumerate(tracks):
             timeInTicks = 0
+            timeInQuarterNotes = 0
             timeInSeconds = 0
             tempoEvents = self.tempoTracks[trackIndex]
             for event in track.events:
                 timeInTicks += event.deltaTime
+                timeInQuarterNotes += self.timeInTicksToQuarterNotes(event.deltaTime)
                 timeInSeconds = self.timeInTicksToSeconds(trackIndex, timeInTicks)
                 if not isinstance(event, TempoEvent): continue
                 tempoEvents.append(TempoEventRecord(timeInTicks, timeInSeconds, event.tempo))
+        self.TempoEvents = tempoEvents
 
     def timeInTicksToSeconds(self, trackIndex, timeInTicks):
         trackIndex = trackIndex if self.midiFormat != 1 else 0
@@ -60,6 +64,9 @@ class TempoMap:
         secondsPerTick = microSecondsPerTick / 1_000_000
         elapsedSeconds = (timeInTicks - tempoEvent.timeInTicks) * secondsPerTick
         return tempoEvent.timeInSeconds + elapsedSeconds
+    
+    def timeInTicksToQuarterNotes(self, timeInTicks):
+        return timeInTicks / self.ppqn
 
 # Notes:
 # - It is possible for multiple consecutive Note On Events to happen on the same
@@ -71,7 +78,8 @@ class TempoMap:
 
 @dataclass
 class NoteOnRecord:
-    time: float
+    time_s: float
+    time_ticks: int
     velocity: float
     numberOfNotes: int = 1
 
@@ -90,7 +98,7 @@ class TrackState:
         if key in self.noteOnTable:
             self.noteOnTable[key].numberOfNotes += 1
         else:
-            self.noteOnTable[key] = NoteOnRecord(self.timeInSeconds, event.velocity / 127)
+            self.noteOnTable[key] = NoteOnRecord(self.timeInSeconds, self.timeInTicks, event.velocity / 127)
 
     def getCorrespondingNoteOnRecord(self, event):
         key = (event.channel, event.note)
@@ -121,9 +129,14 @@ def readMIDIFileCached(path, lastModification):
             elif isinstance(event, NoteOffEvent):
                 noteOnRecord = trackState.getCorrespondingNoteOnRecord(event)
                 if noteOnRecord is None: continue
-                startTime = noteOnRecord.time
+                startTime_s = noteOnRecord.time_s
+                startTime_qn = noteOnRecord.time_ticks / midiFile.ppqn
                 velocity = noteOnRecord.velocity
-                endTime = trackState.timeInSeconds
-                notes.append(MIDINote(event.channel, event.note, startTime, endTime, velocity))
+                endTime_s = trackState.timeInSeconds
+                endTime_qn = trackState.timeInTicks / midiFile.ppqn
+                notes.append(MIDINote(event.channel, event.note,
+                                      startTime_s, endTime_s,
+                                      startTime_qn, endTime_qn, velocity))
         tracks.append(MIDITrack(trackName, trackIndex, notes))
-    return tracks
+        #tempos = tempoMap.TempoEvents
+    return tracks#, tempos

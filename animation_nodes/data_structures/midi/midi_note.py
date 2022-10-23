@@ -22,8 +22,10 @@ def evaluateEnvelope(time, timeOn, timeOff, attackTime, attackInterpolation, dec
 class MIDINote:
     channel: int = 0
     noteNumber: int = 0
-    timeOn: float = 0
-    timeOff: float = 0
+    timeOn_s: float = 0
+    timeOff_s: float = 0
+    timeOn_qn: float = 0
+    timeOff_qn: float = 0
     velocity: float = 0
 
     def evaluate(self, time, attackTime, attackInterpolation, decayTime, decayInterpolation, sustainLevel, 
@@ -38,4 +40,5 @@ class MIDINote:
         return (1 - velocitySensitivity) * value + velocitySensitivity * self.velocity * value
 
     def copy(self):
-        return MIDINote(self.channel, self.noteNumber, self.timeOn, self.timeOff, self.velocity)
+        return MIDINote(self.channel, self.noteNumber, self.timeOn_s, self.timeOff_s,
+                        self.timeOn_qn, self.timeOff_qn, self.velocity)
