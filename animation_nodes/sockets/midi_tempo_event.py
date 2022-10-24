@@ -35,7 +35,7 @@ class MIDINoteListSocket(bpy.types.NodeSocket, PythonListSocket):
 
     @classmethod
     def getCopyExpression(cls):
-        return "[note.copy() for note in value]"
+        return "[tempoEvent.copy() for tempoEvent in value]"
 
     @classmethod
     def correctValue(cls, value):
