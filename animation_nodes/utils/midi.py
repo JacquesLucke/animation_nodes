@@ -2,7 +2,7 @@ import os
 from functools import lru_cache
 from dataclasses import dataclass
 from .. libs.midiparser.parser import MidiFile
-from .. data_structures import MIDITrack, MIDINote
+from .. data_structures import MIDITrack, MIDINote, MIDITempoEvent
 from .. libs.midiparser.events import (
     TempoEvent,
     NoteOnEvent,
@@ -24,12 +24,12 @@ readMIDIFile.cache_clear = lambda: readMIDIFileCached.cache_clear()
 #   events that represents the tempo map of all other tracks. So the code is
 #   written accordingly.
 
-@dataclass
-class TempoEventRecord:
-    timeInTicks: int
-    timeInQuarterNotes: float
-    timeInSeconds: int
-    tempo: int
+# @dataclass
+# class TempoEventRecord:
+#     timeInTicks: int
+#     timeInQuarterNotes: float
+#     timeInSeconds: int
+#     tempo: int
 
 class TempoMap:
     def __init__(self, midiFile):
@@ -51,7 +51,9 @@ class TempoMap:
                 timeInQuarterNotes += self.timeInTicksToQuarterNotes(event.deltaTime)
                 timeInSeconds = self.timeInTicksToSeconds(trackIndex, timeInTicks)
                 if not isinstance(event, TempoEvent): continue
-                tempoEvents.append(TempoEventRecord(timeInTicks, timeInSeconds, event.tempo))
+                tempoEvents.append(MIDITempoEvent(timeInTicks, timeInQuarterNotes,
+                                                  timeInSeconds,
+                                                  event.tempo))
         self.TempoEvents = tempoEvents
 
     def timeInTicksToSeconds(self, trackIndex, timeInTicks):
@@ -59,7 +61,7 @@ class TempoMap:
         tempoEvents = self.tempoTracks[trackIndex]
         matchFunction = lambda event: event.timeInTicks <= timeInTicks
         matchedEvents = filter(matchFunction, reversed(tempoEvents))
-        tempoEvent = next(matchedEvents, TempoEventRecord(0, 0, 500_000))
+        tempoEvent = next(matchedEvents, MIDITempoEvent(0, 0, 0, 500_000))
         microSecondsPerTick = tempoEvent.tempo / self.ppqn
         secondsPerTick = microSecondsPerTick / 1_000_000
         elapsedSeconds = (timeInTicks - tempoEvent.timeInTicks) * secondsPerTick
@@ -138,5 +140,5 @@ def readMIDIFileCached(path, lastModification):
                                       startTime_s, endTime_s,
                                       startTime_qn, endTime_qn, velocity))
         tracks.append(MIDITrack(trackName, trackIndex, notes))
-        #tempos = tempoMap.TempoEvents
-    return tracks#, tempos
+        tempos = tempoMap.TempoEvents
+    return tracks, tempos
