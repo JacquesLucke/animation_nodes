@@ -13,7 +13,7 @@ class MIDITrack:
         releaseTime, releaseInterpolation, velocitySensitivity):
 
         noteFilter = lambda note: note.channel == channel and note.noteNumber == noteNumber
-        timeFilter = lambda note: note.timeOff + releaseTime >= time >= note.timeOn
+        timeFilter = lambda note: note.timeOff_s + releaseTime >= time >= note.timeOn_s
         filteredNotes = filter(lambda note: noteFilter(note) and timeFilter(note), self.notes)
         arguments = (time, attackTime, attackInterpolation, decayTime, decayInterpolation, 
             sustainLevel, releaseTime, releaseInterpolation, velocitySensitivity)
@@ -23,7 +23,7 @@ class MIDITrack:
         attackTime, attackInterpolation, decayTime, decayInterpolation, sustainLevel,
         releaseTime, releaseInterpolation, velocitySensitivity):
         channelFilter = lambda note: note.channel == channel
-        timeFilter = lambda note: note.timeOff + releaseTime >= time >= note.timeOn
+        timeFilter = lambda note: note.timeOff_s + releaseTime >= time >= note.timeOn_s
         filteredNotes = list(filter(lambda note: channelFilter(note) and timeFilter(note), self.notes))
         arguments = (time, attackTime, attackInterpolation, decayTime, decayInterpolation, 
             sustainLevel, releaseTime, releaseInterpolation, velocitySensitivity)

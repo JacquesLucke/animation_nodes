@@ -31,10 +31,10 @@ class MIDINote:
     def evaluate(self, time, attackTime, attackInterpolation, decayTime, decayInterpolation, sustainLevel, 
         releaseTime, releaseInterpolation, velocitySensitivity):
 
-        value = evaluateEnvelope(time, self.timeOn, self.timeOff, attackTime, attackInterpolation, decayTime, decayInterpolation, sustainLevel)
+        value = evaluateEnvelope(time, self.timeOn_s, self.timeOff_s, attackTime, attackInterpolation, decayTime, decayInterpolation, sustainLevel)
 
-        if time > self.timeOff:
-            value = value * releaseInterpolation(1 - ((time - self.timeOff) / releaseTime))
+        if time > self.timeOff_s:
+            value = value * releaseInterpolation(1 - ((time - self.timeOff_s) / releaseTime))
 
         # if velocity sensitivity is 25%, then take 75% of envelope and 25% of envelope with velocity
         return (1 - velocitySensitivity) * value + velocitySensitivity * self.velocity * value
