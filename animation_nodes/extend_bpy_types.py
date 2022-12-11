@@ -73,7 +73,7 @@ class MeshProperties(bpy.types.PropertyGroup):
         return areas
 
     def getPolygonMaterialIndices(self):
-        indices = UShortList(length = len(self.mesh.polygons))
+        indices = UIntegerList(length = len(self.mesh.polygons))
         self.mesh.polygons.foreach_get("material_index", indices.asMemoryView())
         return indices
 
