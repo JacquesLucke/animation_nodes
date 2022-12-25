@@ -86,9 +86,8 @@ class NodeNetwork:
                 appendToList[typeByNode[nodeID]](nodeID)
 
             if typeByNode[nodeID] == "an_InvokeSubprogramNode":
-                subprogramID = nodeByID[nodeID].subprogramIdentifier;
-                if subprogramID != "":
-                    self.referencedSubprogramIDs.add(subprogramID)
+                subprogramID = nodeByID[nodeID].subprogramIdentifier
+                self.referencedSubprogramIDs.add(subprogramID)
 
         self.groupInAmount = len(self.groupInputIDs)
         self.groupOutAmount = len(self.groupOutputIDs)

@@ -104,8 +104,12 @@ def getExecutionUnits(nodeTrees):
     return units
 
 def getNeededSubprogramIDs(network):
-    subprogramIDs = network.referencedSubprogramIDs.copy()
+    subprogramIDs = {
+        subprogramID for subprogramID in network.referencedSubprogramIDs
+        if getNetworkByIdentifier(subprogramID)
+    }
     for subprogramID in network.referencedSubprogramIDs:
         subNetwork = getNetworkByIdentifier(subprogramID)
+        if not subNetwork: continue
         subprogramIDs.update(getNeededSubprogramIDs(subNetwork))
     return subprogramIDs
