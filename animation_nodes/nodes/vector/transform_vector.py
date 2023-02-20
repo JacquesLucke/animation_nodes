@@ -10,7 +10,7 @@ class TransformVectorNode(AnimationNode, bpy.types.Node):
 
     def create(self):
         self.newInput(VectorizedSocket("Vector", "useVectorList",
-            ("Vector", "vector"), ("Vectors", "vectors")))
+            ("Vector", "vector"), ("Vectors", "vectors")), dataIsModified = True)
         self.newInput(VectorizedSocket("Matrix", "useMatrixList",
             ("Matrix", "matrix"), ("Matrices", "matrices")))
 
