@@ -25,6 +25,7 @@
 - Fixed Grease Pencil Nodes for API changes.
 - Fixed missing output for input list nodes.
 - Fixed error when using multiple subprogram nodes.
+- Fixed Transform Vector node.
 
 ### Changed
 

@@ -15,7 +15,7 @@ class TransformVectorNode(AnimationNode, bpy.types.Node):
             ("Matrix", "matrix"), ("Matrices", "matrices")))
 
         self.newOutput(VectorizedSocket("Vector", ["useVectorList", "useMatrixList"],
-            ("Vector", "transformedVector"), ("Vectors", "vectors")))
+            ("Vector", "transformedVector"), ("Vectors", "transformedVectors")))
 
     def getExecutionCode(self, required):
         if any((self.useVectorList, self.useMatrixList)):
@@ -24,6 +24,6 @@ class TransformVectorNode(AnimationNode, bpy.types.Node):
             yield "_vectors = VirtualVector3DList.create(vectors, (0,0,0))"
             yield "_matrices = VirtualMatrix4x4List.create(matrices, Matrix.Identity(4))"
             yield "amount = VirtualVector3DList.getMaxRealLength(_vectors, _matrices)"
-            yield "vectors = AN.nodes.vector.c_utils.transformVirtualVectorList(amount, _vectors, _matrices)"
+            yield "transformedVectors = AN.nodes.vector.c_utils.transformVirtualVectorList(amount, _vectors, _matrices)"
         else:
             yield "transformedVector = matrix @ vector"
