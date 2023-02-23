@@ -25,7 +25,7 @@
 - Fixed Grease Pencil Nodes for API changes.
 - Fixed missing output for input list nodes.
 - Fixed error when using multiple subprogram nodes.
-- Fixed Transform Vector node.
+- Fixed Transform Vector node modifying its inputs.
 - Fixed incorrect position of UI extensions.
 
 ### Changed
@@ -37,7 +37,7 @@
 - Avoid unnecessary updates caused by *Object Visibility Output* node.
 - Avoid unnecessary updates caused by *Viewer* node.
 - Fix nodes accessible to other node systems.
-- Insert Custom Attribute node allows rewriting the Attribute.
+- Allow Insert Custom Attribute node to rewriting an existing attribute.
 
 
 ## 2.2.2 (16 August 2021)
