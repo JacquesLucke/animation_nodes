@@ -36,6 +36,7 @@
 - Avoid unnecessary updates caused by *Object Visibility Output* node.
 - Avoid unnecessary updates caused by *Viewer* node.
 - Fix nodes accessible to other node systems.
+- Insert Custom Attribute node allows rewriting the Attribute.
 
 
 ## 2.2.2 (16 August 2021)

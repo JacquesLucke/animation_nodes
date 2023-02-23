@@ -107,5 +107,3 @@ class InsertCustomAttributeNode(AnimationNode, bpy.types.Node):
     def checkAttributeName(self, mesh, attributeName):
         if attributeName == "":
             self.raiseErrorMessage("Custom attribute name can't be empty.")
-        elif attributeName in mesh.getAllCustomAttributeNames():
-            self.raiseErrorMessage(f"Mesh has already a custom attribute with the name '{attributeName}'.")
