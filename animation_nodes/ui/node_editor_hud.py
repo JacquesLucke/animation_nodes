@@ -1,8 +1,8 @@
 import bpy
 from .. utils.timing import prettyTime
 from .. draw_handler import drawHandler
-from .. utils.blender_ui import getDpi, getDpiFactor
-from .. graphics.drawing_2d import drawText, setTextDrawingDpi
+from .. graphics.drawing_2d import drawText
+from .. utils.blender_ui import getDpiFactor
 
 @drawHandler("SpaceNodeEditor", "WINDOW")
 def drawNodeEditorHud():
@@ -10,7 +10,6 @@ def drawNodeEditorHud():
     if tree is None:
         return
 
-    setTextDrawingDpi(getDpi())
     dpiFactor = getDpiFactor()
 
     top = bpy.context.region.height

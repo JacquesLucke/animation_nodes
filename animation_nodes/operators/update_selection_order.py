@@ -5,7 +5,7 @@ from .. utils.selection import updateSelectionSorting
 def drawCallback():
     fontID = 0
     blf.position(fontID, 15, 30, 0)
-    blf.size(fontID, 20, 72)
+    blf.size(fontID, 20)
     blf.draw(fontID, "Recording selection order. Press Esc to end.")
 
 

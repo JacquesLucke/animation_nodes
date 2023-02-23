@@ -70,12 +70,10 @@ def isInterfaceLocked():
     return getattr(bpy.context.window_manager, "is_interface_locked", False)
 
 def getDpiFactor():
-    return getDpi() / 72
+    return bpy.context.preferences.system.dpi / 72
 
-def getDpi():
-    systemPreferences = bpy.context.preferences.system
-    retinaFactor = getattr(systemPreferences, "pixel_size", 1)
-    return systemPreferences.dpi * retinaFactor
+def getLineWidth():
+    return bpy.context.preferences.system.pixel_size
 
 def executeInAreaType(areaType):
     def changeAreaTypeDecorator(function):

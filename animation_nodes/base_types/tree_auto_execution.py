@@ -1,6 +1,5 @@
 import bpy
 from bpy.props import *
-from .. utils.blender_ui import getDpiFactor
 
 idTypeItems = [
     ("OBJECT", "Object", "", "OBJECT_DATA", 0),

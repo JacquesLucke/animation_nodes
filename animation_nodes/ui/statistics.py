@@ -3,9 +3,9 @@ from mathutils import Vector
 from collections import defaultdict
 from .. graphics.table import Table
 from .. graphics.rectangle import Rectangle
+from .. graphics.drawing_2d import drawText
+from .. utils.blender_ui import getDpiFactor
 from .. utils.nodes import getAnimationNodeTrees
-from .. utils.blender_ui import getDpiFactor, getDpi
-from .. graphics.drawing_2d import drawText, setTextDrawingDpi
 
 statisticsViewIsActive = False
 
@@ -73,8 +73,6 @@ class StatisticsDrawer(bpy.types.Operator):
         bg = Rectangle.fromRegionDimensions(region)
         bg.color = (1, 1, 1, 0.5)
         bg.draw()
-
-        setTextDrawingDpi(getDpi())
 
         text = "Hold CTRL to drag the statistics - Press ESC or RMB to exit this view"
         drawText(text, 10 * dpiFactor, region.height - 20 * dpiFactor,

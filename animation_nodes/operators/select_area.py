@@ -3,7 +3,7 @@ from bgl import *
 from bpy.props import *
 from mathutils import Vector
 from .. graphics.drawing_2d import drawLine, drawVerticalLine, drawHorizontalLine, drawPolygon
-from .. utils.blender_ui import redrawAll, iterAreas, splitAreaVertical, splitAreaHorizontal, getDpiFactor
+from .. utils.blender_ui import redrawAll, iterAreas, splitAreaVertical, splitAreaHorizontal, getLineWidth
 
 class SelectArea(bpy.types.Operator):
     bl_idname = "an.select_area"
@@ -148,7 +148,7 @@ def drawSelection(area, xOffset, yOffset, border, factor):
     #############################################
 
     glEnable(GL_LINE_SMOOTH)
-    glLineWidth(lineThickness * getDpiFactor())
+    glLineWidth(lineThickness * getLineWidth())
 
     # Draw Polygon
     if border == "LEFT":   drawPolygon(polyLeft, polyColor)

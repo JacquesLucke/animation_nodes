@@ -2,7 +2,7 @@ import blf
 import textwrap
 from bgl import *
 from . rectangle import Rectangle
-from .. utils.blender_ui import getDpi, getDpiFactor
+from .. utils.blender_ui import getDpiFactor
 
 font = 1
 
@@ -34,7 +34,7 @@ class TextBox:
         self.drawLines()
 
     def prepareFontDrawing(self):
-        blf.size(font, self.fontSize, int(getDpi()))
+        blf.size(font, self.fontSize * getDpiFactor())
 
     def separateLines(self):
         self.lines = []

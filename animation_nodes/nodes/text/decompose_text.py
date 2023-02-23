@@ -164,7 +164,7 @@ class DecomposeTextNode(AnimationNode, bpy.types.Node):
         if fontID == -1:
             self.raiseErrorMessage("Can't load font!")
 
-        blf.size(fontID, 50, 72)
+        blf.size(fontID, 50)
         return fontID
 
     def validateAlignments(self, alignments):

@@ -1,13 +1,8 @@
 import gpu
 import blf
 from bgl import *
+from .. utils.blender_ui import getDpiFactor
 from gpu_extras.batch import batch_for_shader
-
-dpi = 72
-
-def setTextDrawingDpi(new_dpi):
-    global dpi
-    dpi = new_dpi
 
 def drawHorizontalLine(x, y, length, color = None, thickness = None):
     drawLine(x, y, x + length, y, color, thickness)
@@ -30,7 +25,7 @@ def drawLine(x1, y1, x2, y2, color = None, thickness = None):
 
 def drawText(text, x, y, font = 0, align = "LEFT", verticalAlignment = "BASELINE", size = 12, color = (1, 1, 1, 1)):
     text = str(text)
-    blf.size(font, size, int(dpi))
+    blf.size(font, size * getDpiFactor())
     blf.color(font, *color)
 
     if align == "LEFT" and verticalAlignment == "BASELINE":

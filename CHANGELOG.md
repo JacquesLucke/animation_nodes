@@ -26,6 +26,7 @@
 - Fixed missing output for input list nodes.
 - Fixed error when using multiple subprogram nodes.
 - Fixed Transform Vector node.
+- Fixed incorrect position of UI extensions.
 
 ### Changed
 

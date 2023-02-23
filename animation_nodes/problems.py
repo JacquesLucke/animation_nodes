@@ -2,7 +2,6 @@ import bpy
 from . utils.nodes import idToNode
 from . utils.layout import writeText
 from . tree_info import getNodeByIdentifier
-from . utils.blender_ui import getDpiFactor
 
 currentProblems = []
 

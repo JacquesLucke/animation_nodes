@@ -2,7 +2,7 @@ cimport cython
 
 import bpy
 import blf
-from .. utils.blender_ui import getDpi
+from .. utils.blender_ui import getDpiFactor
 from .. data_structures cimport Vector3DList, EdgeIndicesList
 from .. math cimport Matrix4, Vector3, Vector4, multMatrix4AndVec4, toMatrix4, mixVec3
 
@@ -34,7 +34,7 @@ cdef drawPointIndices(object, Vector3DList points, color, fontSize):
     cdef Py_ssize_t i
     cdef Matrix4 transformation = getTransformationMatrix(object)
 
-    blf.size(0, fontSize, int(getDpi()))
+    blf.size(0, fontSize * getDpiFactor())
     blf.color(0, *color, 1)
     for i in range(len(points)):
         drawAtPoint(points.data + i, str(i), &transformation, width, height)
