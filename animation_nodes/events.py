@@ -39,6 +39,20 @@ def frameChanged(scene, depsgraph):
     event_handler.update(event.getActives().union({"Frame"}))
     evaluatedDepsgraph = None
 
+# This handler is only defined as a workaround for a limitation in Blender, where the frame changed
+# handler doesn't execute if a scene is not being rendered during the rendering pipeline, for
+# instance, when a sequence editor is active and doesn't reference a scene sequence strip. So in
+# this handler, we call the update handler as a frame update if we determine that the frame changed
+# handler will not run due to the aforementioned reasons.
+@eventHandler("RENDER_PRE")
+def renderPre(scene):
+    if not scene.render.use_sequencer or scene.sequence_editor is None: return
+    for sequence in scene.sequence_editor.sequences_all:
+        if sequence.type != "SCENE": continue
+        if sequence.frame_final_start <= scene.frame_current <= sequence.frame_final_end: return
+
+    event_handler.update(event.getActives().union({"Frame"}))
+
 @eventHandler("DEPSGRAPH_UPDATE_POST")
 def sceneChanged(scene, depsgraph):
     global evaluatedDepsgraph

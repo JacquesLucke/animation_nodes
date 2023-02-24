@@ -72,7 +72,7 @@ def versionUpdate(self):
 @persistent
 def renderPre(scene):
     for handler in renderPreHandlers:
-        handler()
+        handler(scene)
 
 @persistent
 def frameChangedPost(scene, depsgraph):

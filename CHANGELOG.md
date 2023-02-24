@@ -334,6 +334,7 @@
 - Fixed the Ensure Animation Data option in the Mesh Object Output node.
 - Fixed crashes during rendering and exporting.
 - Fixed inconsistency between viewport, renders, and exports.
+- Fixed node tree not executing when a sequence editor is active.
 
 ### Changed
 
