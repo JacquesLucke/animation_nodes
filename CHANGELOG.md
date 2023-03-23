@@ -27,6 +27,7 @@
 - Fixed error when using multiple subprogram nodes.
 - Fixed Transform Vector node modifying its inputs.
 - Fixed incorrect position of UI extensions.
+- Fixed incorrect loading of boolean mesh attribute.
 
 ### Changed
 

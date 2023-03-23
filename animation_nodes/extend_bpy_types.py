@@ -107,7 +107,7 @@ class MeshProperties(bpy.types.PropertyGroup):
     def getBevelVertexWeights(self):
         bevelVertexWeights = DoubleList(length = len(self.mesh.vertices))
         self.mesh.vertices.foreach_get("bevel_weight", bevelVertexWeights.asNumpyArray())
-        return bevelVertexWeights       
+        return bevelVertexWeights
 
     def getCustomAttribute(self, name):
         attribute = self.mesh.attributes.get(name)
@@ -132,7 +132,7 @@ class MeshProperties(bpy.types.PropertyGroup):
         elif attribute.data_type in ("FLOAT_COLOR", "BYTE_COLOR"):
             data = ColorList(length = amount)
         else:
-            data = BooleanList(False, length = amount)
+            data = BooleanList(length = amount)
 
         if attribute.data_type in ("FLOAT", "INT", "BOOLEAN"):
             attribute.data.foreach_get("value", data.asNumpyArray())
