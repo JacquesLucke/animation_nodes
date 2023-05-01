@@ -39,9 +39,11 @@ class BMeshMeshNode(AnimationNode, bpy.types.Node):
         return Vector3DList.fromValues(v.co for v in bMesh.verts)
 
     def getEdgeIndices(self, bMesh):
+        bMesh.verts.index_update()
         return EdgeIndicesList.fromValues(tuple(v.index for v in edge.verts) for edge in bMesh.edges)
 
     def getPolygonIndices(self, bMesh):
+        bMesh.verts.index_update()
         return PolygonIndicesList.fromValues(tuple(v.index for v in face.verts) for face in bMesh.faces)
 
     def getMaterialIndices(self, bMesh):

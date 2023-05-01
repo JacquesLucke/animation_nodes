@@ -28,6 +28,7 @@
 - Fixed Transform Vector node modifying its inputs.
 - Fixed incorrect position of UI extensions.
 - Fixed incorrect loading of boolean mesh attribute.
+- Fixed *BMesh Mesh Data* not loading indices.
 
 ### Changed
 
