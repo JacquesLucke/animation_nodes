@@ -19,21 +19,21 @@ jobs:
         python: ['3.10']
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install Cython --install-option="--no-cython-compile"
+          pip install Cython
       - name: Setup Development Enviroment
         uses: ilammy/msvc-dev-cmd@v1
       - name: Build
         run: python setup.py build --export --exportheaders --noversioncheck
       - name: Upload Builds
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Builds
           path: animation_nodes*.zip
@@ -44,7 +44,7 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - name: Download Builds
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: Builds
       - name: Extract Branch Name
