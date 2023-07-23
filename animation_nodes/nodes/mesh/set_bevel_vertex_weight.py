@@ -25,9 +25,6 @@ class SetBevelVertexWeightNode(AnimationNode, bpy.types.Node):
         if object.mode != "OBJECT":
             self.raiseErrorMessage("Object is not in object mode.")
 
-        if not object.data.use_customdata_vertex_bevel:
-            object.data.use_customdata_vertex_bevel = True
-
         weights = VirtualDoubleList.create(weights, 0).materialize(len(object.data.vertices))
         object.data.vertices.foreach_set('bevel_weight', weights)
         object.data.update()
