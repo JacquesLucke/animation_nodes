@@ -1,11 +1,11 @@
-from . random_number_generators.splitmix64 cimport (
+from . splitmix64 cimport (
     SplitMix64
 )
 
-from . random_number_generators.xoshiro256starstar cimport (
+from . xoshiro256starstar cimport (
     XoShiRo256StarStar
 )
 
-from . random_number_generators.xoshiro256plus cimport (
+from . xoshiro256plus cimport (
     XoShiRo256Plus
 )

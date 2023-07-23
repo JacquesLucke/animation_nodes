@@ -1,1 +1,1 @@
-from . FastNoiseSIMD.wrapper cimport PyNoise
+from . wrapper cimport PyNoise
