@@ -11,7 +11,6 @@ from ... nodes.vector.c_utils import convert_Vector2DList_to_Vector3DList
 from ... data_structures import Vector3DList, Vector2DList, Matrix4x4List, Spline, BezierSpline
 
 import gpu
-from bgl import *
 from gpu_extras.batch import batch_for_shader
 from ... graphics.import_shader import getShader
 from ... graphics.c_utils import getMatricesVBOandIBO
@@ -98,7 +97,7 @@ class Viewer3DNode(AnimationNode, bpy.types.Node):
         shader.bind()
         shader.uniform_float("color", (*self.drawColor, 1))
 
-        glPointSize(self.width)
+        gpu.state.point_size_set(self.width)
         batch.draw(shader)
 
     def drawMatrices(self, matrices):
@@ -113,7 +112,7 @@ class Viewer3DNode(AnimationNode, bpy.types.Node):
         shader.uniform_float("u_ViewProjectionMatrix", viewMatrix)
         shader.uniform_int("u_Count", len(matrices))
 
-        glLineWidth(self.width)
+        gpu.state.line_width_set(self.width)
         batch.draw(shader)
 
     def drawSpline(self, spline):
@@ -128,7 +127,7 @@ class Viewer3DNode(AnimationNode, bpy.types.Node):
         shader.bind()
         shader.uniform_float("color", (*self.drawColor, 1))
 
-        glLineWidth(self.width)
+        gpu.state.line_width_set(self.width)
         batch.draw(shader)
 
     def delete(self):
