@@ -91,7 +91,7 @@ class Viewer3DNode(AnimationNode, bpy.types.Node):
             dataByIdentifier[self.identifier] = DrawData(data, self.drawSpline)
 
     def drawVectors(self, vectors):
-        shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+        shader = gpu.shader.from_builtin('UNIFORM_COLOR')
         batch = batch_for_shader(shader, 'POINTS', {"pos": vectors.asNumpyArray().reshape(-1, 3)})
 
         shader.bind()
@@ -121,7 +121,7 @@ class Viewer3DNode(AnimationNode, bpy.types.Node):
             vectors = spline.getDistributedPoints(self.pointAmount, 0, 1, 'RESOLUTION')
         lineType = 'LINE_LOOP' if spline.cyclic else 'LINE_STRIP'
 
-        shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+        shader = gpu.shader.from_builtin('UNIFORM_COLOR')
         batch = batch_for_shader(shader, lineType, {"pos": vectors.asNumpyArray().reshape(-1, 3)})
 
         shader.bind()
