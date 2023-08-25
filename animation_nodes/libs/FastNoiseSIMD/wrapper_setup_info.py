@@ -28,8 +28,7 @@ def getCompileInfo(utils):
     if utils.onWindows:
         return ("FastNoiseSIMD_windows.lib",
                 [os.path.join(sourceDir, "compile_windows.bat")],
-                {"libraries" : ["FastNoiseSIMD_windows"],
-                 "extra_link_args" : ["/NODEFAULTLIB:LIBCMT"]})
+                {"libraries" : ["FastNoiseSIMD_windows"]})
     if utils.onLinux:
         return ("libFastNoiseSIMD_linux.a",
                 ["sh", os.path.join(sourceDir, "compile_linux.sh")],
