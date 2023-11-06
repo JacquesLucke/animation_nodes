@@ -1,9 +1,11 @@
 import bpy
 from bpy.props import *
 from ... math import Vector
+from . c_utils import createEdgeIndices
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import (
     Color,
+    LongList,
     FloatList,
     Attribute,
     AttributeType,
@@ -32,6 +34,7 @@ dataTypeItems = [
     ("FLOAT_COLOR", "Color", "", "NONE", 4),
     ("BYTE_COLOR", "Byte Color", "", "NONE", 5),
     ("BOOLEAN", "Boolean", "", "NONE", 6),
+    ("INT32_2D", "Int32_2d", "", "NONE", 7),
 ]
 
 class InsertCustomAttributeNode(AnimationNode, bpy.types.Node):
@@ -65,9 +68,13 @@ class InsertCustomAttributeNode(AnimationNode, bpy.types.Node):
         elif self.dataType in ("FLOAT_COLOR", "BYTE_COLOR"):
             self.newInput(VectorizedSocket("Color", "useDataList",
             ("Color", "data"), ("Colors", "data")))
-        else:
+        elif self.dataType == "BOOLEAN":
             self.newInput(VectorizedSocket("Boolean", "useDataList",
             ("Value", "data"), ("Values", "data")))
+        else:
+            self.newInput(VectorizedSocket("Edge Indices", "useDataList",
+            ("Value", "data"), ("Values", "data")))
+
 
         self.newOutput("Mesh", "Mesh", "mesh")
 
@@ -89,6 +96,16 @@ class InsertCustomAttributeNode(AnimationNode, bpy.types.Node):
 
         if self.dataType == "INT":
             _data = VirtualLongList.create(data, 0).materialize(amount)
+        elif self.dataType == "INT32_2D":
+            if self.useDataList:
+                indices1 = LongList.fromValues(data.asNumpyArray()[::2])
+                indices2 = LongList.fromValues(data.asNumpyArray()[1::2])
+            else:
+                indices1 = LongList.fromValues([data[0]])
+                indices2 = LongList.fromValues([data[1]])
+            _indices1 = VirtualLongList.create(indices1, 0)
+            _indices2 = VirtualLongList.create(indices2, 0)
+            _data = createEdgeIndices(amount, _indices1, _indices2)
         elif self.dataType == "FLOAT":
             _data = FloatList.fromValues(VirtualDoubleList.create(data, 0).materialize(amount))
         elif self.dataType == "FLOAT2":

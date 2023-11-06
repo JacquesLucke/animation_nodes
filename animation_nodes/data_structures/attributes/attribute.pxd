@@ -18,6 +18,7 @@ cpdef enum AttributeDomain:
 
 cpdef enum AttributeDataType:
     INT,
+    INT32_2D,
     FLOAT,
     FLOAT2,
     FLOAT_VECTOR,
