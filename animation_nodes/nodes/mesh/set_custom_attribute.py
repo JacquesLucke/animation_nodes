@@ -65,7 +65,7 @@ class SetCustomAttributeNode(AnimationNode, bpy.types.Node):
         elif self.dataType in ("FLOAT_COLOR", "BYTE_COLOR"):
             self.newInput(VectorizedSocket("Color", "useDataList",
             ("Color", "data"), ("Colors", "data")))
-        elif self.dataType == "BOLEAN":
+        elif self.dataType == "BOOLEAN":
             self.newInput(VectorizedSocket("Boolean", "useDataList",
             ("Value", "data"), ("Values", "data")))
         else:
