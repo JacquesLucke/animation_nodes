@@ -7,7 +7,7 @@ setlocal
 :: /EHsc   Set appropriate error handling
 :: /GL-    Disable whole program optimization
 :: /Ox     Enable full optimization
-set args=-c /EHsc /GL- /Ox
+set args=-c /EHsc /GL- /Ox /MD
 
 cl FastNoiseSIMD.cpp %args%
 cl FastNoiseSIMD_internal.cpp %args%

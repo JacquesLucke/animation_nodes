@@ -1,6 +1,5 @@
 import gpu
 import blf
-from bgl import *
 from .. utils.blender_ui import getDpiFactor
 from gpu_extras.batch import batch_for_shader
 
@@ -11,17 +10,17 @@ def drawVerticalLine(x, y, length, color = None, thickness = None):
     drawLine(x, y, x, y + length, color, thickness)
 
 def drawLine(x1, y1, x2, y2, color = None, thickness = None):
-    shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+    shader = gpu.shader.from_builtin('UNIFORM_COLOR')
     batch = batch_for_shader(shader, 'LINES', {"pos": ((x1, y1),(x2, y2))})
 
     shader.bind()
     if color: shader.uniform_float("color", color)
 
-    if thickness: glLineWidth(abs(thickness))
-    glEnable(GL_BLEND)
+    if thickness: gpu.state.line_width_set(abs(thickness))
+    gpu.state.blend_set("ALPHA")
     batch.draw(shader)
-    glDisable(GL_BLEND)
-    if thickness: glLineWidth(1)
+    gpu.state.blend_set("NONE")
+    if thickness: gpu.state.line_width_set(1)
 
 def drawText(text, x, y, font = 0, align = "LEFT", verticalAlignment = "BASELINE", size = 12, color = (1, 1, 1, 1)):
     text = str(text)
@@ -42,12 +41,12 @@ def drawText(text, x, y, font = 0, align = "LEFT", verticalAlignment = "BASELINE
     blf.draw(font, text)
 
 def drawPolygon(vertices, color):
-    shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+    shader = gpu.shader.from_builtin('UNIFORM_COLOR')
     batch = batch_for_shader(shader, 'TRI_STRIP', {"pos": vertices[:2] + vertices[2:][::-1]})
 
     shader.bind()
     shader.uniform_float("color", color)
 
-    glEnable(GL_BLEND)
+    gpu.state.blend_set("ALPHA")
     batch.draw(shader)
-    glDisable(GL_BLEND)
+    gpu.state.blend_set("NONE")

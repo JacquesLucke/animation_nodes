@@ -1,3 +1,4 @@
+cimport cython
 from libc.stdint cimport uint32_t
 
 from .. lists.polygon_indices_list cimport PolygonIndicesList
@@ -278,6 +279,7 @@ cdef inline Py_ssize_t getEdgeIndex(unsigned int i1, unsigned int i2,
         slot = (slot + 1) & mask
 
 
+@cython.cpow(True)
 cdef createLookupForHashes(UIntegerList hashes,
                          HandleDuplicateFunction handleDuplicate, void *settings):
     cdef Py_ssize_t maskSize = max(hashes.length-1, 0).bit_length() + 1

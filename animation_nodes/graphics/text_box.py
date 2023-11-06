@@ -1,6 +1,5 @@
 import blf
 import textwrap
-from bgl import *
 from . rectangle import Rectangle
 from .. utils.blender_ui import getDpiFactor
 

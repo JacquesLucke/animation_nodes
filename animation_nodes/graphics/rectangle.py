@@ -1,5 +1,4 @@
 import gpu
-from bgl import *
 from mathutils import Vector
 from gpu_extras.batch import batch_for_shader
 
@@ -68,15 +67,15 @@ class Rectangle:
             (self.x2, self.y1),
             (self.x1, self.y2),
             (self.x2, self.y2))
-        shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+        shader = gpu.shader.from_builtin('UNIFORM_COLOR')
         batch = batch_for_shader(shader, 'TRI_STRIP', {"pos": locations})
 
         shader.bind()
         shader.uniform_float("color", color)
 
-        glEnable(GL_BLEND)
+        gpu.state.blend_set("ALPHA")
         batch.draw(shader)
-        glDisable(GL_BLEND)
+        gpu.state.blend_set("NONE")
 
         if borderThickness == 0: return
 
@@ -92,10 +91,10 @@ class Rectangle:
         shader.bind()
         shader.uniform_float("color", borderColor)
 
-        glEnable(GL_BLEND)
-        glLineWidth(abs(borderThickness))
+        gpu.state.blend_set("ALPHA")
+        gpu.state.line_width_set(abs(borderThickness))
         batch.draw(shader)
-        glDisable(GL_BLEND)
+        gpu.state.blend_set("NONE")
 
     def __repr__(self):
         return "({}, {}) - ({}, {})".format(self.x1, self.y1, self.x2, self.y2)

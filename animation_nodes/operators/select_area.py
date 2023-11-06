@@ -1,5 +1,5 @@
 import bpy
-from bgl import *
+import gpu
 from bpy.props import *
 from mathutils import Vector
 from .. graphics.drawing_2d import drawLine, drawVerticalLine, drawHorizontalLine, drawPolygon
@@ -147,8 +147,7 @@ def drawSelection(area, xOffset, yOffset, border, factor):
     # Draw
     #############################################
 
-    glEnable(GL_LINE_SMOOTH)
-    glLineWidth(lineThickness * getLineWidth())
+    gpu.state.line_width_set(lineThickness * getLineWidth())
 
     # Draw Polygon
     if border == "LEFT":   drawPolygon(polyLeft, polyColor)
@@ -178,8 +177,7 @@ def drawSelection(area, xOffset, yOffset, border, factor):
     drawLine(areaLeft, areaTop, centerLeft, centerTop, color = lineColor)
     drawLine(centerRight, centerBottom, areaRight, areaBottom, color = lineColor)
 
-    glDisable(GL_LINE_SMOOTH)
-    glLineWidth(1)
+    gpu.state.line_width_set(1)
 
 def calcUserSelectionInArea(area, point):
     if not isPointInArea(area, point):

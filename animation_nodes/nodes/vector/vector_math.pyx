@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import *
+from collections import OrderedDict
 from ... base_types import AnimationNode, VectorizedSocket
 
 from ... math cimport (
@@ -83,7 +84,7 @@ cdef new(str name, str label, str type, str expression, void* function):
     op.setup(name, label, type, expression, function)
     return op
 
-cdef dict operations = {}
+operations = OrderedDict()
 
 operations[0] = new("Add", "A + B", "vA_vB",
     "result = a + b", <void*>addVec3)

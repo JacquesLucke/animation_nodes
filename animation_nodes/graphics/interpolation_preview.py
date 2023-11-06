@@ -1,6 +1,5 @@
 import gpu
 import numpy
-from bgl import *
 from . rectangle import Rectangle
 from gpu_extras.batch import batch_for_shader
 
@@ -55,19 +54,17 @@ class InterpolationPreview:
         x = numpy.linspace(left, right, self.resolution)
         y = top + (self.samples.asNumpyArray() - 1) * (top - bottom)
         points = numpy.stack((x, y), axis = -1).astype(numpy.float32)
-        shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+        shader = gpu.shader.from_builtin('UNIFORM_COLOR')
         batch = batch_for_shader(shader, 'LINE_STRIP', {"pos": points})
 
         shader.bind()
         shader.uniform_float("color", (0.2, 0.2, 0.2, 0.8))
 
-        glLineWidth(2)
-        glEnable(GL_BLEND)
-        glEnable(GL_LINE_SMOOTH)
+        gpu.state.line_width_set(2)
+        gpu.state.blend_set("ALPHA")
         batch.draw(shader)
-        glDisable(GL_LINE_SMOOTH)
-        glDisable(GL_BLEND)
-        glLineWidth(1)
+        gpu.state.blend_set("NONE")
+        gpu.state.line_width_set(1)
 
     def drawRangeLines(self):
         points = (
@@ -75,13 +72,13 @@ class InterpolationPreview:
             (self.boundary.right, self.interpolationTop),
             (self.boundary.left, self.interpolationBottom),
             (self.boundary.right, self.interpolationBottom))
-        shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+        shader = gpu.shader.from_builtin('UNIFORM_COLOR')
         batch = batch_for_shader(shader, 'LINES', {"pos": points})
 
         shader.bind()
         shader.uniform_float("color", (0.2, 0.2, 0.2, 0.5))
 
-        glLineWidth(1)
-        glEnable(GL_BLEND)
+        gpu.state.line_width_set(1)
+        gpu.state.blend_set("ALPHA")
         batch.draw(shader)
-        glDisable(GL_BLEND)
+        gpu.state.blend_set("NONE")

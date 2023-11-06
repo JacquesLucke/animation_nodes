@@ -41,6 +41,7 @@
 - Avoid unnecessary updates caused by *Viewer* node.
 - Fix nodes accessible to other node systems.
 - Allow Insert Custom Attribute node to rewriting an existing attribute.
+- Replace deprecated BGL calls with GPU module calls.
 
 
 ## 2.2.2 (16 August 2021)
