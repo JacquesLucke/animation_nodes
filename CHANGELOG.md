@@ -30,6 +30,7 @@
 - Fixed incorrect loading of boolean mesh attribute.
 - Fixed *BMesh Mesh Data* not loading indices.
 - Fixed *Set Bevel Vertex Weight* and *Set Bevel Edge Weight* nodes for API changes.
+- Fixed *Set Keyframe* node failing when path contains a subscript.
 
 ### Changed
 

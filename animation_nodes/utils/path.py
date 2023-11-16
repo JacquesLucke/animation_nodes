@@ -25,7 +25,7 @@ def getResolvedNestedPath(id_block, path):
 def parsePath(expression):
     def split_internal(value):
         if isinstance(value, ast.Subscript):
-            return split_internal(value.value) + [f'["{value.slice.value.s}"]']
+            return split_internal(value.value) + [f'["{value.slice.value}"]']
         elif isinstance(value, ast.Attribute):
             return split_internal(value.value) + [value.attr]
         elif isinstance(value, ast.Name):
