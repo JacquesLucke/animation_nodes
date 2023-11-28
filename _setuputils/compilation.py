@@ -76,6 +76,7 @@ def getExtensionFromPath(path, addonDirectory, includeDirs = []):
         "depends" : []
     }
 
+    # Disable stack checking because it causes link errors for MacOS 10.
     if onMacOS:
         kwargs["extra_compile_args"].append("-fno-stack-check")
 
