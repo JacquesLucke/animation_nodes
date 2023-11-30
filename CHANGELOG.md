@@ -11,6 +11,7 @@
 - Added Container Type advanced option to object instancer node.
 - Added Evaluate FCurves Transforms node.
 - Added *Lamp Input* and *Lamp Output* nodes.
+- Added *Int2* list and socket type.
 
 ### Fixed
 
@@ -32,6 +33,7 @@
 - Fixed *Set Bevel Vertex Weight* and *Set Bevel Edge Weight* nodes for API changes.
 - Fixed *Set Keyframe* node failing when path contains a subscript.
 - Fixed symbol not found error on MacOS 10.
+- Fixed Custom Attributes for new API changes.
 
 ### Changed
 

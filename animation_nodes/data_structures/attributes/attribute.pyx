@@ -6,12 +6,12 @@ from .. lists.base_lists cimport (
     BooleanList,
     Vector2DList,
     Vector3DList,
-    EdgeIndicesList,
+    Int2List,
 )
 
 cListFromDataType = {
     INT: LongList,
-    INT32_2D: EdgeIndicesList,
+    INT32_2D: Int2List,
     FLOAT: FloatList,
     FLOAT2: Vector2DList,
     FLOAT_VECTOR: Vector3DList,

@@ -5,7 +5,7 @@ from . operators.callbacks import executeCallback
 from . utils.depsgraph import getActiveDepsgraph
 from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
                                FloatList, UShortList, UIntegerList, Vector2DList,
-                               ColorList, DoubleList, LongList, BooleanList)
+                               ColorList, DoubleList, LongList, BooleanList, Int2List)
 
 def register():
     bpy.types.Context.getActiveAnimationNodeTree = getActiveAnimationNodeTree
@@ -126,7 +126,7 @@ class MeshProperties(bpy.types.PropertyGroup):
         elif attribute.data_type == "INT":
             data = LongList(length = amount)
         elif attribute.data_type == "INT32_2D":
-            data = EdgeIndicesList(length = amount)
+            data = Int2List(length = amount)
         elif attribute.data_type == "FLOAT2":
             data = Vector2DList(length = amount)
         elif attribute.data_type == "FLOAT_VECTOR":

@@ -69,7 +69,7 @@ class SetCustomAttributeNode(AnimationNode, bpy.types.Node):
             self.newInput(VectorizedSocket("Boolean", "useDataList",
             ("Value", "data"), ("Values", "data")))
         else:
-            self.newInput(VectorizedSocket("Edge Indices", "useDataList",
+            self.newInput(VectorizedSocket("Int2", "useDataList",
             ("Value", "data"), ("Values", "data")))
 
         self.newOutput("Object", "Object", "object")

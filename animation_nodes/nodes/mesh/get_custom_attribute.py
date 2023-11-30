@@ -39,7 +39,7 @@ class GetCustomAttributeNode(AnimationNode, bpy.types.Node):
         elif self.dataType == "BOOLEAN":
             self.newOutput("Boolean List", "Values", "data")
         else:
-            self.newOutput("Edge Indices List", "Values", "data")
+            self.newOutput("Int2 List", "Values", "data")
         self.newOutput("Text", "Type", "type", hide = True)
         self.newOutput("Text", "Domain ", "domain", hide = True)
         self.newOutput("Text", "Data Type ", "dataType", hide = True)
