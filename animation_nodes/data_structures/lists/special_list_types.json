@@ -100,7 +100,7 @@
         "To PyObject" : "(value.v1, value.v2)",
         "Additional Methods" : "",
         "Declarations" : [
-            "cdef struct Int2:\n    int v1, v2"
+            "from ... math.vector cimport Int2"
         ]
     }
 }
