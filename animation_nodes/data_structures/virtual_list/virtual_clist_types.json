@@ -9,6 +9,11 @@
       "Import" : "from ... math.vector cimport Vector2",
       "Return" : "Pointer"
     },
+    "Int2List" : {
+        "Type" : "Int2",
+        "Import" : "from ... math.vector cimport Int2",
+        "Return" : "Pointer"
+    },
     "Matrix4x4List" : {
         "Type" : "Matrix4",
         "Import" : "from ... math.matrix cimport Matrix4",
