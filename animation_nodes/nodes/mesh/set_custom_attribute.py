@@ -5,9 +5,8 @@ from . c_utils import createEdgeIndices
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import (
     Color,
-    LongList,
     FloatList,
-    VirtualPyList,
+    VirtualInt2List,
     VirtualLongList,
     VirtualColorList,
     VirtualDoubleList,
@@ -102,16 +101,7 @@ class SetCustomAttributeNode(AnimationNode, bpy.types.Node):
         if self.dataType == "INT":
             _data = VirtualLongList.create(data, 0).materialize(amount)
         elif self.dataType == "INT32_2D":
-            if self.useDataList:
-                indices1 = LongList.fromValues(data.asNumpyArray()[::2])
-                indices2 = LongList.fromValues(data.asNumpyArray()[1::2])
-            else:
-                indices1 = LongList.fromValues([data[0]])
-                indices2 = LongList.fromValues([data[1]])
-            _indices1 = VirtualLongList.create(indices1, 0)
-            _indices2 = VirtualLongList.create(indices2, 0)
-            _data = createEdgeIndices(amount, _indices1, _indices2)
-            _data = createEdgeIndices(amount, _indices1, _indices2)
+            _data = VirtualInt2List.create(data, (0, 0)).materialize(amount)
         elif self.dataType == "FLOAT":
             _data = FloatList.fromValues(VirtualDoubleList.create(data, 0).materialize(amount))
         elif attribute.data_type == "FLOAT2":

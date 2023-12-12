@@ -8,7 +8,7 @@ class Int2Socket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_Int2Socket"
     bl_label = "Int2 Socket"
     dataType = "Int2"
-    drawColor = (0.625, 0.7, 1.0, 1)
+    drawColor = (0.35, 0.7, 1.0, 1)
     comparable = True
     storable = True
 
@@ -34,7 +34,7 @@ class Int2ListSocket(bpy.types.NodeSocket, CListSocket):
     bl_label = "Int2 List Socket"
     dataType = "Int2 List"
     baseType = Int2Socket
-    drawColor = (0.625, 0.7, 1.0, 0.5)
+    drawColor = (0.35, 0.7, 1.0, 0.5)
     storable = True
     comparable = False
     listClass = Int2List
