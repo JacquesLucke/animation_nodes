@@ -96,11 +96,12 @@
         "Type" : "Int2",
         "Buffer Type" : "int",
         "Equals" : "not memcmp(&(\\1), &(\\2), sizeof(Int2))",
-        "Try Conversion" : "if len(value) == 2: target.v1, target.v2 = value[0], value[1]\nelse: raise TypeError(\"length has to be 2\")",
-        "To PyObject" : "(value.v1, value.v2)",
+        "Try Conversion" : "setInt2(target, value)",
+        "To PyObject" : "toPyInt2(value)",
         "Additional Methods" : "",
         "Declarations" : [
-            "from ... math.vector cimport Int2"
+            "from ... math.vector cimport Int2",
+            "from ... math.conversion cimport setInt2, toPyInt2"
         ]
     }
 }

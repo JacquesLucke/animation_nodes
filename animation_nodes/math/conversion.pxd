@@ -1,7 +1,7 @@
 from . color cimport Color
 from . euler cimport Euler3
 from . quaternion cimport Quaternion
-from . vector cimport Vector2, Vector3, Vector4
+from . vector cimport Vector2, Vector3, Vector4, Int2
 from . matrix cimport Matrix3, Matrix4, Matrix3_or_Matrix4
 
 cdef Matrix4 toMatrix4(value) except *
@@ -21,6 +21,10 @@ cdef toPyVector3(Vector3* v)
 cdef Vector4 toVector4(value) except *
 cdef setVector4(Vector4* v, value)
 cdef toPyVector4(Vector4* v)
+
+cdef Int2 toInt2(value) except *
+cdef setInt2(Int2* v, value)
+cdef toPyInt2(Int2* v)
 
 cdef Euler3 toEuler3(value) except *
 cdef setEuler3(Euler3* e, value)
