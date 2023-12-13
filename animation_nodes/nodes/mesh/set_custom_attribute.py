@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from ... math import Vector
-from . c_utils import createEdgeIndices
 from ... base_types import AnimationNode, VectorizedSocket
 from ... data_structures import (
     Color,
