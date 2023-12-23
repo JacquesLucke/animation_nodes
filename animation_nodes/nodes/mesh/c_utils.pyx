@@ -716,14 +716,14 @@ def convert_EdgeIndicesList_to_Int2List(EdgeIndicesList values):
     cdef Py_ssize_t i
     cdef Int2List int2D = Int2List(length = len(values))
     for i in range(len(values)):
-        int2D.data[i].v1 = <unsigned int>values.data[i].v1
-        int2D.data[i].v2 = <unsigned int>values.data[i].v2
+        int2D.data[i].x = <int>values.data[i].v1
+        int2D.data[i].y = <int>values.data[i].v2
     return int2D
 
 def convert_Int2List_to_EdgeIndicesList(Int2List values):
     cdef Py_ssize_t i
     cdef EdgeIndicesList edges = EdgeIndicesList(length = len(values))
     for i in range(len(values)):
-        edges.data[i].v1 = <unsigned int>values.data[i].v1
-        edges.data[i].v2 = <unsigned int>values.data[i].v2
+        edges.data[i].v1 = <unsigned int>values.data[i].x
+        edges.data[i].v2 = <unsigned int>values.data[i].y
     return edges
