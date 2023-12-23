@@ -11,7 +11,7 @@ dataTypeItems = [
     ("FLOAT_COLOR", "Color", "", "NONE", 4),
     ("BYTE_COLOR", "Byte Color", "", "NONE", 5),
     ("BOOLEAN", "Boolean", "", "NONE", 6),
-    ("INT32_2D", "Int32_2d", "", "NONE", 7),
+    ("INT32_2D", "Integer 2D", "", "NONE", 7),
 ]
 
 class GetCustomAttributeNode(AnimationNode, bpy.types.Node):
@@ -39,7 +39,7 @@ class GetCustomAttributeNode(AnimationNode, bpy.types.Node):
         elif self.dataType == "BOOLEAN":
             self.newOutput("Boolean List", "Values", "data")
         else:
-            self.newOutput("Int2 List", "Values", "data")
+            self.newOutput("Integer 2D List", "Values", "data")
         self.newOutput("Text", "Type", "type", hide = True)
         self.newOutput("Text", "Domain ", "domain", hide = True)
         self.newOutput("Text", "Data Type ", "dataType", hide = True)
