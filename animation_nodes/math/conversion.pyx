@@ -52,6 +52,20 @@ cdef setVector4(Vector4* v, value):
 cdef toPyVector4(Vector4* v):
     return Vector((v.x, v.y, v.z, v.w))
 
+cdef Int2 toInt2(value) except *:
+    cdef Int2 v
+    setInt2(&v, value)
+    return v
+
+cdef setInt2(Int2* v, value):
+    if len(value) != 2:
+        raise TypeError("element is not a 2D integer vector")
+    v.x = value[0]
+    v.y = value[1]
+
+cdef toPyInt2(Int2* v):
+    return (v.x, v.y)
+
 
 # Matrices
 ##########################################################

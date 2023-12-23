@@ -91,5 +91,17 @@
           "from ... math.color cimport Color",
           "from ... math.conversion cimport setColor, toPyColor, toColor"
       ]
+    },
+    "Int2List" : {
+        "Type" : "Int2",
+        "Buffer Type" : "int",
+        "Equals" : "not memcmp(&(\\1), &(\\2), sizeof(Int2))",
+        "Try Conversion" : "setInt2(target, value)",
+        "To PyObject" : "toPyInt2(value)",
+        "Additional Methods" : "",
+        "Declarations" : [
+            "from ... math.vector cimport Int2",
+            "from ... math.conversion cimport setInt2, toPyInt2"
+        ]
     }
 }

@@ -171,7 +171,7 @@ class MeshObjectOutputNode(AnimationNode, bpy.types.Node):
 
             attributeOut = outMesh.attributes.new(attribute.name, dataType, domain)
 
-            if dataType in ("FLOAT", "INT", "BOOLEAN"):
+            if dataType in ("FLOAT", "INT", "INT32_2D", "BOOLEAN"):
                 attributeOut.data.foreach_set("value", data.asMemoryView())
             elif dataType in ("FLOAT2", "FLOAT_VECTOR"):
                 attributeOut.data.foreach_set("vector", data.asMemoryView())

@@ -1,3 +1,6 @@
+cdef struct Int2:
+    int x, y
+
 cdef struct Vector2:
     float x, y
 

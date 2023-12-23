@@ -5,7 +5,7 @@ from . operators.callbacks import executeCallback
 from . utils.depsgraph import getActiveDepsgraph
 from . data_structures import (Vector3DList, EdgeIndicesList, PolygonIndicesList,
                                FloatList, UShortList, UIntegerList, Vector2DList,
-                               ColorList, DoubleList, LongList, BooleanList)
+                               ColorList, DoubleList, LongList, BooleanList, Int2List)
 
 def register():
     bpy.types.Context.getActiveAnimationNodeTree = getActiveAnimationNodeTree
@@ -125,6 +125,8 @@ class MeshProperties(bpy.types.PropertyGroup):
             data = DoubleList(length = amount)
         elif attribute.data_type == "INT":
             data = LongList(length = amount)
+        elif attribute.data_type == "INT32_2D":
+            data = Int2List(length = amount)
         elif attribute.data_type == "FLOAT2":
             data = Vector2DList(length = amount)
         elif attribute.data_type == "FLOAT_VECTOR":
@@ -134,7 +136,7 @@ class MeshProperties(bpy.types.PropertyGroup):
         else:
             data = BooleanList(length = amount)
 
-        if attribute.data_type in ("FLOAT", "INT", "BOOLEAN"):
+        if attribute.data_type in ("FLOAT", "INT", "INT32_2D", "BOOLEAN"):
             attribute.data.foreach_get("value", data.asNumpyArray())
         elif attribute.data_type in ("FLOAT2", "FLOAT_VECTOR"):
             attribute.data.foreach_get("vector", data.asNumpyArray())

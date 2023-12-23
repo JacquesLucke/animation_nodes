@@ -6,10 +6,12 @@ from .. lists.base_lists cimport (
     BooleanList,
     Vector2DList,
     Vector3DList,
+    Int2List,
 )
 
 cListFromDataType = {
     INT: LongList,
+    INT32_2D: Int2List,
     FLOAT: FloatList,
     FLOAT2: Vector2DList,
     FLOAT_VECTOR: Vector3DList,
@@ -38,6 +40,7 @@ stringFromDomain = {
 
 stringFromDataType = {
     INT: "INT",
+    INT32_2D: "INT32_2D",
     FLOAT: "FLOAT",
     FLOAT2: "FLOAT2",
     FLOAT_VECTOR: "FLOAT_VECTOR",

@@ -11,14 +11,14 @@ def importDataStructures():
     from . lists.base_lists import (
         Vector3DList, Vector2DList, Matrix4x4List, EdgeIndicesList, EulerList, ColorList,
         BooleanList, FloatList, DoubleList, LongList, IntegerList, UShortList, CharList,
-        QuaternionList, UIntegerList, ShortList, UShortList
+        QuaternionList, UIntegerList, ShortList, UShortList, Int2List
     )
 
     from . virtual_list.virtual_list import VirtualList, VirtualPyList
     from . virtual_list.virtual_clists import (
         VirtualVector3DList, VirtualMatrix4x4List, VirtualEulerList, VirtualBooleanList,
         VirtualFloatList, VirtualDoubleList, VirtualLongList, VirtualColorList,
-        VirtualVector2DList, VirtualQuaternionList
+        VirtualVector2DList, VirtualQuaternionList, VirtualInt2List
     )
 
     from . splines.base_spline import Spline
