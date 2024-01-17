@@ -204,9 +204,13 @@ class DistributeMatricesNode(AnimationNode, bpy.types.Node):
                 yield "matrices = self.execute_Linear(amount, size)"
         elif self.mode == "GRID":
             if self.distanceMode == "STEP":
-                yield "matrices = self.execute_Grid(xDivisions, yDivisions, zDivisions, xDistance, yDistance, zDistance)"
+                yield ("matrices = self.execute_Grid(xDivisions, yDivisions, zDivisions,"
+                       " xDistance, yDistance, zDistance,"
+                       " self.centerAlongX, self.centerAlongY, self.centerAlongZ)")
             else:
-                yield "matrices = self.execute_Grid(xDivisions, yDivisions, zDivisions, width, length, height)"
+                yield ("matrices = self.execute_Grid(xDivisions, yDivisions, zDivisions,"
+                       " width, length, height,"
+                       " self.centerAlongX, self.centerAlongY, self.centerAlongZ)")
         elif self.mode == "CIRCLE":
             yield "matrices = self.execute_Circle(amount, radius, segment)"
         elif self.mode == "MESH":
@@ -232,16 +236,14 @@ class DistributeMatricesNode(AnimationNode, bpy.types.Node):
 
     def execute_Linear(self, amount, size):
         if self.directionAxis == "X":
-            self.centerAlongX = self.centerLinear
-            return self.execute_Grid(amount, 1, 1, size, 0, 0)
+            return self.execute_Grid(amount, 1, 1, size, 0, 0, self.centerLinear, False, False)
         elif self.directionAxis == "Y":
-            self.centerAlongY = self.centerLinear
-            return self.execute_Grid(1, amount, 1, 0, size, 0)
+            return self.execute_Grid(1, amount, 1, 0, size, 0, False, self.centerLinear, False)
         else:
-            self.centerAlongZ = self.centerLinear
-            return self.execute_Grid(1, 1, amount, 0, 0, size)
+            return self.execute_Grid(1, 1, amount, 0, 0, size, False, False, self.centerLinear)
 
-    def execute_Grid(self, xDivisions, yDivisions, zDivisions, size1, size2, size3):
+    def execute_Grid(self, xDivisions, yDivisions, zDivisions, size1, size2, size3,
+                     xCenter, yCenter, zCenter):
         cdef:
             int xDiv = limitAmount(xDivisions)
             int yDiv = limitAmount(yDivisions)
@@ -259,9 +261,9 @@ class DistributeMatricesNode(AnimationNode, bpy.types.Node):
             yDis = size2 / max(yDiv - 1, 1)
             zDis = size3 / max(zDiv - 1, 1)
 
-        xOffset = xDis * (xDiv - 1) / 2 * int(self.centerAlongX)
-        yOffset = yDis * (yDiv - 1) / 2 * int(self.centerAlongY)
-        zOffset = zDis * (zDiv - 1) / 2 * int(self.centerAlongZ)
+        xOffset = xDis * (xDiv - 1) / 2 * int(xCenter)
+        yOffset = yDis * (yDiv - 1) / 2 * int(yCenter)
+        zOffset = zDis * (zDiv - 1) / 2 * int(zCenter)
 
         for x in range(xDiv):
             for y in range(yDiv):

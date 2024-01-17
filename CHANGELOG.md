@@ -34,6 +34,7 @@
 - Fixed *Set Keyframe* node failing when path contains a subscript.
 - Fixed symbol not found error on MacOS 10.
 - Fixed Custom Attributes for new API changes.
+- Fixed *Distribute Matrices* node causing superfluous executions.
 
 ### Changed
 
