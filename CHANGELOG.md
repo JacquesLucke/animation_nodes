@@ -35,6 +35,10 @@
 - Fixed symbol not found error on MacOS 10.
 - Fixed Custom Attributes for new API changes.
 - Fixed *Distribute Matrices* node causing superfluous executions.
+- Fixed *Mesh Object Input* node for new API changes.
+- Fixed *Set Vertex Weight* node for new API changes.
+- Fixed *Set Edge Weight* node for new API changes.
+- Fixed *Set Edge Crease* node for new API changes.
 
 ### Changed
 

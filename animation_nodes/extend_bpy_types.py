@@ -95,18 +95,27 @@ class MeshProperties(bpy.types.PropertyGroup):
         return vertexColors
 
     def getEdgeCreases(self):
+        attribute = self.mesh.attributes.get("crease_edge")
+        if not attribute or len(attribute.data) != len(self.mesh.edges):
+            return DoubleList.fromValue(0, length = len(self.mesh.edges))
         edgeCreases = DoubleList(length = len(self.mesh.edges))
-        self.mesh.edges.foreach_get("crease", edgeCreases.asNumpyArray())
+        attribute.data.foreach_get("value", edgeCreases.asNumpyArray())
         return edgeCreases
 
     def getBevelEdgeWeights(self):
+        attribute = self.mesh.attributes.get("bevel_weight_edge")
+        if not attribute or len(attribute.data) != len(self.mesh.edges):
+            return DoubleList.fromValue(0, length = len(self.mesh.edges))
         bevelEdgeWeights = DoubleList(length = len(self.mesh.edges))
-        self.mesh.edges.foreach_get("bevel_weight", bevelEdgeWeights.asNumpyArray())
+        attribute.data.foreach_get("value", bevelEdgeWeights.asNumpyArray())
         return bevelEdgeWeights
 
     def getBevelVertexWeights(self):
+        attribute = self.mesh.attributes.get("bevel_weight_vert")
+        if not attribute or len(attribute.data) != len(self.mesh.vertices):
+            return DoubleList.fromValue(0, length = len(self.mesh.vertices))
         bevelVertexWeights = DoubleList(length = len(self.mesh.vertices))
-        self.mesh.vertices.foreach_get("bevel_weight", bevelVertexWeights.asNumpyArray())
+        attribute.data.foreach_get("value", bevelVertexWeights.asNumpyArray())
         return bevelVertexWeights
 
     def getCustomAttribute(self, name):
