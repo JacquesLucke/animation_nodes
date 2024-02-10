@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import textwrap
+import platform
 import subprocess
 from pprint import pprint
 
@@ -36,8 +37,8 @@ if onLinux: currentOS = "linux"
 elif onWindows: currentOS = "windows"
 elif onMacOS: currentOS = "macOS"
 addonVersion = getAddonVersion(initPath)
-exportName = "{}_v{}_{}_{}_py{}{}".format(
-    addonName, *addonVersion[:2], currentOS, *sys.version_info[:2])
+exportName = "{}_v{}_{}_{}_{}_py{}{}".format(
+    addonName, *addonVersion[:2], currentOS, platform.machine(), *sys.version_info[:2])
 
 exportPath = os.path.join(currentDirectory, exportName + ".zip")
 exportCPath = os.path.join(currentDirectory, "{}_c.zip".format(addonName))
