@@ -1,5 +1,6 @@
 import bpy
 import bmesh
+import numpy
 from bpy.props import *
 from ... utils.layout import writeText
 from ... base_types import AnimationNode
@@ -171,10 +172,12 @@ class MeshObjectOutputNode(AnimationNode, bpy.types.Node):
 
             attributeOut = outMesh.attributes.new(attribute.name, dataType, domain)
 
-            if dataType in ("FLOAT", "INT", "INT32_2D", "BOOLEAN"):
+            if dataType in ("FLOAT", "INT", "INT32_2D"):
                 attributeOut.data.foreach_set("value", data.asMemoryView())
             elif dataType in ("FLOAT2", "FLOAT_VECTOR"):
                 attributeOut.data.foreach_set("vector", data.asMemoryView())
+            elif dataType == "BOOLEAN":
+                attributeOut.data.foreach_set("value", data.asNumpyArray() != 0)
             else:
                 attributeOut.data.foreach_set("color", data.asMemoryView())
 

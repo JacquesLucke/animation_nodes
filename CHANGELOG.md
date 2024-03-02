@@ -39,6 +39,7 @@
 - Fixed *Set Vertex Weight* node for new API changes.
 - Fixed *Set Edge Weight* node for new API changes.
 - Fixed *Set Edge Crease* node for new API changes.
+- Fixed *Mesh Object Output* node for boolean custom attributes.
 
 ### Changed
 
