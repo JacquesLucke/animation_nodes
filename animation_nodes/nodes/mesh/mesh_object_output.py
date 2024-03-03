@@ -177,7 +177,7 @@ class MeshObjectOutputNode(AnimationNode, bpy.types.Node):
             elif dataType in ("FLOAT2", "FLOAT_VECTOR"):
                 attributeOut.data.foreach_set("vector", data.asMemoryView())
             elif dataType == "BOOLEAN":
-                attributeOut.data.foreach_set("value", data.asNumpyArray() != 0)
+                attributeOut.data.foreach_set("value", numpy.not_equal(data.asNumpyArray(), b'\0'))
             else:
                 attributeOut.data.foreach_set("color", data.asMemoryView())
 
