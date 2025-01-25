@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Fixed Sequence sockets for recent API change.
+
 ### Changed
 
 ## 2.3 (25 January 2025)
