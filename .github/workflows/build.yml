@@ -35,7 +35,7 @@ jobs:
       - name: Upload Builds
         uses: actions/upload-artifact@v4
         with:
-          name: Builds
+          name: build-${{ strategy.job-index }}
           path: animation_nodes*.zip
   deploy:
     name: Deploy
@@ -46,7 +46,8 @@ jobs:
       - name: Download Builds
         uses: actions/download-artifact@v4
         with:
-          name: Builds
+          pattern: build-*
+          merge-multiple: true
       - name: Extract Branch Name
         id: extract_branch_name
         run: echo ::set-output name=branch::${GITHUB_REF#refs/heads/}
