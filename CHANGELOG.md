@@ -1,4 +1,4 @@
-## Unreleased
+## 2.3 (25 January 2025)
 
 ### Added
 
