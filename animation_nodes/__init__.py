@@ -23,10 +23,11 @@ bl_info = {
     "name":        "Animation Nodes",
     "description": "Node based visual scripting system designed for motion graphics in Blender.",
     "author":      "Jacques Lucke, Omar Emara",
-    "version":     (2, 3, 0),
-    "blender":     (4, 2, 0),
+    "version":     (2, 4, 0),
+    "blender":     (4, 4, 0),
     "location":    "Animation Nodes Editor",
     "category":    "Node",
+    "warning":     "This version is still in development."
 }
 
 
@@ -90,9 +91,9 @@ if "numpy" not in globals():
 
 
 from . preferences import getBlenderVersion
-if getBlenderVersion() < (4, 2, 0):
+if getBlenderVersion() < (4, 4, 0):
     message = ("\n\n"
-        "The Animation Nodes addon requires at least Blender 4.2.\n"
+        "The Animation Nodes addon requires at least Blender 4.4.\n"
         "Your are using an older version.\n"
         "Please download the latest official release.")
     raise Exception(message)
@@ -129,7 +130,7 @@ if currentPythonVersion[:2] != addonPythonVersion[:2]:
         "You have four options:\n"
         "  1. Download a version of Animation Nodes with a suitable python version.\n"
         "  2. Try to make Blender use another Python version.\n"
-        "     (Blender 4.2 officially uses Python 3.11.x)\n"
+        "     (Blender 4.4 officially uses Python 3.11.x)\n"
         "  3. Compile Animation Nodes yourself using the correct Python version.\n"
         "     (Look in the developer manual for more information)\n"
         "  4. Create an issue on Github and ask if someone can create a build for you."
