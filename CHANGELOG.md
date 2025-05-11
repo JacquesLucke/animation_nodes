@@ -50,6 +50,7 @@
 - Fixed *Set Edge Weight* node for new API changes.
 - Fixed *Set Edge Crease* node for new API changes.
 - Fixed *Mesh Object Output* node for boolean custom attributes.
+- Fixed *3D Viewer* node for matrices due to new API changes.
 
 ### Changed
 

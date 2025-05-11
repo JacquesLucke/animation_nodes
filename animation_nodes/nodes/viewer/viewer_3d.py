@@ -1,6 +1,7 @@
 import os
 import bpy
 from bpy.props import *
+from pathlib import Path
 from ... draw_handler import drawHandler
 from ... base_types import AnimationNode
 from ... tree_info import getNodesByType
@@ -12,7 +13,6 @@ from ... data_structures import Vector3DList, Vector2DList, Matrix4x4List, Splin
 
 import gpu
 from gpu_extras.batch import batch_for_shader
-from ... graphics.import_shader import getShader
 from ... graphics.c_utils import getMatricesVBOandIBO
 
 dataByIdentifier = {}
@@ -101,10 +101,24 @@ class Viewer3DNode(AnimationNode, bpy.types.Node):
         batch.draw(shader)
 
     def drawMatrices(self, matrices):
-        shader = getShader(os.path.join(os.path.dirname(__file__), "matrix_shader.glsl"))
+        vertex_shader_output = gpu.types.GPUStageInterfaceInfo("matrix_viewer_interface")
+        vertex_shader_output.flat("VEC4", "v_Color")
+
+        shader_info = gpu.types.GPUShaderCreateInfo()
+        shader_info.push_constant("INT", "u_Count")
+        shader_info.push_constant("MAT4", "u_ViewProjectionMatrix")
+        shader_info.vertex_in(0, 'VEC3', "position")
+        shader_info.vertex_out(vertex_shader_output)
+        shader_info.fragment_out(0, 'VEC4', "FragColor")
+
+        shader_path = os.path.join(os.path.dirname(__file__), "matrix_vertex_shader.glsl")
+        shader_info.vertex_source(Path(shader_path).read_text())
+        shader_info.fragment_source("void main() { FragColor = v_Color; }")
+
+        shader = gpu.shader.create_from_info(shader_info)
         vbo, ibo = getMatricesVBOandIBO(matrices, self.matrixScale)
         batch = batch_for_shader(shader, 'LINES',
-            {"pos": vbo.asNumpyArray().reshape(-1, 3)},
+            {"position": vbo.asNumpyArray().reshape(-1, 3)},
             indices = ibo.asNumpyArray().reshape(-1, 2))
 
         shader.bind()
