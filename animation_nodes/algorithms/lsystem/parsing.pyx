@@ -119,12 +119,11 @@ cdef parseArguments(str source, Py_ssize_t index, argTypes):
         args = []
         for argString, argType in zip(argStrings, argTypes):
             if len(argString) == 0:
-                value = None
+                args.append(None)
             elif argType == "float":
-                value = float(argString)
+                args.append(float(argString))
             elif argType == "int":
-                value = int(argString)
-            args.append(value)
+                args.append(int(argString))
 
         return args + [None] * (len(argTypes) - len(args)), endBracketIndex - index + 1
     else:
