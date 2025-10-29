@@ -64,7 +64,7 @@ def _pathBelongsToArray(object, dataPath):
 
     try:
         data = eval(f"object{dataPath}")
-        if isinstance(data, str):
+        if any(isinstance(data, ty) for ty in [str, float, int, bool]):
             # Strings have len() but aren't arrays
             return False
         return len(data) > 0
