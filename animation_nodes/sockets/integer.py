@@ -5,10 +5,10 @@ from .. data_structures import LongList
 from .. base_types import AnimationNodeSocket, CListSocket
 from . implicit_conversion import registerImplicitConversion
 
-def getValue(self):
-    return min(max(self.minValue, self.get("value", 0)), self.maxValue)
-def setValue(self, value):
-    self["value"] = min(max(self.minValue, value), self.maxValue)
+def getValue(self, value, is_set):
+    return min(max(self.minValue, value), self.maxValue)
+def setValue(self, value, old_value, is_set):
+    return min(max(self.minValue, value), self.maxValue)
 
 class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     bl_idname = "an_IntegerSocket"
@@ -19,7 +19,7 @@ class IntegerSocket(bpy.types.NodeSocket, AnimationNodeSocket):
     storable = True
 
     value: IntProperty(default = 0,
-        set = setValue, get = getValue,
+        set_transform = setValue, get_transform = getValue,
         update = propertyChanged)
 
     minValue: IntProperty(default = -2**31)
