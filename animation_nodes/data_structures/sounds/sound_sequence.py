@@ -50,6 +50,6 @@ def getSoundData(sound):
 def findSceneWithSequence(sequence):
     for scene in bpy.data.scenes:
          if scene.sequence_editor is not None:
-            for strip in scene.sequence_editor.sequences_all:
+            for strip in scene.sequence_editor.strips_all:
                 if strip == sequence:
                     return scene
