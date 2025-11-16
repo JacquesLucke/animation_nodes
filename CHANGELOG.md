@@ -2,6 +2,8 @@
 
 ### Added
 
+- Added support for non-list types in *Object Data Path Output* node.
+
 ### Fixed
 
 - Fixed Sequence sockets for recent API change.
