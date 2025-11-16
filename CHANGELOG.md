@@ -5,6 +5,8 @@
 ### Fixed
 
 - Fixed Sequence sockets for recent API change.
+- Fixed some numerical inputs were not saved or loaded correctly.
+- Fixed audio sequences not working.
 
 ### Changed
 
