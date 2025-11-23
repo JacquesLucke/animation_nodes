@@ -64,8 +64,8 @@ def _pathBelongsToArray(object, dataPath):
 
     try:
         data = eval(f"object{dataPath}")
-        if isinstance(data, str):
-            # Strings have len() but aren't arrays
+        if isinstance(data, (str, float, int, bool)):
+            # Strings and scalars shuldn't be indexed
             return False
         return len(data) > 0
     except:
