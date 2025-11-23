@@ -47,7 +47,7 @@ def frameChanged(scene, depsgraph):
 @eventHandler("RENDER_PRE")
 def renderPre(scene):
     if not scene.render.use_sequencer or scene.sequence_editor is None: return
-    for sequence in scene.sequence_editor.sequences_all:
+    for sequence in scene.sequence_editor.strips_all:
         if sequence.type != "SCENE": continue
         if sequence.frame_final_start <= scene.frame_current <= sequence.frame_final_end: return
 

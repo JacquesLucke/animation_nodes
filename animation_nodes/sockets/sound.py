@@ -12,7 +12,7 @@ def getSoundSequenceItems(self, context):
     items = []
     for scene in bpy.data.scenes:
         if scene.sequence_editor is not None:
-            for strip in scene.sequence_editor.sequences_all:
+            for strip in scene.sequence_editor.strips_all:
                 if strip.type == "SOUND":
                     items.append((strip.name, strip.name, "", strToEnumItemID(strip.name)))
     items.append(("NONE", "Empty Sound", "", 0))
@@ -38,7 +38,7 @@ class SoundSocket(bpy.types.NodeSocket, AnimationNodeSocket):
         if self.soundSequence == "NONE" or self.soundSequence == "": return Sound([])
         for scene in bpy.data.scenes:
             if scene.sequence_editor is not None:
-                sequence = scene.sequence_editor.sequences_all.get(self.soundSequence)
+                sequence = scene.sequence_editor.strips_all.get(self.soundSequence)
                 if sequence is not None:
                     soundSequence = SoundSequence.fromSequence(sequence)
                     return Sound([soundSequence]) if soundSequence is not None else Sound([])
