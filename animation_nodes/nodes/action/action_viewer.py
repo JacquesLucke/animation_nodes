@@ -1,6 +1,7 @@
 import bpy
 from ... base_types import AnimationNode, NodeUIExtension
 from ... graphics.rectangle import Rectangle
+from ... utils.fcurve import getFCurveDataPath
 
 a = None
 
