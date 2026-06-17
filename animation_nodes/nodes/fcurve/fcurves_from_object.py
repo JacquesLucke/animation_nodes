@@ -11,4 +11,4 @@ class FCurvesFromObjectNode(AnimationNode, bpy.types.Node):
 
     def execute(self, object):
         try: return list(object.animation_data.action.fcurves)
-        except: return []
+        except AttributeError: return []
