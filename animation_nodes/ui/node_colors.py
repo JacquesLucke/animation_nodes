@@ -70,8 +70,33 @@ def drawNodeColorPanel(self, context):
 # Register
 ##################################
 
+PANEL_CANDIDATES = (
+    "NODE_PT_active_node_color",
+    "NODE_PT_active_node",
+    "NODE_PT_node_color",
+    "NODE_PT_node",
+)
+
+
+def _get_node_color_panel():
+    for name in PANEL_CANDIDATES:
+        panel = getattr(bpy.types, name, None)
+        if panel is not None:
+            return panel
+    return None
+
+
 def register():
-    bpy.types.NODE_PT_active_node_color.append(drawNodeColorPanel)
+    panel = _get_node_color_panel()
+    if panel is not None:
+        panel.append(drawNodeColorPanel)
+    else:
+        print("animation_nodes: UI panel for active node color not found; skip register")
+
 
 def unregister():
-    bpy.types.NODE_PT_active_node_color.remove(drawNodeColorPanel)
+    panel = _get_node_color_panel()
+    if panel is not None:
+        panel.remove(drawNodeColorPanel)
+    else:
+        print("animation_nodes: UI panel for active node color not found; skip unregister")
