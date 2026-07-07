@@ -71,7 +71,7 @@ def drawNodeColorPanel(self, context):
 ##################################
 
 def register():
-    bpy.types.NODE_PT_active_node_color.append(drawNodeColorPanel)
+    bpy.types.NODE_PT_active_node_generic.append(drawNodeColorPanel)
 
 def unregister():
-    bpy.types.NODE_PT_active_node_color.remove(drawNodeColorPanel)
+    bpy.types.NODE_PT_active_node_generic.remove(drawNodeColorPanel)
