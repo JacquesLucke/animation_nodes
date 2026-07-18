@@ -67,7 +67,7 @@ class ObjectAttributeOutputNode(AnimationNode, bpy.types.Node):
         yield "    if object: self.setErrorMessage('Index not found')"
         yield "except (ValueError, TypeError):"
         yield "    if object: self.setErrorMessage('Value has a wrong type')"
-        yield "except:"
+        yield "except Exception:"
         yield "    if object:"
         yield "        self.setErrorMessage('Unknown error')"
 
@@ -84,4 +84,4 @@ class ObjectAttributeOutputNode(AnimationNode, bpy.types.Node):
         else:
             yield "if object is not None:"
         yield "    try: object.keyframe_insert({})".format(repr(self.attribute))
-        yield "    except: pass"
+        yield "    except Exception: pass"
