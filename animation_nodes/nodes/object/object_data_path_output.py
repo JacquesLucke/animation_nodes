@@ -28,7 +28,7 @@ class ObjectDataPathOutputNode(AnimationNode, bpy.types.Node):
 
         try:
             setAttributeFunction(object, arrayIndex, value)
-        except:
+        except Exception:
             self.setErrorMessage("Error")
         return object
 
@@ -37,7 +37,7 @@ class ObjectDataPathOutputNode(AnimationNode, bpy.types.Node):
             propPath, propName = path.rsplit(".", 1)
             try:
                 dataPath = object.path_resolve(propPath)
-            except:
+            except Exception:
                 dataPath = object
         else:
             dataPath = object
@@ -47,10 +47,10 @@ class ObjectDataPathOutputNode(AnimationNode, bpy.types.Node):
     def getBakeCode(self):
         yield "if object is not None:"
         yield "    try: object.keyframe_insert(path, index = arrayIndex)"
-        yield "    except:"
+        yield "    except Exception:"
         yield "        dataPath, propName = self.getPropertyPath(object, path)"
         yield "        try: dataPath.keyframe_insert(propName, index = arrayIndex)"
-        yield "        except: pass"
+        yield "        except Exception: pass"
 
     def clearCache(self):
         cache.clear()
